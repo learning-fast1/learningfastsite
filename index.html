@@ -3,17 +3,111 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Learning Fast – Εκπαιδευτική πλατφόρμα για παιδιά με παιχνίδια, βιβλία και υλικό για κάθε τάξη." />
   <title>Learning Fast – Αρχική</title>
+  <link rel="stylesheet" href="styles/main.css" />
 </head>
 <body>
-  <h1>Learning Fast</h1>
-  <nav>
-    <ul>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav class="navbar">
+      <div class="navbar__logo">Learning<span>Fast</span></div>
+      <ul class="navbar__links">
+        <li><a href="index.html" class="active">Αρχική</a></li>
+        <li><a href="taxeis/index.html">Τάξεις</a></li>
+        <li><a href="eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a></li>
+        <li><a href="ekpaideftika-paixnidia/index.html">Παιχνίδια</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+      <span class="hero__badge">🎓 Εκπαίδευση για όλους</span>
+      <h1 class="hero__title">
+        Μάθηση που <span>εμπνέει</span><br>κάθε παιδί
+      </h1>
+      <p class="hero__subtitle">
+        Βιβλία, παιχνίδια και υλικό για κάθε τάξη —
+        σχεδιασμένα να κάνουν τη μάθηση διασκεδαστική και αποτελεσματική.
+      </p>
+      <div class="hero__actions">
+        <a href="ekpaideftika-paixnidia/index.html" class="btn btn--primary">🎮 Ξεκίνα τα παιχνίδια</a>
+        <a href="taxeis/index.html" class="btn btn--outline">📚 Δες τις τάξεις</a>
+      </div>
+    </section>
+
+    <!-- ===== EDUCATIONAL BOOKS ===== -->
+    <section class="books">
+      <div class="section__header">
+        <span class="section__label">Βιβλιοθήκη</span>
+        <h2 class="section__title">Εκπαιδευτικά Βιβλία</h2>
+        <p class="section__subtitle">Επίλεξε βιβλίο ανάλογα με την τάξη ή το αντικείμενο</p>
+      </div>
+
+      <div class="books__grid">
+
+        <div class="book-card">
+          <div class="book-card__cover cover--blue">📐</div>
+          <div class="book-card__title">Μαθηματικά Α΄ Δημοτικού</div>
+          <div class="book-card__meta">Α΄ Τάξη</div>
+          <span class="book-card__tag">Μαθηματικά</span>
+        </div>
+
+        <div class="book-card">
+          <div class="book-card__cover cover--green">📖</div>
+          <div class="book-card__title">Γλώσσα Β΄ Δημοτικού</div>
+          <div class="book-card__meta">Β΄ Τάξη</div>
+          <span class="book-card__tag">Γλώσσα</span>
+        </div>
+
+        <div class="book-card">
+          <div class="book-card__cover cover--orange">🌍</div>
+          <div class="book-card__title">Μελέτη Περιβάλλοντος</div>
+          <div class="book-card__meta">Γ΄ Τάξη</div>
+          <span class="book-card__tag">Περιβάλλον</span>
+        </div>
+
+        <div class="book-card">
+          <div class="book-card__cover cover--purple">✏️</div>
+          <div class="book-card__title">Ορθογραφία & Γραμματική</div>
+          <div class="book-card__meta">Δ΄ Τάξη</div>
+          <span class="book-card__tag">Γλώσσα</span>
+        </div>
+
+        <div class="book-card">
+          <div class="book-card__cover cover--red">🔢</div>
+          <div class="book-card__title">Αριθμοί & Πράξεις</div>
+          <div class="book-card__meta">Ε΄ Τάξη</div>
+          <span class="book-card__tag">Μαθηματικά</span>
+        </div>
+
+        <div class="book-card">
+          <div class="book-card__cover cover--teal">🧠</div>
+          <div class="book-card__title">Ειδική Αγωγή</div>
+          <div class="book-card__meta">Όλες οι τάξεις</div>
+          <span class="book-card__tag">Ειδική Εκπαίδευση</span>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer__logo">Learning<span>Fast</span></div>
+    <ul class="footer__links">
       <li><a href="index.html">Αρχική</a></li>
       <li><a href="taxeis/index.html">Τάξεις</a></li>
       <li><a href="eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a></li>
-      <li><a href="ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a></li>
+      <li><a href="ekpaideftika-paixnidia/index.html">Παιχνίδια</a></li>
     </ul>
-  </nav>
+    <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
+
 </body>
 </html>
