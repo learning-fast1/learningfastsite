@@ -36,6 +36,12 @@
       background: linear-gradient(135deg,#4f6ef7,#7c9aff);
     }
     .game-card__title { font-size: 1.1rem; font-weight: 800; color: var(--text); }
+    .game-card__preview {
+      width: 100%;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 4px 14px rgba(0,0,0,.12);
+    }
     .game-card__desc { font-size: .83rem; color: var(--muted); line-height: 1.5; }
     .game-card__btn {
       padding: .5rem 1.5rem;
@@ -76,9 +82,8 @@
       <div class="games-grid">
 
         <a href="https://learning-fast1.github.io/orthografia-game/" class="game-card" target="_blank">
-          <div class="game-card__icon">🔤</div>
-          <div class="game-card__title">Παιχνίδι Ορθογραφίας</div>
-          <p class="game-card__desc">Βρες τη σωστή κατάληξη και γράψε σωστά τις λέξεις!</p>
+          <img src="../../../../assets/images/orthografia-game-preview.png" alt="Παιχνίδι Ορθογραφίας" class="game-card__preview" />
+          <div class="game-card__title">Καταλήξεις -ι, -η, -ει, -οι, -ο, -ω</div>
           <span class="game-card__btn">Παίξε →</span>
         </a>
 
