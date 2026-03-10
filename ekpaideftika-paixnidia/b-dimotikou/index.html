@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Εκπαιδευτικά παιχνίδια για Β' Δημοτικού – Learning Fast" />
+  <title>Β΄ Δημοτικού – Εκπαιδευτικά Παιχνίδια – Learning Fast</title>
+  <link rel="stylesheet" href="../../styles/main.css" />
+  <style>
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1.8rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .game-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .8rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: transform var(--transition), box-shadow var(--transition);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .game-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 36px rgba(34,197,94,.2);
+    }
+
+    .game-card__icon {
+      font-size: 3rem;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg,#22c55e,#86efac);
+    }
+
+    .game-card__title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .game-card__desc {
+      font-size: .85rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .game-card__play {
+      margin-top: .4rem;
+      padding: .5rem 1.4rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg,#22c55e,#86efac);
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    .breadcrumb {
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .breadcrumb a { color: var(--primary); font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav class="navbar">
+      <ul class="navbar__links">
+        <li><a href="../../index.html">Αρχική</a></li>
+        <li><a href="../../taxeis/index.html">Τάξεις</a></li>
+        <li><a href="../../eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a></li>
+        <li><a href="../index.html" class="active">Εκπαιδευτικά Παιχνίδια</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <div class="section__header">
+        <p class="breadcrumb">
+          <a href="../index.html">← Εκπαιδευτικά Παιχνίδια</a>
+        </p>
+        <span class="section__label">🚀 Β΄ Δημοτικού</span>
+        <h1 class="section__title">Παιχνίδια για Β΄ Δημοτικού</h1>
+        <p class="section__subtitle">Ανέβα επίπεδο και εξελίξου στη μάθηση!</p>
+      </div>
+
+      <div class="games-grid">
+
+        <div class="game-card">
+          <div class="game-card__icon">✏️</div>
+          <div class="game-card__title">Ορθογραφία &amp; Γραμματική</div>
+          <p class="game-card__desc">Εξάσκηση στη σωστή γραφή λέξεων και βασικούς γραμματικούς κανόνες.</p>
+          <span class="game-card__play">Παίξε →</span>
+        </div>
+
+        <div class="game-card">
+          <div class="game-card__icon">➖</div>
+          <div class="game-card__title">Αφαίρεση</div>
+          <p class="game-card__desc">Μάθε την αφαίρεση με διασκεδαστικές ασκήσεις και γρήγορες προκλήσεις.</p>
+          <span class="game-card__play">Παίξε →</span>
+        </div>
+
+        <div class="game-card">
+          <div class="game-card__icon">📚</div>
+          <div class="game-card__title">Κατανόηση Κειμένου</div>
+          <p class="game-card__desc">Διάβασε μικρά κείμενα και απάντα σε ερωτήσεις κατανόησης.</p>
+          <span class="game-card__play">Παίξε →</span>
+        </div>
+
+        <div class="game-card">
+          <div class="game-card__icon">🕐</div>
+          <div class="game-card__title">Ώρα &amp; Ημερολόγιο</div>
+          <p class="game-card__desc">Μάθε να διαβάζεις την ώρα και να χρησιμοποιείς το ημερολόγιο.</p>
+          <span class="game-card__play">Παίξε →</span>
+        </div>
+
+        <div class="game-card">
+          <div class="game-card__icon">🗺️</div>
+          <div class="game-card__title">Γεωγραφία &amp; Περιβάλλον</div>
+          <p class="game-card__desc">Ανακάλυψε τον κόσμο γύρω σου και τη φύση με διαδραστικά παιχνίδια.</p>
+          <span class="game-card__play">Παίξε →</span>
+        </div>
+
+        <div class="game-card">
+          <div class="game-card__icon">🧩</div>
+          <div class="game-card__title">Λογική &amp; Παζλ</div>
+          <p class="game-card__desc">Αναπτύξτε τη λογική σκέψη με παζλ και γρίφους κατάλληλους για Β' τάξη.</p>
+          <span class="game-card__play">Παίξε →</span>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__logo"><img src="../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
+    <ul class="footer__links">
+      <li><a href="../../index.html">Αρχική</a></li>
+      <li><a href="../../taxeis/index.html">Τάξεις</a></li>
+      <li><a href="../index.html">Εκπαιδευτικά Παιχνίδια</a></li>
+    </ul>
+    <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
+
+</body>
+</html>
