@@ -7,75 +7,59 @@
   <title>Γ΄ Δημοτικού – Εκπαιδευτικά Παιχνίδια – Learning Fast</title>
   <link rel="stylesheet" href="../../styles/main.css" />
   <style>
-    .games-grid {
+    .subjects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 1.8rem;
-      max-width: 1100px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+      max-width: 700px;
       margin: 0 auto;
     }
-
-    .game-card {
+    .subject-card {
       background: var(--surface);
       border-radius: var(--radius);
-      padding: 2rem 1.5rem;
+      padding: 2.5rem 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: .8rem;
+      gap: 1rem;
       text-align: center;
       box-shadow: var(--shadow);
       transition: transform var(--transition), box-shadow var(--transition);
       text-decoration: none;
       color: inherit;
     }
-
-    .game-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 36px rgba(249,115,22,.2);
+    .subject-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 14px 40px rgba(79,110,247,.22);
     }
-
-    .game-card__icon {
-      font-size: 3rem;
-      width: 80px; height: 80px;
+    .subject-card__icon {
+      font-size: 3.2rem;
+      width: 90px; height: 90px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg,#f97316,#fdba74);
     }
-
-    .game-card__title {
-      font-size: 1rem;
-      font-weight: 700;
+    .subject-card__title {
+      font-size: 1.4rem;
+      font-weight: 800;
       color: var(--text);
     }
-
-    .game-card__desc {
-      font-size: .85rem;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .game-card__play {
-      margin-top: .4rem;
-      padding: .5rem 1.4rem;
+    .subject-card__btn {
+      padding: .6rem 1.8rem;
       border-radius: 999px;
-      background: linear-gradient(135deg,#f97316,#fdba74);
       color: #fff;
-      font-size: .82rem;
+      font-size: .88rem;
       font-weight: 700;
     }
-
-    .breadcrumb {
-      font-size: .85rem;
-      color: var(--muted);
-      margin-bottom: 1rem;
-    }
-    .breadcrumb a { color: var(--primary); font-weight: 600; }
-    .breadcrumb a:hover { text-decoration: underline; }
+    .card--glossa .subject-card__icon { background: linear-gradient(135deg,#4f6ef7,#7c9aff); }
+    .card--glossa .subject-card__btn  { background: linear-gradient(135deg,#4f6ef7,#7c9aff); }
+    .card--math   .subject-card__icon { background: linear-gradient(135deg,#f97316,#fdba74); }
+    .card--math   .subject-card__btn  { background: linear-gradient(135deg,#f97316,#fdba74); }
+    .breadcrumb { font-size:.85rem; color:var(--muted); margin-bottom:1rem; }
+    .breadcrumb a { color:var(--primary); font-weight:600; }
+    .breadcrumb a:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
-
   <header>
     <nav class="navbar">
       <ul class="navbar__links">
@@ -86,75 +70,35 @@
       </ul>
     </nav>
   </header>
-
   <main>
     <section>
       <div class="section__header">
-        <p class="breadcrumb">
-          <a href="../index.html">← Εκπαιδευτικά Παιχνίδια</a>
-        </p>
+        <p class="breadcrumb"><a href="../index.html">← Εκπαιδευτικά Παιχνίδια</a></p>
         <span class="section__label">🧠 Γ΄ Δημοτικού</span>
         <h1 class="section__title">Παιχνίδια για Γ΄ Δημοτικού</h1>
-        <p class="section__subtitle">Πιο απαιτητικές προκλήσεις για έξυπνα μυαλά!</p>
+        <p class="section__subtitle">Επίλεξε μάθημα και ξεκίνα!</p>
       </div>
-
-      <div class="games-grid">
-
-        <div class="game-card">
-          <div class="game-card__icon">✖️</div>
-          <div class="game-card__title">Πολλαπλασιασμός</div>
-          <p class="game-card__desc">Εξάσκηση στα πτυχία πολλαπλασιασμού με διασκεδαστικές προκλήσεις ταχύτητας.</p>
-          <span class="game-card__play">Παίξε →</span>
-        </div>
-
-        <div class="game-card">
-          <div class="game-card__icon">📝</div>
-          <div class="game-card__title">Έκθεση &amp; Σύνθεση</div>
-          <p class="game-card__desc">Δημιούργησε προτάσεις και μικρά κείμενα με καθοδήγηση βήμα-βήμα.</p>
-          <span class="game-card__play">Παίξε →</span>
-        </div>
-
-        <div class="game-card">
-          <div class="game-card__icon">🔬</div>
-          <div class="game-card__title">Φυσικές Επιστήμες</div>
-          <p class="game-card__desc">Ανακάλυψε τον κόσμο της φύσης, τα ζώα, τα φυτά και τα φαινόμενα.</p>
-          <span class="game-card__play">Παίξε →</span>
-        </div>
-
-        <div class="game-card">
-          <div class="game-card__icon">🌍</div>
-          <div class="game-card__title">Γεωγραφία Ελλάδας</div>
-          <p class="game-card__desc">Μάθε τους νομούς, τα νησιά και τις πόλεις της Ελλάδας με χάρτες.</p>
-          <span class="game-card__play">Παίξε →</span>
-        </div>
-
-        <div class="game-card">
-          <div class="game-card__icon">📐</div>
-          <div class="game-card__title">Γεωμετρία</div>
-          <p class="game-card__desc">Σχήματα, γωνίες, περίμετρος και εμβαδόν — παιχνίδια για μικρούς μαθηματικούς.</p>
-          <span class="game-card__play">Παίξε →</span>
-        </div>
-
-        <div class="game-card">
-          <div class="game-card__icon">🏛️</div>
-          <div class="game-card__title">Ιστορία</div>
-          <p class="game-card__desc">Ταξίδι στην αρχαία Ελλάδα και τους σπουδαίους μύθους της με κουίζ.</p>
-          <span class="game-card__play">Παίξε →</span>
-        </div>
-
+      <div class="subjects-grid">
+        <a href="glossa/index.html" class="subject-card card--glossa">
+          <div class="subject-card__icon">📖</div>
+          <div class="subject-card__title">Γλώσσα</div>
+          <span class="subject-card__btn">Παίξε →</span>
+        </a>
+        <a href="mathimatika/index.html" class="subject-card card--math">
+          <div class="subject-card__icon">🔢</div>
+          <div class="subject-card__title">Μαθηματικά</div>
+          <span class="subject-card__btn">Παίξε →</span>
+        </a>
       </div>
     </section>
   </main>
-
   <footer class="footer">
     <div class="footer__logo"><img src="../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
     <ul class="footer__links">
       <li><a href="../../index.html">Αρχική</a></li>
-      <li><a href="../../taxeis/index.html">Τάξεις</a></li>
       <li><a href="../index.html">Εκπαιδευτικά Παιχνίδια</a></li>
     </ul>
     <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
   </footer>
-
 </body>
 </html>
