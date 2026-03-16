@@ -119,11 +119,10 @@ a {
   justify-content: center;
   text-align: center;
   padding: 6rem 1.5rem 5.5rem;
-  background: linear-gradient(135deg,
-      #3b82f6 0%,
-      #8b5cf6 50%,
-      #ec4899 100%);
-  background-size: 300% 300%;
+  background: 
+    linear-gradient(90deg, rgba(251, 207, 232, 0.95) 0%, rgba(251, 207, 232, 0) 18%, rgba(251, 207, 232, 0) 82%, rgba(251, 207, 232, 0.95) 100%),
+    linear-gradient(135deg, #8b5cf6 0%, #d8b4fe 50%, #8b5cf6 100%);
+  background-size: 100% 100%, 300% 300%;
   animation: heroGradientShift 8s ease infinite;
   position: relative;
   overflow: hidden;
@@ -157,7 +156,7 @@ a {
 .hero::before {
   width: 420px;
   height: 420px;
-  background: radial-gradient(circle, #fcd34d, #ec4899);
+  background: radial-gradient(circle, #fce7f3, #d8b4fe);
   top: -120px;
   left: -120px;
   animation: blobFloat1 7s ease-in-out infinite;
@@ -166,7 +165,7 @@ a {
 .hero::after {
   width: 350px;
   height: 350px;
-  background: radial-gradient(circle, #38bdf8, #34d399);
+  background: radial-gradient(circle, #c084fc, #fbcfe8);
   bottom: -100px;
   right: -100px;
   animation: blobFloat2 9s ease-in-out infinite;
@@ -482,10 +481,18 @@ section {
   background: var(--surface);
   border-radius: var(--radius);
   padding: 1.8rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Enhanced shadow for overlap */
   border: 1px solid rgba(0, 0, 0, 0.03);
   position: sticky;
   top: 90px;
+  margin-top: -140px; /* Pull it up over the hero section */
+  z-index: 10;
+}
+
+@media (max-width: 960px) {
+  .sidebar {
+    margin-top: 0;
+  }
 }
 
 .sidebar__title {
