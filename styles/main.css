@@ -28,7 +28,8 @@
 
 html {
   scroll-behavior: smooth;
-  background-color: #e2e8f0;
+  background-color: #e0f2fe; /* Very soft light blue */
+  overflow-x: hidden; /* Prevents scrollbars from edge-placed elements */
 }
 
 body {
@@ -39,17 +40,15 @@ body {
   display: flex;
   flex-direction: column;
   margin: 0 auto;
-  max-width: 1400px;
-  /* Limits the max width, creating margins on large screens */
-  width: calc(100% - 20vw);
-  /* Responsive margins (~10vw each side) */
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+  max-width: 1300px;
+  width: calc(100% - 620px); /* 310px margins to guarantee space for outer sidebar */
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.05); /* Softer shadow */
+  position: relative; /* Crucial for absolute sidebar */
 }
 
-@media (min-width: 1600px) {
+@media (max-width: 1440px) {
   body {
-    width: calc(100% - 20cm);
-    /* Approx 10cm margins on very large screens */
+    width: calc(100% - 40px); /* Normal narrow margins for 1440p laptops and below */
   }
 }
 
@@ -429,12 +428,19 @@ section {
 /* ========== CONTENT WRAPPER & GRID ========== */
 .content-wrapper {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr; /* Defaults to 1 col because sidebar is OUTSIDE */
   gap: 2.5rem;
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 2.5rem 5rem;
   align-items: start;
+}
+
+@media (max-width: 1440px) and (min-width: 961px) {
+  .content-wrapper {
+    /* When sidebar moves inside on laptops, we put it back in the grid layout! */
+    grid-template-columns: 1fr 300px;
+  }
 }
 
 @media (max-width: 960px) {
@@ -481,16 +487,32 @@ section {
   background: var(--surface);
   border-radius: var(--radius);
   padding: 1.8rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Enhanced shadow for overlap */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05); /* Softer elegant shadow */
   border: 1px solid rgba(0, 0, 0, 0.03);
-  position: sticky;
-  top: 90px;
-  margin-top: -140px; /* Pull it up over the hero section */
+  
+  /* POSITION: Outside in the margin */
+  position: absolute;
+  top: 100px; /* Starts high up, near the hero top */
+  left: calc(100% + 25px); /* In the light blue margin */
+  width: 270px;
   z-index: 10;
+  margin-top: 0;
+}
+
+@media (max-width: 1440px) {
+  .sidebar {
+    /* Moves back inside the body card for < 1440 screens */
+    position: sticky;
+    top: 90px;
+    left: auto;
+    width: 100%;
+    margin-top: -120px; /* Overlap hero again, as before */
+  }
 }
 
 @media (max-width: 960px) {
   .sidebar {
+    position: static;
     margin-top: 0;
   }
 }
