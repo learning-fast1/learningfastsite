@@ -28,34 +28,60 @@
 
 html {
   scroll-behavior: smooth;
-  background-color: #e0f2fe; /* Very soft light blue */
-  overflow-x: hidden; /* Prevents scrollbars from edge-placed elements */
+  background-color: #e0f2fe; /* Soft light blue everywhere */
 }
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
-  max-width: 1300px;
-  width: calc(100% - 620px); /* 310px margins to guarantee space for outer sidebar */
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.05); /* Softer shadow */
-  position: relative; /* Crucial for absolute sidebar */
 }
 
-@media (max-width: 1440px) {
-  body {
-    width: calc(100% - 40px); /* Normal narrow margins for 1440p laptops and below */
+/* ========== NEW LAYOUT STRUCTURE ========== */
+.layout-wrapper {
+  display: flex;
+  max-width: 1540px;
+  margin: 0 auto;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 2rem;
+  width: 100%;
+}
+
+.center-card {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
+  overflow: hidden; /* Contains header and hero nicely */
+}
+
+/* The right sidebar wrapper */
+.right-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 2rem;
+}
+
+@media (max-width: 1100px) {
+  .layout-wrapper {
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+  .right-sidebar {
+    width: 100%;
+    position: static;
   }
 }
 
-@media (max-width: 900px) {
-  body {
-    width: 100%;
-    margin: 0;
+@media (max-width: 600px) {
+  .layout-wrapper {
+    padding: 1rem;
   }
 }
 
@@ -427,25 +453,11 @@ section {
 
 /* ========== CONTENT WRAPPER & GRID ========== */
 .content-wrapper {
-  display: grid;
-  grid-template-columns: 1fr; /* Defaults to 1 col because sidebar is OUTSIDE */
-  gap: 2.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 2.5rem 5rem;
-  align-items: start;
-}
-
-@media (max-width: 1440px) and (min-width: 961px) {
-  .content-wrapper {
-    /* When sidebar moves inside on laptops, we put it back in the grid layout! */
-    grid-template-columns: 1fr 300px;
-  }
+  padding: 2.5rem 2.5rem 5rem;
 }
 
 @media (max-width: 960px) {
   .content-wrapper {
-    grid-template-columns: 1fr;
     padding: 2rem 1.5rem 4rem;
   }
 }
@@ -487,34 +499,8 @@ section {
   background: var(--surface);
   border-radius: var(--radius);
   padding: 1.8rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05); /* Softer elegant shadow */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.03);
-  
-  /* POSITION: Outside in the margin */
-  position: absolute;
-  top: 100px; /* Starts high up, near the hero top */
-  left: calc(100% + 25px); /* In the light blue margin */
-  width: 270px;
-  z-index: 10;
-  margin-top: 0;
-}
-
-@media (max-width: 1440px) {
-  .sidebar {
-    /* Moves back inside the body card for < 1440 screens */
-    position: sticky;
-    top: 90px;
-    left: auto;
-    width: 100%;
-    margin-top: -120px; /* Overlap hero again, as before */
-  }
-}
-
-@media (max-width: 960px) {
-  .sidebar {
-    position: static;
-    margin-top: 0;
-  }
 }
 
 .sidebar__title {
@@ -643,7 +629,7 @@ section {
 /* ========== FOOTER ========== */
 .footer {
   margin-top: auto;
-  background: var(--text);
+  background: #0f172a;
   color: rgba(255, 255, 255, .7);
   padding: 2.5rem 2.5rem;
   display: flex;
