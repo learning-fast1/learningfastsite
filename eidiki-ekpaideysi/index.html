@@ -6,46 +6,76 @@
   <title>Ειδική Εκπαίδευση – Learning Fast</title>
   <link rel="stylesheet" href="../styles/main.css" />
   <style>
-    .empty-state {
-      text-align: center;
-      padding: 5rem 2rem;
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .cat-card {
       background: var(--surface);
       border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      text-align: center;
       box-shadow: var(--shadow);
-      max-width: 600px;
-      margin: 4rem auto;
-      border: 1px solid rgba(0,0,0,0.03);
+      transition: transform var(--transition), box-shadow var(--transition);
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
     }
-    .empty-state__icon {
-      font-size: 4.5rem;
-      margin-bottom: 1rem;
+
+    .cat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 36px rgba(79,110,247,.22);
     }
-    .empty-state__title {
-      font-size: 1.8rem;
-      color: var(--text);
-      margin-bottom: 0.5rem;
+
+    .cat-card__icon {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      margin-bottom: .5rem;
+    }
+
+    .cat-card__title {
+      font-size: 1.25rem;
       font-weight: 800;
+      color: var(--text);
     }
-    .empty-state__text {
+
+    .cat-card__sub {
+      font-size: .92rem;
       color: var(--muted);
-      margin-bottom: 2rem;
-      font-size: 1.1rem;
       line-height: 1.6;
     }
-    .back-btn {
+
+    .cat-card__btn {
+      margin-top: .5rem;
       display: inline-block;
-      padding: 0.8rem 1.8rem;
-      background: var(--primary);
-      color: #fff;
+      padding: .6rem 1.6rem;
       border-radius: 999px;
-      text-decoration: none;
+      font-size: .88rem;
       font-weight: 700;
-      transition: background var(--transition), transform var(--transition);
+      color: #fff;
+      transition: transform var(--transition);
     }
-    .back-btn:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-    }
+
+    .cat-card:hover .cat-card__btn { transform: scale(1.05); }
+
+    .cat--1 .cat-card__icon { background: linear-gradient(135deg,#4f6ef7,#7c9aff); }
+    .cat--1 .cat-card__btn  { background: linear-gradient(135deg,#4f6ef7,#7c9aff); }
+
+    .cat--2 .cat-card__icon { background: linear-gradient(135deg,#22c55e,#86efac); }
+    .cat--2 .cat-card__btn  { background: linear-gradient(135deg,#22c55e,#86efac); }
   </style>
 </head>
 <body>
@@ -55,31 +85,50 @@
         <li><a href="../index.html">Αρχική</a></li>
         <li><a href="../taxeis/index.html">Τάξεις</a></li>
         <li><a href="index.html" class="active">Ειδική Εκπαίδευση</a></li>
-        
         <li><a href="../glossa/index.html">Γλώσσα</a></li>
         <li><a href="../mathimatika/index.html">Μαθηματικά</a></li>
         <li><a href="../ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a></li>
       </ul>
     </nav>
   </header>
+
   <main>
-    <div class="empty-state">
-      <div class="empty-state__icon">🚧</div>
-      <h2 class="empty-state__title">Η κατηγορία είναι άδεια</h2>
-      <p class="empty-state__text">Προς το παρόν δεν υπάρχει διαθέσιμο υλικό στην Ειδική Εκπαίδευση. Σύντομα θα προσθέσουμε νέο περιεχόμενο!</p>
-      <a href="../index.html" class="back-btn">← Επιστροφή στην Αρχική</a>
-    </div>
+    <section>
+      <div class="section__header">
+        <span class="section__label">🌟 Ειδική Εκπαίδευση</span>
+        <h1 class="section__title">Ειδική Εκπαίδευση</h1>
+        <p class="section__subtitle">Επίλεξε κατηγορία και ξεκίνα!</p>
+      </div>
+
+      <div class="categories-grid">
+
+        <a href="kategories-taxinomisi/index.html" class="cat-card cat--1">
+          <div class="cat-card__icon">🗂️</div>
+          <div class="cat-card__title">Κατηγορίες - Ταξινόμηση</div>
+          <p class="cat-card__sub">Μάθε να ομαδοποιείς και να ταξινομείς αντικείμενα και έννοιες.</p>
+          <span class="cat-card__btn">Εξερεύνησε →</span>
+        </a>
+
+        <a href="leitourgikos-logos/index.html" class="cat-card cat--2">
+          <div class="cat-card__icon">💬</div>
+          <div class="cat-card__title">Λειτουργικός λόγος</div>
+          <p class="cat-card__sub">Ανάπτυξη επικοινωνιακών δεξιοτήτων και λειτουργικής χρήσης της γλώσσας.</p>
+          <span class="cat-card__btn">Εξερεύνησε →</span>
+        </a>
+
+      </div>
+    </section>
   </main>
+
   <footer class="footer">
     <div class="footer__logo"><img src="../assets/images/logo.png" alt="Learning Fast Logo" /></div>
     <ul class="footer__links">
       <li><a href="../index.html">Αρχική</a></li>
       <li><a href="../taxeis/index.html">Τάξεις</a></li>
       <li><a href="index.html">Ειδική Εκπαίδευση</a></li>
-      
-        <li><a href="../glossa/index.html">Γλώσσα</a></li>
-        <li><a href="../mathimatika/index.html">Μαθηματικά</a></li>
-        <li><a href="../ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a></li>
+      <li><a href="../glossa/index.html">Γλώσσα</a></li>
+      <li><a href="../mathimatika/index.html">Μαθηματικά</a></li>
+      <li><a href="../ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a></li>
     </ul>
     <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
   </footer>
