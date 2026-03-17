@@ -17,43 +17,58 @@
       padding: 0 1.5rem;
     }
 
-    .pdf-toolbar {
+    .pdf-card {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 1.2rem;
       background: var(--surface);
-      border-radius: var(--radius) var(--radius) 0 0;
-      padding: .9rem 1.4rem;
+      border-radius: var(--radius);
+      padding: 1.4rem 1.8rem;
       box-shadow: var(--shadow);
-      border-bottom: 1px solid rgba(0,0,0,.07);
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(0,0,0,.05);
     }
 
-    .pdf-toolbar__title {
-      font-weight: 700;
-      font-size: 1rem;
+    .pdf-card__icon {
+      font-size: 2.8rem;
+      flex-shrink: 0;
+    }
+
+    .pdf-card__info {
+      flex: 1;
+    }
+
+    .pdf-card__title {
+      font-weight: 800;
+      font-size: 1.1rem;
       color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: .5rem;
     }
 
-    .pdf-download {
+    .pdf-card__meta {
+      font-size: .85rem;
+      color: var(--muted);
+      margin-top: .2rem;
+    }
+
+    .pdf-download-btn {
       display: inline-flex;
       align-items: center;
-      gap: .4rem;
-      padding: .5rem 1.2rem;
-      background: var(--primary);
+      gap: .5rem;
+      padding: .75rem 1.8rem;
+      background: linear-gradient(135deg, #4f6ef7, #7c9aff);
       color: #fff;
       border-radius: 999px;
-      font-size: .88rem;
+      font-size: 1rem;
       font-weight: 700;
       text-decoration: none;
-      transition: background var(--transition), transform var(--transition);
+      white-space: nowrap;
+      box-shadow: 0 4px 14px rgba(79,110,247,.35);
+      transition: transform var(--transition), box-shadow var(--transition);
     }
 
-    .pdf-download:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
+    .pdf-download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(79,110,247,.45);
     }
 
     .pdf-embed {
@@ -61,7 +76,7 @@
       height: 80vh;
       min-height: 600px;
       border: none;
-      border-radius: 0 0 var(--radius) var(--radius);
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
       display: block;
       background: #f5f5f5;
@@ -136,10 +151,15 @@
     <div class="pdf-section">
       <a href="../index.html" class="back-link">← Επιστροφή στην Ειδική Εκπαίδευση</a>
 
-      <div class="pdf-toolbar">
-        <span class="pdf-toolbar__title">📄 Κατηγορίες.pdf</span>
-        <a href="../Κατηγορίες.pdf" download class="pdf-download">⬇ Λήψη PDF</a>
+      <div class="pdf-card">
+        <div class="pdf-card__icon">📄</div>
+        <div class="pdf-card__info">
+          <div class="pdf-card__title">Κατηγορίες - Ταξινόμηση</div>
+          <div class="pdf-card__meta">Αρχείο PDF</div>
+        </div>
+        <a href="../Κατηγορίες.pdf" download class="pdf-download-btn">⬇ Κατέβασε το PDF</a>
       </div>
+
       <iframe
         class="pdf-embed"
         src="../Κατηγορίες.pdf"
