@@ -85,6 +85,63 @@ body {
   color: var(--primary);
 }
 
+/* ===== DROPDOWN ===== */
+.navbar__links li {
+  position: relative;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.14);
+  list-style: none;
+  min-width: 220px;
+  padding: .5rem 0;
+  z-index: 200;
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+.dropdown::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 7px solid var(--surface);
+}
+
+.has-dropdown:hover .dropdown {
+  display: block;
+}
+
+.dropdown li a {
+  display: block;
+  padding: .55rem 1.3rem;
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: background var(--transition), color var(--transition);
+}
+
+.dropdown li a:hover {
+  background: rgba(79,110,247,.07);
+  color: var(--primary);
+}
+
+.has-dropdown > a::after {
+  content: ' ▾';
+  font-size: .7rem;
+  opacity: .6;
+}
+
 /* ========== HERO ========== */
 .hero {
   display: flex;
