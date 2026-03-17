@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Κατηγορίες – Learning Fast</title>
+  <link rel="stylesheet" href="../../../styles/main.css" />
+  <style>
+    .detail-wrap {
+      max-width: 680px;
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: .9rem;
+      margin-bottom: 2rem;
+      transition: gap var(--transition);
+      text-decoration: none;
+    }
+    .back-link:hover { gap: .8rem; }
+
+    .detail-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,.05);
+    }
+
+    .detail-card__header {
+      background: linear-gradient(135deg, #4f6ef7, #7c9aff);
+      padding: 2.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .detail-card__icon {
+      font-size: 3.5rem;
+      flex-shrink: 0;
+    }
+
+    .detail-card__header-info h2 {
+      color: #fff;
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: .3rem;
+    }
+
+    .detail-card__header-info p {
+      color: rgba(255,255,255,.85);
+      font-size: .95rem;
+    }
+
+    .detail-card__body {
+      padding: 2rem;
+    }
+
+    .detail-card__description {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .detail-card__download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, #4f6ef7, #7c9aff);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 6px 20px rgba(79,110,247,.4);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(79,110,247,.5);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <ul class="navbar__links">
+        <li><a href="../../../index.html">Αρχική</a></li>
+        <li class="has-dropdown"><a href="../../../taxeis/index.html">Τάξεις</a>
+          <ul class="dropdown">
+            <li><a href="../../../taxeis/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/a-gymnasiou/index.html">Α΄ Γυμνασίου</a></li>
+            <li><a href="../../../taxeis/b-gymnasiou/index.html">Β΄ Γυμνασίου</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../../index.html" class="active">Ειδική Εκπαίδευση</a>
+          <ul class="dropdown">
+            <li><a href="../index.html">Κατηγορίες - Ταξινόμηση</a></li>
+            <li><a href="../../leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../../../glossa/index.html">Γλώσσα</a>
+          <ul class="dropdown">
+            <li><a href="../../../glossa/meri-logou/index.html">Μέρη του λόγου</a></li>
+            <li><a href="../../../glossa/meri-protasis/index.html">Μέρη της πρότασης</a></li>
+            <li><a href="../../../glossa/orthografia/index.html">Ορθογραφία</a></li>
+            <li><a href="../../../glossa/paragogi-graptou/index.html">Παραγωγή γραπτού λόγου</a></li>
+            <li><a href="../../../glossa/katanoisi-graptou/index.html">Κατανόηση γραπτού λόγου</a></li>
+          </ul>
+        </li>
+        <li><a href="../../../mathimatika/index.html">Μαθηματικά</a></li>
+        <li class="has-dropdown"><a href="../../../ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a>
+          <ul class="dropdown">
+            <li><a href="../../../ekpaideftika-paixnidia/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../ekpaideftika-paixnidia/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../ekpaideftika-paixnidia/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="section__header">
+      <span class="section__label">🌟 Ειδική Εκπαίδευση</span>
+      <h1 class="section__title">Υλικό</h1>
+    </div>
+
+    <div class="detail-wrap">
+      <a href="../index.html" class="back-link">← Επιστροφή στα υλικά</a>
+
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <div class="detail-card__icon">📄</div>
+          <div class="detail-card__header-info">
+            <h2>Κατηγορίες</h2>
+            <p>Φύλλο εργασίας · PDF</p>
+          </div>
+        </div>
+        <div class="detail-card__body">
+          <p class="detail-card__description">
+            Φύλλο εργασίας για εξάσκηση στην ταξινόμηση αντικειμένων σε κατηγορίες.
+            Κατάλληλο για μαθητές ειδικής αγωγής.
+          </p>
+          <div class="detail-card__download">
+            <a href="../../Κατηγορίες.pdf" download class="download-btn">
+              ⬇ Κατέβασε το PDF
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__logo"><img src="../../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
+    <ul class="footer__links">
+      <li><a href="../../../index.html">Αρχική</a></li>
+      <li><a href="../../../taxeis/index.html">Τάξεις</a></li>
+      <li><a href="../../index.html">Ειδική Εκπαίδευση</a></li>
+      <li><a href="../../../glossa/index.html">Γλώσσα</a></li>
+      <li><a href="../../../mathimatika/index.html">Μαθηματικά</a></li>
+      <li><a href="../../../ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a></li>
+    </ul>
+    <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
+</body>
+</html>

@@ -6,80 +6,86 @@
   <title>Κατηγορίες - Ταξινόμηση – Learning Fast</title>
   <link rel="stylesheet" href="../../styles/main.css" />
   <style>
-    .page-header {
-      text-align: center;
-      padding: 2.5rem 1rem 1.5rem;
-    }
-
-    .pdf-section {
-      max-width: 960px;
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.2rem;
+      max-width: 900px;
       margin: 0 auto 3rem;
       padding: 0 1.5rem;
     }
 
-    .pdf-card {
+    .resource-card {
       display: flex;
       align-items: center;
-      gap: 1.2rem;
+      gap: 1rem;
       background: var(--surface);
       border-radius: var(--radius);
-      padding: 1.4rem 1.8rem;
+      padding: 1rem 1.2rem;
       box-shadow: var(--shadow);
-      margin-bottom: 1.5rem;
       border: 1px solid rgba(0,0,0,.05);
+      text-decoration: none;
+      color: inherit;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
     }
 
-    .pdf-card__icon {
-      font-size: 2.8rem;
-      flex-shrink: 0;
+    .resource-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 28px rgba(79,110,247,.18);
+      border-color: rgba(79,110,247,.25);
     }
 
-    .pdf-card__info {
-      flex: 1;
-    }
-
-    .pdf-card__title {
-      font-weight: 800;
-      font-size: 1.1rem;
-      color: var(--text);
-    }
-
-    .pdf-card__meta {
-      font-size: .85rem;
-      color: var(--muted);
-      margin-top: .2rem;
-    }
-
-    .pdf-download-btn {
-      display: inline-flex;
+    .resource-card__thumb {
+      width: 70px;
+      height: 70px;
+      border-radius: 12px;
+      display: flex;
       align-items: center;
-      gap: .5rem;
-      padding: .75rem 1.8rem;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
       background: linear-gradient(135deg, #4f6ef7, #7c9aff);
-      color: #fff;
-      border-radius: 999px;
+    }
+
+    .resource-card__info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .resource-card__title {
       font-size: 1rem;
       font-weight: 700;
-      text-decoration: none;
-      white-space: nowrap;
-      box-shadow: 0 4px 14px rgba(79,110,247,.35);
-      transition: transform var(--transition), box-shadow var(--transition);
+      color: var(--text);
+      margin-bottom: .25rem;
     }
 
-    .pdf-download-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(79,110,247,.45);
+    .resource-card__desc {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.4;
     }
 
-    .pdf-embed {
-      width: 100%;
-      height: 80vh;
-      min-height: 600px;
-      border: none;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      display: block;
-      background: #f5f5f5;
+    .resource-card__tag {
+      display: inline-block;
+      margin-top: .4rem;
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(79,110,247,.1);
+      padding: .15rem .55rem;
+      border-radius: 999px;
+    }
+
+    .resource-card__arrow {
+      font-size: 1.1rem;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: transform var(--transition);
+    }
+
+    .resource-card:hover .resource-card__arrow {
+      transform: translateX(4px);
+      color: var(--primary);
     }
 
     .back-link {
@@ -89,7 +95,7 @@
       color: var(--primary);
       font-weight: 600;
       font-size: .9rem;
-      margin-bottom: 1.5rem;
+      margin: 0 1.5rem 1.5rem;
       transition: gap var(--transition);
       text-decoration: none;
     }
@@ -141,30 +147,26 @@
   </header>
 
   <main>
-    <div class="page-header">
-      <div class="section__header">
-        <span class="section__label">🌟 Ειδική Εκπαίδευση</span>
-        <h1 class="section__title">Κατηγορίες - Ταξινόμηση</h1>
-      </div>
+    <div class="section__header">
+      <span class="section__label">🌟 Ειδική Εκπαίδευση</span>
+      <h1 class="section__title">Κατηγορίες - Ταξινόμηση</h1>
+      <p class="section__subtitle">Επίλεξε υλικό για να το δεις ή να το κατεβάσεις</p>
     </div>
 
-    <div class="pdf-section">
-      <a href="../index.html" class="back-link">← Επιστροφή στην Ειδική Εκπαίδευση</a>
+    <a href="../index.html" class="back-link">← Επιστροφή στην Ειδική Εκπαίδευση</a>
 
-      <div class="pdf-card">
-        <div class="pdf-card__icon">📄</div>
-        <div class="pdf-card__info">
-          <div class="pdf-card__title">Κατηγορίες - Ταξινόμηση</div>
-          <div class="pdf-card__meta">Αρχείο PDF</div>
+    <div class="resources-grid">
+
+      <a href="kategoriesaxinomisi/index.html" class="resource-card">
+        <div class="resource-card__thumb">📄</div>
+        <div class="resource-card__info">
+          <div class="resource-card__title">Κατηγορίες</div>
+          <div class="resource-card__desc">Φύλλο εργασίας ταξινόμησης αντικειμένων σε κατηγορίες</div>
+          <span class="resource-card__tag">PDF</span>
         </div>
-        <a href="../Κατηγορίες.pdf" download class="pdf-download-btn">⬇ Κατέβασε το PDF</a>
-      </div>
+        <span class="resource-card__arrow">›</span>
+      </a>
 
-      <iframe
-        class="pdf-embed"
-        src="../Κατηγορίες.pdf"
-        title="Κατηγορίες - Ταξινόμηση">
-      </iframe>
     </div>
   </main>
 
