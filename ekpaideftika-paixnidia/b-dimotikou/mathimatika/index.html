@@ -35,6 +35,12 @@
       display: flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg,#f97316,#fdba74);
     }
+    .game-card__preview {
+      width: 100%;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 4px 14px rgba(0,0,0,.12);
+    }
     .game-card__title { font-size: 1.2rem; font-weight: 800; color: var(--text); }
     .game-card__btn {
       padding: .55rem 1.6rem;
@@ -73,7 +79,7 @@
       </div>
       <div class="games-grid">
         <a href="https://learning-fast1.github.io/mathimatikespraxis/" target="_blank" class="game-card">
-          <div class="game-card__icon">➕</div>
+          <img src="../../../assets/images/mathimatikes-praxeis-preview.png" alt="Παιχνίδι Μαθηματικών Πράξεων" class="game-card__preview" />
           <div class="game-card__title">Μαθηματικές Πράξεις</div>
           <span class="game-card__btn">Παίξε →</span>
         </a>
