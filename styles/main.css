@@ -76,14 +76,13 @@ body {
   font-size: .95rem;
   color: var(--muted);
   padding: .3rem 0;
-  border-bottom: 2px solid transparent;
-  transition: color var(--transition), border-color var(--transition);
+  text-decoration: none;
+  transition: color var(--transition);
 }
 
 .navbar__links a:hover,
 .navbar__links a.active {
   color: var(--primary);
-  border-bottom-color: var(--primary);
 }
 
 /* ========== HERO ========== */
@@ -461,9 +460,6 @@ section {
   padding: 1.8rem;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Enhanced shadow for overlap */
   border: 1px solid rgba(0, 0, 0, 0.03);
-  position: sticky;
-  top: 90px;
-  margin-top: -140px; /* Pull it up over the hero section */
   z-index: 10;
 }
 
