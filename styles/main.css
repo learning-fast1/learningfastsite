@@ -341,6 +341,7 @@ body {
   cursor: pointer;
   transition: transform var(--transition), box-shadow var(--transition);
   border: none;
+  text-decoration: none;
 }
 
 .btn--primary {
