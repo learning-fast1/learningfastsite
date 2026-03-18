@@ -650,6 +650,18 @@ section {
   background: linear-gradient(135deg, #14b8a6, #99f6e4);
 }
 
+.cover--coming-soon {
+  background: linear-gradient(135deg, #6b7280, #9ca3af);
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ========== FOOTER ========== */
 .footer {
   margin-top: auto;
