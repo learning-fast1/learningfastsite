@@ -51,6 +51,7 @@
 <body>
   <header>
     <nav class="navbar">
+      <button class="navbar__hamburger" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
       <ul class="navbar__links">
         <li><a href="../../index.html">Αρχική</a></li>
         <li class="has-dropdown"><a href="../../taxeis/index.html">Τάξεις</a>
@@ -143,5 +144,22 @@
     </ul>
     <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
   </footer>
+
+<script>
+  var btn = document.getElementById('navToggle');
+  var links = document.querySelector('.navbar__links');
+  btn.addEventListener('click', function(){
+    links.classList.toggle('nav-open');
+    btn.classList.toggle('nav-open');
+  });
+  document.querySelectorAll('.has-dropdown > a').forEach(function(a){
+    a.addEventListener('click', function(e){
+      if(window.innerWidth <= 768){
+        e.preventDefault();
+        this.parentElement.classList.toggle('open');
+      }
+    });
+  });
+</script>
 </body>
 </html>

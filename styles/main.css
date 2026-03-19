@@ -710,17 +710,129 @@ section {
   color: rgba(255, 255, 255, .4);
 }
 
+/* ========== HAMBURGER BUTTON ========== */
+.navbar__hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 300;
+  flex-shrink: 0;
+}
+
+.navbar__hamburger span {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: var(--text);
+  border-radius: 3px;
+  transition: all .3s;
+  transform-origin: center;
+}
+
+.navbar__hamburger.nav-open span:nth-child(1) {
+  transform: translateY(8.5px) rotate(45deg);
+}
+
+.navbar__hamburger.nav-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar__hamburger.nav-open span:nth-child(3) {
+  transform: translateY(-8.5px) rotate(-45deg);
+}
+
 /* ========== RESPONSIVE ========== */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .navbar {
     padding: 0 1.2rem;
+    position: relative;
+  }
+
+  .navbar__hamburger {
+    display: flex;
   }
 
   .navbar__links {
-    gap: 1.2rem;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--surface);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 5rem 2rem 2rem;
+    gap: 0;
+    z-index: 250;
+    overflow-y: auto;
+  }
+
+  .navbar__links.nav-open {
+    display: flex;
+  }
+
+  .navbar__links > li {
+    width: 100%;
+    border-bottom: 1px solid rgba(0,0,0,.07);
+  }
+
+  .navbar__links > li > a {
+    display: block;
+    padding: 1rem 0;
+    font-size: 1.1rem;
+  }
+
+  .has-dropdown > a::after {
+    float: right;
+  }
+
+  .dropdown {
+    position: static;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    background: rgba(79,110,247,.05);
+    padding: 0;
+    min-width: unset;
+    display: none;
+  }
+
+  .dropdown::before {
+    display: none;
+  }
+
+  .has-dropdown.open .dropdown {
+    display: block;
+  }
+
+  .has-dropdown:hover .dropdown {
+    display: none;
+  }
+
+  .has-dropdown.open .dropdown {
+    display: block;
+  }
+
+  .dropdown li a {
+    padding: .7rem 1.2rem;
+    font-size: 1rem;
   }
 
   section {
     padding: 3.5rem 1.2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  section {
+    padding: 3rem 1rem;
   }
 }
