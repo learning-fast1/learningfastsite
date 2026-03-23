@@ -197,18 +197,30 @@
 <script>
   var btn = document.getElementById('navToggle');
   var links = document.querySelector('.navbar__links');
-  btn.addEventListener('click', function(){
-    links.classList.toggle('nav-open');
-    btn.classList.toggle('nav-open');
-  });
-  document.querySelectorAll('.has-dropdown > a').forEach(function(a){
-    a.addEventListener('click', function(e){
-      if(window.innerWidth <= 768){
-        e.preventDefault();
-        this.parentElement.classList.toggle('open');
+  if(btn && links){
+    btn.addEventListener('click', function(){
+      links.classList.toggle('nav-open');
+      btn.classList.toggle('nav-open');
+    });
+    document.querySelectorAll('.has-dropdown > a').forEach(function(a){
+      a.addEventListener('click', function(e){
+        if(window.innerWidth <= 768){
+          e.preventDefault();
+          var li = this.parentElement;
+          document.querySelectorAll('.has-dropdown.open').forEach(function(el){
+            if(el !== li) el.classList.remove('open');
+          });
+          li.classList.toggle('open');
+        }
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.navbar') && links.classList.contains('nav-open')){
+        links.classList.remove('nav-open');
+        btn.classList.remove('nav-open');
       }
     });
-  });
+  }
 </script>
 </body>
 </html>
