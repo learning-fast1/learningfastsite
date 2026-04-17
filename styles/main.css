@@ -2,7 +2,7 @@
    Learning Fast – main.css
    ============================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Pangolin&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Bubblegum+Sans&display=swap');
 
 /* ---------- Reset & Base ---------- */
 *,
@@ -74,7 +74,7 @@ body {
 .navbar__links a {
   font-weight: 600;
   font-size: .95rem;
-  font-family: 'Pangolin', cursive;
+  font-family: 'Bubblegum Sans', cursive;
   color: var(--muted);
   padding: .3rem 0;
   text-decoration: none;
