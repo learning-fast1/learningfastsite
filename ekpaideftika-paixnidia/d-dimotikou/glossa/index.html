@@ -54,6 +54,12 @@
       background: var(--primary-dark);
       transform: translateY(-2px);
     }
+    .games-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:2rem; max-width:800px; margin:0 auto; }
+    .game-card { background:var(--surface); border-radius:var(--radius); padding:2.2rem 1.8rem; display:flex; flex-direction:column; align-items:center; gap:1rem; text-align:center; box-shadow:var(--shadow); transition:transform var(--transition),box-shadow var(--transition); text-decoration:none; color:inherit; }
+    .game-card:hover { transform:translateY(-7px); box-shadow:0 14px 40px rgba(79,110,247,.22); }
+    .game-card__icon { font-size:3rem; width:85px; height:85px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#4f6ef7,#7c9aff); }
+    .game-card__title { font-size:1.2rem; font-weight:800; color:var(--text); }
+    .game-card__btn { padding:.55rem 1.6rem; border-radius:999px; background:linear-gradient(135deg,#4f6ef7,#7c9aff); color:#fff; font-size:.85rem; font-weight:700; }
     .breadcrumb { font-size:.85rem; color:var(--muted); margin-bottom:.6rem; }
     .breadcrumb a { color:var(--primary); font-weight:600; }
     .breadcrumb a:hover { text-decoration:underline; }
@@ -119,11 +125,12 @@
         <span class="section__label">📖 Γλώσσα – Δ΄ Δημοτικού</span>
         <h1 class="section__title">Γλώσσα</h1>
       </div>
-      <div class="empty-state">
-        <div class="empty-state__icon">🚧</div>
-        <h2 class="empty-state__title">Η κατηγορία είναι άδεια</h2>
-        <p class="empty-state__text">Προς το παρόν δεν υπάρχει διαθέσιμο υλικό σε αυτή την κατηγορία. Σύντομα θα προσθέσουμε νέο περιεχόμενο!</p>
-        <a href="../index.html" class="back-btn">← Επιστροφή στα Παιχνίδια Δ'</a>
+      <div class="games-grid">
+        <a href="https://learning-fast1.github.io/orthografiamegalwn/" target="_blank" class="game-card">
+          <div class="game-card__icon">✏️</div>
+          <div class="game-card__title">Ορθογραφία Μεγάλων</div>
+          <span class="game-card__btn">Παίξε →</span>
+        </a>
       </div>
     </section>
   </main>
