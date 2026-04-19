@@ -62,6 +62,55 @@
     .breadcrumb { font-size:.85rem; color:var(--muted); margin-bottom:.6rem; }
     .breadcrumb a { color:var(--primary); font-weight:600; }
     .breadcrumb a:hover { text-decoration:underline; }
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem 3rem;
+      background: linear-gradient(135deg, #f0f4ff 0%, #eef9f0 100%);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(79,70,229,.10);
+      max-width: 520px;
+      margin: 4rem auto;
+      border: 1.5px solid rgba(79,70,229,.10);
+      position: relative;
+      overflow: hidden;
+    }
+    .empty-state::before {
+      content: '';
+      position: absolute;
+      top: -50px; right: -50px;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(79,70,229,.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .empty-state::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 140px; height: 140px;
+      background: radial-gradient(circle, rgba(16,185,129,.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .empty-state__icon { font-size: 5rem; margin-bottom: 1.2rem; display: block; line-height: 1; }
+    .empty-state__title { font-size: 1.6rem; color: var(--text); margin-bottom: .75rem; font-weight: 800; }
+    .empty-state__text { color: var(--muted); margin-bottom: 2rem; font-size: 1rem; line-height: 1.7; max-width: 360px; margin-left: auto; margin-right: auto; }
+    .back-btn {
+      display: inline-block;
+      padding: 0.8rem 1.8rem;
+      background: linear-gradient(135deg, var(--primary), #7c9aff);
+      color: #fff;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 4px 14px rgba(79,70,229,.25);
+    }
+    .back-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark), #5f7cf7);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(79,70,229,.35);
+    }
   </style>
 </head>
 <body>
@@ -124,10 +173,10 @@
         <span class="section__label">🔢 Μαθηματικά – Δ΄ Δημοτικού</span>
         <h1 class="section__title">Μαθηματικά</h1>
       </div>
-      <div class="empty-state">
-        <div class="empty-state__icon">🚧</div>
-        <h2 class="empty-state__title">Η κατηγορία είναι άδεια</h2>
-        <p class="empty-state__text">Προς το παρόν δεν υπάρχει διαθέσιμο υλικό σε αυτή την κατηγορία. Σύντομα θα προσθέσουμε νέο περιεχόμενο!</p>
+            <div class="empty-state">
+        <span class="empty-state__icon">🌱</span>
+        <h2 class="empty-state__title">Η κατηγορία αυτή είναι ακόμη άδεια</h2>
+        <p class="empty-state__text">Σύντομα θα προσθέσουμε νέο υλικό και εκπαιδευτικά παιχνίδια για αυτήν την κατηγορία!</p>
         <a href="../index.html" class="back-btn">← Επιστροφή στα Παιχνίδια Δ'</a>
       </div>
     </section>
