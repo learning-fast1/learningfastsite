@@ -64,37 +64,17 @@
     .breadcrumb a:hover { text-decoration:underline; }
     .empty-state {
       text-align: center;
-      padding: 4rem 2rem 3rem;
-      background: linear-gradient(135deg, #f0f4ff 0%, #eef9f0 100%);
-      border-radius: 24px;
-      box-shadow: 0 8px 32px rgba(79,70,229,.10);
-      max-width: 520px;
+      padding: 5rem 2rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 600px;
       margin: 4rem auto;
-      border: 1.5px solid rgba(79,70,229,.10);
-      position: relative;
-      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.03);
     }
-    .empty-state::before {
-      content: '';
-      position: absolute;
-      top: -50px; right: -50px;
-      width: 180px; height: 180px;
-      background: radial-gradient(circle, rgba(79,70,229,.08) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-    .empty-state::after {
-      content: '';
-      position: absolute;
-      bottom: -40px; left: -40px;
-      width: 140px; height: 140px;
-      background: radial-gradient(circle, rgba(16,185,129,.08) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-    .empty-state__icon { font-size: 5rem; margin-bottom: 1.2rem; display: block; line-height: 1; }
-    .empty-state__title { font-size: 1.6rem; color: var(--text); margin-bottom: .75rem; font-weight: 800; }
-    .empty-state__text { color: var(--muted); margin-bottom: 2rem; font-size: 1rem; line-height: 1.7; max-width: 360px; margin-left: auto; margin-right: auto; }
+    .empty-state__icon { font-size: 4.5rem; margin-bottom: 1rem; }
+    .empty-state__title { font-size: 1.8rem; color: var(--text); margin-bottom: 0.5rem; font-weight: 800; }
+    .empty-state__text { color: var(--muted); margin-bottom: 2rem; font-size: 1.1rem; line-height: 1.6; }
     .back-btn {
       display: inline-block;
       padding: 0.8rem 1.8rem;
@@ -173,10 +153,10 @@
         <span class="section__label">🔢 Μαθηματικά – Δ΄ Δημοτικού</span>
         <h1 class="section__title">Μαθηματικά</h1>
       </div>
-            <div class="empty-state">
-        <span class="empty-state__icon">🌱</span>
-        <h2 class="empty-state__title">Η κατηγορία αυτή είναι ακόμη άδεια</h2>
-        <p class="empty-state__text">Σύντομα θα προσθέσουμε νέο υλικό και εκπαιδευτικά παιχνίδια για αυτήν την κατηγορία!</p>
+                  <div class="empty-state">
+        <div class="empty-state__icon">🚧</div>
+        <h2 class="empty-state__title">Η κατηγορία είναι άδεια</h2>
+        <p class="empty-state__text">Προς το παρόν δεν υπάρχει διαθέσιμο υλικό σε αυτή την κατηγορία. Σύντομα θα προσθέσουμε νέο περιεχόμενο!</p>
         <a href="../index.html" class="back-btn">← Επιστροφή στα Παιχνίδια Δ'</a>
       </div>
     </section>
