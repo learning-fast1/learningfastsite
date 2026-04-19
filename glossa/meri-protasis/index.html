@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9FDLC7DPYX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-9FDLC7DPYX');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Μέρη της πρότασης – Learning Fast</title>
+  <link rel="stylesheet" href="../../styles/main.css" />
+  <style>
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem 3rem;
+      background: linear-gradient(135deg, #f0f4ff 0%, #eef9f0 100%);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(79,70,229,.10);
+      max-width: 520px;
+      margin: 4rem auto;
+      border: 1.5px solid rgba(79,70,229,.10);
+      position: relative;
+      overflow: hidden;
+    }
+    .empty-state::before {
+      content: '';
+      position: absolute;
+      top: -50px; right: -50px;
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, rgba(79,70,229,.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .empty-state::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 140px; height: 140px;
+      background: radial-gradient(circle, rgba(16,185,129,.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .empty-state__icon { font-size: 5rem; margin-bottom: 1.2rem; display: block; line-height: 1; }
+    .empty-state__title { font-size: 1.6rem; color: var(--text); margin-bottom: .75rem; font-weight: 800; }
+    .empty-state__text { color: var(--muted); margin-bottom: 2rem; font-size: 1rem; line-height: 1.7; max-width: 360px; margin-left: auto; margin-right: auto; }
+    .back-btn {
+      display: inline-block;
+      padding: 0.8rem 1.8rem;
+      background: linear-gradient(135deg, var(--primary), #7c9aff);
+      color: #fff;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 4px 14px rgba(79,70,229,.25);
+    }
+    .back-btn:hover {
+      background: linear-gradient(135deg, var(--primary-dark), #5f7cf7);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(79,70,229,.35);
+    }
+    .breadcrumb { font-size:.85rem; color:var(--muted); margin-bottom:.6rem; }
+    .breadcrumb a { color:var(--primary); font-weight:600; }
+    .breadcrumb a:hover { text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <button class="navbar__hamburger" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <ul class="navbar__links">
+        <li><a href="../../index.html">Αρχική</a></li>
+        <li class="has-dropdown"><a href="../../taxeis/index.html">Τάξεις</a>
+          <ul class="dropdown">
+            <li><a href="../../taxeis/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../taxeis/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../taxeis/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../taxeis/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../taxeis/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../taxeis/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+            <li><a href="../../taxeis/a-gymnasiou/index.html">Α΄ Γυμνασίου</a></li>
+            <li><a href="../../taxeis/b-gymnasiou/index.html">Β΄ Γυμνασίου</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../../eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a>
+          <ul class="dropdown">
+            <li><a href="../../eidiki-ekpaideysi/kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
+            <li><a href="../../eidiki-ekpaideysi/leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../index.html">Γλώσσα</a>
+          <ul class="dropdown">
+            <li><a href="../meri-logou/index.html">Μέρη του λόγου</a></li>
+            <li><a href="../meri-protasis/index.html">Μέρη της πρότασης</a></li>
+            <li><a href="../orthografia/index.html">Ορθογραφία</a></li>
+            <li><a href="../paragogi-graptou/index.html">Παραγωγή γραπτού λόγου</a></li>
+            <li><a href="../katanoisi-graptou/index.html">Κατανόηση γραπτού λόγου</a></li>
+          </ul>
+        </li>
+        <li><a href="../../mathimatika/index.html">Μαθηματικά</a></li>
+        <li class="has-dropdown"><a href="../../ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a>
+          <ul class="dropdown">
+            <li><a href="../../ekpaideftika-paixnidia/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../ekpaideftika-paixnidia/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../ekpaideftika-paixnidia/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../ekpaideftika-paixnidia/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../ekpaideftika-paixnidia/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../ekpaideftika-paixnidia/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+          </ul>
+        </li>
+        <li><a href="../../epikoinonia/index.html">Επικοινωνία</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section>
+      <div class="section__header">
+        <p class="breadcrumb">
+          <a href="../index.html">Γλώσσα</a>
+        </p>
+        <span class="section__label">🔤 Μέρη της Πρότασης</span>
+        <h1 class="section__title">Μέρη της πρότασης</h1>
+      </div>
+      <div class="empty-state">
+        <span class="empty-state__icon">🌱</span>
+        <h2 class="empty-state__title">Η κατηγορία αυτή είναι ακόμη άδεια</h2>
+        <p class="empty-state__text">Σύντομα θα προσθέσουμε νέο υλικό και εκπαιδευτικές δραστηριότητες για αυτήν την κατηγορία!</p>
+        <a href="../index.html" class="back-btn">← Επιστροφή στη Γλώσσα</a>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="footer__logo"><img src="../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
+    <ul class="footer__links">
+      <li><a href="../../index.html">Αρχική</a></li>
+      <li class="has-dropdown"><a href="../index.html">Γλώσσα</a>
+        <ul class="dropdown">
+          <li><a href="../meri-logou/index.html">Μέρη του λόγου</a></li>
+          <li><a href="../meri-protasis/index.html">Μέρη της πρότασης</a></li>
+          <li><a href="../orthografia/index.html">Ορθογραφία</a></li>
+          <li><a href="../paragogi-graptou/index.html">Παραγωγή γραπτού λόγου</a></li>
+          <li><a href="../katanoisi-graptou/index.html">Κατανόηση γραπτού λόγου</a></li>
+        </ul>
+      </li>
+    </ul>
+    <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
+<script>
+  var btn = document.getElementById('navToggle');
+  var links = document.querySelector('.navbar__links');
+  if(btn && links){
+    btn.addEventListener('click', function(){
+      links.classList.toggle('nav-open');
+      btn.classList.toggle('nav-open');
+    });
+    document.querySelectorAll('.has-dropdown > a').forEach(function(a){
+      a.addEventListener('click', function(e){
+        if(window.innerWidth <= 768){
+          e.preventDefault();
+          var li = this.parentElement;
+          document.querySelectorAll('.has-dropdown.open').forEach(function(el){
+            if(el !== li) el.classList.remove('open');
+          });
+          li.classList.toggle('open');
+        }
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.navbar') && links.classList.contains('nav-open')){
+        links.classList.remove('nav-open');
+        btn.classList.remove('nav-open');
+      }
+    });
+  }
+</script>
+</body>
+</html>
