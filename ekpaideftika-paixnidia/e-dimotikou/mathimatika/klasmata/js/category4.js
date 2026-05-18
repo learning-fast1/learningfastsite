@@ -20,7 +20,7 @@ const Category4 = {
     generateQuestion(stageNum) {
         if (stageNum === 1) {
             // Same denominator, 4 unique fractions — den must be ≥ 5 so there are ≥4 numerators
-            let den = Utils.randomInt(5, 12);
+            let den = Utils.randomInt(5, 20);
             let allNums = Array.from({ length: den - 1 }, (_, k) => k + 1);
             Utils.shuffle(allNums);
             let fracs = allNums.slice(0, 4).map(n => ({ n, d: den, val: n / den }));
