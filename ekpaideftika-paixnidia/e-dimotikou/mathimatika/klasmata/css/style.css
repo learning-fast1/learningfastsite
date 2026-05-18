@@ -926,4 +926,5 @@ h1 {
     .numpad { gap: 4px; padding: 6px; }
     .numpad-btn { width: 34px; height: 34px; font-size: 1.1rem; }
     .fraction-input { height: 40px; }
+    .input-numpad-row { gap: 10px; }
 }

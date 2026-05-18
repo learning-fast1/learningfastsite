@@ -233,12 +233,14 @@ const Category5 = {
                 ${Utils.renderNumpad()}`;
         } else {
             let inputsHTML = q.labels.map((lbl, i) => `
-                <div style="display:flex; align-items:center; gap:10px; justify-content:center;">
-                    <span style="font-family:var(--font-alt); font-size:1rem; color:var(--wood-dark); font-weight:bold; min-width:80px; text-align:right;">${lbl}:</span>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                    <span style="font-family:var(--font-alt); font-size:0.78rem; color:var(--wood-dark); font-weight:bold; white-space:nowrap;">${lbl}</span>
                     <input type="text" id="ans-${i}" class="fraction-input" data-maxlen="3" readonly onclick="Utils.setActiveInput('ans-${i}')">
                 </div>`).join('');
+            inputWrap.style.flexDirection = 'column';
+            inputWrap.style.alignItems = 'center';
             inputWrap.innerHTML = `
-                <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
+                <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                     ${inputsHTML}
                 </div>
                 ${Utils.renderNumpad()}`;
