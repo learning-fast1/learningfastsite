@@ -5,8 +5,8 @@
     --sky-blue: #7cd5f4;
     --grass-green: #7ecb20;
     --star-gold: #FFD700;
-    --font-main: 'Chewy', cursive;
-    --font-alt: 'Balsamiq Sans', cursive;
+    --font-main: 'Nunito', sans-serif;
+    --font-alt: 'Poppins', sans-serif;
 }
 
 * {
