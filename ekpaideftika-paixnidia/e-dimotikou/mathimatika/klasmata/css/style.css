@@ -919,4 +919,11 @@ h1 {
     .s2-boxes { gap: 6px; }
     .s2-box { min-width: 80px; padding: 5px 4px; min-height: 90px; }
     .s2-label .fraction { font-size: 1.05rem; }
+
+    /* Category 5: problem card & compact numpad */
+    .problem-card { padding: 10px 14px; }
+    .problem-body { font-size: 1rem; }
+    .numpad { gap: 4px; padding: 6px; }
+    .numpad-btn { width: 34px; height: 34px; font-size: 1.1rem; }
+    .fraction-input { height: 40px; }
 }

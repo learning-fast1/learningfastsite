@@ -45,6 +45,7 @@ const Category3 = {
         let area = document.getElementById('game-area');
         area.innerHTML = '';
         area.style.flexDirection = 'column';
+        area.style.flexWrap = 'nowrap';
         area.style.alignItems = 'center';
         area.style.gap = '22px';
 

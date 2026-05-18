@@ -70,6 +70,7 @@ const Category4 = {
         let area = document.getElementById('game-area');
         area.innerHTML = '';
         area.style.flexDirection = 'column';
+        area.style.flexWrap = 'nowrap';
         area.style.alignItems = 'stretch';
         area.style.gap = '16px';
 
