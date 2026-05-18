@@ -237,7 +237,7 @@ const Category5 = {
                     <input type="text" id="ans-${i}" class="fraction-input" data-maxlen="3" readonly onclick="Utils.setActiveInput('ans-${i}')">
                 </div>`).join('');
             inputWrap.innerHTML = `
-                <div style="display:flex; flex-direction:column; gap:10px; align-items:center; width:100%;">
+                <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-start;">
                     ${inputsHTML}
                 </div>
                 ${Utils.renderNumpad()}`;
