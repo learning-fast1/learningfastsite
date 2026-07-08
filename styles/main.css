@@ -760,6 +760,10 @@ section {
     justify-content: space-between;
   }
 
+  .navbar__logo img {
+    height: 24px;
+  }
+
   .navbar__hamburger {
     display: flex;
     margin-left: 0;
