@@ -111,10 +111,7 @@ h2 {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: var(--bg-p2);
-    background-image: radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%);
-    background-size: 60px 60px;
-    background-position: 0 0, 30px 30px;
+    background-color: #E6F4FB;
     display: flex;
     flex-direction: column;
     overflow-y: auto;

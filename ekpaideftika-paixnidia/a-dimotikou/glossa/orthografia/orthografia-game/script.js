@@ -140,7 +140,10 @@ function shuffleArray(array) {
     return newArray;
 }
 
-function shuffleNoConsecutive(array, getType, avoidFirstType = null) {
+// Περνάει από ΟΛΕΣ τις κατηγορίες (καταλήξεις/άρθρα) με τη σειρά, μία λέξη από
+// την καθεμία, και μετά ξαναρχίζει τον κύκλο — ώστε να μην επαναλαμβάνεται
+// συνέχεια η ίδια κατηγορία πριν εμφανιστούν όλες οι υπόλοιπες.
+function buildRoundRobinDeck(array, getType) {
     const groups = {};
     shuffleArray(array).forEach(item => {
         const type = getType(item);
@@ -148,28 +151,21 @@ function shuffleNoConsecutive(array, getType, avoidFirstType = null) {
         groups[type].push(item);
     });
 
-    const result = [];
-    let lastType = avoidFirstType;
+    const typeOrder = shuffleArray(Object.keys(groups));
+    const deck = [];
+    let remaining = array.length;
 
-    while (result.length < array.length) {
-        const candidates = Object.entries(groups)
-            .filter(([type, items]) => items.length > 0 && type !== lastType);
-
-        if (candidates.length === 0) {
-            const any = Object.entries(groups).find(([_, items]) => items.length > 0);
-            if (!any) break;
-            result.push(any[1].shift());
-            lastType = any[0];
-        } else {
-            const maxCount = Math.max(...candidates.map(([_, items]) => items.length));
-            const top = candidates.filter(([_, items]) => items.length >= maxCount);
-            const [type, items] = top[Math.floor(Math.random() * top.length)];
-            result.push(items.shift());
-            lastType = type;
+    while (remaining > 0) {
+        for (const type of typeOrder) {
+            const bucket = groups[type];
+            if (bucket && bucket.length > 0) {
+                deck.push(bucket.shift());
+                remaining--;
+            }
         }
     }
 
-    return result;
+    return deck;
 }
 
 class PlayerBoard {
@@ -200,10 +196,10 @@ class PlayerBoard {
         this.initGame();
     }
     
-    initGame(avoidFirstType = null) {
+    initGame() {
         if (this.level === 1) {
             const nounArticles = ['ο', 'η', 'το', 'οι'];
-            this.playerWords = shuffleNoConsecutive(words.filter(w => nounArticles.includes(w.article)), w => w.article, avoidFirstType);
+            this.playerWords = buildRoundRobinDeck(words.filter(w => nounArticles.includes(w.article)), w => w.article);
             const articleOptions = ['ο', 'η', 'το', 'οι'];
             this.optionBtns.forEach((btn, i) => {
                 if (i < articleOptions.length) {
@@ -215,7 +211,7 @@ class PlayerBoard {
                 }
             });
         } else {
-            this.playerWords = shuffleNoConsecutive(words, w => w.option, avoidFirstType);
+            this.playerWords = buildRoundRobinDeck(words, w => w.option);
             this.optionBtns.forEach(btn => btn.style.display = '');
         }
         this.currentWordIndex = 0;
@@ -371,12 +367,29 @@ class PlayerBoard {
             if (this.attemptsForWord === 1) {
                 this.wrongScore++;
                 this.updateScore();
+                const strugglingType = this.level === 1 ? currentWord.article : currentWord.option;
+                this.reinforceType(strugglingType);
             }
-            
+
             // Disable the clicked wrong button
             event.target.disabled = true;
             event.target.style.opacity = '0.4';
             event.target.style.transform = 'scale(0.9)';
+        }
+    }
+
+    // Όταν ένα παιδί δυσκολεύεται με μια κατάληξη/άρθρο, φέρνει πιο κοντά
+    // (μέσα στις επόμενες λίγες λέξεις) μια ακόμα λέξη της ίδιας κατηγορίας
+    // για επιπλέον εξάσκηση, χωρίς να αλλάζει το μέγεθος της τράπουλας.
+    reinforceType(type) {
+        for (let i = this.currentWordIndex + 1; i < this.playerWords.length; i++) {
+            const candidateType = this.level === 1 ? this.playerWords[i].article : this.playerWords[i].option;
+            if (candidateType === type) {
+                const [word] = this.playerWords.splice(i, 1);
+                const insertAt = Math.min(this.currentWordIndex + 2, this.playerWords.length);
+                this.playerWords.splice(insertAt, 0, word);
+                return;
+            }
         }
     }
 
@@ -398,7 +411,7 @@ class PlayerBoard {
             return;
         }
         this.isReviewMode = true;
-        this.playerWords = shuffleNoConsecutive(this.wrongWords, w => this.level === 1 ? w.article : w.option);
+        this.playerWords = buildRoundRobinDeck(this.wrongWords, w => this.level === 1 ? w.article : w.option);
         this.wrongWords = [];
         this.currentWordIndex = 0;
         this.correctScore = 0;
@@ -421,41 +434,31 @@ class PlayerBoard {
                 mistakes: this.wrongScore
             });
 
-            if (this.wrongWords.length > 0) {
-                // Υπάρχουν ακόμα λάθη → αυτόματα ξεκινά επανάληψη
-                const reviewCount = this.wrongWords.length;
-                this.playerWords = shuffleNoConsecutive(this.wrongWords, w => this.level === 1 ? w.article : w.option);
-                this.wrongWords = [];
-                this.currentWordIndex = 0;
-                this.isReviewMode = true;
-                this.loadWord();
-                this.feedbackMessageEl.textContent = `💪 Ας επαναλάβουμε ${reviewCount} λέξ${reviewCount === 1 ? 'η' : 'εις'}!`;
-                this.feedbackMessageEl.className = 'feedback-message error pop-in';
-            } else {
-                // Δεν υπάρχουν λάθη → πίσω στην αρχική οθόνη
-                const message = this.isReviewMode
-                    ? 'Μπράβο! Τελείωσες την επανάληψη! 🏆'
-                    : 'Τέλειο! Τα βρήκες όλα σωστά! 🏆';
-                this.feedbackMessageEl.textContent = message;
-                this.feedbackMessageEl.className = 'feedback-message success pop-in';
+            // Η τράπουλα τελείωσε — καμία λέξη δεν ξαναδείχνεται αυτόματα.
+            // Η επανάληψη λαθών μένει διαθέσιμη μόνο μέσω του κουμπιού
+            // "Επανάληψη Λαθών" στο τέλος του χρόνου.
+            const message = this.isReviewMode
+                ? 'Μπράβο! Τελείωσες την επανάληψη! 🏆'
+                : 'Τέλειο! Τα βρήκες όλα σωστά! 🏆';
+            this.feedbackMessageEl.textContent = message;
+            this.feedbackMessageEl.className = 'feedback-message success pop-in';
 
-                // Μεγάλο confetti γιορτής (μόνο σε 1 παίκτη)
-                if (selectedMode === 'single') {
-                    confetti({
-                        particleCount: 250,
-                        spread: 120,
-                        origin: { y: 0.5 },
-                        colors: ['#FF4757', '#2ED573', '#FFA502', '#1E90FF', '#FF69B4', '#6C5CE7']
-                    });
-                }
-
-                // Disable κουμπιά κατά τη μετάβαση
-                this.optionBtns.forEach(btn => { btn.disabled = true; });
-                this.nextBtn.classList.add('hidden');
-
-                // Αυτόματη επιστροφή στην αρχική μετά από 2.5 δευτ.
-                setTimeout(() => goToStartScreen(), 2500);
+            // Μεγάλο confetti γιορτής (μόνο σε 1 παίκτη)
+            if (selectedMode === 'single') {
+                confetti({
+                    particleCount: 250,
+                    spread: 120,
+                    origin: { y: 0.5 },
+                    colors: ['#FF4757', '#2ED573', '#FFA502', '#1E90FF', '#FF69B4', '#6C5CE7']
+                });
             }
+
+            // Disable κουμπιά κατά τη μετάβαση
+            this.optionBtns.forEach(btn => { btn.disabled = true; });
+            this.nextBtn.classList.add('hidden');
+
+            // Αυτόματη επιστροφή στην αρχική μετά από 2.5 δευτ.
+            setTimeout(() => goToStartScreen(), 2500);
         } else {
             this.loadWord();
         }

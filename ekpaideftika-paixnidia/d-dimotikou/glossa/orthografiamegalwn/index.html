@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ορθογραφία Μεγάλων – Παιχνίδι Ορθογραφίας</title>
+<link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/d-dimotikou/glossa/orthografiamegalwn/" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BH09ZCSS87"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-BH09ZCSS87');
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0c29;
+    --card: rgba(255,255,255,0.07);
+    --purple: #a855f7;
+    --pink: #ec4899;
+    --blue: #3b82f6;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #facc15;
+    --text: #f1f5f9;
+    --radius: 20px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ─── STARS ─── */
+  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    animation: twinkle 3s infinite ease-in-out;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: .2; transform: scale(1); }
+    50%      { opacity: 1;  transform: scale(1.4); }
+  }
+
+  /* ─── WRAPPER ─── */
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 1140px; margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* ─── HEADER ─── */
+  .header { text-align: center; margin-bottom: 36px; }
+  .header-title {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; margin-bottom: 8px;
+  }
+  .header-title img {
+    height: clamp(100px, 14vw, 140px);
+    mix-blend-mode: multiply;
+  }
+  .header-title h1 {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 900;
+    background: linear-gradient(90deg, #a855f7, #ec4899, #facc15);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1.2; text-align: center;
+  }
+  .header p { font-size: 1.1rem; opacity: .7; }
+
+  /* ─── COMPACT LAYOUT (μόνο στις οθόνες παιχνιδιού, ώστε να χωράνε χωρίς scroll) ─── */
+  body.in-game .wrapper { padding: 10px 16px 16px; }
+  body.in-game .header { margin-bottom: 8px; }
+  body.in-game .header-title {
+    flex-direction: row; gap: 10px; margin-bottom: 2px;
+  }
+  body.in-game .header-title img { height: clamp(32px, 4vw, 44px); }
+  body.in-game .header-title h1 { font-size: clamp(1rem, 2.4vw, 1.4rem); }
+
+  /* ─── MENU ─── */
+  #screen-menu { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+
+  /* ─── LENGTH PICKER ─── */
+  #length-picker { text-align: center; animation: fadeIn .3s; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  #length-picker h3 {
+    font-size: 1.3rem; font-weight: 800; margin-bottom: 18px; opacity: .85;
+  }
+  .length-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .length-btn {
+    width: 90px; padding: 18px 0;
+    background: var(--card);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius);
+    color: white; font-family: inherit; font-size: 1.5rem; font-weight: 900;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    backdrop-filter: blur(12px);
+  }
+  .length-btn span { display: block; font-size: .75rem; font-weight: 600; opacity: .6; margin-top: 4px; }
+  .length-btn:hover {
+    transform: translateY(-5px) scale(1.06);
+    box-shadow: 0 12px 36px rgba(168,85,247,.45);
+    border-color: var(--purple);
+  }
+  .btn-back-mode {
+    background: none; border: none; color: rgba(255,255,255,0.5);
+    font-family: inherit; font-size: .95rem; cursor: pointer; margin-top: 8px;
+  }
+  .btn-back-mode:hover { color: white; }
+
+  /* ─── PLAYER PICKER ─── */
+  .player-btns { display: flex; gap: 20px; justify-content: center; }
+  .player-btn {
+    width: 150px; padding: 28px 16px;
+    background: var(--card);
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius);
+    color: white; font-family: inherit;
+    cursor: pointer; text-align: center;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    backdrop-filter: blur(12px);
+  }
+  .player-btn .p-icon  { font-size: 2.8rem; display: block; margin-bottom: 10px; }
+  .player-btn .p-label { font-size: 1.1rem; font-weight: 800; }
+  .player-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 36px rgba(168,85,247,.45);
+    border-color: var(--purple);
+  }
+
+  /* ─── 2-PLAYER LAYOUT ─── */
+  .two-player-answers {
+    display: flex; gap: 20px; justify-content: center;
+    max-width: 780px; margin: 0 auto;
+  }
+  .player-col {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+  }
+  .player-label {
+    font-size: 1rem; font-weight: 800;
+    padding: 7px 22px; border-radius: 50px;
+    letter-spacing: .05em; width: 100%; text-align: center;
+  }
+  .p1-label { background: rgba(59,130,246,.25); border: 1.5px solid var(--blue);  color: #93c5fd; }
+  .p2-label { background: rgba(236,72,153,.25); border: 1.5px solid var(--pink);  color: #f9a8d4; }
+  .player-col .answers { flex-direction: column; width: 100%; }
+  .player-col .ans-btn { width: 100%; }
+  /* P2 score color */
+  #stat-score2  { color: var(--pink); }
+  #stat-streak2 { color: #f97316; }
+  #stat-lives2  { color: var(--red); }
+  .menu-cards { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+  .menu-card {
+    width: 260px; padding: 36px 24px;
+    background: var(--card);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius);
+    cursor: pointer;
+    text-align: center;
+    transition: transform .3s, box-shadow .3s, border-color .3s;
+    backdrop-filter: blur(12px);
+  }
+  .menu-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 20px 60px rgba(168,85,247,.4);
+    border-color: var(--purple);
+  }
+  .menu-card .icon { font-size: 3.5rem; margin-bottom: 14px; }
+  .menu-card h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+  .menu-card p  { font-size: .95rem; opacity: .7; line-height: 1.5; }
+  .menu-card.articles { border-color: rgba(59,130,246,.4); }
+  .menu-card.articles:hover { box-shadow: 0 20px 60px rgba(59,130,246,.4); border-color: var(--blue); }
+  .menu-card.endings  { border-color: rgba(236,72,153,.4); }
+  .menu-card.endings:hover  { box-shadow: 0 20px 60px rgba(236,72,153,.4); border-color: var(--pink); }
+
+  /* ─── GAME SCREEN ─── */
+  #screen-game { display: none; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px; flex-wrap: wrap; gap: 12px;
+  }
+  .btn-back {
+    background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.2);
+    color: white; padding: 10px 20px; border-radius: 50px;
+    font-family: inherit; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: background .2s;
+  }
+  .btn-back:hover { background: rgba(255,255,255,0.2); }
+
+  .stats { display: flex; gap: 12px; flex-wrap: wrap; }
+  .stat-box {
+    background: var(--card); border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 12px; padding: 8px 16px; text-align: center;
+    backdrop-filter: blur(8px); min-width: 80px;
+  }
+  .stat-box .label { font-size: .7rem; opacity: .6; text-transform: uppercase; letter-spacing: .08em; }
+  .stat-box .value { font-size: 1.4rem; font-weight: 900; }
+  .stat-box .value.score  { color: var(--yellow); }
+  .stat-box .value.streak { color: #f97316; }
+  .stat-box .value.lives  { color: var(--red); }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-wrap {
+    background: rgba(255,255,255,0.08);
+    border-radius: 50px; height: 10px; margin-bottom: 14px; overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%; border-radius: 50px;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ─── QUESTION CARD ─── */
+  .question-card {
+    background: var(--card);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    text-align: center;
+    backdrop-filter: blur(14px);
+    margin-bottom: 14px;
+    transition: transform .3s;
+  }
+  .question-card.shake { animation: shake .4s; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+  }
+  .question-card.bounce { animation: bounceQ .4s; }
+  @keyframes bounceQ {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+
+  .mode-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    border-radius: 50px; padding: 4px 16px;
+    font-size: .8rem; font-weight: 700; letter-spacing: .06em;
+    margin-bottom: 18px; text-transform: uppercase;
+  }
+  .q-number { font-size: .95rem; opacity: .5; margin-bottom: 10px; }
+
+  .sentence {
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 800; line-height: 1.4;
+    margin-bottom: 6px;
+  }
+  .blank {
+    display: inline-block;
+    min-width: 80px; border-bottom: 4px solid var(--purple);
+    color: var(--purple); font-style: italic;
+    padding: 0 6px; transition: all .3s;
+  }
+  .blank.filled-correct { color: var(--green); border-color: var(--green); }
+  .blank.filled-wrong   { color: var(--red);   border-color: var(--red); }
+
+  .hint { font-size: .95rem; opacity: .55; margin-top: 10px; }
+
+  /* ─── ANSWER BUTTONS ─── */
+  .answers {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    max-width: 780px; margin: 0 auto;
+  }
+  .ans-btn {
+    padding: 16px 28px;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.18);
+    border-radius: 50px;
+    color: white; font-family: inherit; font-size: 1.4rem; font-weight: 800;
+    cursor: pointer; min-width: 100px;
+    transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
+  }
+  .ans-btn:focus { outline: none; }
+  @media (hover: hover) {
+    .ans-btn:hover:not(:disabled) {
+      transform: translateY(-3px) scale(1.06);
+      background: rgba(168,85,247,0.3);
+      border-color: var(--purple);
+      box-shadow: 0 8px 24px rgba(168,85,247,.4);
+    }
+  }
+  .ans-btn.correct {
+    background: rgba(34,197,94,.25); border-color: var(--green);
+    box-shadow: 0 0 24px rgba(34,197,94,.5);
+    animation: popIn .35s;
+  }
+  .ans-btn.wrong {
+    background: rgba(239,68,68,.25); border-color: var(--red);
+    animation: popIn .35s;
+  }
+  .ans-btn.used-correct {
+    background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.35);
+    opacity: .55;
+  }
+  @keyframes popIn {
+    0% { transform: scale(.9); }
+    60% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+  .ans-btn:disabled { cursor: default; opacity: .5; transform: none !important; }
+
+  /* ─── FEEDBACK TOAST ─── */
+  .toast {
+    position: fixed; top: 32px; left: 50%; transform: translateX(-50%) translateY(-100px);
+    background: rgba(30,20,60,.95);
+    border: 2px solid var(--purple);
+    border-radius: 50px; padding: 14px 32px;
+    font-size: 1.1rem; font-weight: 700;
+    display: flex; align-items: center; gap: 10px;
+    transition: transform .4s cubic-bezier(.4,0,.2,1);
+    z-index: 999; backdrop-filter: blur(12px);
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.ok  { border-color: var(--green); }
+  .toast.err { border-color: var(--red); }
+
+  /* ─── CELEBRATION ─── */
+  .confetti-piece {
+    position: fixed; top: -20px; width: 12px; height: 16px;
+    border-radius: 3px;
+    animation: fall 1.5s ease-in forwards;
+    pointer-events: none; z-index: 9999;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ─── RESULT SCREEN ─── */
+  #screen-result { display: none; text-align: center; }
+  .result-card {
+    background: var(--card); border: 2px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius); padding: 48px 36px;
+    backdrop-filter: blur(14px); max-width: 500px; margin: 0 auto;
+  }
+  .result-emoji { font-size: 4rem; margin-bottom: 16px; }
+  .result-card h2 { font-size: 2rem; font-weight: 900; margin-bottom: 10px; }
+  .result-score {
+    font-size: 3.5rem; font-weight: 900;
+    background: linear-gradient(90deg, var(--yellow), var(--pink));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin: 16px 0;
+  }
+  .result-meta { opacity: .65; margin-bottom: 28px; font-size: 1rem; }
+  .btn-primary {
+    display: inline-block; padding: 16px 40px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    border: none; border-radius: 50px;
+    color: white; font-family: inherit; font-size: 1.1rem; font-weight: 800;
+    cursor: pointer; margin: 8px;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 8px 30px rgba(168,85,247,.4);
+  }
+  .btn-primary:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 14px 40px rgba(168,85,247,.6); }
+  .btn-secondary {
+    display: inline-block; padding: 16px 40px;
+    background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    color: white; font-family: inherit; font-size: 1.1rem; font-weight: 800;
+    cursor: pointer; margin: 8px;
+    transition: background .2s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+
+  /* ─── ASTRO TRACK ─── */
+  #astro-track {
+    display: none;
+    position: fixed;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+    align-items: center;
+    z-index: 20;
+    width: 130px;
+  }
+  .astro-earth {
+    font-size: 4rem;
+    filter: drop-shadow(0 0 16px rgba(34,197,94,.8));
+    margin-bottom: -6px;
+    z-index: 2;
+  }
+  .astro-scene {
+    position: relative;
+    width: 130px;
+    height: 380px;
+  }
+  #astro-svg { position: absolute; top: 0; left: 0; }
+  #astro-ship {
+    position: absolute;
+    font-size: 2.6rem;
+    left: 65px; top: 360px;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    transition: left .65s cubic-bezier(.4,0,.2,1), top .65s cubic-bezier(.4,0,.2,1);
+    filter: drop-shadow(0 0 12px rgba(168,85,247,.9));
+    z-index: 2;
+  }
+  .astro-moon {
+    position: absolute;
+    font-size: 1.8rem;
+    right: 4px; top: 38%;
+    opacity: .7;
+  }
+  .astro-planet {
+    position: absolute;
+    font-size: 1.4rem;
+    left: 2px; top: 65%;
+    opacity: .6;
+  }
+  .astro-space-icon { font-size: 2.2rem; margin-top: -6px; z-index: 2; }
+  #astro-ship.go-up   { animation: bumpUp .35s ease-out; }
+  #astro-ship.go-down { animation: bumpDown .35s ease-out; }
+  @keyframes bumpUp   { 50%{filter:drop-shadow(0 0 28px rgba(34,197,94,1))  scale(1.3)} }
+  @keyframes bumpDown { 50%{filter:drop-shadow(0 0 28px rgba(239,68,68,1))  scale(1.3)} }
+  #astro-track.reached .astro-earth {
+    animation: earthPulse .55s infinite alternate;
+  }
+  @keyframes earthPulse {
+    from { transform: scale(1);    filter: drop-shadow(0 0 16px rgba(34,197,94,.8)); }
+    to   { transform: scale(1.35); filter: drop-shadow(0 0 32px rgba(34,197,94,1));  }
+  }
+  #astro-ship.orbiting {
+    transition: none !important;
+    animation: orbitEarth 1.8s linear infinite !important;
+    filter: drop-shadow(0 0 28px rgba(34,197,94,1)) !important;
+  }
+  @keyframes orbitEarth {
+    0%   { transform: translate(calc(-50% + 34px), -50%)          rotate(0deg);   }
+    25%  { transform: translate(-50%,               calc(-50% - 34px)) rotate(90deg);  }
+    50%  { transform: translate(calc(-50% - 34px), -50%)          rotate(180deg); }
+    75%  { transform: translate(-50%,               calc(-50% + 34px)) rotate(270deg); }
+    100% { transform: translate(calc(-50% + 34px), -50%)          rotate(360deg); }
+  }
+  .mini-ship-2p.orbiting {
+    transition: none !important;
+    animation: orbitEarthMini 1.8s linear infinite !important;
+    filter: drop-shadow(0 0 18px rgba(34,197,94,1)) !important;
+  }
+  @keyframes orbitEarthMini {
+    0%   { transform: translate(calc(-50% + 22px), -50%)          rotate(0deg);   }
+    25%  { transform: translate(-50%,               calc(-50% - 22px)) rotate(90deg);  }
+    50%  { transform: translate(calc(-50% - 22px), -50%)          rotate(180deg); }
+    75%  { transform: translate(-50%,               calc(-50% + 22px)) rotate(270deg); }
+    100% { transform: translate(calc(-50% + 22px), -50%)          rotate(360deg); }
+  }
+  @media (max-width: 960px) { #astro-track { display: none !important; } }
+
+  /* ─── VICTORY ROCKET ─── */
+  #rocket-victory {
+    position: fixed; left: 0; top: 0;
+    font-size: 3rem; pointer-events: none;
+    z-index: 99999; display: none;
+    will-change: transform;
+  }
+
+  @media (max-width: 500px) {
+    .menu-card { width: 100%; }
+    .ans-btn { padding: 12px 18px; font-size: 1rem; }
+    .sentence { font-size: 1.4rem; }
+  }
+
+  /* ─── 2-PLAYER SPLIT SCREEN ─── */
+  #screen-game-2p { display: none; }
+  .topbar-2p {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 8px;
+  }
+  .topbar-2p .progress-wrap { flex: 1; margin-bottom: 0; }
+  .topbar-2p .q-num-2p { font-size: .9rem; opacity: .5; white-space: nowrap; }
+  .panels-2p { display: flex; gap: 8px; align-items: center; }
+  .panel-2p {
+    flex: 1; display: flex; flex-direction: column; gap: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius); padding: 12px;
+    min-width: 0;
+  }
+  .p1-panel { border-color: rgba(59,130,246,.35); }
+  .p2-panel { border-color: rgba(236,72,153,.35); }
+  .panel-header-2p {
+    text-align: center; font-size: 1rem; font-weight: 900;
+    padding: 7px 16px; border-radius: 50px; letter-spacing: .05em;
+  }
+  .p1-header-2p { background: rgba(59,130,246,.2); color: #93c5fd; border: 1.5px solid var(--blue); }
+  .p2-header-2p { background: rgba(236,72,153,.2); color: #f9a8d4; border: 1.5px solid var(--pink); }
+  .panel-stats-2p { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .panel-stats-2p .stat-box { min-width: 52px; padding: 5px 10px; }
+  .panel-stats-2p .stat-box .value { font-size: 1rem; }
+  .qcard-2p {
+    background: var(--card);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    border-radius: 14px; padding: 20px 14px;
+    text-align: center; backdrop-filter: blur(14px);
+    min-height: 60px;
+  }
+  .qcard-2p .sentence { font-size: clamp(1.3rem, 4vw, 2.1rem); font-weight: 800; }
+  .qcard-2p.shake  { animation: shake .4s; }
+  .qcard-2p.bounce { animation: bounceQ .4s; }
+  .answers-2p { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .answers-2p .ans-btn { padding: 13px 20px; font-size: 1.2rem; min-width: 80px; }
+  .mini-track-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    flex: 0 0 auto; padding-top: 4px;
+  }
+  .mini-earth-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 0 10px rgba(34,197,94,.7));
+    margin-bottom: -4px;
+  }
+  .mini-scene-wrap { position: relative; width: 80px; height: 160px; }
+  .mini-scene-wrap svg { position: absolute; top: 0; left: 0; }
+  .mini-ship-2p {
+    position: absolute; font-size: 1.5rem;
+    left: 40px; top: 150px;
+    transform: translate(-50%,-50%) rotate(-45deg);
+    transition: left .55s cubic-bezier(.4,0,.2,1), top .55s cubic-bezier(.4,0,.2,1);
+    filter: drop-shadow(0 0 8px rgba(168,85,247,.9)); z-index: 2;
+  }
+  .mini-ship-2p.go-up   { animation: bumpUp .35s ease-out; }
+  .mini-ship-2p.go-down { animation: bumpDown .35s ease-out; }
+  #mini-track-p1.reached .mini-earth-icon,
+  #mini-track-p2.reached .mini-earth-icon { animation: earthPulse .55s infinite alternate; }
+  @media (max-width: 600px) {
+    .panels-2p { flex-direction: column; }
+    .panel-2p { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-title">
+      <img src="logo.png" alt="Learning Fast logo">
+      <h1>Παιχνίδι Ορθογραφίας</h1>
+    </div>
+  </div>
+
+  <!-- MENU -->
+  <div id="screen-menu">
+    <div class="menu-cards" id="mode-cards">
+      <div class="menu-card articles" onclick="pickMode('articles')" id="card-articles">
+        <h2>Άρθρα</h2>
+        <p>Βρες το σωστό άρθρο!<br><em>η, οι, της, τις, των, τον…</em></p>
+      </div>
+      <div class="menu-card endings" onclick="pickMode('endings')" id="card-endings">
+        <h2>Καταλήξεις</h2>
+        <p>Βρες τη σωστή κατάληξη!<br><em>-η, -οι, -εις, -ων, -ο, -ες…</em></p>
+      </div>
+    </div>
+    <div id="players-picker" style="display:none">
+      <h3>Πόσοι παίκτες;</h3>
+      <div class="player-btns">
+        <button class="player-btn" onclick="pickPlayers(1)">
+          <span class="p-icon">👤</span>
+          <span class="p-label">1 Παίκτης</span>
+        </button>
+        <button class="player-btn" onclick="pickPlayers(2)">
+          <span class="p-icon">👥</span>
+          <span class="p-label">2 Παίκτες</span>
+        </button>
+      </div>
+      <button class="btn-back-mode" onclick="showModeCards()">← Πίσω</button>
+    </div>
+    <div id="length-picker" style="display:none">
+      <h3>Πόσες ερωτήσεις θέλεις;</h3>
+      <div class="length-btns">
+        <button class="length-btn" onclick="startGame(pendingMode,10)">10<span>ερωτήσεις</span></button>
+        <button class="length-btn" onclick="startGame(pendingMode,15)">15<span>ερωτήσεις</span></button>
+        <button class="length-btn" onclick="startGame(pendingMode,20)">20<span>ερωτήσεις</span></button>
+        <button class="length-btn" onclick="startGame(pendingMode,25)">25<span>ερωτήσεις</span></button>
+      </div>
+      <button class="btn-back-mode" onclick="showPlayersPicker()">← Πίσω</button>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="screen-game">
+    <div class="topbar">
+      <button class="btn-back" onclick="goMenu()">← Μενού</button>
+      <div class="stats">
+        <div class="stat-box"><div class="label" id="label-p1">Πόντοι</div><div class="value score" id="stat-score">0</div></div>
+        <div class="stat-box"><div class="label">Σερί</div><div class="value streak" id="stat-streak">0</div></div>
+        <div class="stat-box"><div class="label">Ζωές</div><div class="value lives" id="stat-lives">❤️❤️❤️</div></div>
+      </div>
+      <div class="stats" id="p2-stats" style="display:none">
+        <div class="stat-box"><div class="label" id="label-p2">Πόντοι</div><div class="value" id="stat-score2" style="color:var(--pink)">0</div></div>
+        <div class="stat-box"><div class="label">Σερί</div><div class="value" id="stat-streak2" style="color:#f97316">0</div></div>
+        <div class="stat-box"><div class="label">Ζωές</div><div class="value" id="stat-lives2" style="color:var(--red)">❤️❤️❤️</div></div>
+      </div>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="question-card" id="q-card">
+      <div class="mode-badge" id="mode-badge">Άρθρα</div>
+      <div class="q-number" id="q-number">Ερώτηση 1 / 10</div>
+      <div class="sentence" id="sentence"></div>
+      <div class="hint" id="hint"></div>
+    </div>
+    <!-- 1-player answers -->
+    <div class="answers" id="answers"></div>
+    <!-- 2-player answers -->
+    <div id="two-player-answers" style="display:none" class="two-player-answers">
+      <div class="player-col">
+        <div class="player-label p1-label">👤 Παίκτης 1</div>
+        <div class="answers" id="answers-p1"></div>
+      </div>
+      <div class="player-col">
+        <div class="player-label p2-label">👤 Παίκτης 2</div>
+        <div class="answers" id="answers-p2"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="screen-result">
+    <div class="result-card">
+      <div class="result-emoji" id="res-emoji">🏆</div>
+      <h2 id="res-title">Μπράβο!</h2>
+      <div class="result-score" id="res-score">0</div>
+      <div id="res-score2" style="display:none; font-size:2rem; font-weight:900; color:var(--pink); margin: -8px 0 8px;"></div>
+      <div class="result-meta" id="res-meta"></div>
+      <button class="btn-primary" id="btn-play-again" onclick="playAgain()">🔄 Παίξε Ξανά</button>
+      <button class="btn-secondary" onclick="goMenu()">🏠 Μενού</button>
+    </div>
+  </div>
+
+
+  <!-- 2-PLAYER GAME -->
+  <div id="screen-game-2p">
+    <div class="topbar-2p">
+      <button class="btn-back" onclick="goMenu()">← Μενού</button>
+      <div class="progress-wrap"><div class="progress-bar" id="progress-bar-2p"></div></div>
+      <div class="q-num-2p" id="q-number-2p">1 / 10</div>
+    </div>
+    <div class="panels-2p">
+      <!-- Πύραυλος Παίκτη 1 (αριστερά, έξω από το κουτί) -->
+      <div class="mini-track-wrap side-left" id="mini-track-p1">
+        <div class="mini-earth-icon">🌍</div>
+        <div class="mini-scene-wrap">
+          <svg width="80" height="160" viewBox="0 0 80 160">
+            <path id="mini-path-p1" d="M40,155 C65,130 15,108 40,83 C65,58 15,33 40,10"
+                  fill="none" stroke="rgba(59,130,246,0.45)" stroke-width="2.5" stroke-dasharray="7,5"/>
+          </svg>
+          <span class="mini-ship-2p" id="mini-ship-p1">🚀</span>
+        </div>
+      </div>
+      <!-- P1 -->
+      <div class="panel-2p p1-panel">
+        <div class="panel-header-2p p1-header-2p">👤 Παίκτης 1</div>
+        <div class="panel-stats-2p">
+          <div class="stat-box"><div class="label">Πόντοι</div><div class="value score" id="p1-score">0</div></div>
+          <div class="stat-box"><div class="label">Σερί</div><div class="value streak" id="p1-streak">0</div></div>
+          <div class="stat-box"><div class="label">Ζωές</div><div class="value lives" id="p1-lives">❤️❤️❤️</div></div>
+        </div>
+        <div class="qcard-2p" id="qcard-p1"><div class="sentence" id="sentence-p1"></div></div>
+        <div class="answers-2p" id="ans-p1"></div>
+      </div>
+      <!-- P2 -->
+      <div class="panel-2p p2-panel">
+        <div class="panel-header-2p p2-header-2p">👤 Παίκτης 2</div>
+        <div class="panel-stats-2p">
+          <div class="stat-box"><div class="label">Πόντοι</div><div class="value score" id="p2-score">0</div></div>
+          <div class="stat-box"><div class="label">Σερί</div><div class="value streak" id="p2-streak">0</div></div>
+          <div class="stat-box"><div class="label">Ζωές</div><div class="value lives" id="p2-lives">❤️❤️❤️</div></div>
+        </div>
+        <div class="qcard-2p" id="qcard-p2"><div class="sentence" id="sentence-p2"></div></div>
+        <div class="answers-2p" id="ans-p2"></div>
+      </div>
+      <!-- Πύραυλος Παίκτη 2 (δεξιά, έξω από το κουτί) -->
+      <div class="mini-track-wrap side-right" id="mini-track-p2">
+        <div class="mini-earth-icon">🌍</div>
+        <div class="mini-scene-wrap">
+          <svg width="80" height="160" viewBox="0 0 80 160">
+            <path id="mini-path-p2" d="M40,155 C65,130 15,108 40,83 C65,58 15,33 40,10"
+                  fill="none" stroke="rgba(236,72,153,0.45)" stroke-width="2.5" stroke-dasharray="7,5"/>
+          </svg>
+          <span class="mini-ship-2p" id="mini-ship-p2">🚀</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ASTRONAUT TRACK (1-player mode only) -->
+<div id="astro-track">
+  <div class="astro-earth">🌍</div>
+  <div class="astro-scene">
+    <svg id="astro-svg" width="130" height="380" viewBox="0 0 130 380">
+      <defs>
+        <filter id="pathglow">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <path id="astro-path"
+            d="M65,370 C105,300 20,240 65,175 C105,115 22,60 65,10"
+            fill="none"
+            stroke="rgba(168,85,247,0.35)"
+            stroke-width="3"
+            stroke-dasharray="9,7"
+            filter="url(#pathglow)"/>
+    </svg>
+    <span id="astro-ship">🚀</span>
+    <span class="astro-moon">🌙</span>
+    <span class="astro-planet">🪐</span>
+  </div>
+</div>
+
+<!-- VICTORY ROCKET (full-screen fly-around) -->
+<div id="rocket-victory">🚀</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ Σωστό!</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════ */
+
+
+// Articles mode: 4 hand-picked confusable options per question
+// No γενική αρσενικού/ουδέτερου ενικού ("του") – only γενική θηλυκού "της" is kept
+const articlesData = [
+  // ── Ονομαστική θηλυκό ενικός ──────────────────────────────
+  { word: "μητέρα",     answer: "η",   options: ["η","οι","της","τις"],   hint: "Ονομαστική, ενικός, θηλυκό" },
+  { word: "θάλασσα",    answer: "η",   options: ["η","οι","της","τις"],   hint: "Ονομαστική, ενικός, θηλυκό" },
+  { word: "μαθήτρια",   answer: "η",   options: ["η","οι","της","τις"],   hint: "Ονομαστική, ενικός, θηλυκό" },
+  // ── Γενική θηλυκό ενικός ──────────────────────────────────
+  { word: "δασκάλας",   answer: "της", options: ["της","τις","η","οι"],   hint: "Γενική, ενικός, θηλυκό" },
+  { word: "μαθήτριας",  answer: "της", options: ["της","τις","η","οι"],   hint: "Γενική, ενικός, θηλυκό" },
+  { word: "Μαρίας",     answer: "της", options: ["της","τις","η","οι"],   hint: "Γενική, ενικός, θηλυκό" },
+  { word: "γάτας",      answer: "της", options: ["της","τις","των","τον"], hint: "Γενική, ενικός, θηλυκό" },
+  { word: "νύχτας",     answer: "της", options: ["της","τις","η","οι"],   hint: "Γενική, ενικός, θηλυκό" },
+  { word: "πόλης",      answer: "της", options: ["της","τις","των","τον"], hint: "Γενική, ενικός, θηλυκό" },
+  { word: "φίλης",      answer: "της", options: ["της","τις","η","οι"],   hint: "Γενική, ενικός, θηλυκό" },
+  { word: "αδελφής",    answer: "της", options: ["της","τις","των","τον"], hint: "Γενική, ενικός, θηλυκό" },
+  { word: "μαμάς",      answer: "της", options: ["της","τις","η","οι"],   hint: "Γενική, ενικός, θηλυκό" },
+  { word: "ζωής",       answer: "της", options: ["της","τις","των","τον"], hint: "Γενική, ενικός, θηλυκό" },
+  { word: "χώρας",      answer: "της", options: ["της","τις","η","οι"],   hint: "Γενική, ενικός, θηλυκό" },
+  { word: "καρδιάς",    answer: "της", options: ["της","τις","των","τον"], hint: "Γενική, ενικός, θηλυκό" },
+  { word: "βροχής",     answer: "της", options: ["της","τις","η","οι"],   hint: "Γενική, ενικός, θηλυκό" },
+  { word: "αυλής",      answer: "της", options: ["της","τις","των","τον"], hint: "Γενική, ενικός, θηλυκό" },
+  { word: "τάξης",      answer: "της", options: ["της","τις","η","οι"],   hint: "Γενική, ενικός, θηλυκό" },
+  { word: "θάλασσας",   answer: "της", options: ["της","τις","των","τον"], hint: "Γενική, ενικός, θηλυκό" },
+  { word: "αλεπούς",    answer: "της", options: ["της","τις","η","οι"],   hint: "Γενική, ενικός, θηλυκό" },
+  // ── Ονομαστική αρσενικό πληθυντικός ──────────────────────
+  { word: "μαθητές",    answer: "οι",  options: ["οι","η","της","τις"],   hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { word: "δρόμοι",     answer: "οι",  options: ["οι","η","της","τις"],   hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { word: "λύκοι",      answer: "οι",  options: ["οι","η","της","τις"],   hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  // ── Αιτιατική αρσενικό ενικός ─────────────────────────────
+  { word: "αδελφό",     answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "κελαηδισμό", answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "δρόμο",      answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "ήλιο",       answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "κήπο",       answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "πατέρα",     answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "δάσκαλο",    answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "αέρα",       answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "φίλο",       answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "ουρανό",     answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "κόσμο",      answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "χρόνο",      answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "μαθητή",     answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "λύκο",       answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "βασιλιά",    answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "ποταμό",     answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  { word: "λόφο",       answer: "τον", options: ["τον","των","της","τις"], hint: "Αιτιατική, ενικός, αρσενικό" },
+  // ── Αιτιατική θηλυκό πληθυντικός ─────────────────────────
+  { word: "φίλες",      answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "μαθήτριες",  answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "ώρες",       answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "γυναίκες",   answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "εικόνες",    answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "πόλεις",     answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "μέρες",      answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "νύχτες",     answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "αδελφές",    answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "λέξεις",     answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "τάξεις",     answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "χώρες",      answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "φωνές",      answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "γάτες",      answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "ιδέες",      answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { word: "στιγμές",    answer: "τις", options: ["τις","της","τον","των"],  hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  // ── Ονομαστική/Αιτιατική ουδέτερο πληθυντικός ────────────
+  { word: "αστέρια",    answer: "τα",  options: ["τα","τις","τον","των"],  hint: "Αιτιατική, πληθυντικός, ουδέτερο" },
+  { word: "παιδιά",     answer: "τα",  options: ["τα","τις","τον","των"],  hint: "Ονομαστική, πληθυντικός, ουδέτερο" },
+  // ── Γενική πληθυντικός ────────────────────────────────────
+  { word: "παιδιών",    answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, ουδέτερο" },
+  { word: "μαθητών",    answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, αρσενικό" },
+  { word: "λουλουδιών", answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, ουδέτερο" },
+  { word: "φίλων",      answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, αρσενικό" },
+  { word: "δέντρων",    answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, ουδέτερο" },
+  { word: "ζώων",       answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, ουδέτερο" },
+  { word: "κοριτσιών",  answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, ουδέτερο" },
+  { word: "αστεριών",   answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, ουδέτερο" },
+  { word: "δασκάλων",   answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, αρσενικό" },
+  { word: "γυναικών",   answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, θηλυκό" },
+  { word: "βιβλίων",    answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, ουδέτερο" },
+  { word: "σχολείων",   answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, ουδέτερο" },
+  { word: "αδελφών",    answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, αρσενικό/θηλυκό" },
+  { word: "χωρών",      answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, θηλυκό" },
+  { word: "δρόμων",     answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, αρσενικό" },
+  { word: "λέξεων",     answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, θηλυκό" },
+  { word: "τάξεων",     answer: "των", options: ["των","τον","της","τις"],   hint: "Γενική, πληθυντικός, θηλυκό" },
+];
+
+// Endings mode: pre = stem before blank, post = letters after blank, answer = missing vowel(s)
+// Μόνο ουσιαστικά – αρσενικά & θηλυκά – ονομαστική/γενική πληθ. + αιτιατική πληθ. θηλ. (-εις)
+const endingsData = [
+  // ── Ονομαστική πληθ. αρσενικών σε -ος → -οι ──────────
+  { article: "οι",  pre: "δάσκαλ",   post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "δρόμ",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "φίλ",      post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "κήπ",      post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "λύκ",      post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "κύκλ",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "λόφ",      post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "τοίχ",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "βράχ",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "σκύλ",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "δίσκ",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "πύργ",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "κόσμ",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "χρόν",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "τρόπ",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "τόπ",      post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "θρόν",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "μύθ",      post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  // ── Ονομαστική πληθ. αρσενικών σε -ης → -ες ──────────
+  { article: "οι",  pre: "μαθητ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "αθλητ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "πολίτ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "εργάτ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "επιβάτ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "ποιητ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "κριτ",     post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "πελάτ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "στρατιώτ", post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "τεχνίτ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  // ── Ονομαστική πληθ. θηλυκών (1η κλίση) → -ες ────────
+  { article: "οι",  pre: "γυναίκ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "καρέκλ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "ντομάτ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "πατάτ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "αδελφ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "μαμάδ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "μπάλ",     post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "κούκλ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "πόρτ",     post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "σκάλ",     post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "βάρκ",     post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "τσάντ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "γάτ",      post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "ομπρέλ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  // ── Ονομαστική πληθ. θηλυκών (3η κλίση) → -εις ───────
+  { article: "οι",  pre: "τάξ",      post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "δυνάμ",    post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "πόλ",      post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "λέξ",      post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "ασκήσ",    post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "προτάσ",   post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "πράξ",     post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "σχέσ",     post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "θέσ",      post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "εξετάσ",   post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "εκφράσ",   post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "εξηγήσ",   post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  // ── Γενική πληθ. αρσενικών → -ων ──────────────────────
+  { article: "των", pre: "δασκάλ",   post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "δρόμ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "φίλ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "μαθητ",    post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "κήπ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "λύκ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "βράχ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "σκύλ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "πύργ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "κόσμ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "τρόπ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "τόπ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  // ── Γενική πληθ. θηλυκών (1η κλίση) → -ων ────────────
+  { article: "των", pre: "γυναικ",   post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "αδελφ",    post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "χωρ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "φων",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "μαμάδ",    post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "γατ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "πορτ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "βαρκ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "σκαλ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "μπαλ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  // ── Γενική πληθ. θηλυκών (3η κλίση) → -εων ───────────
+  { article: "των", pre: "τάξ",      post: "ων", answer: "ε", options: ["ε","αι","η","ι"],  hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "δυνάμ",    post: "ων", answer: "ε", options: ["ε","αι","η","ι"],  hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "πόλ",      post: "ων", answer: "ε", options: ["ε","αι","η","ι"],  hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "λέξ",      post: "ων", answer: "ε", options: ["ε","αι","η","ι"],  hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "ασκήσ",    post: "ων", answer: "ε", options: ["ε","αι","η","ι"],  hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "πράξ",     post: "ων", answer: "ε", options: ["ε","αι","η","ι"],  hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "σχέσ",     post: "ων", answer: "ε", options: ["ε","αι","η","ι"],  hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "θέσ",      post: "ων", answer: "ε", options: ["ε","αι","η","ι"],  hint: "Γενική, πληθυντικός, θηλυκό" },
+  // ── Αιτιατική πληθ. θηλυκών (3η κλίση) → -εις ────────
+  { article: "τις", pre: "τάξ",      post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "δυνάμ",    post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "πόλ",      post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "λέξ",      post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "ασκήσ",    post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "προτάσ",   post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "πράξ",     post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "σχέσ",     post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "θέσ",      post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "εξετάσ",   post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "εκφράσ",   post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+  { article: "τις", pre: "εξηγήσ",   post: "ς", answer: "ει", options: ["ει","η","οι","ι"], hint: "Αιτιατική, πληθυντικός, θηλυκό" },
+];
+
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+let mode = '', score = 0, streak = 0, lives = 3, qIndex = 0, questions = [], answered = false, lastMode = '';
+let astroPos = 0, astroPos1 = 0, astroPos2 = 0, pendingMode = '', pendingPlayers = 1;
+let players = 1, score2 = 0, streak2 = 0, lives2 = 3, p1done = false, p2done = false;
+let TOTAL_Q = 10;
+
+/* ══════════════════════════════════════════════
+   STARS
+══════════════════════════════════════════════ */
+function makeStars() {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 3 + 1;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s`;
+    c.appendChild(s);
+  }
+}
+makeStars();
+
+/* ══════════════════════════════════════════════
+   SCREENS
+══════════════════════════════════════════════ */
+function show(id) {
+  ['screen-menu','screen-game','screen-game-2p','screen-result'].forEach(s => document.getElementById(s).style.display = 'none');
+  document.getElementById(id).style.display = (id === 'screen-menu') ? 'flex' : 'block';
+  document.body.classList.toggle('in-game', id === 'screen-game' || id === 'screen-game-2p');
+}
+
+function goMenu() {
+  show('screen-menu');
+  showModeCards();
+  document.getElementById('astro-track').style.display = 'none';
+}
+
+function showModeCards() {
+  document.getElementById('mode-cards').style.display    = 'flex';
+  document.getElementById('players-picker').style.display = 'none';
+  document.getElementById('length-picker').style.display  = 'none';
+}
+
+function showPlayersPicker() {
+  document.getElementById('players-picker').style.display = 'block';
+  document.getElementById('mode-cards').style.display     = 'none';
+  document.getElementById('length-picker').style.display  = 'none';
+}
+
+function pickMode(m) {
+  pendingMode = m;
+  document.getElementById('mode-cards').style.display     = 'none';
+  document.getElementById('players-picker').style.display = 'block';
+}
+
+function pickPlayers(n) {
+  pendingPlayers = n;
+  document.getElementById('players-picker').style.display = 'none';
+  document.getElementById('length-picker').style.display  = 'block';
+}
+
+function playAgain() { startGame(lastMode, TOTAL_Q); }
+
+/* ══════════════════════════════════════════════
+   GAME START
+══════════════════════════════════════════════ */
+function startGame(m, totalQ) {
+  mode = m; lastMode = m; TOTAL_Q = totalQ;
+  players = pendingPlayers;
+  score = 0; streak = 0; lives = 3; qIndex = 0; answered = false;
+  score2 = 0; streak2 = 0; lives2 = 3; p1done = false; p2done = false;
+  const pool = m === 'articles' ? [...articlesData] : [...endingsData];
+  questions = buildRoundRobinDeck(pool, q => q.answer).slice(0, TOTAL_Q);
+  reinforcedForQIndex = -1;
+
+  if (players === 2) {
+    document.getElementById('astro-track').style.display = 'none';
+    astroPos1 = 0; astroPos2 = 0;
+    ['p1','p2'].forEach(p => {
+      const track = document.getElementById(`mini-track-${p}`);
+      track.classList.remove('reached');
+    });
+    setTimeout(() => {
+      ['p1','p2'].forEach(p => {
+        const path = document.getElementById(`mini-path-${p}`);
+        const ship = document.getElementById(`mini-ship-${p}`);
+        const pt = path.getPointAtLength(0);
+        ship.className = 'mini-ship-2p';
+        ship.style.transition = 'none';
+        ship.style.left = pt.x + 'px';
+        ship.style.top  = pt.y + 'px';
+        setTimeout(() => { ship.style.transition = ''; }, 50);
+      });
+    }, 0);
+    show('screen-game-2p');
+    render2P();
+  } else {
+    astroPos = 0;
+    const track = document.getElementById('astro-track');
+    track.style.display = 'flex';
+    track.classList.remove('reached');
+    const ship = document.getElementById('astro-ship');
+    ship.className = '';
+    setTimeout(() => {
+      const path = document.getElementById('astro-path');
+      const pt   = path.getPointAtLength(0);
+      ship.style.transition = 'none';
+      ship.style.left = pt.x + 'px';
+      ship.style.top  = pt.y + 'px';
+      setTimeout(() => { ship.style.transition = ''; }, 50);
+    }, 0);
+    document.getElementById('mode-badge').textContent = m === 'articles' ? '📖 Άρθρα' : '✏️ Καταλήξεις';
+    show('screen-game');
+    updateStats();
+    renderQuestion();
+  }
+}
+
+/* ══════════════════════════════════════════════
+   RENDER QUESTION
+══════════════════════════════════════════════ */
+function renderQuestion() {
+  answered = false; p1done = false; p2done = false;
+  const q = questions[qIndex];
+  document.getElementById('q-number').textContent = `Ερώτηση ${qIndex+1} / ${TOTAL_Q}`;
+  document.getElementById('progress-bar').style.width = `${(qIndex/TOTAL_Q)*100}%`;
+
+  let html = '';
+  if (mode === 'articles') {
+    html = `<span class="blank" id="blank">___</span> ${q.word}`;
+  } else {
+    html = `${q.article} ${q.pre}<span class="blank" id="blank">_</span>${q.post}`;
+  }
+  document.getElementById('sentence').innerHTML = html;
+  document.getElementById('hint').textContent = q.hint || '';
+
+  const opts = (() => { const o = [...q.options]; shuffle(o); return o; })();
+
+  if (players === 1) {
+    const container = document.getElementById('answers');
+    container.innerHTML = '';
+    opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'ans-btn';
+      btn.textContent = opt;
+      btn.onclick = () => { btn.blur(); checkAnswer(opt, q.answer, btn, 0); };
+      container.appendChild(btn);
+    });
+  } else {
+    ['answers-p1','answers-p2'].forEach((cid, pIdx) => {
+      const container = document.getElementById(cid);
+      container.innerHTML = '';
+      opts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'ans-btn';
+        btn.textContent = opt;
+        btn.onclick = () => { btn.blur(); checkAnswer(opt, q.answer, btn, pIdx + 1); };
+        container.appendChild(btn);
+      });
+    });
+  }
+}
+
+/* ══════════════════════════════════════════════
+   CHECK ANSWER
+══════════════════════════════════════════════ */
+function checkAnswer(chosen, correct, btn, pNum) {
+  const isOk = chosen.toLowerCase() === correct.toLowerCase();
+
+  if (players === 1) {
+    if (answered) return;
+    const blank = document.getElementById('blank');
+    if (isOk) {
+      answered = true;
+      streak++;
+      const bonus = Math.min(streak - 1, 3) * 5;
+      score += 10 + bonus;
+      btn.classList.add('correct');
+      if (blank) { blank.textContent = chosen; blank.classList.add('filled-correct'); }
+      showToast(streak >= 3 ? `🔥 Σερί x${streak}! +${10+bonus} πόντοι!` : `✅ Σωστό! +${10+bonus} πόντοι`, 'ok');
+      document.getElementById('q-card').classList.add('bounce');
+      setTimeout(() => document.getElementById('q-card').classList.remove('bounce'), 400);
+      if (streak >= 3) spawnConfetti(8);
+      updateAstronaut(true);
+      updateStats();
+      document.querySelectorAll('#answers .ans-btn').forEach(b => b.disabled = true);
+      setTimeout(() => { qIndex++; if (lives <= 0 || qIndex >= TOTAL_Q) showResult(); else renderQuestion(); }, 1400);
+    } else {
+      streak = 0; lives--;
+      btn.classList.add('wrong');
+      btn.disabled = true;
+      showToast('❌ Λάθος! Ξαναπροσπάθησε!', 'err');
+      document.getElementById('q-card').classList.add('shake');
+      setTimeout(() => document.getElementById('q-card').classList.remove('shake'), 400);
+      updateAstronaut(false);
+      updateStats();
+      reinforceCategory(correct);
+      if (lives <= 0) {
+        document.querySelectorAll('#answers .ans-btn').forEach(b => {
+          if (b.textContent.toLowerCase() === correct.toLowerCase()) b.classList.add('correct');
+          b.disabled = true;
+        });
+        if (blank) { blank.textContent = correct; blank.classList.add('filled-wrong'); }
+        setTimeout(() => showResult(), 1400);
+      }
+    }
+
+  } else {
+    // 2-player mode
+    if (pNum === 1 && p1done) return;
+    if (pNum === 2 && p2done) return;
+    const colId = pNum === 1 ? 'answers-p1' : 'answers-p2';
+    if (isOk) {
+      btn.classList.add('correct');
+      document.querySelectorAll(`#${colId} .ans-btn`).forEach(b => b.disabled = true);
+      if (pNum === 1) { p1done = true; streak++;  score  += 10; }
+      else            { p2done = true; streak2++; score2 += 10; }
+    } else {
+      btn.classList.add('wrong');
+      btn.disabled = true;
+      if (pNum === 1) { streak  = 0; lives--;  }
+      else            { streak2 = 0; lives2--; }
+      reinforceCategory(correct);
+    }
+    updateAstronaut(isOk);
+    updateStats();
+    if (p1done && p2done) {
+      const blank = document.getElementById('blank');
+      if (blank) { blank.textContent = correct; blank.classList.add('filled-correct'); }
+      setTimeout(() => {
+        qIndex++;
+        if (qIndex >= TOTAL_Q) showResult();
+        else renderQuestion();
+      }, 1400);
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════
+   UI HELPERS
+══════════════════════════════════════════════ */
+function updateStats() {
+  document.getElementById('stat-score').textContent  = score;
+  document.getElementById('stat-streak').textContent = streak + (streak >= 3 ? '🔥' : '');
+  const h = ['❤️','❤️','❤️'];
+  for (let i = lives; i < 3; i++) h[i] = '🖤';
+  document.getElementById('stat-lives').textContent = h.join('');
+  if (players === 2) {
+    document.getElementById('stat-score2').textContent  = score2;
+    document.getElementById('stat-streak2').textContent = streak2 + (streak2 >= 3 ? '🔥' : '');
+    const h2 = ['❤️','❤️','❤️'];
+    for (let i = lives2; i < 3; i++) h2[i] = '🖤';
+    document.getElementById('stat-lives2').textContent = h2.join('');
+  }
+}
+
+let toastTimer;
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = 'toast', 1800);
+}
+
+function spawnConfetti(n) {
+  const colors = ['#a855f7','#ec4899','#facc15','#22c55e','#3b82f6','#f97316'];
+  for (let i = 0; i < n; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `left:${Math.random()*100}vw;background:${colors[~~(Math.random()*colors.length)]};animation-duration:${1+Math.random()}s;animation-delay:${Math.random()*.4}s;transform:rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
+}
+
+/* ══════════════════════════════════════════════
+   RESULT
+══════════════════════════════════════════════ */
+function showResult() {
+  document.getElementById('progress-bar').style.width = '100%';
+  const s2el = document.getElementById('res-score2');
+
+  if (players === 2) {
+    let emoji, title;
+    if (score > score2)       { emoji='🏆'; title='Νίκησε ο Παίκτης 1!'; spawnConfetti(30); }
+    else if (score2 > score)  { emoji='🏆'; title='Νίκησε ο Παίκτης 2!'; spawnConfetti(30); }
+    else                      { emoji='🤝'; title='Ισοπαλία!'; spawnConfetti(20); }
+    document.getElementById('res-emoji').textContent = emoji;
+    document.getElementById('res-title').textContent = title;
+    document.getElementById('res-score').textContent = `👤 Παίκτης 1: ${score} πόντοι`;
+    s2el.style.display = 'block';
+    s2el.textContent   = `👤 Παίκτης 2: ${score2} πόντοι`;
+    document.getElementById('res-meta').textContent  = `${qIndex} ερωτήσεις`;
+  } else {
+    s2el.style.display = 'none';
+    const pct = Math.round((score / (TOTAL_Q * 13)) * 100);
+    let emoji, title;
+    if (pct >= 85)      { emoji='🏆'; title='Εξαιρετικά! Είσαι πρωταθλητής!'; spawnConfetti(30); }
+    else if (pct >= 60) { emoji='🌟'; title='Μπράβο! Συνέχισε έτσι!'; spawnConfetti(15); }
+    else if (pct >= 40) { emoji='💪'; title='Καλή προσπάθεια! Ξαναπροσπάθησε!'; }
+    else                { emoji='📚'; title='Χρειάζεσαι λίγη εξάσκηση!'; }
+    document.getElementById('res-emoji').textContent = emoji;
+    document.getElementById('res-title').textContent = title;
+    document.getElementById('res-score').textContent = score + ' πόντοι';
+    document.getElementById('res-meta').textContent  = `${qIndex} ερωτήσεις • ${lives > 0 ? lives : 0} ζωές απομένουν`;
+  }
+  show('screen-result');
+}
+
+/* ══════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════ */
+function updateAstronaut(correct) {
+  if (correct) astroPos = Math.min(astroPos + 1, 10);
+  else         astroPos = Math.max(astroPos - 1, 0);
+  const ship  = document.getElementById('astro-ship');
+  const path  = document.getElementById('astro-path');
+  const track = document.getElementById('astro-track');
+  const len   = path.getTotalLength();
+  const pt    = path.getPointAtLength(len * (astroPos / TOTAL_Q));
+  ship.style.left = pt.x + 'px';
+  ship.style.top  = pt.y + 'px';
+  ship.classList.remove('go-up','go-down','orbiting');
+  void ship.offsetWidth;
+  ship.classList.add(correct ? 'go-up' : 'go-down');
+  if (astroPos >= TOTAL_Q) {
+    track.classList.add('reached');
+    setTimeout(() => {
+      ship.classList.remove('go-up','go-down');
+      ship.classList.add('orbiting');
+      launchVictoryRocket();
+    }, 700);
+  }
+}
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = ~~(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+}
+
+// Περνάει από ΟΛΕΣ τις κατηγορίες (άρθρα/καταλήξεις) με τη σειρά, μία λέξη
+// από την καθεμία, και μετά ξαναρχίζει τον κύκλο — ώστε να μην επαναλαμβάνεται
+// συνέχεια η ίδια κατηγορία πριν εμφανιστούν όλες οι υπόλοιπες.
+function buildRoundRobinDeck(arr, getType) {
+  const groups = {};
+  const shuffled = [...arr];
+  shuffle(shuffled);
+  shuffled.forEach(item => {
+    const type = getType(item);
+    if (!groups[type]) groups[type] = [];
+    groups[type].push(item);
+  });
+
+  const typeOrder = Object.keys(groups);
+  shuffle(typeOrder);
+  const deck = [];
+  let remaining = arr.length;
+
+  while (remaining > 0) {
+    for (const type of typeOrder) {
+      const bucket = groups[type];
+      if (bucket && bucket.length > 0) {
+        deck.push(bucket.shift());
+        remaining--;
+      }
+    }
+  }
+
+  return deck;
+}
+
+// Όταν ένα παιδί δυσκολεύεται με μια κατηγορία (άρθρο/κατάληξη), φέρνει πιο
+// κοντά (μέσα στις επόμενες λίγες ερωτήσεις) άλλη μία της ίδιας κατηγορίας
+// για επιπλέον εξάσκηση, χωρίς να αλλάζει το πλήθος των ερωτήσεων.
+let reinforcedForQIndex = -1;
+function reinforceCategory(type) {
+  if (reinforcedForQIndex === qIndex) return;
+  reinforcedForQIndex = qIndex;
+  for (let i = qIndex + 1; i < questions.length; i++) {
+    if (questions[i].answer === type) {
+      const [q] = questions.splice(i, 1);
+      const insertAt = Math.min(qIndex + 2, questions.length);
+      questions.splice(insertAt, 0, q);
+      return;
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════
+   2-PLAYER RENDER & LOGIC
+══════════════════════════════════════════════ */
+function render2P() {
+  answered = false; p1done = false; p2done = false;
+  const q = questions[qIndex];
+  document.getElementById('q-number-2p').textContent = `${qIndex+1} / ${TOTAL_Q}`;
+  document.getElementById('progress-bar-2p').style.width = `${(qIndex/TOTAL_Q)*100}%`;
+  const opts = [...q.options]; shuffle(opts);
+  ['p1','p2'].forEach((p, idx) => {
+    const html = mode === 'articles'
+      ? `<span class="blank" id="blank-${p}">___</span> ${q.word}`
+      : `${q.article} ${q.pre}<span class="blank" id="blank-${p}">_</span>${q.post}`;
+    document.getElementById(`sentence-${p}`).innerHTML = html;
+    const container = document.getElementById(`ans-${p}`);
+    container.innerHTML = '';
+    const pNum = idx + 1;
+    opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'ans-btn';
+      btn.textContent = opt;
+      btn.onclick = () => { btn.blur(); checkAnswer2P(opt, q.answer, btn, pNum); };
+      container.appendChild(btn);
+    });
+  });
+}
+
+function checkAnswer2P(chosen, correct, btn, pNum) {
+  if (pNum === 1 && p1done) return;
+  if (pNum === 2 && p2done) return;
+  const isOk = chosen.toLowerCase() === correct.toLowerCase();
+  const p = pNum === 1 ? 'p1' : 'p2';
+  const blank = document.getElementById(`blank-${p}`);
+  const card  = document.getElementById(`qcard-${p}`);
+  if (isOk) {
+    btn.classList.add('correct');
+    document.querySelectorAll(`#ans-${p} .ans-btn`).forEach(b => b.disabled = true);
+    if (pNum === 1) { p1done = true; streak++;  const bonus  = Math.min(streak -1,3)*5; score  += 10+bonus;  }
+    else            { p2done = true; streak2++; const bonus2 = Math.min(streak2-1,3)*5; score2 += 10+bonus2; }
+    if (blank) { blank.textContent = chosen;  blank.classList.add('filled-correct'); }
+    card.classList.add('bounce');
+    setTimeout(() => card.classList.remove('bounce'), 400);
+  } else {
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    if (pNum === 1) { streak  = 0; lives--;  }
+    else            { streak2 = 0; lives2--; }
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 400);
+  }
+  updateMiniRocket(pNum, isOk);
+  updateStats2P();
+  if (p1done && p2done) {
+    setTimeout(() => { qIndex++; if (qIndex >= TOTAL_Q) showResult(); else render2P(); }, 1400);
+  }
+}
+
+function updateMiniRocket(pNum, correct) {
+  if (pNum === 1) {
+    astroPos1 = correct ? Math.min(astroPos1+1, TOTAL_Q) : Math.max(astroPos1-1, 0);
+  } else {
+    astroPos2 = correct ? Math.min(astroPos2+1, TOTAL_Q) : Math.max(astroPos2-1, 0);
+  }
+  const p    = pNum === 1 ? 'p1' : 'p2';
+  const pos  = pNum === 1 ? astroPos1 : astroPos2;
+  const ship  = document.getElementById(`mini-ship-${p}`);
+  const path  = document.getElementById(`mini-path-${p}`);
+  const track = document.getElementById(`mini-track-${p}`);
+  const len   = path.getTotalLength();
+  const pt    = path.getPointAtLength(len * (pos / TOTAL_Q));
+  ship.style.left = pt.x + 'px';
+  ship.style.top  = pt.y + 'px';
+  ship.classList.remove('go-up','go-down','orbiting');
+  void ship.offsetWidth;
+  ship.classList.add(correct ? 'go-up' : 'go-down');
+  if (pos >= TOTAL_Q) {
+    track.classList.add('reached');
+    setTimeout(() => {
+      ship.classList.remove('go-up','go-down');
+      ship.classList.add('orbiting');
+      launchVictoryRocket();
+    }, 700);
+  }
+}
+
+function launchVictoryRocket() {
+  const rv = document.getElementById('rocket-victory');
+  rv.style.display = 'block';
+  const duration = 3400;
+  const startTime = performance.now();
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const cx = w * 0.5;
+  const cy = h * 0.5;
+  const rx = w * 0.43;
+  const ry = h * 0.39;
+  // start angle: top-right area (where Earth is on the track)
+  const startAngle = -Math.PI / 3.5;
+  const glowColors = ['#22c55e','#facc15','#a855f7','#ec4899','#3b82f6','#22c55e'];
+
+  function frame(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    const angle = startAngle + t * Math.PI * 2;
+    const x = cx + rx * Math.cos(angle);
+    const y = cy + ry * Math.sin(angle);
+    // scale: grows to 2.8x in first third, stays big, shrinks at end
+    const scale = t < 0.3
+      ? 0.8 + t * (2.8 - 0.8) / 0.3
+      : t > 0.85
+        ? 2.8 * (1 - (t - 0.85) / 0.15)
+        : 2.8;
+    // rotate to follow the ellipse tangent
+    const tx = -rx * Math.sin(angle);
+    const ty =  ry * Math.cos(angle);
+    const rotateDeg = Math.atan2(ty, tx) * 180 / Math.PI - 45;
+    // glow color cycle
+    const ci = Math.floor(t * (glowColors.length - 1));
+    const glow = glowColors[Math.min(ci, glowColors.length - 1)];
+    const opacity = t > 0.88 ? 1 - (t - 0.88) / 0.12 : 1;
+    rv.style.transform = `translate(${x}px,${y}px) translate(-50%,-50%) scale(${Math.max(0.1,scale)}) rotate(${rotateDeg}deg)`;
+    rv.style.filter = `drop-shadow(0 0 28px ${glow})`;
+    rv.style.opacity = opacity;
+    if (t < 1) requestAnimationFrame(frame);
+    else rv.style.display = 'none';
+  }
+  requestAnimationFrame(frame);
+}
+
+function updateStats2P() {
+  document.getElementById('p1-score').textContent  = score;
+  document.getElementById('p1-streak').textContent = streak + (streak >= 3 ? '🔥' : '');
+  const h1 = ['❤️','❤️','❤️']; for (let i = lives; i < 3; i++) h1[i] = '🖤';
+  document.getElementById('p1-lives').textContent  = h1.join('');
+  document.getElementById('p2-score').textContent  = score2;
+  document.getElementById('p2-streak').textContent = streak2 + (streak2 >= 3 ? '🔥' : '');
+  const h2 = ['❤️','❤️','❤️']; for (let i = lives2; i < 3; i++) h2[i] = '🖤';
+  document.getElementById('p2-lives').textContent  = h2.join('');
+}
+</script>
+</body>
+</html>
