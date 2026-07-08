@@ -757,11 +757,11 @@ section {
 @media (max-width: 768px) {
   .navbar {
     padding: 0 1.2rem;
-    justify-content: space-between;
+    justify-content: flex-end;
   }
 
-  .navbar__logo img {
-    height: 24px;
+  .navbar__logo {
+    display: none;
   }
 
   .navbar__hamburger {
