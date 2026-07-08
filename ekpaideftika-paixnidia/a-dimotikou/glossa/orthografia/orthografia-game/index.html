@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Παιχνίδι Ορθογραφίας  ι, η, ει, οι</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=6">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NFLV4ZCHPZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-NFLV4ZCHPZ');
+    </script>
+</head>
+<body>
+    <div class="app-container" id="app">
+        <!-- Αρχική Οθόνη Επιλογής -->
+        <div id="start-screen" class="start-screen">
+            <header>
+                <img src="logo.png" alt="Logo" class="game-logo">
+                <h1>Παιχνίδι Ορθογραφίας</h1>
+                <p>Επίλεξε πως θέλεις να παίξεις</p>
+            </header>
+            <div class="mode-options">
+                <button class="mode-btn" onclick="selectMode('single')">
+                    <span class="icon">👤</span>
+                    <span>1 Παιδί</span>
+                </button>
+                <button class="mode-btn" onclick="selectMode('tablet')">
+                    <span class="icon">📱</span>
+                    <span>2 Παιδιά (Απέναντι)</span>
+                </button>
+                <button class="mode-btn" onclick="selectMode('board')">
+                    <span class="icon">🖥️</span>
+                    <span>2 Παιδιά (Δίπλα-δίπλα)</span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Οθόνη Επιλογής Επιπέδου -->
+        <div id="level-screen" class="start-screen hidden">
+            <header>
+                <h1>Παιχνίδι Ορθογραφίας</h1>
+                <p>Επίλεξε επίπεδο δυσκολίας</p>
+            </header>
+            <div class="mode-options">
+                <button class="mode-btn level-btn" onclick="selectLevel(1)">
+                    <span class="icon">⭐</span>
+                    <span>Επίπεδο 1</span>
+                    <span class="level-desc">Βρες το άρθρο</span>
+                </button>
+                <button class="mode-btn level-btn" onclick="selectLevel(2)">
+                    <span class="icon">⭐⭐</span>
+                    <span>Επίπεδο 2</span>
+                    <span class="level-desc">Με άρθρο</span>
+                </button>
+                <button class="mode-btn level-btn" onclick="selectLevel(3)">
+                    <span class="icon">⭐⭐⭐</span>
+                    <span>Επίπεδο 3</span>
+                    <span class="level-desc">Χωρίς άρθρο</span>
+                </button>
+            </div>
+            <button class="back-btn" onclick="goBackToStart()">← Πίσω</button>
+        </div>
+
+        <!-- Οθόνη Επιλογής Χρόνου -->
+        <div id="time-screen" class="start-screen hidden">
+            <header>
+                <h1>Παιχνίδι Ορθογραφίας</h1>
+                <p>Επίλεξε χρόνο παιχνιδιού</p>
+            </header>
+            <div class="mode-options">
+                <button class="mode-btn time-btn" onclick="startGame(30)">
+                    <span class="icon">⏱️</span>
+                    <span>30 δευτ.</span>
+                </button>
+                <button class="mode-btn time-btn" onclick="startGame(60)">
+                    <span class="icon">⏱️</span>
+                    <span>1 λεπτό</span>
+                </button>
+                <button class="mode-btn time-btn" onclick="startGame(120)">
+                    <span class="icon">⏱️</span>
+                    <span>2 λεπτά</span>
+                </button>
+                <button class="mode-btn time-btn" onclick="startGame(180)">
+                    <span class="icon">⏱️</span>
+                    <span>3 λεπτά</span>
+                </button>
+                <button class="mode-btn time-btn" onclick="startGame(300)">
+                    <span class="icon">⏱️</span>
+                    <span>5 λεπτά</span>
+                </button>
+            </div>
+            <button class="back-btn" onclick="goBackToLevel()">← Πίσω</button>
+        </div>
+
+        <!-- Κύριος χώρος παιχνιδιού (κρύβεται αρχικά) -->
+        <div id="game-container" class="game-container hidden">
+            <!-- Εδώ θα προστεθούν δυναμικά τα boards από την JS -->
+            <button id="home-btn" class="home-btn" onclick="location.reload()">🏠 Αρχικό Μενού</button>
+            <div id="timer-display" class="timer-display"></div>
+        </div>
+
+        <!-- Overlay τέλους παιχνιδιού -->
+        <div id="end-overlay" class="end-overlay hidden">
+            <div class="end-card">
+                <div class="end-title">⏰ Τέλος χρόνου!</div>
+                <div id="end-scores" class="end-scores"></div>
+                <div class="end-buttons">
+                    <button class="end-btn retry-btn" id="retry-btn">🔄 Επανάληψη λαθών</button>
+                    <button class="end-btn home-end-btn" onclick="location.reload()">🏠 Αρχική</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Template για το ταμπλό παίκτη (κρυμμένο) -->
+        <template id="player-board-template">
+            <div class="player-board">
+                <header>
+                    <div class="score-board">
+                        <div class="score-badge correct">
+                            <span>Σωστά:</span> <span class="correct-score">0</span>
+                        </div>
+                        <div class="score-badge wrong">
+                            <span>Λάθος:</span> <span class="wrong-score">0</span>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="game-area">
+                    <div class="word-card" class="word-card">
+                        <span class="word-article"></span> <span class="word-stem">πουλ</span><span class="word-ending missing">&nbsp;</span>
+                    </div>
+                    
+                    <div class="feedback-message"></div>
+
+                    <div class="options-container">
+                        <button class="option-btn" data-ending="ι">-ι</button>
+                        <button class="option-btn" data-ending="η">-η</button>
+                        <button class="option-btn" data-ending="ει">-ει</button>
+                        <button class="option-btn" data-ending="οι">-οι</button>
+                        <button class="option-btn" data-ending="ω">-ω</button>
+                        <button class="option-btn" data-ending="ο">-ο</button>
+                    </div>
+                    
+                    <button class="next-btn hidden">Επόμενη Λέξη ➔</button>
+                </main>
+            </div>
+        </template>
+
+        <!-- Confetti Canvas (Κοινό για όλους) -->
+        <canvas id="confetti-canvas"></canvas>
+    </div>
+
+    <!-- Include Canvas Confetti library for winning effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="script.js?v=6"></script>
+</body>
+</html>
