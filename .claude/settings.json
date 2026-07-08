@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Start-Process \"c:\\\\Users\\\\Asus\\\\Desktop\\\\programming\\\\learningfastsite\\\\enimeroseis\\\\index.html\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git config *)",
+      "Bash(git push *)",
+      "Bash(gh api *)",
+      "Bash(gh run *)",
+      "Bash(curl -s \"https://api.github.com/repos/learning-fast1/learningfastsite/pages\")",
+      "Bash(curl -s \"https://api.github.com/repos/learning-fast1/learningfastsite/pages/builds/latest\")",
+      "Bash(curl -s \"https://api.github.com/repos/learning-fast1/learningfastsite\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"https://learning-fast.com/\")",
+      "Bash(curl -s \"https://learning-fast.com/\")",
+      "Bash(curl -s \"https://learning-fast.com/?_=$\\(date +%s\\)\" -H \"Cache-Control: no-cache\")",
+      "Bash(curl -sI \"https://learning-fast.com/\")",
+      "Bash(curl -s \"https://learning-fast.com/\" -o /tmp/live_index.html)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"CSS status: %{http_code}\\\\n\" \"https://learning-fast.com/styles/main.css\")",
+      "Bash(curl -s -o /dev/null -w \"logo-wordmark status: %{http_code}\\\\n\" \"https://learning-fast.com/assets/images/logo-wordmark.png\")",
+      "Bash(curl -s -o /dev/null -w \"klasmata status: %{http_code}\\\\n\" \"https://learning-fast.com/assets/images/klasmata.png\")",
+      "Bash(curl -s \"https://learning-fast.com/styles/main.css\" -o /tmp/live_main.css)",
+      "Read(//c/Users/Asus/AppData/Local/Temp/**)",
+      "Bash(curl -s \"https://learning-fast.com/styles/main.css\")",
+      "Bash(curl -sI \"https://learning-fast.com/styles/main.css\")",
+      "Bash(curl -s \"https://learning-fast.com/styles/main.css?v=$\\(date +%s\\)\")",
+      "Bash(ls -la \"c:/Users/Asus/Desktop/programming/\" 2>&1)",
+      "Read(//c/Users/Asus/Desktop/programming/**)",
+      "Bash(find \"c:/Users/Asus/Desktop/programming/MathimatikesPraxis\" -maxdepth 3 -type f | head -60)",
+      "Read(//c/Users/Asus/Desktop/programming/MathimatikesPraxis/**)",
+      "Read(//c/Users/Asus/Desktop/programming/MathimatikesPraxis/mathimatikespraxis/**)",
+      "Bash(ls -la \"c:/Users/Asus/Desktop/programming/MathimatikesPraxis/mathimatikespraxis/\" | grep -v \"^d\\\\|\\\\.git\" *)",
+      "Bash(mkdir -p \"c:/Users/Asus/Desktop/programming/learningfastsite/ekpaideftika-paixnidia/a-dimotikou/mathimatika/mathimatikespraxis\" *)",
+      "PowerShell(Start-Process \"c:\\\\Users\\\\Asus\\\\Desktop\\\\programming\\\\learningfastsite\\\\ekpaideftika-paixnidia\\\\a-dimotikou\\\\mathimatika\\\\mathimatikespraxis\\\\index.html\")",
+      "Bash(cd \"c:/Users/Asus/Desktop/programming/learningfastsite\" && grep -rn \"orthografia-game\" --include=\"*.html\" . *)",
+      "Read(//c/Users/Asus/Desktop/programming/orthografia/**)",
+      "Bash(mkdir -p \"c:/Users/Asus/Desktop/programming/learningfastsite/ekpaideftika-paixnidia/a-dimotikou/glossa/orthografia/orthografia-game\")",
+      "Bash(cp c:/Users/Asus/Desktop/programming/orthografia/index.html c:/Users/Asus/Desktop/programming/orthografia/logo.png c:/Users/Asus/Desktop/programming/orthografia/script.js c:/Users/Asus/Desktop/programming/orthografia/style.css c:/Users/Asus/Desktop/programming/learningfastsite/ekpaideftika-paixnidia/a-dimotikou/glossa/orthografia/orthografia-game/)",
+      "PowerShell(Start-Process \"c:\\\\Users\\\\Asus\\\\Desktop\\\\programming\\\\learningfastsite\\\\ekpaideftika-paixnidia\\\\a-dimotikou\\\\glossa\\\\orthografia\\\\orthografia-game\\\\index.html\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Asus\\Desktop\\programming\\MathimatikesPraxis\\mathimatikespraxis"
+    ]
+  }
+}
