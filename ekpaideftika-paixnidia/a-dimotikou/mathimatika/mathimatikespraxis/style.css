@@ -1,0 +1,854 @@
+:root {
+    --bg-p1: #DCF0FA;
+    /* Very soft pale blue for P1 */
+    --bg-p2: #87CEEB;
+    /* Sky blue for P2 */
+    --primary-text: #333;
+    --accent-red: #FF6B6B;
+    --accent-green: #4ECDC4;
+    --accent-yellow: #FFE66D;
+    --accent-purple: #9D75CB;
+    --accent-blue: #45B7D1;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    touch-action: manipulation;
+    /* Important for fast tap on tablets */
+    -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes logoBounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25%       { transform: translateY(-12px) rotate(-3deg); }
+    50%       { transform: translateY(-6px) rotate(2deg); }
+    75%       { transform: translateY(-14px) rotate(-2deg); }
+}
+
+.logo-bounce {
+    animation: logoBounce 2.4s ease-in-out infinite;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.game-subtitle {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent-purple);
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--primary-text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+h1,
+h2 {
+    font-family: 'Comic Neue', sans-serif;
+    color: var(--primary-text);
+    text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.7);
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.split-screen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    transition: all 0.3s ease;
+}
+
+/* Tablet mode (Default split-screen) */
+.split-screen.tablet-mode .player-1 {
+    transform: rotate(180deg);
+}
+
+/* Interactive Board mode (Side by Side) */
+.split-screen.board-mode {
+    flex-direction: row;
+}
+
+.split-screen.board-mode .divider {
+    height: 100%;
+    width: 30px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+}
+
+.split-screen.board-mode .divider h1 {
+    font-size: 1.1rem;
+    transform: rotate(180deg);
+    /* Counteract the wrapper rotation if needed */
+}
+
+/* Single player mode */
+.split-screen.single-mode .player-2,
+.split-screen.single-mode .divider {
+    display: none !important;
+}
+
+.split-screen.single-mode .player-1 {
+    transform: none;
+    /* Reset rotation */
+    height: 100vh;
+}
+
+/* Selection Screen */
+.selection-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-p2);
+    background-image: radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 1000;
+    padding: 20px 0;
+    box-sizing: border-box;
+}
+
+.selection-content {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 30px;
+    padding: 60px 40px 40px 40px;
+    /* Increased top padding to push title down */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    /* Increased to allow 3 buttons side-by-side */
+    width: 95%;
+    text-align: center;
+    border: 8px dashed white;
+    position: relative;
+    z-index: 2;
+    margin: auto;
+    /* Centers when space is available, scrolls nicely when not */
+}
+
+.selection-content h1 {
+    font-size: 3rem;
+    color: var(--accent-purple);
+    margin-bottom: 20px;
+}
+
+.selection-content p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-text);
+    margin-bottom: 40px;
+}
+
+.selection-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 20px;
+    flex-wrap: nowrap;
+    /* Force buttons to stay side-by-side on desktop */
+}
+
+.op-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 10px;
+    align-items: stretch;
+    /* ensure all buttons stretch to same height */
+}
+
+.op-btn {
+    flex: 1 1 200px;
+    max-width: 210px;
+    width: 100%;
+    height: auto;
+    /* let flex stretch */
+    min-height: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.choice-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex: 1;
+    /* Make all buttons equal width normally */
+    min-width: 150px;
+    /* reduced from 220px to allow tighter grid */
+    border-radius: 15px;
+    border: 4px solid transparent;
+    background-color: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 10px;
+}
+
+.choice-btn .icon {
+    font-size: 2.5rem;
+}
+
+.choice-btn span {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary-text);
+    font-family: 'Comic Neue', sans-serif;
+}
+
+.choice-btn small {
+    font-size: 1rem;
+    color: #666;
+}
+
+#btn-single {
+    border-color: var(--accent-red);
+}
+
+#btn-tablet {
+    border-color: var(--accent-blue);
+}
+
+#btn-board {
+    border-color: var(--accent-green);
+}
+
+#btn-single:hover {
+    background-color: #FFE6E6;
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px rgba(255, 107, 107, 0.3);
+}
+
+#btn-tablet:hover {
+    background-color: #E6F7FF;
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px rgba(69, 183, 209, 0.3);
+}
+
+#btn-board:hover {
+    background-color: #E6FFF9;
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px rgba(78, 205, 196, 0.3);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.back-btn {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 500;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 8px 15px;
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    border: 2px dashed #333 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1) !important;
+    color: #333 !important;
+}
+
+.back-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 transparent !important;
+}
+
+.player-board {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.6) 10%, transparent 11%), radial-gradient(circle, rgba(255, 255, 255, 0.6) 10%, transparent 11%);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.player-1 {
+    background-color: var(--bg-p1);
+    /* Transformation handled by .tablet-mode class now */
+}
+
+.player-2 {
+    background-color: var(--bg-p2);
+}
+
+.divider {
+    height: 30px;
+    background-color: #2c3e50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+.divider h1 {
+    font-size: 1.1rem;
+    margin: 0;
+    text-shadow: none;
+    color: var(--accent-yellow);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 10px;
+    position: absolute;
+    top: 15px;
+    left: 20px;
+}
+
+header h2 {
+    font-size: 1.4rem;
+}
+
+.score-board {
+    font-size: 1.2rem;
+    background-color: white;
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+    border: 3px dashed var(--accent-purple);
+}
+
+.timer-display {
+    font-size: 1.5rem;
+    background-color: white;
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+    border: 3px dashed var(--accent-red);
+    color: var(--accent-red);
+    margin-top: 5px;
+    font-family: 'Comic Neue', sans-serif;
+}
+
+.timer-pulse {
+    animation: pop 0.5s infinite alternate;
+}
+
+.game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 15px 30px;
+    border-radius: 25px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border: 5px dashed white;
+    max-width: 95%;
+}
+
+.equation-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'Comic Neue', sans-serif;
+    font-size: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.number {
+    background-color: var(--accent-blue);
+    color: white;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    box-shadow: 0 5px 0 #2A8FA8, inset 0 -3px 0 rgba(0, 0, 0, 0.1);
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+    transform: rotate(-5deg);
+}
+
+#num2-p1,
+#num2-p2 {
+    transform: rotate(5deg);
+    background-color: var(--accent-purple);
+    box-shadow: 0 5px 0 #7A5CA3, inset 0 -3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.operator,
+.equals {
+    color: var(--accent-red);
+}
+
+.answer-box {
+    font-family: 'Comic Neue', sans-serif;
+    font-size: 2.5rem;
+    width: 80px;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 4px solid var(--accent-purple);
+    border-radius: 15px;
+    background: white;
+    color: var(--primary-text);
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom Numpad */
+.numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 250px;
+}
+
+.numpad button {
+    font-family: 'Comic Neue', sans-serif;
+    font-size: 1.5rem;
+    padding: 10px;
+    border: none;
+    border-radius: 12px;
+    background-color: white;
+    color: var(--primary-text);
+    box-shadow: 0 4px 0 #ddd;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    touch-action: none;
+}
+
+.numpad button:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #ddd;
+}
+
+.numpad button.num-btn {
+    background-color: white;
+    border: 2px solid #eee;
+}
+
+.numpad button.cmd-btn.clear {
+    background-color: var(--accent-yellow);
+    box-shadow: 0 4px 0 #D4BE54;
+    color: #333;
+}
+
+.numpad button.cmd-btn.check {
+    background-color: var(--accent-green);
+    box-shadow: 0 4px 0 #3BA59C;
+    color: white;
+}
+
+.numpad button.cmd-btn.clear:active {
+    box-shadow: 0 0 0 transparent;
+}
+
+.numpad button.cmd-btn.check:active {
+    box-shadow: 0 0 0 transparent;
+}
+
+.feedback {
+    font-size: 1.8rem;
+    font-weight: bold;
+    min-height: 40px;
+    font-family: 'Comic Neue', sans-serif;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-align: center;
+}
+
+.feedback.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.feedback.correct {
+    color: var(--accent-green);
+}
+
+.feedback.wrong {
+    color: var(--accent-red);
+}
+
+.feedback.win {
+    color: var(--accent-purple);
+    font-size: 2.2rem;
+    animation: pop 0.5s ease-in-out;
+}
+
+
+@keyframes pop {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pop-animation {
+    animation: pop 0.4s ease-in-out;
+}
+
+/* Confetti styling */
+.confetti {
+    position: fixed;
+    width: 15px;
+    height: 15px;
+    border-radius: 2px;
+    animation: fall linear forwards;
+    z-index: 1000;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(720deg);
+    }
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 600px) {
+    .selection-content {
+        padding: 30px 20px;
+    }
+
+    .selection-content h1 {
+        font-size: 2rem;
+    }
+
+    .selection-content p {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+
+    .selection-buttons {
+        /* On mobile, we still want a grid or a wrap, but smaller */
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 0 5px;
+    }
+
+    .choice-btn {
+        width: 100%;
+        max-width: 100%;
+        /* Take up the fraction assigned by flex */
+        min-width: 140px;
+        height: auto;
+        padding: 10px 5px;
+        flex-direction: column;
+        /* Keep icon above text */
+        justify-content: center;
+        margin: 0;
+    }
+
+    .op-btn {
+        flex: 1 1 140px;
+        /* Allow 2 per row even on 320px screens */
+        max-width: 180px;
+    }
+
+    .choice-btn .icon {
+        font-size: 2rem;
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+
+    .choice-btn span {
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .choice-btn small {
+        display: block;
+        margin-top: 2px;
+        font-size: 0.8rem;
+        text-align: center;
+    }
+
+    .btn-text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    header {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 5px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 15px;
+    }
+
+    header h2 {
+        font-size: 1.2rem;
+        margin-bottom: 0;
+    }
+
+    .score-board {
+        font-size: 1rem;
+        padding: 5px 10px;
+        border-width: 2px;
+    }
+
+    .game-area {
+        padding: 10px;
+        margin-top: 5px;
+        gap: 10px;
+    }
+
+    .equation-container {
+        font-size: 2rem;
+    }
+
+    .number {
+        width: 45px;
+        height: 45px;
+    }
+
+    .answer-box {
+        width: 60px;
+        height: 50px;
+        font-size: 1.8rem;
+    }
+
+    .numpad {
+        max-width: 220px;
+        gap: 8px;
+    }
+
+    .numpad button {
+        font-size: 1.2rem;
+        padding: 8px;
+    }
+
+    .back-btn {
+        top: 5px;
+        right: 5px;
+        font-size: 1rem;
+        padding: 5px 10px;
+    }
+
+    /* Specific overrides for Single Mode on mobile */
+    .split-screen.single-mode .player-1 {
+        justify-content: center;
+        padding: 20px 10px;
+    }
+
+    .split-screen.single-mode header {
+        position: relative;
+        flex-direction: column;
+        /* Stack name and score */
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .split-screen.single-mode header h2 {
+        font-size: 1.5rem;
+    }
+
+    .split-screen.single-mode .score-board {
+        font-size: 1.2rem;
+        padding: 8px 20px;
+    }
+
+    .split-screen.single-mode .numpad {
+        max-width: 320px;
+        /* Make the numpad wider */
+        gap: 12px;
+        /* More space between buttons */
+    }
+
+    .split-screen.single-mode .numpad button {
+        font-size: 1.8rem;
+        /* Larger text */
+        padding: 15px;
+        /* Taller/Wider buttons */
+        border-radius: 15px;
+    }
+
+    .split-screen.single-mode .equation-container {
+        font-size: 3rem;
+        /* Larger equation text */
+        margin-bottom: 10px;
+    }
+
+    .split-screen.single-mode .number {
+        width: 60px;
+        height: 60px;
+    }
+
+    .split-screen.single-mode .answer-box {
+        width: 80px;
+        height: 70px;
+        font-size: 2.5rem;
+    }
+}
+
+/* ===== Animated +/- title decoration ===== */
+.math-anim-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    vertical-align: middle;
+    position: relative;
+    top: -4px;
+}
+
+.math-sign {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-family: 'Comic Neue', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: white;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.15);
+}
+
+.plus-sign {
+    background: var(--accent-red);
+    animation: mathBounce 2.4s ease-in-out infinite;
+}
+
+.minus-sign {
+    background: var(--accent-blue);
+    animation: mathBounce 2.4s ease-in-out infinite 1.2s;
+}
+
+@keyframes mathBounce {
+    0% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        box-shadow: 0 5px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    20% {
+        transform: translateY(-10px) scale(1.15) rotate(-12deg);
+        box-shadow: 0 15px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    40% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        box-shadow: 0 5px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    55% {
+        transform: translateY(-4px) scale(1.05) rotate(6deg);
+    }
+
+    70% {
+        transform: translateY(0) scale(1) rotate(0deg);
+    }
+
+    100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+    }
+}
+
+/* ===== Button icon signs (+/−) ===== */
+.btn-sign {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-family: 'Comic Neue', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: white;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    margin-bottom: 4px;
+    transition: transform 0.15s ease;
+}
+
+.btn-sign-plus {
+    background: var(--accent-red);
+    box-shadow: 0 5px 0 #c94d4d;
+}
+
+.btn-sign-minus {
+    background: var(--accent-blue);
+    box-shadow: 0 5px 0 #2d8aaa;
+}
+
+.choice-btn:hover .btn-sign {
+    transform: scale(1.15) rotate(-8deg);
+}
+
+/* Mix button: two signs side by side with alternating bounce */
+.btn-sign-mix {
+    display: inline-flex;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.mix-plus {
+    animation: mixPop 1.8s ease-in-out infinite;
+}
+
+.mix-minus {
+    animation: mixPop 1.8s ease-in-out infinite 0.9s;
+}
+
+@keyframes mixPop {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+    }
+
+    30% {
+        transform: translateY(-8px) scale(1.2) rotate(-10deg);
+    }
+
+    60% {
+        transform: translateY(0) scale(1) rotate(4deg);
+    }
+}
