@@ -21,7 +21,7 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       max-width: 600px;
-      margin: 4rem auto;
+      margin: 1.5rem auto 4rem;
       border: 1px solid rgba(0,0,0,0.03);
     }
     .empty-state__icon {
@@ -59,6 +59,7 @@
 <body>
   <header>
     <nav class="navbar">
+      <a href="../../index.html" class="navbar__logo"><img src="../../assets/images/logo-wordmark.png" alt="Learning Fast" /></a>
       <button class="navbar__hamburger" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
       <ul class="navbar__links">
         <li><a href="../../index.html">Αρχική</a></li>
@@ -105,55 +106,21 @@
   </header>
   <main>
     <section>
-      <div class="section__header">
-        <p class="breadcrumb"><a href="../index.html">← Τάξεις</a></p>
-        <span class="section__label">ΣΤ΄ Δημοτικού</span>
-        <h1 class="section__title">ΣΤ΄ Δημοτικού</h1>
-        <p class="section__subtitle">Εκπαιδευτικό υλικό για ΣΤ΄ Δημοτικού</p>
+      <div class="empty-state">
+        <div class="empty-state__icon">🚧</div>
+        <h2 class="empty-state__title">Η κατηγορία είναι άδεια</h2>
+        <p class="empty-state__text">Προς το παρόν δεν υπάρχει διαθέσιμο υλικό σε αυτή την κατηγορία. Σύντομα θα προσθέσουμε νέο περιεχόμενο!</p>
+        <a href="../index.html" class="back-btn">← Επιστροφή στις Τάξεις</a>
       </div>
     </section>
   </main>
   <footer class="footer">
     <div class="footer__logo"><img src="../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
     <ul class="footer__links">
-      <li><a href="../../index.html">Αρχική</a></li>
-      <li class="has-dropdown"><a href="../../taxeis/index.html">Τάξεις</a>
-        <ul class="dropdown">
-          <li><a href="../../taxeis/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
-          <li><a href="../../taxeis/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
-          <li><a href="../../taxeis/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
-          <li><a href="../../taxeis/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
-          <li><a href="../../taxeis/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
-          <li><a href="../../taxeis/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
-          <li><a href="../../taxeis/a-gymnasiou/index.html">Α΄ Γυμνασίου</a></li>
-          <li><a href="../../taxeis/b-gymnasiou/index.html">Β΄ Γυμνασίου</a></li>
-        </ul>
-      </li>
-      <li class="has-dropdown"><a href="../../eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a>
-        <ul class="dropdown">
-          <li><a href="../../eidiki-ekpaideysi/kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
-          <li><a href="../../eidiki-ekpaideysi/leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
-        </ul>
-      </li>
-      
-        <li class="has-dropdown"><a href="../../glossa/index.html">Γλώσσα</a>
-          <ul class="dropdown">
-            <li><a href="../../glossa/meri-logou/index.html">Μέρη του λόγου</a></li>
-            <li><a href="../../glossa/meri-protasis/index.html">Μέρη της πρότασης</a></li>
-            <li><a href="../../glossa/orthografia/index.html">Ορθογραφία</a></li>
-            <li><a href="../../glossa/paragogi-graptou/index.html">Παραγωγή γραπτού λόγου</a></li>
-            <li><a href="../../glossa/katanoisi-graptou/index.html">Κατανόηση γραπτού λόγου</a></li>
-          </ul>
-        </li>        <li class="has-dropdown"><a href="../../ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a>
-          <ul class="dropdown">
-            <li><a href="../../ekpaideftika-paixnidia/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
-            <li><a href="../../ekpaideftika-paixnidia/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
-            <li><a href="../../ekpaideftika-paixnidia/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
-            <li><a href="../../ekpaideftika-paixnidia/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
-            <li><a href="../../ekpaideftika-paixnidia/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
-            <li><a href="../../ekpaideftika-paixnidia/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
-          </ul>
-        </li>
+      <li><a href="../../epikoinonia/index.html">Επικοινωνία</a></li>
+      <li><a href="../../steile-mia-idea/index.html">Στείλε μια ιδέα!</a></li>
+      <li><a href="../../enimeroseis/index.html">Ενημερώσεις</a></li>
+      <li><a href="../../oroi-xrisis/index.html">Όροι και προϋποθέσεις</a></li>
     </ul>
     <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
   </footer>

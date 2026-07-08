@@ -65,6 +65,14 @@
         "@type": "Answer",
         "text": "Ναι, όλα τα παιχνίδια και το εκπαιδευτικό υλικό είναι εντελώς δωρεάν — χωρίς εγγραφή και χωρίς χρέωση."
       }
+    },
+    {
+      "@type": "Question",
+      "name": "Από ποιους μπορεί να χρησιμοποιηθεί το υλικό και τα παιχνίδια;",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Από γονείς, εκπαιδευτικούς, ειδικούς παιδαγωγούς, λογοθεραπευτές και εργοθεραπευτές."
+      }
     }
   ]
 }
@@ -75,6 +83,7 @@
   <!-- ===== NAVBAR ===== -->
   <header>
     <nav class="navbar">
+      <a href="index.html" class="navbar__logo"><img src="assets/images/logo-wordmark.png" alt="Learning Fast" /></a>
       <button class="navbar__hamburger" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
       <ul class="navbar__links">
         <li><a href="index.html" class="active">Αρχική</a></li>
@@ -124,17 +133,12 @@
 
     <!-- ===== HERO ===== -->
     <section class="hero">
-      <!-- Floating emoji confetti -->
-      <div class="hero__confetti" aria-hidden="true">
-        <span>🎉</span><span>🎈</span><span>📚</span><span>🌈</span><span>🚀</span>
-        <span>🎉</span><span>🦋</span><span>✏️</span><span>🎮</span><span>🦋</span>
-      </div>
       <img src="assets/images/logo.png" alt="Learning Fast Logo" class="hero__logo-big" />
       <h1 class="hero__title">
-        Μάθηση για <span>ΟΛΑ</span> τα παιδιά!
+        Μάθηση για <span>όλα</span> τα παιδιά!
       </h1>
       <p class="hero__subtitle">
-        Δωρεάν εκπαιδευτικά παιχνίδια και υλικό για κάθε μαθητή!
+        Παιχνίδια και υλικό γλώσσας, μαθηματικών και ειδικής εκπαίδευσης για Α΄–ΣΤ΄ Δημοτικού.
       </p>
       <div class="hero__actions">
         <a href="ekpaideftika-paixnidia/index.html" class="btn btn--primary">Ξεκίνα τα παιχνίδια</a>
@@ -142,12 +146,107 @@
       </div>
     </section>
 
+    <!-- ===== EKPAIDEFTIKA PAIXNIDIA ===== -->
+    <section class="section--wash-primary">
+      <div class="section__header">
+        <span class="section__label">Παιχνίδια</span>
+        <h2 class="section__title">Εκπαιδευτικά Παιχνίδια</h2>
+        <p class="section__subtitle">Όλα τα παιχνίδια σε ένα μέρος!</p>
+      </div>
+      <div class="games-grid">
+        <a href="ekpaideftika-paixnidia/e-dimotikou/mathimatika/klasmata/index.html" class="game-card">
+          <div class="game-card__image"><img src="assets/images/klasmata.png" alt="Παιχνίδι με τα Κλάσματα" /></div>
+          <div class="game-card__body">
+            <div class="game-card__title">Παιχνίδι με τα Κλάσματα</div>
+            <span class="game-card__tag">Β΄ – ΣΤ΄ Δημοτικού</span>
+          </div>
+        </a>
+        <a href="https://learning-fast1.github.io/pollaplasiasmoiAdimotikou/" target="_blank" class="game-card">
+          <div class="game-card__image"><img src="assets/images/pollaplasiasmoiAdimotikou.png" alt="Πολλαπλασιασμοί Α' Δημοτικού" /></div>
+          <div class="game-card__body">
+            <div class="game-card__title">Εξάσκηση στην προπαίδεια Α' Δημοτικού</div>
+            <span class="game-card__tag">Α' Δημοτικού</span>
+          </div>
+        </a>
+        <a href="https://learning-fast1.github.io/pollaplasiasmoi/" target="_blank" class="game-card">
+          <div class="game-card__image"><img src="assets/images/pollaplasiasmoi.png" alt="Πολλαπλασιασμοί" /></div>
+          <div class="game-card__body">
+            <div class="game-card__title">Πολλαπλασιασμοί</div>
+            <span class="game-card__tag">Α' – ΣΤ' Δημ.</span>
+          </div>
+        </a>
+        <a href="https://learning-fast1.github.io/telikon/" target="_blank" class="game-card">
+          <div class="game-card__image"><img src="assets/images/telikon.png" alt="Τελικό -ν" /></div>
+          <div class="game-card__body">
+            <div class="game-card__title">Τελικό -ν</div>
+            <span class="game-card__tag">Δ' Δημοτικού</span>
+          </div>
+        </a>
+        <a href="https://learning-fast1.github.io/orthografiamegalwn/" target="_blank" class="game-card">
+          <div class="game-card__image"><img src="assets/images/orthografiamegalwn.png" alt="Ορθογραφία Μεγάλων" /></div>
+          <div class="game-card__body">
+            <div class="game-card__title">Ορθογραφία για Δ', Ε' και ΣΤ' Δημοτικού</div>
+            <span class="game-card__tag">Δ' Ε' ΣΤ' Δημ.</span>
+          </div>
+        </a>
+        <a href="ekpaideftika-paixnidia/a-dimotikou/glossa/orthografia/index.html" class="game-card">
+          <div class="game-card__image"><img src="assets/images/orthografia-game-preview.png" alt="Παιχνίδι Ορθογραφίας" /></div>
+          <div class="game-card__body">
+            <div class="game-card__title">Μαθαίνω Ορθογραφία</div>
+            <span class="game-card__tag">Α' Δημοτικού</span>
+          </div>
+        </a>
+        <a href="https://learning-fast1.github.io/mathimatikespraxis/" target="_blank" class="game-card">
+          <div class="game-card__image"><img src="assets/images/Screenshot%202026-03-17%20174021.png" alt="Παιχνίδι Μαθηματικών Πράξεων" /></div>
+          <div class="game-card__body">
+            <div class="game-card__title">Μαθηματικές Πράξεις</div>
+            <span class="game-card__tag">Α' & Β' Δημ.</span>
+          </div>
+        </a>
+      </div>
     </section>
 
-    <!-- ===== MAIN LAYOUT ===== -->
-    <div class="content-wrapper">
-      <!-- ===== EDUCATIONAL BOOKS ===== -->
-      <section class="books">
+    <!-- ===== TAXEIS ===== -->
+    <section class="section--wash-sky">
+      <div class="section__header">
+        <span class="section__label">Τάξεις</span>
+        <h2 class="section__title">Υλικό για κάθε τάξη!</h2>
+      </div>
+      <div class="grade-grid">
+        <a class="grade-card" href="taxeis/a-dimotikou/index.html"><b>Α΄ Δημοτικού</b><span>Γλώσσα &amp; Μαθηματικά</span></a>
+        <a class="grade-card" href="taxeis/b-dimotikou/index.html"><b>Β΄ Δημοτικού</b><span>Γλώσσα &amp; Μαθηματικά</span></a>
+        <a class="grade-card" href="taxeis/g-dimotikou/index.html"><b>Γ΄ Δημοτικού</b><span>Γλώσσα &amp; Μαθηματικά</span></a>
+        <a class="grade-card" href="taxeis/d-dimotikou/index.html"><b>Δ΄ Δημοτικού</b><span>Γλώσσα &amp; Μαθηματικά</span></a>
+        <a class="grade-card" href="taxeis/e-dimotikou/index.html"><b>Ε΄ Δημοτικού</b><span>Γλώσσα &amp; Μαθηματικά</span></a>
+        <a class="grade-card" href="taxeis/st-dimotikou/index.html"><b>ΣΤ΄ Δημοτικού</b><span>Γλώσσα &amp; Μαθηματικά</span></a>
+        <a class="grade-card grade-card--gym" href="taxeis/a-gymnasiou/index.html"><b>Α΄ Γυμνασίου</b><span>Υλικό Γυμνασίου</span></a>
+        <a class="grade-card grade-card--gym" href="taxeis/b-gymnasiou/index.html"><b>Β΄ Γυμνασίου</b><span>Υλικό Γυμνασίου</span></a>
+      </div>
+    </section>
+
+    <!-- ===== EIDIKI EKPAIDEYSI ===== -->
+    <section class="section--wash-sun">
+      <div class="section__header">
+        <span class="section__label">Ειδική Εκπαίδευση</span>
+        <h2 class="section__title">Υλικό ειδικής εκπαίδευσης</h2>
+        <p class="section__subtitle">Δραστηριότητες και υλικό για παιδιά με αναπηρίες</p>
+      </div>
+      <div class="option-grid">
+        <a class="option-card option-card--primary" href="eidiki-ekpaideysi/kategories-taxinomisi/index.html">
+          <span class="option-card__mark">🗂️</span>
+          <h3>Κατηγορίες - Ταξινόμηση</h3>
+          <p>Δραστηριότητες κατηγοριοποίησης</p>
+        </a>
+        <a class="option-card option-card--sky" href="eidiki-ekpaideysi/leitourgikos-logos/index.html">
+          <span class="option-card__mark">💬</span>
+          <h3>Λειτουργικός λόγος</h3>
+          <p>Επικοινωνία &amp; καθημερινός λόγος</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== EDUCATIONAL BOOKS ===== -->
+    <section class="books">
       <div class="section__header">
         <span class="section__label">Βιβλιοθήκη</span>
         <h2 class="section__title">Εκπαιδευτικά Βιβλία</h2>
@@ -158,84 +257,14 @@
 
         <div class="book-card">
           <div class="book-card__cover cover--coming-soon">Coming Soon</div>
+          <div class="book-card__title">Ο κύριος Ξεφτέρης</div>
         </div>
 
       </div>
-      </section>
-
-      <!-- ===== SIDEBAR ===== -->
-      <aside class="sidebar">
-        <div class="sidebar__header">
-          <h3 class="sidebar__title">Νέα Παιχνίδια</h3>
-        </div>
-        <div class="sidebar__content">
-          <a href="ekpaideftika-paixnidia/e-dimotikou/mathimatika/klasmata/index.html" class="sidebar-item">
-            <div class="sidebar-item__image"><img src="assets/images/klasmata.png" alt="Παιχνίδι με τα Κλάσματα" /></div>
-            <div class="sidebar-item__info">
-              <h4 class="sidebar-item__title">Παιχνίδι με τα Κλάσματα</h4>
-              <span class="sidebar-item__tag">Β΄ – ΣΤ΄ Δημοτικού</span>
-            </div>
-          </a>
-          <a href="https://learning-fast1.github.io/pollaplasiasmoiAdimotikou/" target="_blank" class="sidebar-item">
-            <div class="sidebar-item__image">
-              <img src="assets/images/pollaplasiasmoiAdimotikou.png" alt="Πολλαπλασιασμοί Α' Δημοτικού" />
-            </div>
-            <div class="sidebar-item__info">
-              <h4 class="sidebar-item__title">Εξάσκηση στην προπαίδεια Α' Δημοτικού</h4>
-              <span class="sidebar-item__tag">Α' Δημοτικού</span>
-            </div>
-          </a>
-          <a href="https://learning-fast1.github.io/pollaplasiasmoi/" target="_blank" class="sidebar-item">
-            <div class="sidebar-item__image">
-              <img src="assets/images/pollaplasiasmoi.png" alt="Πολλαπλασιασμοί" />
-            </div>
-            <div class="sidebar-item__info">
-              <h4 class="sidebar-item__title">Πολλαπλασιασμοί</h4>
-              <span class="sidebar-item__tag">Α' – ΣΤ' Δημ.</span>
-            </div>
-          </a>
-          <a href="https://learning-fast1.github.io/telikon/" target="_blank" class="sidebar-item">
-            <div class="sidebar-item__image">
-              <img src="assets/images/telikon.png" alt="Τελικό -ν" />
-            </div>
-            <div class="sidebar-item__info">
-              <h4 class="sidebar-item__title">Τελικό -ν</h4>
-              <span class="sidebar-item__tag">Δ' Δημοτικού</span>
-            </div>
-          </a>
-          <a href="https://learning-fast1.github.io/orthografiamegalwn/" target="_blank" class="sidebar-item">
-            <div class="sidebar-item__image">
-              <img src="assets/images/orthografiamegalwn.png" alt="Ορθογραφία Μεγάλων" />
-            </div>
-            <div class="sidebar-item__info">
-              <h4 class="sidebar-item__title">Ορθογραφία για Δ', Ε' και ΣΤ' Δημοτικού</h4>
-              <span class="sidebar-item__tag">Δ' Ε' ΣΤ' Δημ.</span>
-            </div>
-          </a>
-          <a href="ekpaideftika-paixnidia/a-dimotikou/glossa/orthografia/index.html" class="sidebar-item">
-            <div class="sidebar-item__image">
-              <img src="assets/images/orthografia-game-preview.png" alt="Παιχνίδι Ορθογραφίας" />
-            </div>
-            <div class="sidebar-item__info">
-              <h4 class="sidebar-item__title">Μαθαίνω Ορθογραφία</h4>
-              <span class="sidebar-item__tag">Α' Δημοτικού</span>
-            </div>
-          </a>
-          <a href="https://learning-fast1.github.io/mathimatikespraxis/" target="_blank" class="sidebar-item">
-            <div class="sidebar-item__image">
-              <img src="assets/images/Screenshot%202026-03-17%20174021.png" alt="Παιχνίδι Μαθηματικών Πράξεων" />
-            </div>
-            <div class="sidebar-item__info">
-              <h4 class="sidebar-item__title">Μαθηματικές Πράξεις</h4>
-              <span class="sidebar-item__tag">Α' & Β' Δημ.</span>
-            </div>
-          </a>
-        </div>
-      </aside>
-    </div>
+    </section>
 
     <!-- ===== WHAT WE OFFER ===== -->
-    <section>
+    <section class="section--wash-leaf">
       <div class="section__header">
         <span class="section__label">Τι Προσφέρουμε</span>
         <h2 class="section__title">Εκπαιδευτικό υλικό για κάθε τάξη</h2>
@@ -280,6 +309,10 @@
         <p class="faq__q">Το εκπαιδευτικό υλικό είναι δωρεάν;</p>
         <p class="faq__a">Ναι, όλα τα παιχνίδια και το εκπαιδευτικό υλικό είναι εντελώς δωρεάν — χωρίς εγγραφή και χωρίς χρέωση.</p>
       </div>
+      <div class="faq__item">
+        <p class="faq__q">Από ποιους μπορεί να χρησιμοποιηθεί το υλικό και τα παιχνίδια;</p>
+        <p class="faq__a">Από γονείς, εκπαιδευτικούς, ειδικούς παιδαγωγούς, λογοθεραπευτές και εργοθεραπευτές.</p>
+      </div>
     </div>
 
   </main>
@@ -288,26 +321,10 @@
   <footer class="footer">
     <div class="footer__logo"><img src="assets/images/logo.png" alt="Learning Fast Logo" /></div>
     <ul class="footer__links">
-      <li><a href="index.html">Αρχική</a></li>
-      <li class="has-dropdown"><a href="taxeis/index.html">Τάξεις</a>
-        <ul class="dropdown">
-          <li><a href="taxeis/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
-          <li><a href="taxeis/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
-          <li><a href="taxeis/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
-          <li><a href="taxeis/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
-          <li><a href="taxeis/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
-          <li><a href="taxeis/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
-          <li><a href="taxeis/a-gymnasiou/index.html">Α΄ Γυμνασίου</a></li>
-          <li><a href="taxeis/b-gymnasiou/index.html">Β΄ Γυμνασίου</a></li>
-        </ul>
-      </li>
-      <li class="has-dropdown"><a href="eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a>
-        <ul class="dropdown">
-          <li><a href="eidiki-ekpaideysi/kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
-          <li><a href="eidiki-ekpaideysi/leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
-        </ul>
-      </li>
-      <li><a href="ekpaideftika-paixnidia/index.html">Παιχνίδια</a></li>
+      <li><a href="epikoinonia/index.html">Επικοινωνία</a></li>
+      <li><a href="steile-mia-idea/index.html">Στείλε μια ιδέα!</a></li>
+      <li><a href="enimeroseis/index.html">Ενημερώσεις</a></li>
+      <li><a href="oroi-xrisis/index.html">Όροι και προϋποθέσεις</a></li>
     </ul>
     <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
   </footer>

@@ -11,7 +11,7 @@
 </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Κατηγορία – Learning Fast</title>
+  <title>Λειτουργικός Λόγος – Learning Fast</title>
   <link rel="stylesheet" href="../../styles/main.css" />
   <style>
     .empty-state {
@@ -43,6 +43,18 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(79,70,229,.35);
     }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: .9rem;
+      margin: 0 1.5rem 1.5rem;
+      transition: gap var(--transition);
+      text-decoration: none;
+    }
+    .back-link:hover { gap: .8rem; }
   </style>
 </head>
 <body>
@@ -64,6 +76,12 @@
             <li><a href="../../taxeis/b-gymnasiou/index.html">Β΄ Γυμνασίου</a></li>
           </ul>
         </li>
+        <li class="has-dropdown"><a href="../index.html" class="active">Ειδική Εκπαίδευση</a>
+          <ul class="dropdown">
+            <li><a href="../kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
+            <li><a href="index.html">Λειτουργικός λόγος</a></li>
+          </ul>
+        </li>
         <li class="has-dropdown"><a href="../../glossa/index.html">Γλώσσα</a>
           <ul class="dropdown">
             <li><a href="../../glossa/meri-logou/index.html">Μέρη του λόγου</a></li>
@@ -72,18 +90,12 @@
             <li><a href="../../glossa/paragogi-graptou/index.html">Παραγωγή γραπτού λόγου</a></li>
             <li><a href="../../glossa/katanoisi-graptou/index.html">Κατανόηση γραπτού λόγου</a></li>
           </ul>
-        </li>
-        
-        <li class="has-dropdown"><a href="../../eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a>
-          <ul class="dropdown">
-            <li><a href="../../eidiki-ekpaideysi/kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
-            <li><a href="../../eidiki-ekpaideysi/leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
-          </ul>
         </li>        <li class="has-dropdown"><a href="../../ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a>
           <ul class="dropdown">
             <li><a href="../../ekpaideftika-paixnidia/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
             <li><a href="../../ekpaideftika-paixnidia/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
             <li><a href="../../ekpaideftika-paixnidia/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+
             <li><a href="../../ekpaideftika-paixnidia/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
             <li><a href="../../ekpaideftika-paixnidia/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
             <li><a href="../../ekpaideftika-paixnidia/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
@@ -93,14 +105,24 @@
       </ul>
     </nav>
   </header>
+
   <main>
-                <div class="empty-state">
-        <div class="empty-state__icon">🚧</div>
-        <h2 class="empty-state__title">Η κατηγορία είναι άδεια</h2>
-        <p class="empty-state__text">Προς το παρόν δεν υπάρχει διαθέσιμο υλικό σε αυτή την κατηγορία. Σύντομα θα προσθέσουμε νέο περιεχόμενο!</p>
-        <a href="../index.html" class="back-btn">← Επιστροφή στις Τάξεις</a>
-      </div>
+    <div class="section__header">
+      <span class="section__label">Ειδική Εκπαίδευση</span>
+      <h1 class="section__title">Λειτουργικός Λόγος</h1>
+      <p class="section__subtitle">Επικοινωνία και καθημερινός λόγος</p>
+    </div>
+
+    <a href="../index.html" class="back-link">← Επιστροφή στην Ειδική Εκπαίδευση</a>
+
+    <div class="empty-state">
+      <div class="empty-state__icon">🚧</div>
+      <h2 class="empty-state__title">Η κατηγορία είναι άδεια</h2>
+      <p class="empty-state__text">Προς το παρόν δεν υπάρχει διαθέσιμο υλικό σε αυτή την κατηγορία. Σύντομα θα προσθέσουμε νέο περιεχόμενο!</p>
+      <a href="../index.html" class="back-btn">← Επιστροφή στην Ειδική Εκπαίδευση</a>
+    </div>
   </main>
+
   <footer class="footer">
     <div class="footer__logo"><img src="../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
     <ul class="footer__links">
