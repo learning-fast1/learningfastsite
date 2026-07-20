@@ -281,6 +281,21 @@
             white-space: nowrap;
         }
 
+        .home-btn {
+            background: rgba(108, 99, 255, 0.15);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            border-radius: 30px;
+            padding: 8px 14px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background: rgba(108, 99, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
         .streak-display {
             display: flex;
             align-items: center;
@@ -792,8 +807,8 @@
                 <div class="rule-card">
                     <h3>📖 Ο κανόνας</h3>
                     <p>
-                        <span class="keep-n">Κρατάμε το -ν</span> πριν από: <strong>φωνήεντα</strong> (α, ε, η, ι, ο, υ, ω) 
-                        και τα σύμφωνα <strong>κ, π, τ, ξ, ψ, μπ, ντ, γκ, τσ, τζ</strong>.
+                        <span class="keep-n">Κρατάμε το -ν</span> πριν από: <strong>φωνήεντα</strong> (α, ε, η, ι, ο, υ, ω)
+                        και τα σύμφωνα <strong>κ, π, τ, ξ, ψ, μπ, ντ, γκ, τσ, τζ</strong>, στα αρσενικά ουσιαστικά.
                         <br><br>
                         <span class="drop-n">Αφαιρούμε το -ν</span> πριν από: <strong>β, γ, δ, ζ, θ, λ, μ, ν, ρ, σ, φ, χ</strong>.
                     </p>
@@ -804,6 +819,7 @@
         <!-- ===== GAME SCREEN ===== -->
         <div class="screen" id="gameScreen">
             <div class="game-header">
+                <button class="home-btn" id="gameHomeBtn" aria-label="Αρχική">🏠</button>
                 <div class="score-display">
                     <span>✅</span>
                     <span id="scoreText">0</span>
@@ -1094,6 +1110,7 @@
         // Result buttons
         $('retryBtn').addEventListener('click', startGame);
         $('homeBtn').addEventListener('click', goHome);
+        $('gameHomeBtn').addEventListener('click', goHome);
 
         // =============================================
         // GAME LOGIC
@@ -1125,6 +1142,7 @@
         }
 
         function goHome() {
+            if (state.timerInterval) clearInterval(state.timerInterval);
             showScreen(welcomeScreen);
         }
 
