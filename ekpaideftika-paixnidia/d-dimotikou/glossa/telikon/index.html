@@ -758,6 +758,27 @@
             color: var(--error);
             font-weight: 600;
         }
+
+        .rule-card .rule-list {
+            list-style: none;
+            padding: 0;
+            margin: 6px 0 0;
+        }
+
+        .rule-card .rule-list li {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.6;
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .rule-card .rule-list li::before {
+            content: '•';
+            color: var(--success);
+            position: absolute;
+            left: 4px;
+        }
     </style>
 </head>
 <body>
@@ -785,7 +806,7 @@
             </div>
 
             <div class="welcome-card">
-                <h2>⏱️ Πόσο θέλεις να εξασκηθείς;</h2>
+                <h2>Πόσο θέλεις να εξασκηθείς;</h2>
                 <p class="subtitle">Διάλεξε χρόνο εξάσκησης</p>
 
                 <div class="time-options">
@@ -805,13 +826,15 @@
                 <button class="start-btn" id="startBtn" disabled>Ξεκίνα!</button>
 
                 <div class="rule-card">
-                    <h3>📖 Ο κανόνας</h3>
+                    <h3>Κανόνας:</h3>
                     <p>
-                        <span class="keep-n">Κρατάμε το -ν</span> πριν από: <strong>φωνήεντα</strong> (α, ε, η, ι, ο, υ, ω)
-                        και τα σύμφωνα <strong>κ, π, τ, ξ, ψ, μπ, ντ, γκ, τσ, τζ</strong>, στα αρσενικά ουσιαστικά.
-                        <br><br>
-                        <span class="drop-n">Αφαιρούμε το -ν</span> πριν από: <strong>β, γ, δ, ζ, θ, λ, μ, ν, ρ, σ, φ, χ</strong>.
+                        <span class="keep-n">Βάζουμε -ν</span> όταν η λέξη:
                     </p>
+                    <ul class="rule-list">
+                        <li>είναι αρσενικό ουσιαστικό (τον, έναν)</li>
+                        <li>ξεκινά από φωνήεν (α, ε, ι, ο, η, υ, ω)</li>
+                        <li>ξεκινά από το κ, π, τ, ψ, ξ και μπ, ντ, γκ, γγ, τσ, τζ</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -821,15 +844,15 @@
             <div class="game-header">
                 <button class="home-btn" id="gameHomeBtn" aria-label="Αρχική">🏠</button>
                 <div class="score-display">
-                    <span>✅</span>
+                    <span>Σωστά:</span>
                     <span id="scoreText">0</span>
                 </div>
                 <div class="streak-display">
-                    <span>🔥</span>
+                    <span>Σερί:</span>
                     <span id="streakText">0</span>
                 </div>
                 <div class="score-display" style="background: rgba(255,82,82,0.1); border-color: rgba(255,82,82,0.3);">
-                    <span>❌</span>
+                    <span>Λάθη:</span>
                     <span id="wrongText">0</span>
                 </div>
             </div>
@@ -843,7 +866,7 @@
                 <p class="question-label">Ποιο είναι το σωστό άρθρο;</p>
                 <p class="question-article-type" id="articleTypeLabel"></p>
                 <div class="word-display" id="wordDisplay">κόσμο</div>
-                <p class="hint-text" id="hintText">Κοίτα το πρώτο γράμμα! 👀</p>
+                <p class="hint-text" id="hintText">Κοίτα το πρώτο γράμμα!</p>
                 <div class="choices" id="choicesContainer">
                     <button class="choice-btn" id="choiceWithN">
                         τον
@@ -870,24 +893,24 @@
                 <div class="stats-grid">
                     <div class="stat-card highlight">
                         <div class="stat-value" id="statCorrect">0</div>
-                        <div class="stat-label">Σωστές ✅</div>
+                        <div class="stat-label">Σωστές</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="statWrong">0</div>
-                        <div class="stat-label">Λάθη ❌</div>
+                        <div class="stat-label">Λάθη</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="statPercent">0%</div>
-                        <div class="stat-label">Ποσοστό 📊</div>
+                        <div class="stat-label">Ποσοστό</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="statStreak">0</div>
-                        <div class="stat-label">Μέγιστο σερί 🔥</div>
+                        <div class="stat-label">Μέγιστο σερί</div>
                     </div>
                 </div>
 
                 <div class="wrong-answers-section" id="wrongAnswersSection" style="display:none;">
-                    <h3>📝 Ας τα δούμε ξανά:</h3>
+                    <h3>Ας τα δούμε ξανά:</h3>
                     <div id="wrongAnswersList"></div>
                 </div>
 
@@ -1202,17 +1225,14 @@
             state.recentArticleTypes.push(articleType);
             if (state.recentArticleTypes.length > 5) state.recentArticleTypes.shift();
 
-            // Decide if we keep or drop the ν (50/50)
-            const keepN = Math.random() < 0.5;
+            // In writing, the masculine accusative (τον / έναν) always keeps the -ν,
+            // whatever letter follows. Only the feminine (την) depends on the next letter.
+            const gender = articleType === 'tin' ? 'feminine' : 'masculine';
+            const keepN = gender === 'masculine' ? true : Math.random() < 0.5;
 
-            let gender;
-            if (articleType === 'tin') {
-                gender = 'feminine';
-            } else {
-                gender = 'masculine';
-            }
-
-            const pool = keepN ? wordBank.keepN[gender] : wordBank.dropN[gender];
+            const pool = gender === 'masculine'
+                ? wordBank.keepN.masculine.concat(wordBank.dropN.masculine)
+                : (keepN ? wordBank.keepN.feminine : wordBank.dropN.feminine);
 
             // Avoid repeating recent questions
             let availablePool = pool.filter(w => !state.usedQuestions.includes(w.word));
@@ -1247,6 +1267,7 @@
                 word: wordEntry.word,
                 firstLetter: wordEntry.firstLetter,
                 category: wordEntry.category,
+                gender: gender,
                 keepN: keepN,
                 withN: withN,
                 withoutN: withoutN,
@@ -1254,6 +1275,13 @@
                 typeLabel: typeLabel,
                 correctAnswer: keepN ? withN : withoutN
             };
+        }
+
+        function ruleExplanation(q) {
+            if (q.gender === 'masculine') {
+                return 'Στο αρσενικό (τον/έναν) το -ν μένει πάντα στον γραπτό λόγο, ό,τι κι αν ακολουθεί';
+            }
+            return `Πριν από "${q.firstLetter}" ${q.keepN ? 'κρατάμε' : 'αφαιρούμε'} το -ν (${q.category})`;
         }
 
         function nextQuestion() {
@@ -1266,12 +1294,16 @@
             // Update UI
             articleTypeLabel.textContent = question.typeLabel;
 
-            // Highlight first letter(s)
+            // Highlight the first letter only when it actually matters (feminine)
             const fl = question.firstLetter;
             const rest = question.word.substring(fl.length);
-            wordDisplay.innerHTML = `___ <span class="highlight-letter">${fl}</span>${rest}`;
+            wordDisplay.innerHTML = question.gender === 'masculine'
+                ? `___ ${question.word}`
+                : `___ <span class="highlight-letter">${fl}</span>${rest}`;
 
-            hintText.textContent = `Κοίτα! Η λέξη ξεκινάει από "${fl}" 👀`;
+            hintText.textContent = question.gender === 'masculine'
+                ? 'Στο αρσενικό, το -ν μένει πάντα στον γραπτό λόγο!'
+                : `Κοίτα! Η λέξη ξεκινάει από "${fl}"`;
 
             choiceWithN.innerHTML = `${question.withN}<span class="choice-sub">με -ν</span>`;
             choiceWithoutN.innerHTML = `${question.withoutN}<span class="choice-sub">χωρίς -ν</span>`;
@@ -1314,9 +1346,9 @@
                 }
 
                 // Correct feedback
-                const messages = ['Μπράβο! 🎉', 'Σωστά! ⭐', 'Τέλεια! 🌟', 'Εξαιρετικά! 💪', 'Πολύ καλά! 👏'];
+                const messages = ['Μπράβο!', 'Σωστά!', 'Τέλεια!', 'Εξαιρετικά!', 'Πολύ καλά!'];
                 feedback.innerHTML = messages[Math.floor(Math.random() * messages.length)];
-                feedback.innerHTML += `<span class="rule-explain">Το "${q.firstLetter}" ${q.keepN ? 'κρατάει' : 'αφαιρεί'} το -ν (${q.category})</span>`;
+                feedback.innerHTML += `<span class="rule-explain">${ruleExplanation(q)}</span>`;
                 feedback.className = 'feedback show correct';
 
                 // Spawn floating stars
@@ -1341,7 +1373,7 @@
                 }
 
                 feedback.innerHTML = `Ουπς! Το σωστό είναι: <strong>${q.correctAnswer} ${q.word}</strong>`;
-                feedback.innerHTML += `<span class="rule-explain">Πριν από "${q.firstLetter}" ${q.keepN ? 'κρατάμε' : 'αφαιρούμε'} το -ν (${q.category})</span>`;
+                feedback.innerHTML += `<span class="rule-explain">${ruleExplanation(q)}</span>`;
                 feedback.className = 'feedback show wrong';
 
                 state.wrongAnswers.push({
