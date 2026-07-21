@@ -76,10 +76,13 @@ const Category2 = {
         }
 
         if (Category2.stage === 1) {
-            let shapeDiv = document.createElement('div');
-            shapeDiv.className = 'shape-container';
-            shapeDiv.innerHTML = `<div class="pie-chart" style="${Utils.createPieChart(q.num, q.den)}"></div>`;
-            area.appendChild(shapeDiv);
+            let shapeCol = document.createElement('div');
+            shapeCol.className = 'shape-column';
+            shapeCol.innerHTML = `
+                ${Utils.renderFraction(q.num, q.den)}
+                <div class="shape-container"><div class="pie-chart" style="${Utils.createPieChart(q.num, q.den)}"></div></div>
+            `;
+            area.appendChild(shapeCol);
         }
 
         let choicesDiv = document.createElement('div');
@@ -90,13 +93,13 @@ const Category2 = {
             btn.className = 'btn-choice';
             btn.id = `choice-${index}`;
 
-            let content = Utils.renderFraction(opt.n, opt.d);
-
             if (Category2.stage === 1) {
-                content += `<div class="pie-chart" style="width:60px; height:60px; margin-top:10px; border-width:2px; ${Utils.createPieChart(opt.n, opt.d)}"></div>`;
+                btn.classList.add('btn-choice-shapes');
+                btn.innerHTML = `<div class="pie-chart" style="${Utils.createPieChart(opt.n, opt.d)}"></div>`;
+            } else {
+                btn.innerHTML = Utils.renderFraction(opt.n, opt.d);
             }
 
-            btn.innerHTML = content;
             btn.onclick = () => {
                 document.querySelectorAll('.btn-choice').forEach(b => b.style.transform = '');
                 document.querySelectorAll('.btn-choice').forEach(b => b.style.borderColor = 'var(--secondary)');
@@ -105,7 +108,16 @@ const Category2 = {
                 Category2.correctAnswer = opt.correct;
                 Utils.playSound('pop');
             };
-            choicesDiv.appendChild(btn);
+
+            if (Category2.stage === 1) {
+                let col = document.createElement('div');
+                col.className = 'shape-column';
+                col.innerHTML = Utils.renderFraction(opt.n, opt.d);
+                col.appendChild(btn);
+                choicesDiv.appendChild(col);
+            } else {
+                choicesDiv.appendChild(btn);
+            }
         });
 
         area.appendChild(choicesDiv);

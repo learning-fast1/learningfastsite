@@ -46,12 +46,12 @@ const Category1 = {
             }
         }
         else if (stageNum === 4) {
-            // 10 cases, each with a distinct num/den. Abstract calculation.
+            // 10 cases, each with a distinct num/den. Abstract calculation. Denominators up to 11.
             const used = new Set();
             for (let i = 0; i < 10; i++) {
                 let den, num;
                 [num, den] = Utils.uniqueFraction(used, () => {
-                    let d = Utils.randomInt(2, 12);
+                    let d = Utils.randomInt(2, 11);
                     return [Utils.randomInt(1, d - 1), d];
                 });
                 let multiplier = Utils.randomInt(2, 8);
@@ -60,13 +60,13 @@ const Category1 = {
             }
         }
         else if (stageNum === 5) {
-            // 10 cases, each with a distinct num/den. Find the whole: X/Y του ___ = result
+            // 10 cases, each with a distinct num/den. Find the whole: X/Y του ___ = result. Denominators up to 11.
             const used = new Set();
             for (let i = 0; i < 10; i++) {
                 let den, num;
                 [num, den] = Utils.uniqueFraction(used, () => {
                     let n = Utils.randomInt(1, 7);
-                    return [n, Utils.randomInt(n + 1, n + 7)];
+                    return [n, Utils.randomInt(n + 1, Math.min(n + 7, 11))];
                 });
                 let multiplier = Utils.randomInt(2, 10);
                 let result = num * multiplier;

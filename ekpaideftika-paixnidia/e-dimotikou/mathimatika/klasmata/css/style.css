@@ -257,13 +257,14 @@ h1 {
 
 .stage-options {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 10px;
     justify-content: center;
-    align-content: center;
+    align-items: center;
     flex: 1;
     overflow-y: auto;
-    padding: 4px 2px;
+    overflow-x: hidden;
+    padding: 4px 12px;
 }
 
 .btn-stage {
@@ -278,8 +279,18 @@ h1 {
     box-shadow: 0 5px 0px #028090;
     transition: all 0.1s;
     text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 380px;
 }
-.btn-stage:hover { transform: scale(1.05) rotate(-2deg); }
+.btn-stage:hover { transform: scale(1.02); }
+
+.btn-stage-note {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 400;
+    opacity: 0.85;
+    margin-top: 2px;
+}
 .btn-stage:active { transform: translateY(7px); box-shadow: none; }
 
 /* Game Area */
@@ -505,10 +516,43 @@ h1 {
 .pie-chart {
     width: 96px;
     height: 96px;
+    flex-shrink: 0;
     border-radius: 50%;
     background: #E0E0E0;
     border: 4px solid var(--wood-dark);
     box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+}
+
+.shape-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    flex-shrink: 0;
+}
+
+/* Category 2 Stage 1: the fraction is a small caption OUTSIDE the box,
+   so the box only ever holds the circle — same size, same padding,
+   for the reference shape and every option, everything lines up. */
+.shape-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.shape-column .fraction {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.btn-choice-shapes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    flex-shrink: 0;
 }
 
 /* Overlay & Celebration */
@@ -900,8 +944,9 @@ h1 {
 
     /* Category 2: pie charts & choice buttons */
     .pie-chart { width: 58px; height: 58px; }
-    .btn-choice .pie-chart { width: 32px !important; height: 32px !important; margin-top: 4px !important; }
     .btn-choice { padding: 5px 10px; margin: 2px; }
+    .btn-choice-shapes, .shape-container { padding: 6px; }
+    .shape-column .fraction { font-size: 0.85rem; }
 
     /* Category 3: comparison */
     .compare-container { gap: 14px; padding: 10px 16px; }
