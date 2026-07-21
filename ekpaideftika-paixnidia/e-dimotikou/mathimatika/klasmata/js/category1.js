@@ -11,58 +11,63 @@ const Category1 = {
         Category1.currentQ = 0;
         
         if (stageNum === 1) {
-            // Unit fractions 1/2 – 1/9, big pool shuffled, take 10
-            const pool = [
-                [1,2],[1,2],[1,2],
-                [1,3],[1,3],[1,3],
-                [1,4],[1,4],[1,4],
-                [1,5],[1,5],[1,5],
-                [1,6],[1,6],[1,6],
-                [1,7],[1,7],
-                [1,8],[1,8],
-                [1,9],[1,9],
-            ];
-            Utils.shuffle(pool);
-            Category1.questions = pool.slice(0, 10).map(f => {
-                const maxMult = Math.floor(20 / f[1]);
-                let multiplier = Utils.randomInt(2, Math.max(2, maxMult));
-                let total = f[1] * multiplier;
-                return { num: f[0], den: f[1], total, target: total / f[1] };
+            // Unit fractions 1/2 – 1/11, one denominator each so nothing repeats.
+            // Total objects = denominator exactly, so the unit fraction (1/x) is shown with x objects.
+            const dens = [2,3,4,5,6,7,8,9,10,11];
+            Utils.shuffle(dens);
+            Category1.questions = dens.slice(0, 10).map(den => {
+                return { num: 1, den, total: den, target: 1 };
             });
         }
         else if (stageNum === 2) {
-            // 10 cases. Denominator = Total Objects (up to 15).
+            // 10 cases, each with a distinct num/den. Denominator = Total Objects (up to 15).
+            const used = new Set();
             for (let i = 0; i < 10; i++) {
-                let den = Utils.randomInt(3, 15);
-                let num = Utils.randomInt(1, den - 1);
+                let den, num;
+                [num, den] = Utils.uniqueFraction(used, () => {
+                    let d = Utils.randomInt(3, 15);
+                    return [Utils.randomInt(1, d - 1), d];
+                });
                 Category1.questions.push({ num, den, total: den, target: num });
             }
         }
         else if (stageNum === 3) {
-            // 10 cases. Total objects > Denominator
+            // 10 cases, each with a distinct num/den. Total objects > Denominator
+            const used = new Set();
             for (let i = 0; i < 10; i++) {
-                let den = Utils.randomInt(2, 8);
-                let num = Utils.randomInt(1, den - 1);
+                let den, num;
+                [num, den] = Utils.uniqueFraction(used, () => {
+                    let d = Utils.randomInt(2, 8);
+                    return [Utils.randomInt(1, d - 1), d];
+                });
                 let multiplier = Utils.randomInt(2, 5);
                 let total = den * multiplier;
                 Category1.questions.push({ num, den, total, target: num * multiplier });
             }
         }
         else if (stageNum === 4) {
-            // 10 cases. Abstract calculation.
+            // 10 cases, each with a distinct num/den. Abstract calculation.
+            const used = new Set();
             for (let i = 0; i < 10; i++) {
-                let den = Utils.randomInt(2, 12);
-                let num = Utils.randomInt(1, den - 1);
+                let den, num;
+                [num, den] = Utils.uniqueFraction(used, () => {
+                    let d = Utils.randomInt(2, 12);
+                    return [Utils.randomInt(1, d - 1), d];
+                });
                 let multiplier = Utils.randomInt(2, 8);
                 let total = den * multiplier;
                 Category1.questions.push({ num, den, total, target: num * multiplier });
             }
         }
         else if (stageNum === 5) {
-            // 10 cases. Find the whole: X/Y του ___ = result
+            // 10 cases, each with a distinct num/den. Find the whole: X/Y του ___ = result
+            const used = new Set();
             for (let i = 0; i < 10; i++) {
-                let num = Utils.randomInt(1, 7);
-                let den = Utils.randomInt(num + 1, num + 7);
+                let den, num;
+                [num, den] = Utils.uniqueFraction(used, () => {
+                    let n = Utils.randomInt(1, 7);
+                    return [n, Utils.randomInt(n + 1, n + 7)];
+                });
                 let multiplier = Utils.randomInt(2, 10);
                 let result = num * multiplier;
                 let total  = den * multiplier;
@@ -117,7 +122,7 @@ const Category1 = {
              setTimeout(() => Utils.setActiveInput('answer-input'), 50);
         } else {
              let objEmoji = Utils.getRandomObject();
-             promptHtml = `Επέλεξε τα ${Utils.renderFraction(q.num, q.den)}`;
+             promptHtml = `Επέλεξε ${q.num === 1 ? 'το' : 'τα'} ${Utils.renderFraction(q.num, q.den)}`;
              app.prepareGameArea(`Ερώτηση ${Category1.currentQ + 1} / ${Category1.questions.length}`, promptHtml);
              
              let area = document.getElementById('game-area');

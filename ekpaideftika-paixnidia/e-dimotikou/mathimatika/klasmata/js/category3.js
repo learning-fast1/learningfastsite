@@ -10,11 +10,19 @@ const Category3 = {
         Category3.questions = [];
         Category3.currentQ = 0;
 
+        const used = new Set();
         for (let i = 0; i < 10; i++) {
-            let den1 = Utils.randomInt(2, 10);
-            let num1 = Utils.randomInt(1, den1);
-            let den2 = Utils.randomInt(2, 10);
-            let num2 = Utils.randomInt(1, den2);
+            let den1, num1, den2, num2, key;
+            do {
+                den1 = Utils.randomInt(2, 10);
+                num1 = Utils.randomInt(1, den1);
+                den2 = Utils.randomInt(2, 10);
+                num2 = Utils.randomInt(1, den2);
+                let a = `${num1}/${den1}`, b = `${num2}/${den2}`;
+                key = a < b ? `${a}|${b}` : `${b}|${a}`;
+            } while (used.has(key));
+            used.add(key);
+
             let val1 = num1 / den1;
             let val2 = num2 / den2;
             let sign = val1 < val2 ? '<' : val1 > val2 ? '>' : '=';

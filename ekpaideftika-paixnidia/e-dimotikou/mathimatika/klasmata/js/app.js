@@ -49,8 +49,8 @@ const app = {
         if (catId === 1) {
             title = 'Μέρος του Αριθμού';
             stagesHTML = `
-                <button class="btn-stage" onclick="Category1.startStage(2)">Στάδιο 1: Εναδικά κλάσματα</button>
-                <button class="btn-stage" onclick="Category1.startStage(1)">Στάδιο 2: Εναδικά κλάσματα</button>
+                <button class="btn-stage" onclick="Category1.startStage(1)">Στάδιο 1: Εναδικά κλάσματα</button>
+                <button class="btn-stage" onclick="Category1.startStage(2)">Στάδιο 2: Κλάσματα</button>
                 <button class="btn-stage" onclick="Category1.startStage(3)">Στάδιο 3: Κλάσματα</button>
                 <button class="btn-stage" onclick="Category1.startStage(4)">Στάδιο 4: Βρες το μέρος του αριθμού</button>
                 <button class="btn-stage" onclick="Category1.startStage(5)">Στάδιο 5: Βρες τον κρυμμένο αριθμό</button>

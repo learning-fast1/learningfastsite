@@ -10,10 +10,14 @@ const Category2 = {
         Category2.currentQ = 0;
 
         let total = stageNum === 3 ? 8 : 10;
+        const used = new Set();
 
         for (let i = 0; i < total; i++) {
-            let den = Utils.randomInt(2, 9);
-            let num = Utils.randomInt(1, den - 1);
+            let den, num;
+            [num, den] = Utils.uniqueFraction(used, () => {
+                let d = Utils.randomInt(2, 9);
+                return [Utils.randomInt(1, d - 1), d];
+            });
             let multiplier = Utils.randomInt(2, 6);
             let eqNum = num * multiplier;
             let eqDen = den * multiplier;

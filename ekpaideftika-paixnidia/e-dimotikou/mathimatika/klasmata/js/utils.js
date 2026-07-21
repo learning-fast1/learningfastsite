@@ -18,6 +18,18 @@ const Utils = {
         return b === 0 ? a : Utils.gcd(b, a % b);
     },
 
+    // Keep drawing num/den from genFn() until one not already in usedKeys turns up.
+    // genFn must return [num, den]. Caller owns usedKeys and should add the returned key.
+    uniqueFraction: (usedKeys, genFn) => {
+        let num, den, key;
+        do {
+            [num, den] = genFn();
+            key = num + '/' + den;
+        } while (usedKeys.has(key));
+        usedKeys.add(key);
+        return [num, den];
+    },
+
     // Play simple sound with AudioContext
     audioCtx: null,
     playSound: (type) => {
