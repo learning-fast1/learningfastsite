@@ -61,12 +61,15 @@ const app = {
                 <button class="btn-stage" onclick="Category2.startStage(1)">Στάδιο 1: Με σχήματα</button>
                 <button class="btn-stage" onclick="Category2.startStage(2)">Στάδιο 2: Χωρίς σχήματα</button>
                 <button class="btn-stage" onclick="Category2.startStage(3)">Στάδιο 3: Γράψε εσύ!</button>
+                <button class="btn-stage" onclick="Category2.startStage(4)">Στάδιο 4: Βρες τον όρο που λείπει</button>
             `;
         } else if (catId === 3) {
             title = 'Σύγκριση Κλασμάτων';
             stagesHTML = `
-                <button class="btn-stage" onclick="Category3.startStage(1)">Στάδιο 1: Με σχήματα</button>
-                <button class="btn-stage" onclick="Category3.startStage(2)">Στάδιο 2: Χωρίς σχήματα</button>
+                <button class="btn-stage" onclick="Category3.startStage(1)">Στάδιο 1: Σύγκριση κλασμάτων με σχήματα</button>
+                <button class="btn-stage" onclick="Category3.startStage(2)">Στάδιο 2: Σύγκριση ομώνυμων κλασμάτων</button>
+                <button class="btn-stage" onclick="Category3.startStage(3)">Στάδιο 3: Σύγκριση κλασμάτων με όμοιο αριθμητή</button>
+                <button class="btn-stage" onclick="Category3.startStage(4)">Στάδιο 4: Σύγκριση ετερώνυμων κλασμάτων</button>
             `;
         } else if (catId === 4) {
             title = 'Σειροθέτηση Κλασμάτων';
@@ -80,7 +83,7 @@ const app = {
             stagesHTML = `
                 <button class="btn-stage" onclick="Category5.startStage(1)">Στάδιο 1: Μέρος του αριθμού (ένα κλάσμα)</button>
                 <button class="btn-stage" onclick="Category5.startStage(2)">Στάδιο 2: Μέρος του αριθμού (δύο κλάσματα)</button>
-                <button class="btn-stage" onclick="Category5.startStage(3)">Στάδιο 3: Συνολικός αριθμός</button>
+                <button class="btn-stage" onclick="Category5.startStage(3)">Στάδιο 3: Μέρος του αριθμού (συνολικός αριθμός)</button>
             `;
         }
         

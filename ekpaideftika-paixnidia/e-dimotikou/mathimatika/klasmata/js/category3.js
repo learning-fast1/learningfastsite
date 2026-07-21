@@ -11,25 +11,68 @@ const Category3 = {
         Category3.currentQ = 0;
 
         const used = new Set();
-        for (let i = 0; i < 10; i++) {
-            let den1, num1, den2, num2, key;
-            do {
-                den1 = Utils.randomInt(2, 10);
-                num1 = Utils.randomInt(1, den1);
-                den2 = Utils.randomInt(2, 10);
-                num2 = Utils.randomInt(1, den2);
-                let a = `${num1}/${den1}`, b = `${num2}/${den2}`;
-                key = a < b ? `${a}|${b}` : `${b}|${a}`;
-            } while (used.has(key));
-            used.add(key);
 
-            let val1 = num1 / den1;
-            let val2 = num2 / den2;
-            let sign = val1 < val2 ? '<' : val1 > val2 ? '>' : '=';
-            Category3.questions.push({ n1: num1, d1: den1, n2: num2, d2: den2, sign });
+        if (stageNum === 2) {
+            // Like-denominator fractions: comparison comes down to the numerators.
+            for (let i = 0; i < 10; i++) {
+                let den, num1, num2, key, sign;
+                do {
+                    den = Utils.randomInt(2, 10);
+                    num1 = Utils.randomInt(1, den);
+                    num2 = Utils.randomInt(1, den);
+                    let a = `${num1}/${den}`, b = `${num2}/${den}`;
+                    key = a < b ? `${a}|${b}` : `${b}|${a}`;
+                    sign = num1 < num2 ? '<' : num1 > num2 ? '>' : '=';
+                } while (used.has(key) || Category3.tooManySameSign(sign));
+                used.add(key);
+
+                Category3.questions.push({ n1: num1, d1: den, n2: num2, d2: den, sign });
+            }
+        } else if (stageNum === 3) {
+            // Same numerator, different denominators: the bigger denominator makes the smaller fraction.
+            for (let i = 0; i < 10; i++) {
+                let den1, den2, num, key, sign;
+                do {
+                    den1 = Utils.randomInt(2, 10);
+                    den2 = Utils.randomInt(2, 10);
+                    if (den1 === den2) { key = null; continue; }
+                    num = Utils.randomInt(1, Math.min(den1, den2) - 1);
+                    let a = `${num}/${den1}`, b = `${num}/${den2}`;
+                    key = a < b ? `${a}|${b}` : `${b}|${a}`;
+                    sign = den1 < den2 ? '>' : '<';
+                } while (!key || used.has(key) || Category3.tooManySameSign(sign));
+                used.add(key);
+
+                Category3.questions.push({ n1: num, d1: den1, n2: num, d2: den2, sign });
+            }
+        } else {
+            for (let i = 0; i < 10; i++) {
+                let den1, num1, den2, num2, key, sign;
+                do {
+                    den1 = Utils.randomInt(2, 10);
+                    num1 = Utils.randomInt(1, den1);
+                    den2 = Utils.randomInt(2, 10);
+                    num2 = Utils.randomInt(1, den2);
+                    let a = `${num1}/${den1}`, b = `${num2}/${den2}`;
+                    key = a < b ? `${a}|${b}` : `${b}|${a}`;
+                    let val1 = num1 / den1;
+                    let val2 = num2 / den2;
+                    sign = val1 < val2 ? '<' : val1 > val2 ? '>' : '=';
+                } while (used.has(key) || Category3.tooManySameSign(sign));
+                used.add(key);
+
+                Category3.questions.push({ n1: num1, d1: den1, n2: num2, d2: den2, sign });
+            }
         }
 
         Category3.loadQuestion();
+    },
+
+    // No sign (<, =, >) may appear 3 times in a row.
+    tooManySameSign: (sign) => {
+        const qs = Category3.questions;
+        const n = qs.length;
+        return n >= 2 && qs[n - 1].sign === sign && qs[n - 2].sign === sign;
     },
 
     loadQuestion: () => {

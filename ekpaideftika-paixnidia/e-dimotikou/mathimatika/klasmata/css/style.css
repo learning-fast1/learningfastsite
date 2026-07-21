@@ -413,6 +413,19 @@ h1 {
 }
 .fraction-input:focus { outline: none; border-color: var(--grass-green); }
 
+/* Static revealed numerator/denominator next to the blank input (Category 2 Stage 4) */
+.fraction-given {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 58px;
+    font-size: 2.2rem;
+    font-family: var(--font-main);
+    font-weight: bold;
+    color: var(--wood-dark);
+}
+
 /* Fractions */
 .fraction {
     display: inline-flex;
@@ -920,6 +933,19 @@ h1 {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-20px) rotate(-10deg); }
     75% { transform: translateX(20px) rotate(10deg); }
+}
+
+@keyframes correctWiggle {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(-4deg); }
+    50% { transform: scale(1.12) rotate(4deg); }
+    75% { transform: scale(1.1) rotate(-2deg); }
+}
+
+.input-correct {
+    border-color: var(--grass-green) !important;
+    background-color: #d4edda !important;
+    animation: correctWiggle 0.5s ease;
 }
 
 /* ── Mobile: all content fits on screen without scrolling ──── */

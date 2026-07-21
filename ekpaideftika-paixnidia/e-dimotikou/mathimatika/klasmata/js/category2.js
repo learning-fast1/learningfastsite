@@ -24,6 +24,9 @@ const Category2 = {
 
             if (stageNum === 3) {
                 Category2.questions.push({ num, den, eqNum, eqDen });
+            } else if (stageNum === 4) {
+                let revealSide = Math.random() < 0.5 ? 'num' : 'den';
+                Category2.questions.push({ num, den, eqNum, eqDen, revealSide });
             } else {
                 let options = [{n: eqNum, d: eqDen, correct: true}];
                 while (options.length < 4) {
@@ -72,6 +75,34 @@ const Category2 = {
                     ${Utils.renderNumpad()}
                 </div>`;
             setTimeout(() => Utils.setActiveInput('input-num'), 50);
+            return;
+        }
+
+        if (Category2.stage === 4) {
+            let topContent, bottomContent, activeId;
+            if (q.revealSide === 'num') {
+                topContent = `<span class="fraction-given">${q.eqNum}</span>`;
+                bottomContent = `<input id="input-den" class="fraction-input" type="text" readonly onclick="Utils.setActiveInput('input-den')" placeholder="?">`;
+                activeId = 'input-den';
+            } else {
+                topContent = `<input id="input-num" class="fraction-input" type="text" readonly onclick="Utils.setActiveInput('input-num')" placeholder="?">`;
+                bottomContent = `<span class="fraction-given">${q.eqDen}</span>`;
+                activeId = 'input-num';
+            }
+            area.innerHTML = `
+                <div class="input-numpad-row">
+                    <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap; justify-content:center;">
+                        ${Utils.renderFraction(q.num, q.den)}
+                        <span style="font-family:var(--font-main); font-size:2.4rem; color:var(--wood-dark);">=</span>
+                        <div style="display:inline-flex; flex-direction:column; align-items:center; gap:4px;">
+                            ${topContent}
+                            <div style="border-top:4px solid var(--wood-dark); width:100%;"></div>
+                            ${bottomContent}
+                        </div>
+                    </div>
+                    ${Utils.renderNumpad()}
+                </div>`;
+            setTimeout(() => Utils.setActiveInput(activeId), 50);
             return;
         }
 
@@ -124,6 +155,37 @@ const Category2 = {
     },
     
     check: () => {
+        if (Category2.stage === 4) {
+            let q = Category2.questions[Category2.currentQ];
+            let activeId = q.revealSide === 'num' ? 'input-den' : 'input-num';
+            let input = document.getElementById(activeId);
+            let val = parseInt(input.value);
+
+            if (!val) return;
+
+            let isCorrect = q.revealSide === 'num'
+                ? (q.eqNum * q.den === val * q.num)
+                : (val * q.den === q.eqDen * q.num);
+
+            if (isCorrect) {
+                Utils.playSound('correct');
+                app.addScore(1);
+                input.classList.add('input-correct');
+                app.autoNext();
+            } else {
+                Utils.playSound('wrong');
+                input.style.borderColor = '#EF476F';
+                input.classList.add('shake');
+                setTimeout(() => {
+                    input.classList.remove('shake');
+                    input.style.borderColor = '';
+                    input.value = '';
+                    Utils.setActiveInput(activeId);
+                }, 600);
+            }
+            return;
+        }
+
         if (Category2.stage === 3) {
             let inNum = parseInt(document.getElementById('input-num').value);
             let inDen = parseInt(document.getElementById('input-den').value);
@@ -136,8 +198,8 @@ const Category2 = {
             if (isCorrect) {
                 Utils.playSound('correct');
                 app.addScore(1);
-                document.getElementById('input-num').style.borderColor = 'var(--grass-green)';
-                document.getElementById('input-den').style.borderColor = 'var(--grass-green)';
+                document.getElementById('input-num').classList.add('input-correct');
+                document.getElementById('input-den').classList.add('input-correct');
                 app.autoNext();
             } else {
                 Utils.playSound('wrong');
