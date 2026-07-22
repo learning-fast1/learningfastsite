@@ -240,7 +240,10 @@ h1 {
 .site-back-link {
     display: inline-block;
     align-self: center;
-    margin-bottom: 8px;
+    margin-top: 40px;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 45;
     background: #FF5E7E;
     border: 3px solid #FFF;
     border-radius: 13px;
@@ -980,6 +983,12 @@ h1 {
 
 /* ── Mobile: all content fits on screen without scrolling ──── */
 @media (max-width: 500px) {
+    /* Main menu: keep logo, back-link and title from overlapping */
+    .corner-logo { height: 46px; top: 4px; left: 4px; }
+    .site-back-link { margin-top: 30px; margin-bottom: 20px; }
+    .game-header-title { transform: rotate(-3deg) scale(0.9); }
+    .game-header-title h1 { font-size: 1.9rem; }
+
     /* Nav header */
     .nav-header { margin-bottom: 8px; }
     .title-wood { font-size: 1.4rem; }
