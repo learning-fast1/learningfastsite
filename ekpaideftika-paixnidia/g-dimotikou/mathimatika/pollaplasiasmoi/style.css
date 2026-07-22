@@ -102,7 +102,7 @@ body {
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    height: 75px;
+    height: 58px;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.5));
@@ -657,7 +657,7 @@ body {
     #map-screen header { padding: 10px 12px 10px 90px; }
     #map-screen header h1 { font-size: 18px; }
     #map-screen header p  { font-size: 13px; margin-top: 2px; }
-    #header-logo { height: 60px; }
+    #header-logo { height: 46px; }
     #total-stars-display {
         position: absolute;
         right: 10px;

@@ -174,7 +174,7 @@ body {
 }
 
 .hero__logo-big {
-  width: 420px;
+  width: 260px;
   max-width: 80vw;
   height: auto;
   margin-bottom: 1.2rem;
@@ -858,7 +858,7 @@ section {
   }
 
   .hero__logo-big {
-    width: 280px;
+    width: 175px;
   }
 
   .hero__title {

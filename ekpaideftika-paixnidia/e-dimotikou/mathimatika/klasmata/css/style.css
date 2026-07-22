@@ -37,6 +37,18 @@ body {
     padding: 8px;
 }
 
+/* Corner logo (static) */
+.corner-logo {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    height: 70px;
+    width: auto;
+    z-index: 40;
+    pointer-events: none;
+    filter: drop-shadow(2px 3px 4px rgba(0,0,0,0.3));
+}
+
 /* Mascot */
 #mascot-container {
     position: absolute;
