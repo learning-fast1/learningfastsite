@@ -983,9 +983,11 @@ h1 {
 
 /* ── Mobile: all content fits on screen without scrolling ──── */
 @media (max-width: 500px) {
-    /* Main menu: keep logo, back-link and title from overlapping */
-    .corner-logo { height: 46px; top: 4px; left: 4px; }
-    .site-back-link { margin-top: 30px; margin-bottom: 20px; }
+    /* Main menu: the corner logo has no room on narrow screens without
+       overlapping the title, and the back-link already carries the
+       "Learning Fast" name, so just hide it here. */
+    .corner-logo { display: none; }
+    .site-back-link { margin-top: 10px; margin-bottom: 16px; }
     .game-header-title { transform: rotate(-3deg) scale(0.9); }
     .game-header-title h1 { font-size: 1.9rem; }
 
