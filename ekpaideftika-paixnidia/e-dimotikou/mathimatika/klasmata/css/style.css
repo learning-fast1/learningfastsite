@@ -237,6 +237,24 @@ h1 {
     box-shadow: 0 0px 0px #D35400, 0 4px 8px rgba(0,0,0,0.2);
 }
 
+.site-back-link {
+    display: inline-block;
+    align-self: center;
+    margin-bottom: 8px;
+    background: #FF5E7E;
+    border: 3px solid #FFF;
+    border-radius: 13px;
+    padding: 5px 12px;
+    font-family: var(--font-main);
+    font-size: 0.8rem;
+    color: #FFF;
+    text-decoration: none;
+    box-shadow: 0 4px 0px #C9184A;
+    transition: all 0.1s;
+    flex-shrink: 0;
+}
+.site-back-link:active { transform: translateY(3px); box-shadow: none; }
+
 .btn-back {
     background: #FF5E7E;
     border: 3px solid #FFF;

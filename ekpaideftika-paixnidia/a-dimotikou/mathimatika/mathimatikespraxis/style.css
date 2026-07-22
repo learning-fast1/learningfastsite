@@ -252,6 +252,23 @@ h2 {
     display: none !important;
 }
 
+.site-back-link {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 500;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 6px 14px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 2px dashed #333;
+    border-radius: 20px;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+    color: #333;
+    text-decoration: none;
+}
+
 .back-btn {
     position: fixed;
     top: 15px;

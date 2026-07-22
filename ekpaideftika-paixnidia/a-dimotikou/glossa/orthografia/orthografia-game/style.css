@@ -464,6 +464,27 @@ header p {
     border-radius: 20px;
 }
 
+.site-back-link {
+    position: absolute;
+    top: 1.2rem;
+    left: 1.2rem;
+    background: none;
+    border: 3px solid #aaa;
+    border-radius: 15px;
+    padding: 0.4rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #888;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    z-index: 20;
+}
+
+.site-back-link:hover {
+    border-color: #6C5CE7;
+    color: #6C5CE7;
+}
+
 .back-btn {
     margin-top: 1rem;
     background: none;
