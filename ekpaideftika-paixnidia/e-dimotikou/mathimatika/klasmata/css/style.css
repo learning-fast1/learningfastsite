@@ -988,8 +988,8 @@ h1 {
        "Learning Fast" name, so just hide it here. */
     .corner-logo { display: none; }
     .site-back-link { margin-top: 10px; margin-bottom: 16px; }
-    .game-header-title { transform: rotate(-3deg) scale(0.9); margin-top: 24px; }
-    .game-header-title h1 { font-size: 1.9rem; }
+    .game-header-title { transform: rotate(-3deg); margin-top: 24px; }
+    .game-header-title h1 { font-size: 2.3rem; }
 
     /* Nav header */
     .nav-header { margin-bottom: 8px; }
