@@ -270,7 +270,7 @@
   }
   .blank {
     display: inline-block;
-    min-width: 80px; border-bottom: 4px solid var(--purple);
+    min-width: 140px; border-bottom: 4px solid var(--purple);
     color: var(--purple); font-style: italic;
     padding: 0 6px; transition: all .3s;
   }
@@ -1073,9 +1073,9 @@ function renderQuestion() {
 
   let html = '';
   if (mode === 'articles') {
-    html = `<span class="blank" id="blank">___</span> ${q.word}`;
+    html = `<span class="blank" id="blank">&nbsp;</span> ${q.word}`;
   } else {
-    html = `${q.article} ${q.pre}<span class="blank" id="blank">_</span>${q.post}`;
+    html = `${q.article} ${q.pre}<span class="blank" id="blank">&nbsp;</span>${q.post}`;
   }
   document.getElementById('sentence').innerHTML = html;
   document.getElementById('hint').textContent = q.hint || '';
@@ -1346,8 +1346,8 @@ function render2P() {
   const opts = [...q.options]; shuffle(opts);
   ['p1','p2'].forEach((p, idx) => {
     const html = mode === 'articles'
-      ? `<span class="blank" id="blank-${p}">___</span> ${q.word}`
-      : `${q.article} ${q.pre}<span class="blank" id="blank-${p}">_</span>${q.post}`;
+      ? `<span class="blank" id="blank-${p}">&nbsp;</span> ${q.word}`
+      : `${q.article} ${q.pre}<span class="blank" id="blank-${p}">&nbsp;</span>${q.post}`;
     document.getElementById(`sentence-${p}`).innerHTML = html;
     const container = document.getElementById(`ans-${p}`);
     container.innerHTML = '';
