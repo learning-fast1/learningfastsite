@@ -206,6 +206,13 @@ h2 {
     font-size: 2.5rem;
 }
 
+.ui-icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+    flex-shrink: 0;
+}
+
 .choice-btn span {
     font-size: 1.2rem;
     font-weight: bold;

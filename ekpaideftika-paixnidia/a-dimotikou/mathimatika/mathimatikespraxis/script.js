@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isReplayMode) {
             if (players[p].mistakenProblems.length === 0) {
                 players[p].isActive = false;
-                opEls[p].textContent = '✔️';
+                opEls[p].textContent = '✔';
                 answerEls[p].textContent = '';
                 num1Els[p].textContent = '';
                 num2Els[p].textContent = '';
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => scoreEls[player].parentElement.classList.remove('pop-animation'), 400);
             }
 
-            feedbackEls[player].textContent = 'Σωστά! 🎉';
+            feedbackEls[player].textContent = 'Σωστά!';
             feedbackEls[player].className = 'feedback show win';
 
             createConfetti(player);
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const prob = players[player].currentProblemAttempt;
             trackEvent('answer_submitted', { problem: `${prob.num1}${prob.operator}${prob.num2}`, is_correct: false, player });
             trackEvent('wrong_answer', { problem: `${prob.num1}${prob.operator}${prob.num2}`, correct_answer: players[player].currentAnswer, given_answer: val, player, operation: selectedOperation });
-            feedbackEls[player].textContent = 'Λάθος! 💫';
+            feedbackEls[player].textContent = 'Προσπάθησε πάλι.';
             feedbackEls[player].className = 'feedback show wrong';
             players[player].answerStr = ''; // clear for retry
             updateAnswerDisplay(player);
@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         players[2].isActive = false;
         isReplayMode = false;
         
-        let resultHtml = `Μπράβο! 🎉<br>Ολοκλήρωσες τέλεια τη διόρθωση των λαθών σου!`;
+        let resultHtml = `Μπράβο!<br>Ολοκλήρωσες τέλεια τη διόρθωση των λαθών σου!`;
         createConfetti(1);
         if (selectedMode !== 'single') {
             createConfetti(2);
@@ -482,17 +482,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let resultHtml = '';
         if (selectedMode === 'single') {
-            resultHtml = `Μπράβο! Το σκορ σου είναι <b>${players[1].score}</b> 🎉`;
+            resultHtml = `Μπράβο! Το σκορ σου είναι <b>${players[1].score}</b>`;
             createConfetti(1);
         } else {
             if (players[1].score > players[2].score) {
-                resultHtml = `Νικητής: Παίκτης 1 με ${players[1].score} πόντους! 🎉<br>Παίκτης 2: ${players[2].score} πόντους.`;
+                resultHtml = `Νικητής: Παίκτης 1 με ${players[1].score} πόντους!<br>Παίκτης 2: ${players[2].score} πόντους.`;
                 createConfetti(1);
             } else if (players[2].score > players[1].score) {
-                resultHtml = `Νικητής: Παίκτης 2 με ${players[2].score} πόντους! 🎉<br>Παίκτης 1: ${players[1].score} πόντους.`;
+                resultHtml = `Νικητής: Παίκτης 2 με ${players[2].score} πόντους!<br>Παίκτης 1: ${players[1].score} πόντους.`;
                 createConfetti(2);
             } else {
-                resultHtml = `Ισοπαλία με ${players[1].score} πόντους! 🤝`;
+                resultHtml = `Ισοπαλία με ${players[1].score} πόντους!`;
                 createConfetti(1);
                 createConfetti(2);
             }
