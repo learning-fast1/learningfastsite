@@ -19,8 +19,10 @@ const Category4 = {
 
     generateQuestion(stageNum) {
         if (stageNum === 1) {
-            // Same denominator, 4 unique fractions — den must be ≥ 5 so there are ≥4 numerators
-            let den = Utils.randomInt(5, 20);
+            // Same denominator, 4 unique fractions. Keep it under 10 — den
+            // must be >= 5 for 4 numerators, and 5-9 always has enough, so
+            // there's no need to ever reach for a bigger one here.
+            let den = Utils.randomInt(5, 9);
             let allNums = Array.from({ length: den - 1 }, (_, k) => k + 1);
             Utils.shuffle(allNums);
             let fracs = allNums.slice(0, 4).map(n => ({ n, d: den, val: n / den }));
@@ -37,13 +39,17 @@ const Category4 = {
             let fracs = picked.map(([n, d]) => ({ n, d, val: n / d }));
             return { fracs };
         } else {
-            // Different denominators, 4 fractions with distinct values
+            // Different denominators, 4 fractions with distinct values.
+            // Prefer denominators under 10; only reach a bit higher (up to
+            // 12, still close to ten) if that's not enough to find 4
+            // sufficiently distinct values.
             let fracs = [];
             let vals = [];
             let attempts = 0;
             while (fracs.length < 4 && attempts < 200) {
                 attempts++;
-                let d = Utils.randomInt(2, 12);
+                let maxDen = attempts < 150 ? 9 : 12;
+                let d = Utils.randomInt(2, maxDen);
                 let n = Utils.randomInt(1, d - 1);
                 let val = n / d;
                 if (!vals.some(v => Math.abs(v - val) < 0.05)) {
@@ -83,11 +89,40 @@ const Category4 = {
 
     // ── Number Line (Stages 1 & 3) ──────────────────────────────────────────
 
+    // Positions slots by min-gap-clamped true value instead of even spacing,
+    // so the line reflects real magnitude. Uses the SORTED values (not bank
+    // order) since the exercise only requires ascending order across slots,
+    // not a fixed fraction-to-slot mapping.
+    declutterPositions(positions, minGap, lo, hi) {
+        let pos = positions.slice();
+        let n = pos.length;
+        for (let i = 1; i < n; i++) {
+            if (pos[i] - pos[i - 1] < minGap) pos[i] = pos[i - 1] + minGap;
+        }
+        if (pos[n - 1] > hi) {
+            pos[n - 1] = hi;
+            for (let i = n - 2; i >= 0; i--) {
+                if (pos[i + 1] - pos[i] < minGap) pos[i] = pos[i + 1] - minGap;
+            }
+        }
+        if (pos[0] < lo) {
+            pos[0] = lo;
+            for (let i = 1; i < n; i++) {
+                if (pos[i] - pos[i - 1] < minGap) pos[i] = pos[i - 1] + minGap;
+            }
+        }
+        return pos;
+    },
+
     renderNumberLine(fracs) {
         let n = fracs.length;
+        let sortedVals = fracs.map(f => f.val).sort((a, b) => a - b);
+        let truePositions = sortedVals.map(v => v * 100);
+        let positions = Category4.declutterPositions(truePositions, 11, 8, 92);
+
         let slotsHTML = '';
         for (let i = 0; i < n; i++) {
-            let pct = ((i + 1) / (n + 1) * 100).toFixed(1);
+            let pct = positions[i].toFixed(1);
             slotsHTML += `
                 <div class="nl-slot" data-index="${i}" style="left:${pct}%"
                     ondragover="event.preventDefault(); document.getElementById('nl-drop-${i}').classList.add('drag-over')"
