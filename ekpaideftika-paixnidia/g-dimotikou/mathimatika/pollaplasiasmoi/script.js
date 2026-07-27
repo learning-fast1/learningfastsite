@@ -289,33 +289,29 @@ function generateAnswers() {
 }
 
 function handleAnswer(selectedAnswer, btnElement) {
-    // Disable all buttons to prevent double-clicks
-    const allBtns = document.querySelectorAll('.answer-btn');
-    allBtns.forEach(b => b.style.pointerEvents = 'none');
-    
     if (selectedAnswer === questionData.correctAnswer) {
+        // Round over — disable every choice now and advance after a beat.
+        document.querySelectorAll('.answer-btn').forEach(b => b.style.pointerEvents = 'none');
         btnElement.classList.add('correct');
         currentCorrectAnswers++;
         scoreText.textContent = Math.round((currentCorrectAnswers / levelQuestions) * 100);
-        // Play success sound (conceptually)
+
+        setTimeout(() => {
+            currentQuestionIndex++;
+            generateQuestion();
+        }, 1200); // Wait bit to let user see response
     } else {
+        // Wrong pick: don't reveal the answer — just disable this one
+        // button and let the child try one of the others.
         btnElement.classList.add('wrong');
-        allBtns.forEach(b => {
-            if (parseInt(b.textContent) === questionData.correctAnswer) {
-                b.classList.add('correct');
-            }
-        });
+        btnElement.style.pointerEvents = 'none';
+
         // Καταγραφή λάθους ανά πίνακα (για boss report)
         if (currentLevel.isBoss) {
             const t = questionData.table;
             tableErrors[t] = (tableErrors[t] || 0) + 1;
         }
     }
-    
-    setTimeout(() => {
-        currentQuestionIndex++;
-        generateQuestion();
-    }, 1200); // Wait bit to let user see response
 }
 
 function endGame() {
