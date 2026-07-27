@@ -296,7 +296,7 @@ class PlayerBoard {
             }
             this.wordCardEl.className = 'word-card correct-anim';
             
-            this.feedbackMessageEl.textContent = 'Τέλεια! 🌟';
+            this.feedbackMessageEl.textContent = 'Σωστό!';
             this.feedbackMessageEl.className = 'feedback-message success pop-in';
             
             if (this.attemptsForWord === 0) {
@@ -339,7 +339,7 @@ class PlayerBoard {
             } else {
                 // Κανονικό mode: δείξε το κουμπί "Επόμενη"
                 if (this.currentWordIndex === this.playerWords.length - 1) {
-                    this.nextBtn.textContent = 'Παίξε ξανά 🔄';
+                    this.nextBtn.textContent = 'Παίξε ξανά';
                 } else {
                     this.nextBtn.textContent = 'Επόμενη Λέξη ➔';
                 }
@@ -361,7 +361,7 @@ class PlayerBoard {
             void this.wordCardEl.offsetWidth; // trigger reflow
             this.wordCardEl.classList.add('shake');
             
-            this.feedbackMessageEl.textContent = 'Ωχ! Δοκίμασε ξανά... 🤔';
+            this.feedbackMessageEl.textContent = 'Προσπάθησε πάλι.';
             this.feedbackMessageEl.className = 'feedback-message error';
             
             if (this.attemptsForWord === 1) {
@@ -399,13 +399,13 @@ class PlayerBoard {
             btn.style.opacity = '0.4';
         });
         this.nextBtn.classList.add('hidden');
-        this.feedbackMessageEl.textContent = `⏰ Τέλος! Σωστά: ${this.correctScore} | Λάθος: ${this.wrongScore}`;
+        this.feedbackMessageEl.textContent = `Τέλος! Σωστά: ${this.correctScore} | Λάθος: ${this.wrongScore}`;
         this.feedbackMessageEl.className = 'feedback-message success pop-in';
     }
 
     startReview() {
         if (this.wrongWords.length === 0) {
-            this.feedbackMessageEl.textContent = 'Μπράβο! Δεν έκανες κανένα λάθος! 🌟';
+            this.feedbackMessageEl.textContent = 'Μπράβο! Δεν έκανες κανένα λάθος!';
             this.feedbackMessageEl.className = 'feedback-message success pop-in';
             setTimeout(() => goToStartScreen(), 2500);
             return;
@@ -418,7 +418,7 @@ class PlayerBoard {
         this.wrongScore = 0;
         this.updateScore();
         this.loadWord();
-        this.feedbackMessageEl.textContent = `💪 Επαναλαμβάνουμε ${this.playerWords.length} λάθη!`;
+        this.feedbackMessageEl.textContent = `Επαναλαμβάνουμε ${this.playerWords.length} λάθη!`;
         this.feedbackMessageEl.className = 'feedback-message error pop-in';
     }
 
@@ -438,8 +438,8 @@ class PlayerBoard {
             // Η επανάληψη λαθών μένει διαθέσιμη μόνο μέσω του κουμπιού
             // "Επανάληψη Λαθών" στο τέλος του χρόνου.
             const message = this.isReviewMode
-                ? 'Μπράβο! Τελείωσες την επανάληψη! 🏆'
-                : 'Τέλειο! Τα βρήκες όλα σωστά! 🏆';
+                ? 'Μπράβο! Τελείωσες την επανάληψη!'
+                : 'Τέλειο! Τα βρήκες όλα σωστά!';
             this.feedbackMessageEl.textContent = message;
             this.feedbackMessageEl.className = 'feedback-message success pop-in';
 
@@ -554,8 +554,8 @@ function startTimer(seconds) {
         const mins = Math.floor(timeRemaining / 60);
         const secs = timeRemaining % 60;
         timerDisplayEl.textContent = mins > 0
-            ? `⏱️ ${mins}:${secs.toString().padStart(2, '0')}`
-            : `⏱️ ${secs}`;
+            ? `${mins}:${secs.toString().padStart(2, '0')}`
+            : `${secs}`;
         if (timeRemaining <= 10) {
             timerDisplayEl.classList.add('timer-urgent');
         } else {
@@ -575,7 +575,7 @@ function startTimer(seconds) {
 }
 
 function endGame() {
-    timerDisplayEl.textContent = '⏰ Τέλος χρόνου!';
+    timerDisplayEl.textContent = 'Τέλος χρόνου!';
     timerDisplayEl.classList.remove('timer-urgent');
     timerDisplayEl.classList.add('timer-ended');
     playerBoards.forEach(board => board.disable());
@@ -599,14 +599,14 @@ function endGame() {
 
     endScores.innerHTML = playerBoards.map((b, i) => {
         const label = playerBoards.length > 1 ? `<span class="player-label">Παίκτης ${i + 1}</span>` : '';
-        return `${label}<span class="end-correct">✅ Σωστά: ${b.correctScore}</span><span class="end-wrong">❌ Λάθος: ${b.wrongScore}</span>`;
+        return `${label}<span class="end-correct">Σωστά: ${b.correctScore}</span><span class="end-wrong">Λάθος: ${b.wrongScore}</span>`;
     }).join('<hr class="score-divider">');
 
     if (hasWrongWords) {
         retryBtn.classList.remove('hidden');
         retryBtn.onclick = () => {
             endOverlay.classList.add('hidden');
-            timerDisplayEl.textContent = '📝 Επανάληψη λαθών!';
+            timerDisplayEl.textContent = 'Επανάληψη λαθών!';
             timerDisplayEl.classList.remove('timer-ended');
             timerDisplayEl.classList.add('timer-review');
             playerBoards.forEach(board => board.startReview());
