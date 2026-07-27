@@ -139,6 +139,7 @@
   }
   .player-btn .p-icon  { font-size: 2.8rem; display: block; margin-bottom: 10px; }
   .player-btn .p-label { font-size: 1.1rem; font-weight: 800; }
+  .player-btn .p-sublabel { font-size: 0.8rem; font-weight: 400; display: block; }
   .player-btn:hover {
     transform: translateY(-5px) scale(1.05);
     box-shadow: 0 12px 36px rgba(168,85,247,.45);
@@ -586,6 +587,7 @@
         <button class="player-btn" onclick="pickPlayers(2)">
           <span class="p-icon">👥</span>
           <span class="p-label">2 Παίκτες</span>
+          <span class="p-sublabel">(Διαδραστικός Πίνακας)</span>
         </button>
       </div>
       <button class="btn-back-mode" onclick="showModeCards()">← Πίσω</button>
@@ -1135,7 +1137,7 @@ function checkAnswer(chosen, correct, btn, pNum) {
       streak = 0; lives--;
       btn.classList.add('wrong');
       btn.disabled = true;
-      showToast('❌ Λάθος! Ξαναπροσπάθησε!', 'err');
+      showToast('Προσπάθησε πάλι!', 'err');
       document.getElementById('q-card').classList.add('shake');
       setTimeout(() => document.getElementById('q-card').classList.remove('shake'), 400);
       updateAstronaut(false);
