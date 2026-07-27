@@ -562,6 +562,15 @@ header h2 {
 
 /* --- Mobile Responsiveness --- */
 @media (max-width: 600px) {
+    .site-back-link {
+        top: 8px;
+        left: 8px;
+        font-size: 0.65rem;
+        padding: 4px 10px;
+        border-width: 1px;
+        border-radius: 12px;
+    }
+
     .selection-content {
         padding: 30px 20px;
     }
