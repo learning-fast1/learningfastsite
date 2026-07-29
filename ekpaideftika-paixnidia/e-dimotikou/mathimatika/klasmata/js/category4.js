@@ -84,6 +84,7 @@ const Category4 = {
             area.innerHTML = Category4.renderStage2(q.fracs);
         } else {
             area.innerHTML = Category4.renderNumberLine(q.fracs);
+            Category4.layoutNumberLine(q.fracs);
         }
     },
 
@@ -133,11 +134,24 @@ const Category4 = {
                 </div>`;
         }
         let bankHTML = fracs.map((f, i) => Category4.makeFrac(f, i)).join('');
+        let noticeHTML = Category4.shouldShowMobileNotice() ? `
+            <div class="nl-mobile-notice" id="nl-mobile-notice">
+                <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <line x1="12" y1="11" x2="12" y2="16"></line>
+                    <circle cx="12" cy="8" r="0.6" fill="currentColor" stroke="none"></circle>
+                </svg>
+                <span>Στο κινητό οι αποστάσεις ανάμεσα στα κλάσματα μπορεί να μην είναι απόλυτα ακριβείς, λόγω του μικρού χώρου στην οθόνη.</span>
+                <button class="nl-notice-close" onclick="Category4.dismissMobileNotice()">Κατάλαβα</button>
+            </div>` : '';
         return `
             <div class="nl-container">
+                ${noticeHTML}
                 <div class="nl-bar">
                     <span class="nl-label-end">0</span>
-                    <div class="nl-track" id="nl-track">${slotsHTML}</div>
+                    <div class="nl-track" id="nl-track">
+                        <div class="nl-track-inner" id="nl-track-inner">${slotsHTML}</div>
+                    </div>
                     <span class="nl-label-end">1</span>
                 </div>
                 <div class="frac-bank" id="fraction-bank"
@@ -146,6 +160,52 @@ const Category4 = {
                     ${bankHTML}
                 </div>
             </div>`;
+    },
+
+    // Shown once per browser session, only at phone widths — explains
+    // why the number line's spacing may look compressed there (see
+    // layoutNumberLine: not enough screen width for full true-to-scale
+    // positions without hiding boxes off-screen).
+    shouldShowMobileNotice() {
+        if (window.innerWidth > 500) return false;
+        try {
+            return !sessionStorage.getItem('klasmata_nl_notice_dismissed');
+        } catch (e) {
+            return true;
+        }
+    },
+
+    dismissMobileNotice() {
+        try { sessionStorage.setItem('klasmata_nl_notice_dismissed', '1'); } catch (e) { /* ignore */ }
+        let el = document.getElementById('nl-mobile-notice');
+        if (el) el.remove();
+    },
+
+    // Re-measures the actual rendered inner-track/box width (after CSS
+    // media queries apply, and after mobile's .nl-track-inner has taken
+    // its wider scrollable size) and re-positions slots so drop-boxes
+    // never overlap. On mobile the inner track is now wider than the
+    // viewport (see .nl-track-inner in the ≤500px media query), which is
+    // what gives true-proportional spacing enough room instead of being
+    // squeezed into a near-even layout by the minimum-gap floor.
+    layoutNumberLine(fracs) {
+        let trackInner = document.getElementById('nl-track-inner');
+        if (!trackInner) return;
+
+        let trackWidth = trackInner.getBoundingClientRect().width;
+        let sampleBox = trackInner.querySelector('.nl-drop-box');
+        let boxWidth = sampleBox ? sampleBox.getBoundingClientRect().width : 60;
+        if (trackWidth <= 0) return;
+
+        let minGapPercent = Math.max(((boxWidth + 6) / trackWidth) * 100, 6);
+
+        let sortedVals = fracs.map(f => f.val).sort((a, b) => a - b);
+        let truePositions = sortedVals.map(v => v * 100);
+        let positions = Category4.declutterPositions(truePositions, minGapPercent, 6, 94);
+
+        trackInner.querySelectorAll('.nl-slot').forEach((slot, i) => {
+            slot.style.left = positions[i].toFixed(1) + '%';
+        });
     },
 
     // ── Stage 2 (Three Boxes) ────────────────────────────────────────────────

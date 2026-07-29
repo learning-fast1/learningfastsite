@@ -641,6 +641,43 @@ h1 {
     gap: 14px;
 }
 
+.nl-mobile-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(124, 213, 244, 0.25);
+    border: 2px dashed var(--wood-dark);
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    color: var(--wood-dark);
+    font-family: var(--font-alt);
+}
+
+.nl-mobile-notice .ui-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.nl-mobile-notice span {
+    flex: 1;
+    line-height: 1.3;
+}
+
+.nl-notice-close {
+    flex-shrink: 0;
+    background: var(--wood-dark);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: var(--font-main);
+}
+
 .nl-bar {
     display: flex;
     align-items: flex-start;
@@ -662,7 +699,17 @@ h1 {
     height: 116px;
 }
 
-.nl-track::before {
+/* Slots position/measure against this inner layer instead of .nl-track
+   directly, so on narrow phones it can be made wider than the viewport
+   (with .nl-track scrolling to reveal it) without losing true-proportional
+   spacing to a cramped minimum-gap floor. */
+.nl-track-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.nl-track-inner::before {
     content: '';
     position: absolute;
     top: 10px;
@@ -1019,11 +1066,17 @@ h1 {
     .btn-sign { width: 52px; height: 52px; font-size: 1.9rem; }
     .compare-sign-box { width: 52px; height: 52px; font-size: 2rem; }
 
-    /* Category 4: number line */
-    .nl-track { height: 95px; }
-    .nl-drop-box { width: 46px; min-height: 54px; }
+    /* Category 4: number line — all 4 boxes must stay visible without
+       scrolling (kids won't think to scroll), so boxes are smaller here
+       than elsewhere in the game: a smaller box needs a smaller minimum
+       gap, leaving more room for true-proportional spacing to actually
+       show within the one visible screen width. */
+    .nl-track { height: 88px; }
+    .nl-drop-box { width: 38px; min-height: 46px; padding: 2px; }
     .drag-frac { padding: 4px 8px; }
     .drag-frac .fraction { font-size: 1.15rem; }
+    .nl-drop-box .drag-frac { padding: 2px 4px; }
+    .nl-drop-box .drag-frac .fraction { font-size: 0.95rem; }
 
     /* Category 4 Stage 2: three boxes */
     .s2-boxes { gap: 6px; }
