@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S07M3VNB5N');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Παιχνίδι Φωνολογικής Επίγνωσης (Φωνολογικής Ενημερότητας) — διαδραστικό εκπαιδευτικό παιχνίδι για πρόταση, λέξη, συλλαβή, φωνήματα, ομοιοκαταληξία και ήχους των λέξεων." />
+  <title>Παιχνίδι Φωνολογικής Επίγνωσης – Learning Fast</title>
+  <link rel="canonical" href="https://learning-fast.com/eidiki-ekpaideysi/fonologiki-epignosi/paixnidi-fonologikis-epignosis/" />
+  <link rel="stylesheet" href="../../../styles/main.css" />
+  <style>
+    .detail-wrap {
+      max-width: 680px;
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: .9rem;
+      margin-bottom: 2rem;
+      transition: gap var(--transition);
+      text-decoration: none;
+    }
+    .back-link:hover { gap: .8rem; }
+
+    .detail-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,.05);
+    }
+
+    .detail-card__header {
+      background: linear-gradient(135deg, #B8A9E8, #A8E6CF);
+      padding: 2.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .detail-card__icon {
+      font-size: 3.5rem;
+      flex-shrink: 0;
+    }
+
+    .detail-card__header-info h2 {
+      color: #fff;
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: .3rem;
+    }
+
+    .detail-card__header-info p {
+      color: rgba(255,255,255,.85);
+      font-size: .95rem;
+    }
+
+    .detail-card__body {
+      padding: 2rem;
+    }
+
+    .detail-card__description {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .detail-card__description:last-of-type {
+      margin-bottom: 2rem;
+    }
+
+    .detail-card__play {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, #B8A9E8, #A8E6CF);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 6px 20px rgba(139,121,199,.4);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .play-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(139,121,199,.5);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <a href="../../../index.html" class="navbar__logo"><img src="../../../assets/images/logo-wordmark.png" alt="Learning Fast" /></a>
+      <button class="navbar__hamburger" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <ul class="navbar__links">
+        <li><a href="../../../index.html">Αρχική</a></li>
+        <li class="has-dropdown"><a href="../../../taxeis/index.html">Τάξεις</a>
+          <ul class="dropdown">
+            <li><a href="../../../taxeis/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+            <li><a href="../../../taxeis/a-gymnasiou/index.html">Α΄ Γυμνασίου</a></li>
+            <li><a href="../../../taxeis/b-gymnasiou/index.html">Β΄ Γυμνασίου</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../../index.html" class="active">Ειδική Εκπαίδευση</a>
+          <ul class="dropdown">
+            <li><a href="../../kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
+            <li><a href="../../leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
+          </ul>
+        </li>        <li class="has-dropdown"><a href="../../../ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a>
+          <ul class="dropdown">
+            <li><a href="../../../ekpaideftika-paixnidia/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../ekpaideftika-paixnidia/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../ekpaideftika-paixnidia/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+
+            <li><a href="../../../ekpaideftika-paixnidia/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../../ekpaideftika-paixnidia/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../../ekpaideftika-paixnidia/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+          </ul>
+        </li>
+        <li><a href="../../../epikoinonia/index.html">Επικοινωνία</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="section__header">
+      <span class="section__label">Ειδική Εκπαίδευση</span>
+      <h1 class="section__title">Φωνολογική Επίγνωση</h1>
+    </div>
+
+    <div class="detail-wrap">
+      <a href="../index.html" class="back-link">← Επιστροφή στη Φωνολογική Επίγνωση</a>
+
+      <div class="detail-card">
+        <div class="detail-card__header">
+          <div class="detail-card__icon">👂</div>
+          <div class="detail-card__header-info">
+            <h2>Παιχνίδι Φωνολογικής Επίγνωσης</h2>
+            <p>Φωνολογικής Ενημερότητας · Διαδραστικό παιχνίδι</p>
+          </div>
+        </div>
+        <div class="detail-card__body">
+          <p class="detail-card__description">
+            Ένα διαδραστικό εκπαιδευτικό παιχνίδι που βοηθά τα παιδιά να αναπτύξουν τη φωνολογική τους ενημερότητα μέσα από ευχάριστες και στοχευμένες δραστηριότητες.
+          </p>
+          <p class="detail-card__description">
+            Τα παιδιά εξασκούνται στην πρόταση, λέξη, συλλαβή και φωνήματα, στην ομοιοκαταληξία και τους ήχους των λέξεων, προχωρώντας σταδιακά από πιο απλές σε πιο σύνθετες δεξιότητες. Στόχος η κατάκτηση της ανάγνωσης και της γραφής.
+          </p>
+          <p class="detail-card__description">
+            Ιδανικό για αξιοποίηση από εκπαιδευτικούς, ειδικούς παιδαγωγούς, λογοθεραπευτές και γονείς, στο σχολείο, στο σπίτι και στο χώρο εργασίας.
+          </p>
+          <div class="detail-card__play">
+            <a href="../paixnidi/index.html" class="play-btn" onclick="gtag('event','play_game',{event_category:'Game',event_label:'Fonologiki Epignosi'})">
+              🎮 Παίξε το παιχνίδι
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__logo"><img src="../../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
+    <ul class="footer__links">
+      <li><a href="../../../epikoinonia/index.html">Επικοινωνία</a></li>
+      <li><a href="../../../steile-mia-idea/index.html">Στείλε μια ιδέα!</a></li>
+      <li><a href="../../../enimeroseis/index.html">Ενημερώσεις</a></li>
+      <li><a href="../../../oroi-xrisis/index.html">Όροι και προϋποθέσεις</a></li>
+    </ul>
+    <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
+
+<script>
+  var btn = document.getElementById('navToggle');
+  var links = document.querySelector('.navbar__links');
+  if(btn && links){
+    btn.addEventListener('click', function(){
+      links.classList.toggle('nav-open');
+      btn.classList.toggle('nav-open');
+    });
+    document.querySelectorAll('.has-dropdown > a').forEach(function(a){
+      a.addEventListener('click', function(e){
+        if(window.innerWidth <= 768){
+          e.preventDefault();
+          var li = this.parentElement;
+          document.querySelectorAll('.has-dropdown.open').forEach(function(el){
+            if(el !== li) el.classList.remove('open');
+          });
+          li.classList.toggle('open');
+        }
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.navbar') && links.classList.contains('nav-open')){
+        links.classList.remove('nav-open');
+        btn.classList.remove('nav-open');
+      }
+    });
+  }
+</script>
+</body>
+</html>

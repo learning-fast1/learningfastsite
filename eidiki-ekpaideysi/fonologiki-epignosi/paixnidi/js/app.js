@@ -93,10 +93,10 @@ Phono.app = {
         });
 
         // Link back to the main Learning Fast site — this copy lives at
-        // eidiki-ekpaideysi/fonologiki-epignosi/, two levels below root.
+        // eidiki-ekpaideysi/fonologiki-epignosi/paixnidi/, three levels below root.
         const backLink = el('a', {
             className: 'site-back-link',
-            href: '../../index.html',
+            href: '../../../index.html',
             textContent: '← Learning Fast',
         });
 
