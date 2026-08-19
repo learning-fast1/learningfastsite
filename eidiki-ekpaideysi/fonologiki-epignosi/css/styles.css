@@ -1,0 +1,2214 @@
+/* ============================================================
+   ΦΩΝΟΠΑΙΧΝΙΔΙ — Complete Stylesheet
+   Design System + Components + Games + Animations
+   ============================================================ */
+
+/* ===========================================
+   1. DESIGN TOKENS (CSS Custom Properties)
+   =========================================== */
+:root {
+    /* --- Colors: Calm & Child-Friendly --- */
+    --bg-primary: #FFF8F0;
+    --bg-secondary: #FFF0E5;
+    --bg-card: #FFFFFF;
+    --bg-overlay: rgba(61, 61, 61, 0.4);
+
+    --primary: #B8A9E8;
+    --primary-light: #D4C9F0;
+    --primary-dark: #8B79C7;
+    --secondary: #A8E6CF;
+    --secondary-light: #C8F0DF;
+    --secondary-dark: #6CC99E;
+    --accent-warm: #FFB7B2;
+    --accent-warm-light: #FFD4D1;
+    --accent-cool: #87CEEB;
+    --accent-cool-light: #B0DFEF;
+
+    --success: #81C784;
+    --success-light: #C8E6C9;
+    --error: #F48FB1;
+    --error-light: #F8BBD0;
+    --warning: #FFE082;
+
+    --text-primary: #3D3D3D;
+    --text-secondary: #6B6B6B;
+    --text-light: #FFFFFF;
+    --text-muted: #9E9E9E;
+
+    /* Level Colors */
+    --level1: #FFE082;
+    --level1-dark: #F9A825;
+    --level2: #A8E6CF;
+    --level2-dark: #43A047;
+    --level3: #B8A9E8;
+    --level3-dark: #7E57C2;
+    --level4: #87CEEB;
+    --level4-dark: #1976D2;
+    --level5: #FFB7B2;
+    --level5-dark: #E53935;
+
+    /* --- Typography --- */
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Nunito', sans-serif;
+
+    --text-xs: 0.7rem;
+    --text-sm: 0.8rem;
+    --text-base: 0.95rem;
+    --text-lg: 1.05rem;
+    --text-xl: 1.15rem;
+    --text-2xl: 1.35rem;
+    --text-3xl: 1.7rem;
+    --text-4xl: 2.1rem;
+    --text-5xl: 2.8rem;
+
+    /* --- Spacing (trimmed so a full game screen fits in one viewport) --- */
+    --space-xs: 0.2rem;
+    --space-sm: 0.35rem;
+    --space-md: 0.6rem;
+    --space-lg: 0.9rem;
+    --space-xl: 1.15rem;
+    --space-2xl: 1.6rem;
+    --space-3xl: 2.2rem;
+
+    /* --- Borders & Shadows --- */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --radius-full: 9999px;
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --shadow-glow: 0 0 20px rgba(184, 169, 232, 0.3);
+    --shadow-success: 0 0 20px rgba(129, 199, 132, 0.4);
+    --shadow-error: 0 0 20px rgba(244, 143, 177, 0.4);
+
+    /* --- Transitions --- */
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+}
+
+/* ===========================================
+   2. RESET & BASE STYLES
+   =========================================== */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-body);
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+button {
+    font-family: var(--font-body);
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+input {
+    font-family: var(--font-body);
+    font-weight: 600;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: var(--radius-full);
+}
+
+/* ===========================================
+   3. APP CONTAINER
+   =========================================== */
+#app {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-md);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ===========================================
+   4. FLOATING BACKGROUND SHAPES
+   =========================================== */
+#bg-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.bg-shape {
+    position: absolute;
+    opacity: 0.12;
+    border-radius: 50%;
+}
+
+.shape-circle {
+    border-radius: 50%;
+}
+
+.shape-square {
+    border-radius: var(--radius-lg);
+}
+
+.shape-triangle {
+    border-radius: 0;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.shape-1 {
+    width: 120px; height: 120px;
+    background: var(--primary);
+    top: 10%; left: 5%;
+    animation: floatSlow 20s ease-in-out infinite;
+}
+.shape-2 {
+    width: 80px; height: 80px;
+    background: var(--secondary);
+    top: 60%; right: 8%;
+    animation: floatSlow 25s ease-in-out infinite reverse;
+}
+.shape-3 {
+    width: 60px; height: 60px;
+    background: var(--accent-warm);
+    top: 30%; right: 15%;
+    animation: floatSlow 18s ease-in-out infinite 2s;
+}
+.shape-4 {
+    width: 90px; height: 90px;
+    background: var(--accent-cool);
+    bottom: 15%; left: 10%;
+    animation: floatSlow 22s ease-in-out infinite 5s;
+}
+.shape-5 {
+    width: 50px; height: 50px;
+    background: var(--warning);
+    top: 75%; left: 50%;
+    animation: floatSlow 15s ease-in-out infinite 3s;
+}
+.shape-6 {
+    width: 70px; height: 70px;
+    background: var(--primary-light);
+    top: 5%; right: 30%;
+    animation: floatSlow 24s ease-in-out infinite 1s;
+}
+.shape-7 {
+    width: 40px; height: 40px;
+    background: var(--secondary-dark);
+    bottom: 30%; right: 5%;
+    animation: floatSlow 19s ease-in-out infinite 4s;
+}
+.shape-8 {
+    width: 100px; height: 100px;
+    background: var(--accent-warm-light);
+    bottom: 5%; left: 40%;
+    animation: floatSlow 21s ease-in-out infinite 6s;
+}
+
+/* ===========================================
+   5. CONFETTI CANVAS
+   =========================================== */
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    pointer-events: none;
+}
+
+/* ===========================================
+   6. BUTTONS
+   =========================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-xl);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    transition: all var(--duration-normal) var(--ease-bounce);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.btn:hover {
+    transform: translateY(-3px) scale(1.03);
+}
+.btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--text-light);
+    box-shadow: var(--shadow-md), 0 4px 15px rgba(184, 169, 232, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+    color: var(--text-primary);
+    box-shadow: var(--shadow-md), 0 4px 15px rgba(168, 230, 207, 0.4);
+}
+
+.btn-accent {
+    background: linear-gradient(135deg, var(--accent-warm), #e8918b);
+    color: var(--text-light);
+    box-shadow: var(--shadow-md), 0 4px 15px rgba(255, 183, 178, 0.4);
+}
+
+.btn-large {
+    padding: var(--space-lg) var(--space-3xl);
+    font-size: var(--text-2xl);
+    border-radius: var(--radius-xl);
+}
+
+.btn-small {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-md);
+}
+
+.btn-icon {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: var(--text-xl);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-icon:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.btn-back {
+    position: absolute;
+    top: var(--space-md);
+    left: var(--space-md);
+    z-index: 10;
+}
+
+.btn-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ===========================================
+   7. CARDS
+   =========================================== */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-md);
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.card-interactive {
+    cursor: pointer;
+}
+.card-interactive:hover {
+    transform: translateY(-4px);
+}
+.card-interactive:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Level Card */
+.level-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-lg) var(--space-xl);
+    border-left: 6px solid var(--level-color, var(--primary));
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-bounce);
+    width: 100%;
+    max-width: 600px;
+}
+
+.level-card:hover {
+    transform: translateX(8px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+.level-card:active {
+    transform: translateX(4px) scale(0.99);
+}
+
+.level-card .level-emoji {
+    font-size: var(--text-4xl);
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.level-card .level-img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    border-radius: var(--radius-md);
+}
+
+.level-card .level-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.level-card .level-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.level-card .level-desc {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+.level-card .level-stars {
+    display: flex;
+    gap: 2px;
+    margin-top: var(--space-xs);
+    font-size: var(--text-sm);
+}
+
+/* Game Card (sub-game selection) */
+.game-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-bounce);
+    width: 100%;
+    max-width: 600px;
+    border: 2px solid transparent;
+}
+
+.game-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--level-color, var(--primary-light));
+}
+
+.game-card:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.game-card .game-icon {
+    font-size: var(--text-3xl);
+    flex-shrink: 0;
+}
+
+.game-card .game-icon-img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+}
+
+.game-card .game-info {
+    flex: 1;
+}
+
+.game-card .game-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 700;
+}
+
+.game-card .game-desc {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+.game-card .game-stars {
+    display: flex;
+    gap: 2px;
+    font-size: var(--text-base);
+}
+
+/* ===========================================
+   8. PROGRESS BAR
+   =========================================== */
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transition: width var(--duration-slow) var(--ease-bounce);
+    position: relative;
+}
+
+.progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.3), transparent);
+    border-radius: var(--radius-full);
+}
+
+/* ===========================================
+   9. HOME SCREEN
+   =========================================== */
+.home-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: var(--space-xl);
+    gap: var(--space-xl);
+}
+
+.home-logo {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary-dark), var(--accent-cool), var(--secondary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease-in-out infinite;
+    background-size: 200% 200%;
+    line-height: 1.1;
+}
+
+.home-logo-img {
+    width: 136px;
+    height: auto;
+    animation: bounce 2.5s ease-in-out infinite;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.12));
+    cursor: pointer;
+    transition: transform var(--duration-fast) var(--ease-bounce);
+}
+
+.home-logo-img:hover {
+    animation-play-state: paused;
+    transform: scale(1.08);
+}
+
+.home-subtitle {
+    font-size: var(--text-xl);
+    color: var(--text-secondary);
+    max-width: 400px;
+}
+
+.home-settings {
+    position: fixed;
+    top: var(--space-md);
+    right: var(--space-md);
+    z-index: 10;
+}
+
+.site-back-link {
+    position: fixed;
+    top: var(--space-md);
+    left: var(--space-md);
+    z-index: 10;
+    display: inline-block;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    background: var(--bg-card);
+    color: var(--primary-dark);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--duration-fast) var(--ease-bounce);
+}
+
+.site-back-link:hover {
+    transform: translateY(-2px);
+}
+
+/* Sound + settings icons on the level-select screen, grouped so they
+   can't drift apart or shift when other buttons on the screen are
+   pressed (fixed to the viewport, same as the home screen's gear icon). */
+.level-select-topbar-icons {
+    position: fixed;
+    top: var(--space-md);
+    right: var(--space-md);
+    z-index: 10;
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.sound-toggle-level {
+    font-size: var(--text-xl);
+}
+
+/* ===========================================
+   10. LEVEL SELECT SCREEN
+   =========================================== */
+.level-select-screen {
+    width: 100%;
+    padding: var(--space-xl) var(--space-md);
+    padding-top: var(--space-3xl);
+}
+
+.level-select-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.level-select-header h1 {
+    font-size: var(--text-3xl);
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.level-select-header p {
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+}
+
+.level-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: center;
+    position: relative;
+}
+
+/* Path connector between levels */
+.level-list::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    bottom: 40px;
+    left: 50%;
+    width: 4px;
+    background: linear-gradient(
+        180deg,
+        var(--level1),
+        var(--level2),
+        var(--level3),
+        var(--level4),
+        var(--level5)
+    );
+    border-radius: var(--radius-full);
+    transform: translateX(-50%);
+    z-index: -1;
+    opacity: 0.3;
+}
+
+/* ===========================================
+   11. GAME SELECT SCREEN (Sub-games in a level)
+   =========================================== */
+.game-select-screen {
+    width: 100%;
+    padding: var(--space-xl) var(--space-md);
+    padding-top: var(--space-3xl);
+}
+
+.game-select-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.game-select-header .level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-full);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+    color: var(--text-primary);
+}
+
+.game-select-header h1 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-sm);
+}
+
+.game-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+/* ===========================================
+   12. GAME PLAY SCREEN
+   =========================================== */
+.game-screen {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-md);
+}
+
+.game-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    margin-bottom: var(--space-md);
+    position: relative;
+}
+
+.game-header .game-header-title {
+    flex: 1;
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+}
+
+.game-header .game-header-progress {
+    flex: 1;
+    max-width: 200px;
+}
+
+.game-header .round-counter {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 4px;
+}
+
+.game-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-xl);
+    padding: var(--space-md);
+    padding-top: var(--space-3xl);
+}
+
+.game-instruction {
+    text-align: center;
+    font-size: var(--text-xl);
+    color: var(--text-secondary);
+    max-width: 500px;
+    animation: fadeSlideIn var(--duration-slow) var(--ease-smooth);
+}
+
+.game-main-word {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    text-align: center;
+    color: var(--text-primary);
+    animation: popIn var(--duration-slow) var(--ease-bounce);
+}
+
+.game-main-emoji {
+    font-size: 60px;
+    text-align: center;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    animation: popIn var(--duration-slow) var(--ease-bounce);
+}
+
+.game-footer {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    padding: var(--space-lg) 0;
+}
+
+/* ===========================================
+   13. GAME: CLAPPING (Word Counting)
+   =========================================== */
+.clap-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    width: 100%;
+}
+
+.clap-sentence {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    text-align: center;
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    line-height: 1.6;
+    max-width: 500px;
+    width: 100%;
+}
+
+.clap-sentence .word {
+    display: inline-block;
+    padding: 2px 6px;
+    margin: 2px;
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-normal) var(--ease-bounce);
+}
+
+.clap-sentence .word.highlighted {
+    background: var(--primary-light);
+    transform: scale(1.1);
+}
+
+.clap-button {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--accent-warm-light), var(--accent-warm));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    box-shadow: var(--shadow-lg), 0 8px 25px rgba(255, 183, 178, 0.4);
+    transition: all var(--duration-fast) var(--ease-bounce);
+    cursor: pointer;
+    border: none;
+    position: relative;
+}
+
+.clap-button:hover {
+    transform: scale(1.08);
+}
+
+.clap-button:active {
+    transform: scale(0.92);
+    box-shadow: var(--shadow-sm);
+}
+
+.clap-button.clapped {
+    animation: clapPulse 0.3s var(--ease-bounce);
+}
+
+.clap-counter {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    justify-content: center;
+    min-height: 50px;
+}
+
+.clap-button-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.clap-reset-btn {
+    width: 40px;
+    height: 40px;
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+}
+
+.clap-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-lg);
+    color: white;
+    font-weight: 800;
+    animation: popIn var(--duration-normal) var(--ease-bounce);
+    box-shadow: var(--shadow-sm);
+}
+
+.clap-check-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.clap-number-choices {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.number-choice-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    border: 3px solid var(--primary-light);
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-bounce);
+    box-shadow: var(--shadow-sm);
+}
+
+.number-choice-btn:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.number-choice-btn:active {
+    transform: scale(0.95);
+}
+
+.number-choice-btn.correct {
+    background: var(--success-light);
+    border-color: var(--success);
+    animation: correctPulse 0.5s var(--ease-bounce);
+}
+
+.number-choice-btn.wrong {
+    background: var(--error-light);
+    border-color: var(--error);
+    animation: shake 0.5s var(--ease-smooth);
+}
+
+/* Level 4 letter picker */
+.letter-picker-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+    max-width: 640px;
+    margin: var(--space-lg) auto 0;
+}
+
+.letter-chip {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    border: 3px solid var(--primary-light);
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-bounce);
+    box-shadow: var(--shadow-sm);
+}
+
+.letter-chip:hover {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.letter-chip.selected {
+    background: var(--primary);
+    border-color: var(--primary-dark);
+    color: var(--text-light);
+}
+
+/* ===========================================
+   14. GAME: DRAG & DROP
+   =========================================== */
+.drag-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    width: 100%;
+}
+
+.drop-zone-container {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: var(--space-md);
+    min-height: 80px;
+}
+
+.drop-zone {
+    min-width: 80px;
+    min-height: 60px;
+    padding: var(--space-md);
+    border: 3px dashed var(--primary-light);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    background: rgba(255,255,255,0.6);
+    font-size: var(--text-lg);
+    font-weight: 700;
+}
+
+.drop-zone.drag-over {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    transform: scale(1.05);
+    box-shadow: var(--shadow-glow);
+}
+
+.drop-zone.filled {
+    border-style: solid;
+    border-color: var(--primary);
+    background: var(--bg-card);
+}
+
+.drop-zone.correct {
+    border-color: var(--success);
+    background: var(--success-light);
+}
+
+.drop-zone.wrong {
+    border-color: var(--error);
+    background: var(--error-light);
+    animation: shake 0.5s var(--ease-smooth);
+}
+
+.draggable-items {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: var(--space-md);
+}
+
+.draggable-item {
+    padding: var(--space-md) var(--space-lg);
+    background: var(--bg-card);
+    border: 2px solid var(--primary-light);
+    border-radius: var(--radius-md);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    cursor: grab;
+    transition: all var(--duration-normal) var(--ease-bounce);
+    box-shadow: var(--shadow-sm);
+    touch-action: none;
+}
+
+.draggable-item:hover {
+    transform: translateY(-3px) scale(1.05);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+}
+
+.draggable-item:active,
+.draggable-item.dragging {
+    cursor: grabbing;
+    transform: scale(1.1) rotate(2deg);
+    box-shadow: var(--shadow-lg);
+    z-index: 50;
+    opacity: 0.9;
+}
+
+.draggable-item.placed {
+    opacity: 0.3;
+    pointer-events: none;
+    transform: scale(0.9);
+}
+
+/* ===========================================
+   15. GAME: MULTIPLE CHOICE
+   =========================================== */
+.choices-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+    max-width: 620px;
+    width: 100%;
+}
+
+.choice-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xl);
+    background: var(--bg-card);
+    border: 3px solid transparent;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-bounce);
+}
+
+.choice-card:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.choice-card:active {
+    transform: scale(0.96);
+}
+
+.choice-card .choice-emoji {
+    font-size: 72px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.choice-card .choice-word {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 700;
+}
+
+.choice-card.correct {
+    border-color: var(--success);
+    background: var(--success-light);
+    animation: correctPulse 0.5s var(--ease-bounce);
+}
+
+.choice-card.wrong {
+    border-color: var(--error);
+    background: var(--error-light);
+    animation: shake 0.5s var(--ease-smooth);
+}
+
+.choice-card.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* ===========================================
+   16. GAME: MEMORY CARDS
+   =========================================== */
+.memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-md);
+    max-width: 500px;
+    width: 100%;
+}
+
+.memory-card-wrapper {
+    aspect-ratio: 1;
+    perspective: 600px;
+    cursor: pointer;
+}
+
+.memory-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s var(--ease-smooth);
+    border-radius: var(--radius-md);
+}
+
+.memory-card.flipped {
+    transform: rotateY(180deg);
+}
+
+.memory-card.matched {
+    animation: matchPulse 0.6s var(--ease-bounce);
+}
+
+.memory-card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.memory-card-front {
+    background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+    color: white;
+    font-size: var(--text-3xl);
+}
+
+.memory-card-front::after {
+    content: '?';
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+}
+
+.memory-card-back {
+    background: var(--bg-card);
+    border: 3px solid var(--primary-light);
+    transform: rotateY(180deg);
+    font-size: 36px;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+}
+
+.memory-card-back .memory-word {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.memory-card.matched .memory-card-back {
+    border-color: var(--success);
+    background: var(--success-light);
+}
+
+/* ===========================================
+   17. GAME: SYLLABLE BOXES
+   =========================================== */
+.syllable-boxes {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+    transition: opacity var(--duration-slow) var(--ease-smooth);
+}
+
+.syllable-box {
+    min-width: 80px;
+    min-height: 70px;
+    padding: var(--space-md);
+    background: var(--bg-card);
+    border: 3px solid var(--primary-light);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    transition: all var(--duration-normal) var(--ease-bounce);
+    box-shadow: var(--shadow-sm);
+}
+
+.syllable-box.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+.syllable-box.removing {
+    animation: syllableRemove 0.8s var(--ease-smooth) forwards;
+}
+
+.syllable-box.remaining {
+    border-color: var(--success);
+    background: var(--success-light);
+}
+
+/* ===========================================
+   18. GAME: ELKONIN BOXES
+   =========================================== */
+.elkonin-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    width: 100%;
+}
+
+.elkonin-boxes {
+    display: flex;
+    gap: var(--space-sm);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.elkonin-box {
+    width: 64px;
+    height: 64px;
+    border: 3px dashed var(--primary-light);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    background: rgba(255,255,255,0.6);
+}
+
+.elkonin-box.filled {
+    border-style: solid;
+    border-color: var(--primary);
+}
+
+.elkonin-box.drag-over {
+    border-color: var(--primary-dark);
+    background: var(--primary-light);
+    transform: scale(1.08);
+}
+
+.elkonin-box .phoneme-token {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 800;
+    color: white;
+    animation: popIn var(--duration-normal) var(--ease-bounce);
+}
+
+.phoneme-token.vowel {
+    background: linear-gradient(145deg, var(--accent-warm), #e88a83);
+}
+
+.phoneme-token.consonant {
+    background: linear-gradient(145deg, var(--accent-cool), #5ba8c8);
+}
+
+.phoneme-tokens-source {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.phoneme-draggable {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 800;
+    color: white;
+    cursor: grab;
+    transition: all var(--duration-normal) var(--ease-bounce);
+    box-shadow: var(--shadow-md);
+    touch-action: none;
+}
+
+.phoneme-draggable.vowel {
+    background: linear-gradient(145deg, var(--accent-warm), #e88a83);
+}
+
+.phoneme-draggable.consonant {
+    background: linear-gradient(145deg, var(--accent-cool), #5ba8c8);
+}
+
+.phoneme-draggable:hover {
+    transform: scale(1.15);
+}
+
+.phoneme-draggable.placed {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* ===========================================
+   19. GAME: SORTING / CATEGORIZATION
+   =========================================== */
+.sorting-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    width: 100%;
+}
+
+.sort-categories {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.sort-category {
+    flex: 1;
+    min-width: 140px;
+    max-width: 220px;
+    border: 3px dashed var(--primary-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    text-align: center;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    min-height: 150px;
+}
+
+.sort-category.drag-over {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    transform: scale(1.03);
+}
+
+.sort-category-label {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+    display: inline-block;
+}
+
+.sort-category-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+    min-height: 50px;
+}
+
+.sort-item {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    box-shadow: var(--shadow-sm);
+    animation: popIn var(--duration-normal) var(--ease-bounce);
+}
+
+.sort-items-source {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.sort-draggable {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background: var(--bg-card);
+    border: 2px solid var(--primary-light);
+    border-radius: var(--radius-md);
+    cursor: grab;
+    transition: all var(--duration-normal) var(--ease-bounce);
+    box-shadow: var(--shadow-sm);
+    touch-action: none;
+}
+
+.sort-draggable:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.sort-draggable .sort-emoji {
+    font-size: var(--text-2xl);
+}
+
+.sort-draggable .sort-word {
+    font-size: var(--text-sm);
+    font-weight: 700;
+}
+
+/* ===========================================
+   20. GAME: TEXT INPUT
+   =========================================== */
+.text-input-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    width: 100%;
+    max-width: 400px;
+}
+
+.game-text-input {
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    border: 3px solid var(--primary-light);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    text-align: center;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    transition: all var(--duration-normal) var(--ease-smooth);
+    box-shadow: var(--shadow-sm);
+}
+
+.game-text-input:focus {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-glow);
+    outline: none;
+}
+
+.game-text-input.correct {
+    border-color: var(--success);
+    box-shadow: var(--shadow-success);
+}
+
+.game-text-input.wrong {
+    border-color: var(--error);
+    box-shadow: var(--shadow-error);
+    animation: shake 0.5s var(--ease-smooth);
+}
+
+/* ===========================================
+   21. GAME COMPLETE SCREEN
+   =========================================== */
+.game-complete-screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+}
+
+.complete-emoji {
+    font-size: 60px;
+    animation: bounce 1s var(--ease-bounce) infinite;
+}
+
+.complete-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.complete-message {
+    font-size: var(--text-xl);
+    color: var(--text-secondary);
+    max-width: 400px;
+}
+
+.complete-stars {
+    display: flex;
+    gap: var(--space-md);
+    font-size: 50px;
+}
+
+.complete-star {
+    transition: all 0.5s var(--ease-bounce);
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+}
+
+.complete-star.earned {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
+
+.complete-star:nth-child(1).earned { transition-delay: 0.2s; }
+.complete-star:nth-child(2).earned { transition-delay: 0.5s; }
+.complete-star:nth-child(3).earned { transition-delay: 0.8s; }
+
+.complete-buttons {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ===========================================
+   22. SETTINGS PANEL (Therapist)
+   =========================================== */
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-overlay);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn var(--duration-normal) var(--ease-smooth);
+}
+
+.settings-panel {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    max-width: 500px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp var(--duration-slow) var(--ease-bounce);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.settings-panel h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-xl);
+    text-align: center;
+}
+
+.setting-group {
+    margin-bottom: var(--space-lg);
+}
+
+.setting-group label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+    color: var(--text-primary);
+}
+
+.setting-group select,
+.setting-group input[type="range"] {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border: 2px solid var(--primary-light);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    background: var(--bg-primary);
+}
+
+.setting-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md) 0;
+}
+
+.toggle-switch {
+    width: 52px;
+    height: 28px;
+    background: var(--text-muted);
+    border-radius: var(--radius-full);
+    position: relative;
+    cursor: pointer;
+    transition: background var(--duration-normal) var(--ease-smooth);
+}
+
+.toggle-switch.active {
+    background: var(--success);
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform var(--duration-normal) var(--ease-bounce);
+    box-shadow: var(--shadow-sm);
+}
+
+.toggle-switch.active::after {
+    transform: translateX(24px);
+}
+
+/* ===========================================
+   23. FEEDBACK ELEMENTS
+   =========================================== */
+.feedback-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 150;
+    pointer-events: none;
+}
+
+.feedback-message {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: 800;
+    text-align: center;
+    animation: feedbackPop 1.2s var(--ease-bounce) forwards;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.feedback-message.correct {
+    color: var(--success);
+}
+
+.feedback-message.wrong {
+    color: var(--error);
+}
+
+/* Hint button */
+.hint-btn {
+    position: fixed;
+    bottom: var(--space-lg);
+    right: var(--space-lg);
+    z-index: 10;
+}
+
+/* Sound toggle */
+.sound-toggle {
+    position: fixed;
+    bottom: var(--space-lg);
+    left: var(--space-lg);
+    z-index: 10;
+}
+
+/* Teacher-note toggle — mirrors sound-toggle on the opposite corner */
+.teacher-info-toggle {
+    position: fixed;
+    bottom: var(--space-lg);
+    right: var(--space-lg);
+    z-index: 10;
+}
+
+.teacher-note-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-overlay);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    padding: var(--space-lg);
+}
+
+.teacher-note-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    max-width: 480px;
+    max-height: 85vh;
+    overflow-y: auto;
+    width: 100%;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.teacher-note-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: var(--space-md);
+}
+
+.teacher-note-text {
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    text-align: left;
+}
+
+/* Voice (read-aloud) toggle — per-stage, separate from the sound toggle.
+   Placed inline, to the right of whatever box it belongs to. */
+.sentence-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    width: 100%;
+}
+
+.voice-toggle-inline {
+    width: 40px;
+    height: 40px;
+    font-size: var(--text-lg);
+    flex-shrink: 0;
+}
+
+.repeat-btn-text {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .sentence-row { gap: var(--space-sm); }
+    .voice-toggle-inline { width: 34px; height: 34px; font-size: var(--text-base); }
+    .repeat-btn-text { padding: var(--space-xs) var(--space-sm); font-size: var(--text-xs); }
+}
+
+/* ===========================================
+   24. PHONEME DISPLAY (for synthesis games)
+   =========================================== */
+.phoneme-display {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.phoneme-bubble {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: white;
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    transform: scale(0);
+    transition: all var(--duration-normal) var(--ease-bounce);
+}
+
+.phoneme-bubble.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.phoneme-bubble.vowel {
+    background: linear-gradient(145deg, var(--accent-warm), #e88a83);
+}
+
+.phoneme-bubble.consonant {
+    background: linear-gradient(145deg, var(--accent-cool), #5ba8c8);
+}
+
+.phoneme-separator {
+    font-size: var(--text-xl);
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity var(--duration-normal);
+}
+
+.phoneme-separator.visible {
+    opacity: 1;
+}
+
+/* ===========================================
+   25. TAP COUNTER (for syllable/phoneme counting)
+   =========================================== */
+.tap-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    width: 100%;
+}
+
+/* Shared by the newer Level 1 games (wordSizeCompare, wordPosition) —
+   tighter spacing + a footer slot for a manual "next" control, so extra
+   content revealed after answering still fits in one screen instead of
+   pushing the page taller. */
+.compact-tap-area {
+    gap: var(--space-md);
+}
+
+.round-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.round-footer .wordsize-clap-btn {
+    width: 64px;
+    height: 64px;
+    font-size: var(--text-xl);
+}
+
+.wordsize-syllable-boxes .syllable-box-mini {
+    min-width: 34px;
+    min-height: 34px;
+    padding: var(--space-xs);
+    font-size: var(--text-sm);
+    border-width: 2px;
+}
+
+.tap-button {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, var(--secondary-light), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    box-shadow: var(--shadow-lg), 0 8px 25px rgba(168, 230, 207, 0.4);
+    cursor: pointer;
+    border: none;
+    transition: all var(--duration-fast) var(--ease-bounce);
+}
+
+.tap-button:hover {
+    transform: scale(1.08);
+}
+
+.tap-button:active {
+    transform: scale(0.9);
+}
+
+.tap-button.tapped {
+    animation: tapPulse 0.3s var(--ease-bounce);
+}
+
+.tap-counter-dots {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tap-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--secondary);
+    animation: popIn var(--duration-normal) var(--ease-bounce);
+    box-shadow: var(--shadow-sm);
+}
+
+.tap-controls {
+    display: flex;
+    gap: var(--space-sm);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ===========================================
+   26. SOUND CHANGE GAME
+   =========================================== */
+.sound-change-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+    width: 100%;
+}
+
+.letter-display {
+    display: flex;
+    gap: var(--space-xs);
+    justify-content: center;
+    transition: opacity var(--duration-slow) var(--ease-smooth);
+}
+
+.letter-box {
+    width: 56px;
+    height: 64px;
+    background: var(--bg-card);
+    border: 3px solid var(--primary-light);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--duration-normal) var(--ease-bounce);
+}
+
+.letter-box.highlight {
+    border-color: var(--accent-warm);
+    background: var(--accent-warm-light);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 183, 178, 0.5);
+}
+
+.letter-box.changed {
+    border-color: var(--success);
+    background: var(--success-light);
+    animation: popIn var(--duration-normal) var(--ease-bounce);
+}
+
+
+/* ===========================================
+   27. ANIMATIONS (@keyframes)
+   =========================================== */
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+@keyframes floatSlow {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(20px, -30px) rotate(5deg); }
+    50% { transform: translate(-10px, -50px) rotate(-3deg); }
+    75% { transform: translate(30px, -20px) rotate(7deg); }
+}
+
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeSlideIn {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes slideUp {
+    0% { transform: translateY(40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+}
+
+/* Draws the child's eye back to the instruction the moment the sentence
+   is hidden and they have to answer from memory. */
+.shake-attention {
+    animation: shake 0.5s var(--ease-smooth);
+}
+
+@keyframes correctPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+@keyframes clapPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.85); }
+    100% { transform: scale(1); }
+}
+
+@keyframes tapPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.88); }
+    100% { transform: scale(1); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); box-shadow: var(--shadow-sm); }
+    50% { transform: scale(1.03); box-shadow: var(--shadow-glow); }
+}
+
+@keyframes matchPulse {
+    0% { transform: rotateY(180deg) scale(1); }
+    50% { transform: rotateY(180deg) scale(1.15); }
+    100% { transform: rotateY(180deg) scale(1); }
+}
+
+@keyframes syllableRemove {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2) translateY(-10px); opacity: 0.5; }
+    100% { transform: scale(0) translateY(-30px); opacity: 0; }
+}
+
+@keyframes feedbackPop {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    40% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+    70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes starSpin {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes confettiFall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===========================================
+   28. UTILITY CLASSES
+   =========================================== */
+.text-center { text-align: center; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+.gap-lg { gap: var(--space-lg); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+.mb-md { margin-bottom: var(--space-md); }
+.mb-lg { margin-bottom: var(--space-lg); }
+.w-full { width: 100%; }
+.hidden { display: none !important; }
+.fade-in { animation: fadeSlideIn var(--duration-slow) var(--ease-smooth); }
+.pop-in { animation: popIn var(--duration-normal) var(--ease-bounce); }
+
+/* ===========================================
+   29. RESPONSIVE DESIGN
+   =========================================== */
+@media (max-width: 600px) {
+    :root {
+        --text-5xl: 2.5rem;
+        --text-4xl: 2rem;
+        --text-3xl: 1.5rem;
+    }
+
+    #app {
+        padding: var(--space-sm);
+    }
+
+    .memory-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-sm);
+    }
+
+    .choices-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
+    }
+
+    .choice-card {
+        padding: var(--space-lg);
+    }
+
+    .choice-card .choice-emoji {
+        font-size: 54px;
+    }
+
+    .choice-card .choice-word {
+        font-size: var(--text-lg);
+    }
+
+    .clap-button {
+        width: 110px;
+        height: 110px;
+        font-size: 45px;
+    }
+
+    .tap-button {
+        width: 100px;
+        height: 100px;
+        font-size: 40px;
+    }
+
+    .home-mascot {
+        font-size: 70px;
+    }
+
+    .game-main-emoji {
+        font-size: 60px;
+    }
+
+    .sort-category {
+        min-width: 120px;
+    }
+
+    .letter-box {
+        width: 44px;
+        height: 52px;
+        font-size: var(--text-xl);
+    }
+
+    .level-card {
+        padding: var(--space-md);
+    }
+}
+
+@media (min-width: 768px) {
+    .memory-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .home-screen {
+        gap: var(--space-2xl);
+    }
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --text-5xl: 4rem;
+    }
+}
+
+/* ===========================================
+   30. PRINT STYLES (hide non-essentials)
+   =========================================== */
+@media print {
+    #bg-shapes,
+    #confetti-canvas,
+    .btn-back,
+    .hint-btn,
+    .sound-toggle {
+        display: none;
+    }
+}

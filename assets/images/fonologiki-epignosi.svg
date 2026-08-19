@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B8A9E8"/>
+      <stop offset="100%" stop-color="#A8E6CF"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#bg)"/>
+  <circle cx="60" cy="240" r="70" fill="#ffffff" opacity="0.12"/>
+  <circle cx="360" cy="50" r="50" fill="#ffffff" opacity="0.12"/>
+  <circle cx="340" cy="250" r="30" fill="#ffffff" opacity="0.15"/>
+  <text x="200" y="140" font-size="72" text-anchor="middle" dominant-baseline="middle">👂</text>
+  <text x="200" y="225" font-family="'Nunito', 'Segoe UI', sans-serif" font-size="27" font-weight="800" fill="#ffffff" text-anchor="middle">Φωνολογική Επίγνωση</text>
+</svg>
