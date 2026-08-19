@@ -113,7 +113,7 @@ Phono.app = {
             })(),
 
             // Title
-            el('h1', { className: 'home-logo', textContent: 'Φωνολογική Ενημερότητα' }),
+            el('h1', { className: 'home-logo', textContent: 'Φωνολογική Επίγνωση' }),
 
             // Subtitle
             el('p', { className: 'home-subtitle', textContent: 'Μαθαίνω τους ήχους παίζοντας!' }),
