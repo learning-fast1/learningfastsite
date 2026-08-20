@@ -596,6 +596,9 @@ section {
 
 .game-card__body {
   padding: 1rem 1.15rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .game-card__title {
@@ -614,6 +617,8 @@ section {
   padding: .2rem .6rem;
   border-radius: 999px;
   display: inline-block;
+  align-self: flex-start;
+  margin-top: auto;
 }
 
 /* ========== GRADE GRID (Τάξεις) ========== */
