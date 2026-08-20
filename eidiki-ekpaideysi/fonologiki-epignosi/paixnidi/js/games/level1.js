@@ -1046,7 +1046,12 @@ Phono.games.wordDeletion = {
                     box.style.visibility = 'hidden';
 
                     setTimeout(() => {
-                        if (boxesEl) boxesEl.style.opacity = '0';
+                        // visibility (not just opacity) — some mobile
+                        // browsers don't reliably run the opacity
+                        // transition here, leaving the rest of the
+                        // sentence visible instead of hiding with the
+                        // target box.
+                        if (boxesEl) { boxesEl.style.opacity = '0'; boxesEl.style.visibility = 'hidden'; }
                         const instructionEl = document.getElementById('worddel-instruction');
                         if (instructionEl) instructionEl.classList.add('shake-attention');
                     }, 150);

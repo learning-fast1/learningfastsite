@@ -556,7 +556,12 @@ Phono.games.syllableRemoval = {
                     if (choices) choices.style.display = '';
 
                     setTimeout(() => {
-                        if (boxesEl) boxesEl.style.opacity = '0';
+                        // visibility (not just opacity) — some mobile
+                        // browsers don't reliably run the opacity
+                        // transition here, leaving the rest of the
+                        // word visible instead of hiding with the
+                        // target box.
+                        if (boxesEl) { boxesEl.style.opacity = '0'; boxesEl.style.visibility = 'hidden'; }
                         const instructionEl = document.getElementById('sylremoval-instruction');
                         if (instructionEl) instructionEl.classList.add('shake-attention');
                     }, 150);

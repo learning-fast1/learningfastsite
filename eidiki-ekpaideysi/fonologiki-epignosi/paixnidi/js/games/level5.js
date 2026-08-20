@@ -529,7 +529,12 @@ Phono.games.phonemeDeletion = {
                     if (choices) choices.style.display = '';
 
                     setTimeout(() => {
-                        if (letterDisplayEl) letterDisplayEl.style.opacity = '0';
+                        // visibility (not just opacity) — some mobile
+                        // browsers don't reliably run the opacity
+                        // transition here, leaving the rest of the
+                        // word visible instead of hiding with the
+                        // target letter.
+                        if (letterDisplayEl) { letterDisplayEl.style.opacity = '0'; letterDisplayEl.style.visibility = 'hidden'; }
                         const instructionEl = document.getElementById('phonemedeletion-instruction');
                         if (instructionEl) instructionEl.classList.add('shake-attention');
                     }, 150);
