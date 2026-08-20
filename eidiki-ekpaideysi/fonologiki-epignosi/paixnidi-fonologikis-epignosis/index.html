@@ -16,10 +16,86 @@
   <link rel="canonical" href="https://learning-fast.com/eidiki-ekpaideysi/fonologiki-epignosi/paixnidi-fonologikis-epignosis/" />
   <link rel="stylesheet" href="../../../styles/main.css" />
   <style>
-    .detail-wrap {
-      max-width: 680px;
+    .game-detail {
+      display: flex;
+      align-items: stretch;
+      gap: 2.5rem;
+      max-width: 1000px;
       margin: 0 auto 4rem;
       padding: 0 1.5rem;
+    }
+
+    .game-detail__frame {
+      flex: 1 1 380px;
+      display: block;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      position: relative;
+      text-decoration: none;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .game-detail__frame:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(139,121,199,.35);
+    }
+
+    .game-detail__frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .game-detail__play-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(60,45,90,.35);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .game-detail__frame:hover .game-detail__play-hint { opacity: 1; }
+
+    .game-detail__play-hint span {
+      padding: .9rem 2rem;
+      border-radius: 999px;
+      background: #fff;
+      color: #8B79C7;
+      font-weight: 800;
+      font-size: 1.1rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    }
+
+    .game-detail__text {
+      flex: 1 1 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .game-detail__text h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: .3rem;
+    }
+
+    .game-detail__text .game-detail__tag {
+      color: var(--muted);
+      font-size: .95rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .game-detail__text p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 1.1rem;
     }
 
     .back-link {
@@ -29,79 +105,14 @@
       color: var(--primary);
       font-weight: 600;
       font-size: .9rem;
-      margin-bottom: 2rem;
+      margin: 0 1.5rem 1.5rem;
       transition: gap var(--transition);
       text-decoration: none;
     }
     .back-link:hover { gap: .8rem; }
 
-    .detail-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      border: 1px solid rgba(0,0,0,.05);
-    }
-
-    .detail-card__header {
-      background: linear-gradient(135deg, #B8A9E8, #A8E6CF);
-      padding: 2.5rem 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
-    .detail-card__header-info h2 {
-      color: #fff;
-      font-size: 1.6rem;
-      font-weight: 800;
-      margin-bottom: .3rem;
-    }
-
-    .detail-card__header-info p {
-      color: rgba(255,255,255,.85);
-      font-size: .95rem;
-    }
-
-    .detail-card__body {
-      padding: 2rem;
-    }
-
-    .detail-card__description {
-      color: var(--muted);
-      font-size: 1rem;
-      line-height: 1.7;
-      margin-bottom: 1.2rem;
-    }
-
-    .detail-card__description:last-of-type {
-      margin-bottom: 2rem;
-    }
-
-    .detail-card__play {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .play-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: .6rem;
-      padding: 1rem 2.5rem;
-      background: linear-gradient(135deg, #B8A9E8, #A8E6CF);
-      color: #fff;
-      border-radius: 999px;
-      font-size: 1.1rem;
-      font-weight: 800;
-      text-decoration: none;
-      box-shadow: 0 6px 20px rgba(139,121,199,.4);
-      transition: transform var(--transition), box-shadow var(--transition);
-    }
-
-    .play-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 28px rgba(139,121,199,.5);
+    @media (max-width: 760px) {
+      .game-detail { flex-direction: column; }
     }
   </style>
 </head>
@@ -152,32 +163,25 @@
       <h1 class="section__title">Φωνολογική Επίγνωση</h1>
     </div>
 
-    <div class="detail-wrap">
-      <a href="../index.html" class="back-link">← Επιστροφή στη Φωνολογική Επίγνωση</a>
+    <a href="../index.html" class="back-link">← Επιστροφή στη Φωνολογική Επίγνωση</a>
 
-      <div class="detail-card">
-        <div class="detail-card__header">
-          <div class="detail-card__header-info">
-            <h2>Παιχνίδι Φωνολογικής Επίγνωσης</h2>
-            <p>Φωνολογικής Ενημερότητας · Διαδραστικό παιχνίδι</p>
-          </div>
-        </div>
-        <div class="detail-card__body">
-          <p class="detail-card__description">
-            Ένα διαδραστικό εκπαιδευτικό παιχνίδι που βοηθά τα παιδιά να αναπτύξουν τη φωνολογική τους ενημερότητα μέσα από ευχάριστες και στοχευμένες δραστηριότητες.
-          </p>
-          <p class="detail-card__description">
-            Τα παιδιά εξασκούνται στην πρόταση, λέξη, συλλαβή και φωνήματα, στην ομοιοκαταληξία και τους ήχους των λέξεων, προχωρώντας σταδιακά από πιο απλές σε πιο σύνθετες δεξιότητες. Στόχος η κατάκτηση της ανάγνωσης και της γραφής.
-          </p>
-          <p class="detail-card__description">
-            Ιδανικό για αξιοποίηση από εκπαιδευτικούς, ειδικούς παιδαγωγούς, λογοθεραπευτές και γονείς, στο σχολείο, στο σπίτι και στο χώρο εργασίας.
-          </p>
-          <div class="detail-card__play">
-            <a href="../paixnidi/index.html" class="play-btn" onclick="gtag('event','play_game',{event_category:'Game',event_label:'Fonologiki Epignosi'})">
-              Παίξε το παιχνίδι
-            </a>
-          </div>
-        </div>
+    <div class="game-detail">
+      <a href="../paixnidi/index.html" class="game-detail__frame" onclick="gtag('event','play_game',{event_category:'Game',event_label:'Fonologiki Epignosi'})">
+        <img src="../../../assets/images/fonologiki-epignosi.png" alt="Παιχνίδι Φωνολογικής Επίγνωσης" />
+        <span class="game-detail__play-hint"><span>▶ Παίξε</span></span>
+      </a>
+      <div class="game-detail__text">
+        <h2>Παιχνίδι Φωνολογικής Επίγνωσης</h2>
+        <p class="game-detail__tag">Φωνολογικής Ενημερότητας · Διαδραστικό παιχνίδι</p>
+        <p>
+          Ένα διαδραστικό εκπαιδευτικό παιχνίδι που βοηθά τα παιδιά να αναπτύξουν τη φωνολογική τους ενημερότητα μέσα από ευχάριστες και στοχευμένες δραστηριότητες.
+        </p>
+        <p>
+          Τα παιδιά εξασκούνται στην πρόταση, λέξη, συλλαβή και φωνήματα, στην ομοιοκαταληξία και τους ήχους των λέξεων, προχωρώντας σταδιακά από πιο απλές σε πιο σύνθετες δεξιότητες. Στόχος η κατάκτηση της ανάγνωσης και της γραφής.
+        </p>
+        <p>
+          Ιδανικό για αξιοποίηση από εκπαιδευτικούς, ειδικούς παιδαγωγούς, λογοθεραπευτές και γονείς, στο σχολείο, στο σπίτι και στο χώρο εργασίας.
+        </p>
       </div>
     </div>
   </main>
