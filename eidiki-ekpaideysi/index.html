@@ -20,7 +20,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 2rem;
-      max-width: 800px;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
@@ -43,17 +43,6 @@
     .cat-card:hover {
       transform: translateY(-8px);
       box-shadow: 0 12px 36px rgba(79,110,247,.22);
-    }
-
-    .cat-card__icon {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.8rem;
-      margin-bottom: .5rem;
     }
 
     .cat-card__title {
@@ -81,13 +70,8 @@
 
     .cat-card:hover .cat-card__btn { transform: scale(1.05); }
 
-    .cat--1 .cat-card__icon { background: linear-gradient(135deg,#4f6ef7,#7c9aff); }
     .cat--1 .cat-card__btn  { background: linear-gradient(135deg,#4f6ef7,#7c9aff); }
-
-    .cat--2 .cat-card__icon { background: linear-gradient(135deg,#22c55e,#86efac); }
     .cat--2 .cat-card__btn  { background: linear-gradient(135deg,#22c55e,#86efac); }
-
-    .cat--3 .cat-card__icon { background: linear-gradient(135deg,#B8A9E8,#A8E6CF); }
     .cat--3 .cat-card__btn  { background: linear-gradient(135deg,#B8A9E8,#A8E6CF); }
 
     .landing-intro { max-width:720px; margin:0 auto 2.5rem; font-size:1.05rem; color:var(--muted); line-height:1.8; text-align:center; }
@@ -149,21 +133,18 @@
       <div class="categories-grid">
 
         <a href="kategories-taxinomisi/index.html" class="cat-card cat--1">
-          <div class="cat-card__icon">🗂️</div>
           <div class="cat-card__title">Κατηγορίες - Ταξινόμηση</div>
           <p class="cat-card__sub">Μάθε να ομαδοποιείς και να ταξινομείς αντικείμενα και έννοιες.</p>
           <span class="cat-card__btn">Εξερεύνησε →</span>
         </a>
 
         <a href="leitourgikos-logos/index.html" class="cat-card cat--2">
-          <div class="cat-card__icon">💬</div>
           <div class="cat-card__title">Λειτουργικός λόγος</div>
           <p class="cat-card__sub">Ανάπτυξη επικοινωνιακών δεξιοτήτων και λειτουργικής χρήσης της γλώσσας.</p>
           <span class="cat-card__btn">Εξερεύνησε →</span>
         </a>
 
         <a href="fonologiki-epignosi/index.html" class="cat-card cat--3">
-          <div class="cat-card__icon">👂</div>
           <div class="cat-card__title">Φωνολογική Επίγνωση</div>
           <p class="cat-card__sub">Διαδραστικό παιχνίδι με συλλαβές, ρίμες και φωνήματα.</p>
           <span class="cat-card__btn">Παίξε τώρα →</span>
