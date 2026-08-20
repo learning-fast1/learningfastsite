@@ -27,6 +27,60 @@
     .homepage-faq .faq__item { background:var(--surface); border-radius:var(--radius); padding:1.4rem 1.8rem; margin-bottom:1rem; box-shadow:var(--shadow); }
     .homepage-faq .faq__q { font-weight:700; color:var(--text); margin-bottom:.5rem; font-size:1rem; }
     .homepage-faq .faq__a { color:var(--muted); font-size:.95rem; line-height:1.6; margin:0; }
+
+    .newsletter-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(30,20,60,.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+    }
+    .newsletter-modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .newsletter-modal {
+      position: relative;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 420px;
+      width: 100%;
+      padding: 2rem 1.75rem 1.5rem;
+      text-align: center;
+      transform: translateY(12px);
+      transition: transform var(--transition);
+    }
+    .newsletter-modal-overlay.open .newsletter-modal { transform: translateY(0); }
+
+    .newsletter-modal__close {
+      position: absolute;
+      top: .75rem;
+      right: .75rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition), color var(--transition);
+    }
+    .newsletter-modal__close:hover { background: var(--primary-tint); color: var(--primary); }
+
+    .newsletter-modal__title { font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: .5rem; }
+    .newsletter-modal__text { color: var(--muted); font-size: .95rem; line-height: 1.6; margin-bottom: 1.25rem; }
+    .newsletter-modal__embed-wrap { display: flex; justify-content: center; }
+    .newsletter-modal__embed-wrap iframe { width: 100%; max-width: 340px; height: 300px; border: 1px solid #eee; background: #fff; border-radius: var(--radius); }
   </style>
 </head>
 <script type="application/ld+json">
@@ -329,7 +383,38 @@
     <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
   </footer>
 
+  <!-- ===== NEWSLETTER SIGNUP MODAL ===== -->
+  <div class="newsletter-modal-overlay" id="newsletterModalOverlay">
+    <div class="newsletter-modal">
+      <button class="newsletter-modal__close" id="newsletterModalClose" aria-label="Κλείσιμο">✕</button>
+      <div class="newsletter-modal__title">📬 Μείνε ενημερωμένος/η!</div>
+      <p class="newsletter-modal__text">Εγγράψου στο newsletter για νέα, ανακοινώσεις και νέο υλικό απευθείας στο email σου.</p>
+      <div class="newsletter-modal__embed-wrap">
+        <iframe src="https://learningfast.substack.com/embed" width="340" height="300" style="border: 1px solid #EEE; background: white" frameborder="0" scrolling="no"></iframe>
+      </div>
+    </div>
+  </div>
 
+<script>
+  (function () {
+    var STORAGE_KEY = 'newsletterModalShown';
+    if (localStorage.getItem(STORAGE_KEY)) return;
+    var overlay = document.getElementById('newsletterModalOverlay');
+    var closeBtn = document.getElementById('newsletterModalClose');
+    if (!overlay || !closeBtn) return;
+
+    function closeModal() {
+      overlay.classList.remove('open');
+      localStorage.setItem(STORAGE_KEY, '1');
+    }
+
+    setTimeout(function () { overlay.classList.add('open'); }, 1500);
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) closeModal();
+    });
+  })();
+</script>
 <script>
   var btn = document.getElementById('navToggle');
   var links = document.querySelector('.navbar__links');
