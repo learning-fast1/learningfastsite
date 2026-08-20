@@ -53,6 +53,21 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(79,70,229,.35);
     }
+
+    .newsletter {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 3rem;
+      padding: 2.5rem 2rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+    .newsletter__title { font-size: 1.5rem; font-weight: 800; color: var(--text); margin-bottom: .5rem; }
+    .newsletter__text { color: var(--muted); font-size: 1rem; line-height: 1.6; margin-bottom: 1.5rem; }
+    .newsletter__embed-wrap { display: flex; justify-content: center; }
+    .newsletter__embed-wrap iframe { width: 100%; max-width: 480px; height: 320px; border: 1px solid #eee; background: #fff; border-radius: var(--radius); }
   </style>
 </head>
 <body>
@@ -100,6 +115,14 @@
       <span class="section__label">Νέα</span>
       <h1 class="section__title">Ενημερώσεις</h1>
       <p class="section__subtitle">Νέα, ανακοινώσεις και αρχεία από το Learning Fast</p>
+    </div>
+
+    <div class="newsletter">
+      <h2 class="newsletter__title">📬 Εγγράψου στο Newsletter</h2>
+      <p class="newsletter__text">Λάβε νέα, ανακοινώσεις και νέο υλικό απευθείας στο email σου.</p>
+      <div class="newsletter__embed-wrap">
+        <iframe src="https://learningfast.substack.com/embed" width="480" height="320" style="border: 1px solid #EEE; background: white" frameborder="0" scrolling="no"></iframe>
+      </div>
     </div>
 
     <div class="empty-state">
