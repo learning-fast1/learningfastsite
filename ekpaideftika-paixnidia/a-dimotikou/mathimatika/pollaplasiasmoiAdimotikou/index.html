@@ -1,192 +1,219 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Εξάσκηση Προπαίδειας - Α' Δημοτικού</title>
-    <meta name="description" content="Εξάσκηση στην προπαίδεια για Α' Δημοτικού. Δωρεάν διαδραστικό παιχνίδι πολλαπλασιασμών.">
-    <link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/a-dimotikou/mathimatika/pollaplasiasmoiAdimotikou/" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2;family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6MPX8SLSYM"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-6MPX8SLSYM');
-    </script>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S07M3VNB5N');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Παιχνίδι Προπαίδειας – Α΄ Δημοτικού. Διαδραστικό εκπαιδευτικό παιχνίδι εξάσκησης στην προπαίδεια του 0 έως 5." />
+  <title>Παιχνίδι Προπαίδειας – Α΄ Δημοτικού – Learning Fast</title>
+  <link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/a-dimotikou/mathimatika/pollaplasiasmoiAdimotikou/" />
+  <link rel="stylesheet" href="../../../styles/main.css" />
+  <style>
+    .game-detail {
+      display: flex;
+      align-items: stretch;
+      gap: 2.5rem;
+      max-width: 1000px;
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+
+    .game-detail__frame {
+      flex: 1 1 380px;
+      display: block;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      position: relative;
+      text-decoration: none;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .game-detail__frame:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(79,110,247,.25);
+    }
+
+    .game-detail__frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .game-detail__play-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30,20,60,.35);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .game-detail__frame:hover .game-detail__play-hint { opacity: 1; }
+
+    .game-detail__play-hint span {
+      padding: .9rem 2rem;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 1.1rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    }
+
+    .game-detail__text {
+      flex: 1 1 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .game-detail__text h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .game-detail__text p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 1.1rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: .9rem;
+      margin: 0 1.5rem 1.5rem;
+      transition: gap var(--transition);
+      text-decoration: none;
+    }
+    .back-link:hover { gap: .8rem; }
+
+    @media (max-width: 760px) {
+      .game-detail { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
-    <div id="app">
+  <header>
+    <nav class="navbar">
+      <a href="../../../../index.html" class="navbar__logo"><img src="../../../../assets/images/logo-wordmark.png" alt="Learning Fast" /></a>
+      <button class="navbar__hamburger" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <ul class="navbar__links">
+        <li><a href="../../../../index.html">Αρχική</a></li>
+        <li class="has-dropdown"><a href="../../../../taxeis/index.html">Τάξεις</a>
+          <ul class="dropdown">
+            <li><a href="../../../../taxeis/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/a-gymnasiou/index.html">Α΄ Γυμνασίου</a></li>
+            <li><a href="../../../../taxeis/b-gymnasiou/index.html">Β΄ Γυμνασίου</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../../../../eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a>
+          <ul class="dropdown">
+            <li><a href="../../../../eidiki-ekpaideysi/kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
+            <li><a href="../../../../eidiki-ekpaideysi/leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
+            <li><a href="../../../../eidiki-ekpaideysi/fonologiki-epignosi/index.html">Φωνολογική Επίγνωση</a></li>
+          </ul>
+        </li>        <li class="has-dropdown"><a href="../../../index.html">Εκπαιδευτικά Παιχνίδια</a>
+          <ul class="dropdown">
+            <li><a href="../../../../ekpaideftika-paixnidia/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+          </ul>
+        </li>
+        <li><a href="../../../../epikoinonia/index.html">Επικοινωνία</a></li>
+      </ul>
+    </nav>
+  </header>
 
-        <!-- Main Menu -->
-        <div id="menu-screen" class="screen active">
-            <div class="header">
-                <a href="../../../../index.html" class="site-back-link">← Learning Fast</a>
-                <img src="logo.png" id="logo" alt="logo">
-                <div class="header-title-block">
-                    <h1>Εξάσκηση στις προπαίδειες!</h1>
-                    <span class="subtitle">Α' δημοτικού</span>
-                </div>
-            </div>
+  <main>
+    <section>
+      <div class="section__header">
+        <p class="breadcrumb">
+          <a href="../../../index.html">Εκπαιδευτικά Παιχνίδια</a> →
+          <a href="../../index.html">Α΄ Δημοτικού</a>
+        </p>
+        <span class="section__label">Μαθηματικά – Α΄ Δημοτικού</span>
+        <h1 class="section__title">Παιχνίδι Προπαίδειας</h1>
+      </div>
 
-            <div class="player-selection">
-                <button class="btn player-count-btn selected" id="btn-1p">👤 1 Παίκτης</button>
-                <button class="btn player-count-btn" id="btn-2p">👥 2 Παίκτες</button>
-            </div>
-
-            <div class="time-selection">
-                <span class="selection-label">⏱ Χρόνος:</span>
-                <div class="time-buttons">
-                    <button class="btn time-btn" data-time="30">30''</button>
-                    <button class="btn time-btn selected" data-time="60">1'</button>
-                    <button class="btn time-btn" data-time="120">2'</button>
-                    <button class="btn time-btn" data-time="180">3'</button>
-                    <button class="btn time-btn" data-time="300">5'</button>
-                </div>
-            </div>
-
-            <div class="menu-options">
-                <button class="btn menu-btn mode-012" data-mode="012">
-                    <span class="btn-text">Προπαίδειες 0, 1, 2</span>
-                </button>
-                <button class="btn menu-btn mode-345" data-mode="345">
-                    <span class="btn-text">Προπαίδειες 3, 4, 5</span>
-                </button>
-                <button class="btn menu-btn mode-all" data-mode="all">
-                    <span class="btn-text">Προπαίδειες 0, 1, 2, 3, 4, 5</span>
-                </button>
-            </div>
-
-            <div class="menu-footer">
-                <p>Διάλεξε αριθμό παικτών και επίπεδο!</p>
-            </div>
+      <div class="game-detail">
+        <a href="paixnidi/index.html" class="game-detail__frame" onclick="gtag('event','play_game',{event_category:'Game',event_label:'Pollaplasiasmoi A Dimotikou'})">
+          <img src="../../../../assets/images/pollaplasiasmoiAdimotikou.png" alt="Παιχνίδι Προπαίδειας Α΄ Δημοτικού" />
+          <span class="game-detail__play-hint"><span>▶ Παίξε</span></span>
+        </a>
+        <div class="game-detail__text">
+          <h2>Παιχνίδι Προπαίδειας – Α΄ Δημοτικού</h2>
+          <p>Ένα διαδραστικό εκπαιδευτικό παιχνίδι σχεδιασμένο για παιδιά Α΄ Δημοτικού, με στόχο την ανάπτυξη της διαδικαστικής επάρκειας στον πολλαπλασιασμό μέσα από συστηματική και ευχάριστη εξάσκηση.</p>
+          <p>Τα παιδιά εξασκούνται στις προπαίδειες του 0, του 1 και του 2, καθώς και σε επιλεγμένες πράξεις από τις προπαίδειες του 3, του 4 και του 5, κατάλληλα προσαρμοσμένες στο επίπεδο και στο αναλυτικό πρόγραμμα της Α΄ Δημοτικού.</p>
+          <p>Μέσα από επαναλαμβανόμενη εξάσκηση, το παιχνίδι στοχεύει στην ακρίβεια, την ευχέρεια, στη ανάπτυξη της εργαζόμενης μνήμης και τη σταδιακή αυτοματοποίηση βασικών γινομένων, δημιουργώντας μια σταθερή βάση για την περαιτέρω ανάπτυξη των δεξιοτήτων πολλαπλασιασμού.</p>
         </div>
+      </div>
+    </section>
+  </main>
 
-        <!-- Single Player Screen -->
-        <div id="game-screen" class="screen">
-            <div class="top-bar">
-                <button id="back-btn" class="btn small-btn">🏠 Πίσω</button>
-                <div id="timer-display" class="timer-display">1:00</div>
-                <div class="score-container">
-                    <span>Σκορ:</span>
-                    <span id="score">0</span>
-                    <span class="score-star">⭐</span>
-                </div>
-            </div>
+  <footer class="footer">
+    <div class="footer__logo"><img src="../../../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
+    <ul class="footer__links">
+      <li><a href="../../../../epikoinonia/index.html">Επικοινωνία</a></li>
+      <li><a href="../../../../steile-mia-idea/index.html">Στείλε μια ιδέα!</a></li>
+      <li><a href="../../../../enimeroseis/index.html">Ενημερώσεις</a></li>
+      <li><a href="../../../../oroi-xrisis/index.html">Όροι και προϋποθέσεις</a></li>
+    </ul>
+    <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
 
-            <div class="game-area">
-                <div class="question-container">
-                    <div id="question" class="question-text">2 × 3</div>
-                    <div class="equals">=</div>
-                    <div id="answer-display" class="answer-display">;</div>
-                </div>
-
-                <div id="feedback-inline" class="feedback-inline hidden"></div>
-
-                <div class="numpad">
-                    <button class="numpad-btn" data-val="7">7</button>
-                    <button class="numpad-btn" data-val="8">8</button>
-                    <button class="numpad-btn" data-val="9">9</button>
-                    <button class="numpad-btn" data-val="4">4</button>
-                    <button class="numpad-btn" data-val="5">5</button>
-                    <button class="numpad-btn" data-val="6">6</button>
-                    <button class="numpad-btn" data-val="1">1</button>
-                    <button class="numpad-btn" data-val="2">2</button>
-                    <button class="numpad-btn" data-val="3">3</button>
-                    <button class="numpad-btn numpad-del" data-val="del">⌫</button>
-                    <button class="numpad-btn" data-val="0">0</button>
-                    <button class="numpad-btn numpad-ok" data-val="ok">✓</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Two Player Screen -->
-        <div id="two-player-screen" class="screen">
-            <div class="two-player-topbar">
-                <button id="back-btn-2p" class="btn small-btn">🏠 Πίσω</button>
-                <div id="timer-display-2p" class="timer-display">1:00</div>
-            </div>
-
-            <div class="two-player-area">
-                <!-- Player 1 -->
-                <div class="player-panel" id="panel-1">
-                    <div class="panel-header p1-header">
-                        <span class="player-label">🔵 Παίκτης 1</span>
-                        <span class="panel-score">Σκορ: <span id="score-p1">0</span> ⭐</span>
-                    </div>
-                    <div class="question-container">
-                        <div id="question-p1" class="question-text">2 × 3</div>
-                        <div class="equals">=</div>
-                        <div id="answer-p1" class="answer-display">;</div>
-                    </div>
-                    <div id="feedback-p1" class="feedback-inline hidden"></div>
-                    <div class="numpad">
-                        <button class="numpad-btn" data-player="1" data-val="7">7</button>
-                        <button class="numpad-btn" data-player="1" data-val="8">8</button>
-                        <button class="numpad-btn" data-player="1" data-val="9">9</button>
-                        <button class="numpad-btn" data-player="1" data-val="4">4</button>
-                        <button class="numpad-btn" data-player="1" data-val="5">5</button>
-                        <button class="numpad-btn" data-player="1" data-val="6">6</button>
-                        <button class="numpad-btn" data-player="1" data-val="1">1</button>
-                        <button class="numpad-btn" data-player="1" data-val="2">2</button>
-                        <button class="numpad-btn" data-player="1" data-val="3">3</button>
-                        <button class="numpad-btn numpad-del" data-player="1" data-val="del">⌫</button>
-                        <button class="numpad-btn" data-player="1" data-val="0">0</button>
-                        <button class="numpad-btn numpad-ok" data-player="1" data-val="ok">✓</button>
-                    </div>
-                </div>
-
-                <div class="panel-divider"></div>
-
-                <!-- Player 2 -->
-                <div class="player-panel" id="panel-2">
-                    <div class="panel-header p2-header">
-                        <span class="player-label">🔴 Παίκτης 2</span>
-                        <span class="panel-score">Σκορ: <span id="score-p2">0</span> ⭐</span>
-                    </div>
-                    <div class="question-container">
-                        <div id="question-p2" class="question-text">5 × 4</div>
-                        <div class="equals">=</div>
-                        <div id="answer-p2" class="answer-display">;</div>
-                    </div>
-                    <div id="feedback-p2" class="feedback-inline hidden"></div>
-                    <div class="numpad">
-                        <button class="numpad-btn" data-player="2" data-val="7">7</button>
-                        <button class="numpad-btn" data-player="2" data-val="8">8</button>
-                        <button class="numpad-btn" data-player="2" data-val="9">9</button>
-                        <button class="numpad-btn" data-player="2" data-val="4">4</button>
-                        <button class="numpad-btn" data-player="2" data-val="5">5</button>
-                        <button class="numpad-btn" data-player="2" data-val="6">6</button>
-                        <button class="numpad-btn" data-player="2" data-val="1">1</button>
-                        <button class="numpad-btn" data-player="2" data-val="2">2</button>
-                        <button class="numpad-btn" data-player="2" data-val="3">3</button>
-                        <button class="numpad-btn numpad-del" data-player="2" data-val="del">⌫</button>
-                        <button class="numpad-btn" data-player="2" data-val="0">0</button>
-                        <button class="numpad-btn numpad-ok" data-player="2" data-val="ok">✓</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Game Over Overlay -->
-        <div id="game-over" class="game-over-overlay hidden">
-            <div class="game-over-box">
-                <div id="game-over-title" class="game-over-title">⏰ Τελείωσε ο χρόνος!</div>
-                <div id="game-over-scores" class="game-over-scores"></div>
-                <div class="game-over-buttons">
-                    <button id="review-btn" class="btn menu-btn mode-345" style="display:none">📝 Επανάληψη Λαθών</button>
-                    <button id="play-again-btn" class="btn menu-btn mode-all">🔄 Παίξε Ξανά</button>
-                    <button id="go-menu-btn" class="btn menu-btn mode-012">🏠 Μενού</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <script src="script.js"></script>
+<script>
+  var btn = document.getElementById('navToggle');
+  var links = document.querySelector('.navbar__links');
+  if(btn && links){
+    btn.addEventListener('click', function(){
+      links.classList.toggle('nav-open');
+      btn.classList.toggle('nav-open');
+    });
+    document.querySelectorAll('.has-dropdown > a').forEach(function(a){
+      a.addEventListener('click', function(e){
+        if(window.innerWidth <= 768){
+          e.preventDefault();
+          var li = this.parentElement;
+          document.querySelectorAll('.has-dropdown.open').forEach(function(el){
+            if(el !== li) el.classList.remove('open');
+          });
+          li.classList.toggle('open');
+        }
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.navbar') && links.classList.contains('nav-open')){
+        links.classList.remove('nav-open');
+        btn.classList.remove('nav-open');
+      }
+    });
+  }
+</script>
 </body>
 </html>
