@@ -616,6 +616,15 @@ Phono.games.wordPosition = {
             this.createRepeatButton(() => Phono.audio.speak(this.currentSentence.text, 0.5)),
         ]);
 
+        // Teacher-only peek at the sentence and the correct answer — the
+        // sentence is never shown written out, so the teacher has no way
+        // to read it herself with the sound muted without this.
+        const revealBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: '🔒 Απάντηση (δάσκαλος)',
+            onClick: () => this.showAnswer(),
+        });
+
         // Word-position boxes — as many empty boxes as words in the
         // sentence, visualizing the sequence (no text yet).
         const boxesDiv = el('div', { className: 'syllable-boxes', id: 'wordpos-boxes' });
@@ -646,10 +655,33 @@ Phono.games.wordPosition = {
 
         const footer = el('div', { className: 'round-footer', id: 'wordpos-footer' });
 
-        this.container.appendChild(el('div', { className: 'tap-area compact-tap-area' }, [instructionRow, boxesDiv, choicesGrid, footer]));
+        this.container.appendChild(el('div', { className: 'tap-area compact-tap-area' }, [instructionRow, revealBtn, boxesDiv, choicesGrid, footer]));
 
         // Read the sentence once, normally, as soon as it appears.
         Phono.audio.speak(this.currentSentence.text, 0.5);
+    },
+
+    /** Teacher-only overlay with the sentence and the correct answer, as
+     * a fixed overlay attached to #app (not this.container, since the
+     * game area sits inside the .fade-in screen, whose `transform` would
+     * break a fixed-position child). */
+    showAnswer() {
+        const { el } = Phono.helpers;
+        const close = () => overlay.remove();
+
+        const overlay = el('div', {
+            className: 'teacher-note-overlay',
+            onClick: (e) => { if (e.target === overlay) close(); },
+        }, [
+            el('div', { className: 'teacher-note-card' }, [
+                el('div', { className: 'teacher-note-title', textContent: '🔒 Για τον/την εκπαιδευτικό' }),
+                el('p', { innerHTML: `<strong>Πρόταση:</strong> ${this.currentSentence.text}` }),
+                el('p', { innerHTML: `<strong>Ζητούμενη λέξη:</strong> ${this.positionLabel}` }),
+                el('p', { innerHTML: `<strong>Απάντηση:</strong> ${this.currentSentence.words[this.targetIndex]}` }),
+                el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
+            ]),
+        ]);
+        document.getElementById('app').appendChild(overlay);
     },
 
     checkAnswer(cardEl) {
