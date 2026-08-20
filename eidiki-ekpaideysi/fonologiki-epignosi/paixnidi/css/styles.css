@@ -852,6 +852,7 @@ input {
     cursor: pointer;
     border: none;
     position: relative;
+    touch-action: manipulation;
 }
 
 .clap-button:hover {
@@ -1903,6 +1904,7 @@ input {
     cursor: pointer;
     border: none;
     transition: all var(--duration-fast) var(--ease-bounce);
+    touch-action: manipulation;
 }
 
 .tap-button:hover {
