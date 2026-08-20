@@ -79,6 +79,15 @@
       margin-bottom: 2rem;
     }
 
+    .detail-card__preview {
+      width: 100%;
+      max-width: 320px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: block;
+      margin: 0 auto 2rem;
+    }
+
     .detail-card__download {
       display: flex;
       align-items: center;
@@ -169,6 +178,7 @@
             Υλικό για ενίσχυση του λειτουργικού λόγου με θέμα τα ζώα.
             Κατάλληλο για μαθητές ειδικής αγωγής.
           </p>
+          <img src="zoa-preview.png" alt="Προεπισκόπηση: Τα ζώα" class="detail-card__preview" />
           <div class="detail-card__download">
             <a href="enisxysi-leitourgikou-logou-zoa.pdf" download="Ενίσχυση λειτουργικού λόγου - ζώα.pdf" class="download-btn" onclick="gtag('event','download',{event_category:'PDF',event_label:'Ενίσχυση λειτουργικού λόγου - ζώα.pdf'})">
               ⬇ Κατέβασε το PDF
