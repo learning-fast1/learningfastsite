@@ -583,7 +583,7 @@ section {
 }
 
 .game-card__image {
-  aspect-ratio: 4 / 3;
+  height: 160px;
   background: var(--bg);
 }
 
