@@ -1,183 +1,220 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Παιχνίδι Ορθογραφίας  ι, η, ει, οι</title>
-    <link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/a-dimotikou/glossa/orthografia/orthografia-game/" />
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=6">
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NFLV4ZCHPZ"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-NFLV4ZCHPZ');
-    </script>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S07M3VNB5N');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Παιχνίδι Άρθρων &amp; Καταλήξεων. Διαδραστικό εκπαιδευτικό παιχνίδι για παιδιά 6–8 ετών, εξάσκηση στα οριστικά άρθρα και τις καταλήξεις των λέξεων." />
+  <title>Παιχνίδι Άρθρων &amp; Καταλήξεων – Learning Fast</title>
+  <link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/a-dimotikou/glossa/orthografia/orthografia-game/" />
+  <link rel="stylesheet" href="../../../../../styles/main.css" />
+  <style>
+    .game-detail {
+      display: flex;
+      align-items: stretch;
+      gap: 2.5rem;
+      max-width: 1000px;
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+
+    .game-detail__frame {
+      flex: 1 1 380px;
+      display: block;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      position: relative;
+      text-decoration: none;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .game-detail__frame:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(79,110,247,.25);
+    }
+
+    .game-detail__frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .game-detail__play-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30,20,60,.35);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .game-detail__frame:hover .game-detail__play-hint { opacity: 1; }
+
+    .game-detail__play-hint span {
+      padding: .9rem 2rem;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 1.1rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    }
+
+    .game-detail__text {
+      flex: 1 1 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .game-detail__text h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .game-detail__text p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 1.1rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: .9rem;
+      margin: 0 1.5rem 1.5rem;
+      transition: gap var(--transition);
+      text-decoration: none;
+    }
+    .back-link:hover { gap: .8rem; }
+
+    @media (max-width: 760px) {
+      .game-detail { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
-    <div class="app-container" id="app">
-        <!-- Αρχική Οθόνη Επιλογής -->
-        <div id="start-screen" class="start-screen">
-            <a href="../../../../../index.html" class="site-back-link">← Learning Fast</a>
-            <header>
-                <img src="logo.png" alt="Logo" class="game-logo">
-                <h1>Παιχνίδι Ορθογραφίας</h1>
-                <p>Επίλεξε πως θέλεις να παίξεις</p>
-            </header>
-            <div class="mode-options">
-                <button class="mode-btn start-mode-btn" onclick="selectMode('single')">
-                    <span>1 Παιδί</span>
-                    <div class="device-badges">
-                        <span class="device-badge">📱 Κινητό</span>
-                        <span class="device-badge">📱 Ταμπλέτ</span>
-                        <span class="device-badge">🖥️ Οθόνη</span>
-                    </div>
-                </button>
-                <button class="mode-btn start-mode-btn" onclick="selectMode('tablet')">
-                    <span>2 Παιδιά (Απέναντι)</span>
-                    <div class="device-badges">
-                        <span class="device-badge">📱 Κινητό</span>
-                        <span class="device-badge">📱 Ταμπλέτ</span>
-                    </div>
-                </button>
-                <button class="mode-btn start-mode-btn" onclick="selectMode('board')">
-                    <span>2 Παιδιά (Δίπλα-δίπλα)</span>
-                    <div class="device-badges">
-                        <span class="device-badge">📽️ Διαδραστικός Πίνακας</span>
-                    </div>
-                </button>
-            </div>
+  <header>
+    <nav class="navbar">
+      <a href="../../../../../index.html" class="navbar__logo"><img src="../../../../../assets/images/logo-wordmark.png" alt="Learning Fast" /></a>
+      <button class="navbar__hamburger" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <ul class="navbar__links">
+        <li><a href="../../../../../index.html">Αρχική</a></li>
+        <li class="has-dropdown"><a href="../../../../../taxeis/index.html">Τάξεις</a>
+          <ul class="dropdown">
+            <li><a href="../../../../../taxeis/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../../../taxeis/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../../../taxeis/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../../../../taxeis/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../../../../taxeis/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../../../../taxeis/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+            <li><a href="../../../../../taxeis/a-gymnasiou/index.html">Α΄ Γυμνασίου</a></li>
+            <li><a href="../../../../../taxeis/b-gymnasiou/index.html">Β΄ Γυμνασίου</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../../../../../eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a>
+          <ul class="dropdown">
+            <li><a href="../../../../../eidiki-ekpaideysi/kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
+            <li><a href="../../../../../eidiki-ekpaideysi/leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
+            <li><a href="../../../../../eidiki-ekpaideysi/fonologiki-epignosi/index.html">Φωνολογική Επίγνωση</a></li>
+          </ul>
+        </li>        <li class="has-dropdown"><a href="../../../../index.html">Εκπαιδευτικά Παιχνίδια</a>
+          <ul class="dropdown">
+            <li><a href="../../../../../ekpaideftika-paixnidia/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../../../ekpaideftika-paixnidia/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../../../ekpaideftika-paixnidia/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../../../../ekpaideftika-paixnidia/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../../../../ekpaideftika-paixnidia/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../../../../ekpaideftika-paixnidia/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+          </ul>
+        </li>
+        <li><a href="../../../../../epikoinonia/index.html">Επικοινωνία</a></li>
+      </ul>
+    </nav>
+  </header>
 
+  <main>
+    <section>
+      <div class="section__header">
+        <p class="breadcrumb">
+          <a href="../../../../index.html">Εκπαιδευτικά Παιχνίδια</a> →
+          <a href="../../../index.html">Α΄ Δημοτικού</a>
+        </p>
+        <span class="section__label">Γλώσσα – Α΄ Δημοτικού</span>
+        <h1 class="section__title">Παιχνίδι Άρθρων &amp; Καταλήξεων</h1>
+      </div>
+
+      <div class="game-detail">
+        <a href="paixnidi/index.html" class="game-detail__frame" onclick="gtag('event','play_game',{event_category:'Game',event_label:'Orthografia Arthra Katalixeis'})">
+          <img src="../../../../../assets/images/orthografia-game-preview.png" alt="Παιχνίδι Άρθρων & Καταλήξεων" />
+          <span class="game-detail__play-hint"><span>▶ Παίξε</span></span>
+        </a>
+        <div class="game-detail__text">
+          <h2>Παιχνίδι Άρθρων &amp; Καταλήξεων</h2>
+          <p>Ένα διαδραστικό εκπαιδευτικό παιχνίδι για παιδιά 6–8 ετών, σχεδιασμένο για την εξάσκηση στα οριστικά άρθρα και στις καταλήξεις των λέξεων, μέσα από τρία επίπεδα διαβαθμισμένης δυσκολίας.</p>
+          <p>Στο 1ο επίπεδο, τα παιδιά εξασκούνται στα οριστικά άρθρα του ενικού και πληθυντικού αριθμού (ο, η, το, οι, τα). Στο 2ο επίπεδο, εξασκούνται στις καταλήξεις των λέξεων έχοντας ως βοήθεια το άρθρο που προηγείται, ενώ στο 3ο επίπεδο η υποστήριξη αποσύρεται και τα παιδιά καλούνται να επιλέξουν τη σωστή κατάληξη χωρίς να τους δίνεται το άρθρο.</p>
+          <p>Η σταδιακή αύξηση της δυσκολίας επιτρέπει στα παιδιά να περάσουν από την καθοδηγούμενη εξάσκηση στην πιο αυτόνομη εφαρμογή όσων έχουν μάθει.</p>
+          <p>Το παιχνίδι μπορεί να παιχτεί από ένα ή δύο παιδιά και είναι κατάλληλο για χρήση σε υπολογιστή, κινητό τηλέφωνο και διαδραστικό πίνακα, τόσο για ατομική όσο και για συνεργατική εξάσκηση. Είναι κατάλληλο για το σχολείο, το σπίτι αλλά και για χώρους που παρέχεται ειδική εκπαίδευση.</p>
         </div>
+      </div>
+    </section>
+  </main>
 
-        <!-- Οθόνη Επιλογής Επιπέδου -->
-        <div id="level-screen" class="start-screen hidden">
-            <header>
-                <h1>Παιχνίδι Ορθογραφίας</h1>
-                <p>Επίλεξε επίπεδο δυσκολίας</p>
-            </header>
-            <div class="mode-options">
-                <button class="mode-btn level-btn" onclick="selectLevel(1)">
-                    <span class="icon">⭐</span>
-                    <span>Επίπεδο 1</span>
-                    <span class="level-desc">Βρες το άρθρο</span>
-                </button>
-                <button class="mode-btn level-btn" onclick="selectLevel(2)">
-                    <span class="icon">⭐⭐</span>
-                    <span>Επίπεδο 2</span>
-                    <span class="level-desc">Με άρθρο</span>
-                </button>
-                <button class="mode-btn level-btn" onclick="selectLevel(3)">
-                    <span class="icon">⭐⭐⭐</span>
-                    <span>Επίπεδο 3</span>
-                    <span class="level-desc">Χωρίς άρθρο</span>
-                </button>
-            </div>
-            <button class="back-btn" onclick="goBackToStart()">← Πίσω</button>
-        </div>
+  <footer class="footer">
+    <div class="footer__logo"><img src="../../../../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
+    <ul class="footer__links">
+      <li><a href="../../../../../epikoinonia/index.html">Επικοινωνία</a></li>
+      <li><a href="../../../../../steile-mia-idea/index.html">Στείλε μια ιδέα!</a></li>
+      <li><a href="../../../../../enimeroseis/index.html">Ενημερώσεις</a></li>
+      <li><a href="../../../../../oroi-xrisis/index.html">Όροι και προϋποθέσεις</a></li>
+    </ul>
+    <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
 
-        <!-- Οθόνη Επιλογής Χρόνου -->
-        <div id="time-screen" class="start-screen hidden">
-            <header>
-                <h1>Παιχνίδι Ορθογραφίας</h1>
-                <p>Επίλεξε χρόνο παιχνιδιού</p>
-            </header>
-            <div class="mode-options">
-                <button class="mode-btn time-btn" onclick="startGame(30)">
-                    <span class="icon">⏱️</span>
-                    <span>30 δευτ.</span>
-                </button>
-                <button class="mode-btn time-btn" onclick="startGame(60)">
-                    <span class="icon">⏱️</span>
-                    <span>1 λεπτό</span>
-                </button>
-                <button class="mode-btn time-btn" onclick="startGame(120)">
-                    <span class="icon">⏱️</span>
-                    <span>2 λεπτά</span>
-                </button>
-                <button class="mode-btn time-btn" onclick="startGame(180)">
-                    <span class="icon">⏱️</span>
-                    <span>3 λεπτά</span>
-                </button>
-                <button class="mode-btn time-btn" onclick="startGame(300)">
-                    <span class="icon">⏱️</span>
-                    <span>5 λεπτά</span>
-                </button>
-            </div>
-            <button class="back-btn" onclick="goBackToLevel()">← Πίσω</button>
-        </div>
-
-        <!-- Κύριος χώρος παιχνιδιού (κρύβεται αρχικά) -->
-        <div id="game-container" class="game-container hidden">
-            <!-- Εδώ θα προστεθούν δυναμικά τα boards από την JS -->
-            <button id="home-btn" class="home-btn" onclick="location.reload()">Αρχικό Μενού</button>
-            <div id="timer-display" class="timer-display"></div>
-        </div>
-
-        <!-- Overlay τέλους παιχνιδιού -->
-        <div id="end-overlay" class="end-overlay hidden">
-            <div class="end-card">
-                <div class="end-title">
-                    <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="13" x2="15" y2="15"></line><line x1="9" y1="2" x2="15" y2="2"></line><line x1="12" y1="2" x2="12" y2="5"></line></svg>
-                    Τέλος χρόνου!
-                </div>
-                <div id="end-scores" class="end-scores"></div>
-                <div class="end-buttons">
-                    <button class="end-btn retry-btn" id="retry-btn">
-                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"></path><polyline points="21 3 21 9 15 9"></polyline></svg>
-                        Επανάληψη λαθών
-                    </button>
-                    <button class="end-btn home-end-btn" onclick="location.reload()">
-                        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg>
-                        Αρχική
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Template για το ταμπλό παίκτη (κρυμμένο) -->
-        <template id="player-board-template">
-            <div class="player-board">
-                <header>
-                    <div class="score-board">
-                        <div class="score-badge correct">
-                            <span>Σωστά:</span> <span class="correct-score">0</span>
-                        </div>
-                        <div class="score-badge wrong">
-                            <span>Λάθος:</span> <span class="wrong-score">0</span>
-                        </div>
-                    </div>
-                </header>
-
-                <main class="game-area">
-                    <div class="word-card" class="word-card">
-                        <span class="word-article"></span> <span class="word-stem">πουλ</span><span class="word-ending missing">&nbsp;</span>
-                    </div>
-                    
-                    <div class="feedback-message"></div>
-
-                    <div class="options-container">
-                        <button class="option-btn" data-ending="ι">-ι</button>
-                        <button class="option-btn" data-ending="η">-η</button>
-                        <button class="option-btn" data-ending="ει">-ει</button>
-                        <button class="option-btn" data-ending="οι">-οι</button>
-                        <button class="option-btn" data-ending="ω">-ω</button>
-                        <button class="option-btn" data-ending="ο">-ο</button>
-                    </div>
-                    
-                    <button class="next-btn hidden">Επόμενη Λέξη ➔</button>
-                </main>
-            </div>
-        </template>
-
-        <!-- Confetti Canvas (Κοινό για όλους) -->
-        <canvas id="confetti-canvas"></canvas>
-    </div>
-
-    <!-- Include Canvas Confetti library for winning effect -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="script.js?v=6"></script>
+<script>
+  var btn = document.getElementById('navToggle');
+  var links = document.querySelector('.navbar__links');
+  if(btn && links){
+    btn.addEventListener('click', function(){
+      links.classList.toggle('nav-open');
+      btn.classList.toggle('nav-open');
+    });
+    document.querySelectorAll('.has-dropdown > a').forEach(function(a){
+      a.addEventListener('click', function(e){
+        if(window.innerWidth <= 768){
+          e.preventDefault();
+          var li = this.parentElement;
+          document.querySelectorAll('.has-dropdown.open').forEach(function(el){
+            if(el !== li) el.classList.remove('open');
+          });
+          li.classList.toggle('open');
+        }
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.navbar') && links.classList.contains('nav-open')){
+        links.classList.remove('nav-open');
+        btn.classList.remove('nav-open');
+      }
+    });
+  }
+</script>
 </body>
 </html>
