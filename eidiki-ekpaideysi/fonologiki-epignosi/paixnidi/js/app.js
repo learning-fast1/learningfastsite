@@ -94,6 +94,10 @@ Phono.app = {
 
         // Link back to the main Learning Fast site — this copy lives at
         // eidiki-ekpaideysi/fonologiki-epignosi/paixnidi/, three levels below root.
+        // Kept OUTSIDE the fade-in screen below, same reason as settingsBtn
+        // above: its `position:fixed` gets dragged along by the screen's
+        // entrance `transform` if nested inside it, so it visibly drifts
+        // every time this screen re-renders (entering/leaving the game).
         const backLink = el('a', {
             className: 'site-back-link',
             href: '../../../index.html',
@@ -101,7 +105,6 @@ Phono.app = {
         });
 
         const screen = el('div', { className: 'home-screen fade-in' }, [
-            backLink,
             // Logo image (replaces mascot)
             (() => {
                 const img = document.createElement('img');
@@ -132,6 +135,7 @@ Phono.app = {
 
         this.container.appendChild(screen);
         this.container.appendChild(settingsBtn);
+        this.container.appendChild(backLink);
     },
 
     /* ===========================================
