@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Παιχνίδι με τα Κλάσματα!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Poppins:wght@400;600;700&subset=greek&display=swap" rel="stylesheet">
+    <link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/e-dimotikou/mathimatika/klasmata/paixnidi/">
+    <link rel="stylesheet" href="css/style.css?v=3">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QE4TCHHH73"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-QE4TCHHH73');
+    </script>
+</head>
+<body>
+    <div id="game-wrapper">
+        <div id="app" class="wooden-board">
+            <!-- Main Menu -->
+            <section id="screen-main-menu" class="screen active">
+                <img src="assets/logo.png" alt="Learning Fast" class="corner-logo">
+                <a href="../../../../../index.html" class="site-back-link">← Learning Fast</a>
+                <header class="game-header-title">
+                    <h1 class="bounce-anim">Μαθαίνω τα<br>Κλάσματα!</h1>
+                </header>
+                <div class="menu-options">
+                    <button class="btn-menu btn-wood-1" onclick="app.showCategory(1)">
+                        <div class="btn-inner">Μέρος του Αριθμού</div>
+                    </button>
+                    <button class="btn-menu btn-wood-2" onclick="app.showCategory(2)">
+                        <div class="btn-inner">Ισοδύναμα</div>
+                    </button>
+                    <button class="btn-menu btn-wood-3" onclick="app.showCategory(3)">
+                        <div class="btn-inner">Σύγκριση</div>
+                    </button>
+                    <button class="btn-menu btn-wood-4" onclick="app.showCategory(4)">
+                        <div class="btn-inner">Σειροθέτηση</div>
+                    </button>
+                    <button class="btn-menu btn-wood-5" onclick="app.showCategory(5)">
+                        <div class="btn-inner">Προβλήματα</div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Category View -->
+            <section id="screen-category" class="screen">
+                <header class="nav-header">
+                    <button class="btn-back" onclick="app.goBack()">⬅️ Πίσω</button>
+                    <h2 id="category-title" class="title-wood">Κατηγορία</h2>
+                    <div class="score-board">
+                        <span class="star-icon">⭐</span> <span id="score-display">0</span>
+                    </div>
+                </header>
+                
+                <div id="stage-selector" class="stage-options">
+                    <!-- Buttons injected by JS based on category -->
+                </div>
+
+                <div id="game-container" class="hidden">
+                    <div class="game-header-board">
+                        <h3 id="stage-title">Στάδιο</h3>
+                        <p id="game-prompt" class="prompt">Οδηγία</p>
+                    </div>
+                    
+                    <div id="game-area" class="game-area">
+                        <!-- Game content goes here -->
+                    </div>
+                    
+                    <div id="game-controls" class="game-controls hidden">
+                        <button id="btn-submit" class="btn-action btn-submit" onclick="app.checkAnswer()">Υποβολή!</button>
+                        <button id="btn-next" class="btn-action btn-next hidden" onclick="app.nextQuestion()">Επόμενο ➡️</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Celebration Overlay -->
+            <div id="celebration" class="overlay hidden">
+                <div class="celebration-box">
+                    <h2 class="bounce-anim">ΤΕΛΕΙΑ!</h2>
+                    <p>Ολοκλήρωσες το στάδιο!</p>
+                    <div class="stars-container">
+                        ⭐ ⭐ ⭐
+                    </div>
+                    <button class="btn-action btn-wood-1" onclick="app.closeCelebration()">Συνέχεια</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/category1.js"></script>
+    <script src="js/category2.js"></script>
+    <script src="js/category3.js"></script>
+    <script src="js/category4.js?v=2"></script>
+    <script src="js/category5.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
