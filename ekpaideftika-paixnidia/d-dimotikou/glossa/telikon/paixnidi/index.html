@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Τελικό Ν - Παιχνίδι Γραμματικής</title>
+    <meta name="description" content="Διαδραστικό παιχνίδι για εξάσκηση στο τελικό ν των άρθρων της ελληνικής γλώσσας.">
+    <link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/d-dimotikou/glossa/telikon/paixnidi/" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLG1NP9YCE"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-SLG1NP9YCE');
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6C63FF;
+            --primary-light: #8B85FF;
+            --secondary: #FF6B9D;
+            --accent: #00D2FF;
+            --success: #00E676;
+            --error: #FF5252;
+            --warning: #FFD740;
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-card-light: #1f3460;
+            --text-light: #e8e8f0;
+            --text-muted: #a0a0b8;
+            --glow-purple: rgba(108, 99, 255, 0.4);
+            --glow-pink: rgba(255, 107, 157, 0.4);
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: var(--bg-dark);
+            min-height: 100vh;
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ========== ANIMATED BACKGROUND ========== */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-animation .bubble {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.08;
+            animation: floatBubble 15s ease-in-out infinite;
+        }
+
+        .bg-animation .bubble:nth-child(1) { width: 300px; height: 300px; background: var(--primary); top: 10%; left: -5%; animation-delay: 0s; }
+        .bg-animation .bubble:nth-child(2) { width: 200px; height: 200px; background: var(--secondary); top: 60%; right: -3%; animation-delay: -3s; }
+        .bg-animation .bubble:nth-child(3) { width: 250px; height: 250px; background: var(--accent); bottom: -5%; left: 30%; animation-delay: -6s; }
+        .bg-animation .bubble:nth-child(4) { width: 150px; height: 150px; background: var(--warning); top: 30%; right: 20%; animation-delay: -9s; }
+        .bg-animation .bubble:nth-child(5) { width: 180px; height: 180px; background: var(--success); bottom: 20%; left: 10%; animation-delay: -12s; }
+
+        @keyframes floatBubble {
+            0%, 100% { transform: translateY(0) scale(1); }
+            33% { transform: translateY(-30px) scale(1.05); }
+            66% { transform: translateY(20px) scale(0.95); }
+        }
+
+        /* ========== CONTAINER ========== */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 10px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ========== SCREENS ========== */
+        .screen {
+            display: none;
+            width: 100%;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== WELCOME SCREEN ========== */
+        .welcome-title {
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .logo-row {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .site-back-link {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(108, 99, 255, 0.15);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            border-radius: 30px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .site-back-link:hover {
+            background: rgba(108, 99, 255, 0.3);
+        }
+
+        .welcome-title .logo-img {
+            width: 115px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            animation: bounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 4px 15px rgba(108, 99, 255, 0.3));
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .welcome-title h1 {
+            font-size: 2.1rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 8px 0 2px;
+            line-height: 1.2;
+        }
+
+        .welcome-title p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-card-light));
+            border-radius: 24px;
+            padding: 18px 22px;
+            margin-top: 14px;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px var(--glow-purple);
+        }
+
+        .welcome-card h2 {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .welcome-card .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .time-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .time-btn {
+            background: rgba(108, 99, 255, 0.1);
+            border: 2px solid rgba(108, 99, 255, 0.3);
+            border-radius: 16px;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: var(--text-light);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+        }
+
+        .time-btn:hover {
+            background: rgba(108, 99, 255, 0.2);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--glow-purple);
+        }
+
+        .time-btn.selected {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px var(--glow-purple);
+        }
+
+        .time-btn .time-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .time-btn .time-label {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .time-btn .time-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .time-btn.selected .time-desc {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+
+
+        .start-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'Fredoka', sans-serif;
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(108, 99, 255, 0.4);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ========== GAME SCREEN ========== */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 230, 118, 0.1);
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .home-btn {
+            background: rgba(108, 99, 255, 0.15);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            border-radius: 30px;
+            padding: 8px 14px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background: rgba(108, 99, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .streak-display {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 215, 64, 0.1);
+            border: 1px solid rgba(255, 215, 64, 0.3);
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .timer-bar-container {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--accent), var(--primary));
+            border-radius: 10px;
+            transition: width 1s linear;
+            position: relative;
+        }
+
+        .timer-bar::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 30px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
+            border-radius: 10px;
+        }
+
+        .timer-bar.warning {
+            background: linear-gradient(90deg, var(--error), var(--warning));
+        }
+
+        .timer-text {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-card-light));
+            border-radius: 24px;
+            padding: 35px 30px;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+
+        .question-label {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .question-article-type {
+            color: var(--accent);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .word-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin: 20px 0 10px;
+            padding: 15px;
+            background: rgba(108, 99, 255, 0.1);
+            border-radius: 16px;
+            border: 1px dashed rgba(108, 99, 255, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .word-display .highlight-letter {
+            color: var(--warning);
+            text-decoration: underline;
+            text-underline-offset: 6px;
+        }
+
+        .hint-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .hint-toggle {
+            display: block;
+            margin: 0 auto 30px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-style: italic;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 4px;
+        }
+
+        .hint-toggle:hover {
+            color: var(--primary);
+        }
+
+        .choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .choice-btn {
+            padding: 22px 20px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: 'Fredoka', sans-serif;
+            color: var(--text-light);
+            background: rgba(108, 99, 255, 0.15);
+            border: 2px solid rgba(108, 99, 255, 0.3);
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .choice-btn:hover {
+            background: rgba(108, 99, 255, 0.3);
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px var(--glow-purple);
+        }
+
+        .choice-btn:hover::before {
+            width: 200%;
+            height: 200%;
+        }
+
+        .choice-btn.correct {
+            background: linear-gradient(135deg, #00c853, #00e676) !important;
+            border-color: var(--success) !important;
+            transform: scale(1.08);
+            box-shadow: 0 10px 30px rgba(0, 230, 118, 0.4);
+            animation: correctPulse 0.5s ease;
+        }
+
+        .choice-btn.wrong {
+            background: linear-gradient(135deg, #d32f2f, #ff5252) !important;
+            border-color: var(--error) !important;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+            100% { transform: scale(1.08); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+        }
+
+        .choice-btn .choice-sub {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .choice-btn.correct .choice-sub,
+        .choice-btn.wrong .choice-sub {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Feedback message */
+        .feedback {
+            margin-top: 20px;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: none;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: rgba(0, 230, 118, 0.15);
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            color: var(--success);
+        }
+
+        .feedback.wrong {
+            background: rgba(255, 82, 82, 0.15);
+            border: 1px solid rgba(255, 82, 82, 0.3);
+            color: var(--error);
+        }
+
+        .feedback .rule-explain {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* ========== RESULTS SCREEN ========== */
+        .results-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-card-light));
+            border-radius: 24px;
+            padding: 40px 30px;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 60px var(--glow-purple);
+            text-align: center;
+        }
+
+        .results-emoji {
+            font-size: 5rem;
+            display: block;
+            margin-bottom: 15px;
+            animation: bounce 1.5s ease-in-out infinite;
+        }
+
+        .results-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .results-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(108, 99, 255, 0.1);
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            border-radius: 16px;
+            padding: 18px 12px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stat-card.highlight {
+            background: linear-gradient(135deg, rgba(0, 230, 118, 0.1), rgba(0, 210, 255, 0.1));
+            border-color: rgba(0, 230, 118, 0.3);
+        }
+
+        .stat-card.highlight .stat-value {
+            color: var(--success);
+        }
+
+        .wrong-answers-section {
+            margin-top: 10px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .wrong-answers-section h3 {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .wrong-answer-item {
+            background: rgba(255, 82, 82, 0.08);
+            border: 1px solid rgba(255, 82, 82, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wrong-answer-item .wrong-word {
+            font-weight: 600;
+        }
+
+        .wrong-answer-item .correct-answer {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .result-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .result-btn {
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Fredoka', sans-serif;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .ui-icon {
+            width: 1.1em;
+            height: 1.1em;
+            flex-shrink: 0;
+        }
+
+        .result-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.3);
+        }
+
+        .result-btn.secondary {
+            background: rgba(108, 99, 255, 0.15);
+            color: var(--text-light);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+        }
+
+        .result-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(108, 99, 255, 0.3);
+        }
+
+        /* ========== CONFETTI ========== */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: confettiFall 3s ease-in forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* ========== FLOATING STARS ========== */
+        .floating-star {
+            position: fixed;
+            font-size: 1.5rem;
+            animation: floatStar 1.5s ease-out forwards;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        @keyframes floatStar {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(0.3); opacity: 0; }
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 500px) {
+            .welcome-title h1 { font-size: 2rem; }
+            .word-display { font-size: 1.8rem; }
+            .choice-btn { font-size: 1.3rem; padding: 16px; }
+            .game-header { flex-wrap: wrap; justify-content: center; }
+            .time-options { grid-template-columns: 1fr; }
+            .container { padding: 15px; }
+        }
+
+        /* ========== PROGRESS COUNTER ========== */
+        .progress-counter {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+
+        /* ========== RULE CARD ========== */
+        .rule-card {
+            background: rgba(0, 210, 255, 0.08);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            margin-bottom: 0;
+        }
+
+        .rule-card h3 {
+            color: var(--accent);
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .rule-card p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .rule-card .keep-n {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .rule-card .drop-n {
+            color: var(--error);
+            font-weight: 600;
+        }
+
+        .rule-card .rule-list {
+            list-style: none;
+            padding: 0;
+            margin: 6px 0 0;
+        }
+
+        .rule-card .rule-list li {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.6;
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .rule-card .rule-list li::before {
+            content: '•';
+            color: var(--success);
+            position: absolute;
+            left: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <!-- Confetti container -->
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <div class="container">
+
+        <!-- ===== WELCOME SCREEN ===== -->
+        <div class="screen active" id="welcomeScreen">
+            <div class="welcome-title">
+                <div class="logo-row">
+                    <a href="../../../../../index.html" class="site-back-link">← Learning Fast</a>
+                    <img src="logo.png" alt="Learning Fast" class="logo-img">
+                </div>
+                <h1>Τελικό -ν</h1>
+                <p>Μάθε πότε μπαίνει το <strong>-ν</strong> στα άρθρα!</p>
+            </div>
+
+            <div class="welcome-card">
+                <h2>Πόσο θέλεις να εξασκηθείς;</h2>
+                <p class="subtitle">Διάλεξε χρόνο εξάσκησης</p>
+
+                <div class="time-options">
+                    <button class="time-btn" data-time="60" id="time60">
+                        <span class="time-label">1 λεπτό</span>
+                    </button>
+                    <button class="time-btn" data-time="120" id="time120">
+                        <span class="time-label">2 λεπτά</span>
+                    </button>
+                    <button class="time-btn" data-time="300" id="time300">
+                        <span class="time-label">5 λεπτά</span>
+                    </button>
+                </div>
+
+
+
+                <button class="start-btn" id="startBtn" disabled>Ξεκίνα!</button>
+
+                <div class="rule-card">
+                    <h3>Κανόνας:</h3>
+                    <p>
+                        <span class="keep-n">Βάζουμε -ν</span> όταν η λέξη:
+                    </p>
+                    <ul class="rule-list">
+                        <li>είναι αρσενικό ουσιαστικό (τον, έναν)</li>
+                        <li>ξεκινά από φωνήεν (α, ε, ι, ο, η, υ, ω)</li>
+                        <li>ξεκινά από το κ, π, τ, ψ, ξ και μπ, ντ, γκ, γγ, τσ, τζ</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== GAME SCREEN ===== -->
+        <div class="screen" id="gameScreen">
+            <div class="game-header">
+                <button class="home-btn" id="gameHomeBtn" aria-label="Αρχική"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg></button>
+                <div class="score-display">
+                    <span>Σωστά:</span>
+                    <span id="scoreText">0</span>
+                </div>
+                <div class="streak-display">
+                    <span>Σερί:</span>
+                    <span id="streakText">0</span>
+                </div>
+                <div class="score-display" style="background: rgba(255,82,82,0.1); border-color: rgba(255,82,82,0.3);">
+                    <span>Λάθη:</span>
+                    <span id="wrongText">0</span>
+                </div>
+            </div>
+
+            <div class="timer-bar-container">
+                <div class="timer-bar" id="timerBar"></div>
+            </div>
+            <div class="timer-text" id="timerText">⏱️ 0:00</div>
+
+            <div class="game-card" id="gameCard">
+                <p class="question-label">Ποιο είναι το σωστό άρθρο;</p>
+                <p class="question-article-type" id="articleTypeLabel"></p>
+                <div class="word-display" id="wordDisplay">κόσμο</div>
+                <button class="hint-toggle" id="hintToggle">💡 Χρειάζεσαι βοήθεια;</button>
+                <p class="hint-text" id="hintText" style="display:none;">Κοίτα το πρώτο γράμμα!</p>
+                <div class="choices" id="choicesContainer">
+                    <button class="choice-btn" id="choiceWithN">
+                        τον
+                        <span class="choice-sub">με -ν</span>
+                    </button>
+                    <button class="choice-btn" id="choiceWithoutN">
+                        το
+                        <span class="choice-sub">χωρίς -ν</span>
+                    </button>
+                </div>
+                <div class="feedback" id="feedback"></div>
+                <button class="start-btn" id="nextBtn" style="display:none; margin-top:16px;">Επόμενο ▶</button>
+            </div>
+
+            <div class="progress-counter" id="progressCounter">Ερώτηση 1</div>
+        </div>
+
+        <!-- ===== RESULTS SCREEN ===== -->
+        <div class="screen" id="resultsScreen">
+            <div class="results-card">
+                <span class="results-emoji" id="resultsEmoji">🏆</span>
+                <h1 class="results-title" id="resultsTitle">Μπράβο!</h1>
+                <p class="results-subtitle" id="resultsSubtitle">Τα πήγες πολύ καλά!</p>
+
+                <div class="stats-grid">
+                    <div class="stat-card highlight">
+                        <div class="stat-value" id="statCorrect">0</div>
+                        <div class="stat-label">Σωστές</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statWrong">0</div>
+                        <div class="stat-label">Λάθη</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statPercent">0%</div>
+                        <div class="stat-label">Ποσοστό</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statStreak">0</div>
+                        <div class="stat-label">Μέγιστο σερί</div>
+                    </div>
+                </div>
+
+                <div class="wrong-answers-section" id="wrongAnswersSection" style="display:none;">
+                    <h3>Ας τα δούμε ξανά:</h3>
+                    <div id="wrongAnswersList"></div>
+                </div>
+
+                <div class="result-buttons">
+                    <button class="result-btn secondary" id="homeBtn"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Αρχική</button>
+                    <button class="result-btn primary" id="retryBtn"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"></path><polyline points="21 3 21 9 15 9"></polyline></svg> Ξανά!</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // =============================================
+        // WORD BANK
+        // =============================================
+        const wordBank = {
+            // Words where we KEEP the ν (start with vowel, κ, π, τ, ξ, ψ, μπ, ντ, γκ, τσ, τζ)
+            keepN: {
+                masculine: [
+                    // Vowels
+                    { word: "αέρα", firstLetter: "α", category: "φωνήεν" },
+                    { word: "αστυνομικό", firstLetter: "α", category: "φωνήεν" },
+                    { word: "αδερφό", firstLetter: "α", category: "φωνήεν" },
+                    { word: "αριθμό", firstLetter: "α", category: "φωνήεν" },
+                    { word: "άνθρωπο", firstLetter: "α", category: "φωνήεν" },
+                    { word: "ελέφαντα", firstLetter: "ε", category: "φωνήεν" },
+                    { word: "εαυτό", firstLetter: "ε", category: "φωνήεν" },
+                    { word: "ήλιο", firstLetter: "η", category: "φωνήεν" },
+                    { word: "ήχο", firstLetter: "η", category: "φωνήεν" },
+                    { word: "ίσκιο", firstLetter: "ι", category: "φωνήεν" },
+                    { word: "ιδιοκτήτη", firstLetter: "ι", category: "φωνήεν" },
+                    { word: "ουρανό", firstLetter: "ο", category: "φωνήεν" },
+                    { word: "οδηγό", firstLetter: "ο", category: "φωνήεν" },
+                    { word: "υπολογιστή", firstLetter: "υ", category: "φωνήεν" },
+                    { word: "ωκεανό", firstLetter: "ω", category: "φωνήεν" },
+                    // κ, π, τ
+                    { word: "κόσμο", firstLetter: "κ", category: "κ, π, τ" },
+                    { word: "κήπο", firstLetter: "κ", category: "κ, π, τ" },
+                    { word: "καιρό", firstLetter: "κ", category: "κ, π, τ" },
+                    { word: "καθρέφτη", firstLetter: "κ", category: "κ, π, τ" },
+                    { word: "πατέρα", firstLetter: "π", category: "κ, π, τ" },
+                    { word: "πίνακα", firstLetter: "π", category: "κ, π, τ" },
+                    { word: "πόλεμο", firstLetter: "π", category: "κ, π, τ" },
+                    { word: "παππού", firstLetter: "π", category: "κ, π, τ" },
+                    { word: "τοίχο", firstLetter: "τ", category: "κ, π, τ" },
+                    { word: "τρόπο", firstLetter: "τ", category: "κ, π, τ" },
+                    { word: "ταχυδρόμο", firstLetter: "τ", category: "κ, π, τ" },
+                    // ξ, ψ
+                    { word: "ξένο", firstLetter: "ξ", category: "ξ, ψ" },
+                    { word: "ξάδερφο", firstLetter: "ξ", category: "ξ, ψ" },
+                    { word: "ψαρά", firstLetter: "ψ", category: "ξ, ψ" },
+                    { word: "ψύλλο", firstLetter: "ψ", category: "ξ, ψ" },
+                    // μπ, ντ, γκ, τσ, τζ
+                    { word: "μπαμπά", firstLetter: "μπ", category: "μπ, ντ, γκ, τσ, τζ" },
+                    { word: "μπάρμπα", firstLetter: "μπ", category: "μπ, ντ, γκ, τσ, τζ" },
+                    { word: "ντετέκτιβ", firstLetter: "ντ", category: "μπ, ντ, γκ, τσ, τζ" },
+                    { word: "γκαρσόν", firstLetter: "γκ", category: "μπ, ντ, γκ, τσ, τζ" },
+                    { word: "τσοπάνη", firstLetter: "τσ", category: "μπ, ντ, γκ, τσ, τζ" },
+                    { word: "τζίτζικα", firstLetter: "τζ", category: "μπ, ντ, γκ, τσ, τζ" },
+                ],
+                feminine: [
+                    // Vowels
+                    { word: "αγελάδα", firstLetter: "α", category: "φωνήεν" },
+                    { word: "αλεπού", firstLetter: "α", category: "φωνήεν" },
+                    { word: "αυλή", firstLetter: "α", category: "φωνήεν" },
+                    { word: "εφημερίδα", firstLetter: "ε", category: "φωνήεν" },
+                    { word: "ελπίδα", firstLetter: "ε", category: "φωνήεν" },
+                    { word: "ηλεκτρική", firstLetter: "η", category: "φωνήεν" },
+                    { word: "ιστορία", firstLetter: "ι", category: "φωνήεν" },
+                    { word: "ομπρέλα", firstLetter: "ο", category: "φωνήεν" },
+                    { word: "ομάδα", firstLetter: "ο", category: "φωνήεν" },
+                    { word: "υγεία", firstLetter: "υ", category: "φωνήεν" },
+                    { word: "ώρα", firstLetter: "ω", category: "φωνήεν" },
+                    // κ, π, τ
+                    { word: "καρδιά", firstLetter: "κ", category: "κ, π, τ" },
+                    { word: "καρέκλα", firstLetter: "κ", category: "κ, π, τ" },
+                    { word: "πόρτα", firstLetter: "π", category: "κ, π, τ" },
+                    { word: "πατρίδα", firstLetter: "π", category: "κ, π, τ" },
+                    { word: "τσάντα", firstLetter: "τ", category: "κ, π, τ" },
+                    { word: "τάξη", firstLetter: "τ", category: "κ, π, τ" },
+                    // ξ, ψ
+                    { word: "ξαδέρφη", firstLetter: "ξ", category: "ξ, ψ" },
+                    { word: "ψυχή", firstLetter: "ψ", category: "ξ, ψ" },
+                    // μπ, ντ, γκ, τσ, τζ
+                    { word: "μπάλα", firstLetter: "μπ", category: "μπ, ντ, γκ, τσ, τζ" },
+                    { word: "μπανάνα", firstLetter: "μπ", category: "μπ, ντ, γκ, τσ, τζ" },
+                    { word: "ντομάτα", firstLetter: "ντ", category: "μπ, ντ, γκ, τσ, τζ" },
+                    { word: "τσέπη", firstLetter: "τσ", category: "μπ, ντ, γκ, τσ, τζ" },
+                    { word: "τζαμαρία", firstLetter: "τζ", category: "μπ, ντ, γκ, τσ, τζ" },
+                ]
+            },
+            // Words where we DROP the ν (start with β, γ, δ, ζ, θ, λ, μ, ν, ρ, σ, φ, χ)
+            dropN: {
+                masculine: [
+                    { word: "βασιλιά", firstLetter: "β", category: "β, γ, δ..." },
+                    { word: "βοσκό", firstLetter: "β", category: "β, γ, δ..." },
+                    { word: "γιατρό", firstLetter: "γ", category: "β, γ, δ..." },
+                    { word: "γείτονα", firstLetter: "γ", category: "β, γ, δ..." },
+                    { word: "δάσκαλο", firstLetter: "δ", category: "β, γ, δ..." },
+                    { word: "δρόμο", firstLetter: "δ", category: "β, γ, δ..." },
+                    { word: "δήμαρχο", firstLetter: "δ", category: "β, γ, δ..." },
+                    { word: "ζωγράφο", firstLetter: "ζ", category: "β, γ, δ..." },
+                    { word: "ζαχαροπλάστη", firstLetter: "ζ", category: "β, γ, δ..." },
+                    { word: "θείο", firstLetter: "θ", category: "β, γ, δ..." },
+                    { word: "θησαυρό", firstLetter: "θ", category: "β, γ, δ..." },
+                    { word: "λαγό", firstLetter: "λ", category: "β, γ, δ..." },
+                    { word: "λύκο", firstLetter: "λ", category: "β, γ, δ..." },
+                    { word: "μαθητή", firstLetter: "μ", category: "β, γ, δ..." },
+                    { word: "μάγο", firstLetter: "μ", category: "β, γ, δ..." },
+                    { word: "ναύτη", firstLetter: "ν", category: "β, γ, δ..." },
+                    { word: "νόμο", firstLetter: "ν", category: "β, γ, δ..." },
+                    { word: "ρήτορα", firstLetter: "ρ", category: "β, γ, δ..." },
+                    { word: "σκύλο", firstLetter: "σ", category: "β, γ, δ..." },
+                    { word: "στρατιώτη", firstLetter: "σ", category: "β, γ, δ..." },
+                    { word: "σταθμό", firstLetter: "σ", category: "β, γ, δ..." },
+                    { word: "φίλο", firstLetter: "φ", category: "β, γ, δ..." },
+                    { word: "φούρναρη", firstLetter: "φ", category: "β, γ, δ..." },
+                    { word: "χορό", firstLetter: "χ", category: "β, γ, δ..." },
+                    { word: "χρόνο", firstLetter: "χ", category: "β, γ, δ..." },
+                    { word: "χάρτη", firstLetter: "χ", category: "β, γ, δ..." },
+                ],
+                feminine: [
+                    { word: "βάρκα", firstLetter: "β", category: "β, γ, δ..." },
+                    { word: "βροχή", firstLetter: "β", category: "β, γ, δ..." },
+                    { word: "γάτα", firstLetter: "γ", category: "β, γ, δ..." },
+                    { word: "γιαγιά", firstLetter: "γ", category: "β, γ, δ..." },
+                    { word: "γυναίκα", firstLetter: "γ", category: "β, γ, δ..." },
+                    { word: "δασκάλα", firstLetter: "δ", category: "β, γ, δ..." },
+                    { word: "δύναμη", firstLetter: "δ", category: "β, γ, δ..." },
+                    { word: "ζωή", firstLetter: "ζ", category: "β, γ, δ..." },
+                    { word: "ζάχαρη", firstLetter: "ζ", category: "β, γ, δ..." },
+                    { word: "θάλασσα", firstLetter: "θ", category: "β, γ, δ..." },
+                    { word: "θέση", firstLetter: "θ", category: "β, γ, δ..." },
+                    { word: "λίμνη", firstLetter: "λ", category: "β, γ, δ..." },
+                    { word: "λέξη", firstLetter: "λ", category: "β, γ, δ..." },
+                    { word: "μητέρα", firstLetter: "μ", category: "β, γ, δ..." },
+                    { word: "μέρα", firstLetter: "μ", category: "β, γ, δ..." },
+                    { word: "νύχτα", firstLetter: "ν", category: "β, γ, δ..." },
+                    { word: "ρόδα", firstLetter: "ρ", category: "β, γ, δ..." },
+                    { word: "σοκολάτα", firstLetter: "σ", category: "β, γ, δ..." },
+                    { word: "σχολή", firstLetter: "σ", category: "β, γ, δ..." },
+                    { word: "φωτιά", firstLetter: "φ", category: "β, γ, δ..." },
+                    { word: "φωνή", firstLetter: "φ", category: "β, γ, δ..." },
+                    { word: "χαρά", firstLetter: "χ", category: "β, γ, δ..." },
+                    { word: "χώρα", firstLetter: "χ", category: "β, γ, δ..." },
+                ]
+            }
+        };
+
+        // =============================================
+        // GAME STATE
+        // =============================================
+        let state = {
+            selectedTime: 0,
+            selectedType: 'all',
+            timeRemaining: 0,
+            score: 0,
+            wrong: 0,
+            streak: 0,
+            maxStreak: 0,
+            questionNum: 0,
+            currentQuestion: null,
+            wrongAnswers: [],
+            timerInterval: null,
+            isAnswering: false,
+            usedQuestions: [],
+            recentArticleTypes: [],
+            recentGenders: []
+        };
+
+        // =============================================
+        // DOM ELEMENTS
+        // =============================================
+        const $ = id => document.getElementById(id);
+
+        const welcomeScreen = $('welcomeScreen');
+        const gameScreen = $('gameScreen');
+        const resultsScreen = $('resultsScreen');
+        const startBtn = $('startBtn');
+        const timerBar = $('timerBar');
+        const timerText = $('timerText');
+        const wordDisplay = $('wordDisplay');
+        const hintText = $('hintText');
+        const hintToggle = $('hintToggle');
+        const choiceWithN = $('choiceWithN');
+        const choiceWithoutN = $('choiceWithoutN');
+        const feedback = $('feedback');
+        const nextBtn = $('nextBtn');
+        const scoreText = $('scoreText');
+        const wrongText = $('wrongText');
+        const streakText = $('streakText');
+        const articleTypeLabel = $('articleTypeLabel');
+        const progressCounter = $('progressCounter');
+
+        // =============================================
+        // EVENT LISTENERS
+        // =============================================
+
+        // Time selection
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                state.selectedTime = parseInt(btn.dataset.time);
+                checkStartReady();
+            });
+        });
+
+
+
+        function checkStartReady() {
+            startBtn.disabled = state.selectedTime === 0;
+        }
+
+        // Start button
+        startBtn.addEventListener('click', startGame);
+
+        // Choice buttons
+        choiceWithN.addEventListener('click', () => handleAnswer(true));
+        choiceWithoutN.addEventListener('click', () => handleAnswer(false));
+
+        // Result buttons
+        $('retryBtn').addEventListener('click', startGame);
+        $('homeBtn').addEventListener('click', goHome);
+        $('gameHomeBtn').addEventListener('click', goHome);
+
+        // =============================================
+        // GAME LOGIC
+        // =============================================
+        function showScreen(screen) {
+            [welcomeScreen, gameScreen, resultsScreen].forEach(s => s.classList.remove('active'));
+            screen.classList.add('active');
+        }
+
+        function startGame() {
+            state.timeRemaining = state.selectedTime;
+            state.score = 0;
+            state.wrong = 0;
+            state.streak = 0;
+            state.maxStreak = 0;
+            state.questionNum = 0;
+            state.wrongAnswers = [];
+            state.isAnswering = false;
+            state.usedQuestions = [];
+            state.recentArticleTypes = [];
+            state.recentGenders = [];
+
+            scoreText.textContent = '0';
+            wrongText.textContent = '0';
+            streakText.textContent = '0';
+
+            showScreen(gameScreen);
+            startTimer();
+            nextQuestion();
+        }
+
+        function goHome() {
+            if (state.timerInterval) clearInterval(state.timerInterval);
+            showScreen(welcomeScreen);
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            timerBar.style.width = '100%';
+            timerBar.classList.remove('warning');
+
+            if (state.timerInterval) clearInterval(state.timerInterval);
+
+            state.timerInterval = setInterval(() => {
+                state.timeRemaining--;
+                updateTimerDisplay();
+
+                const percent = (state.timeRemaining / state.selectedTime) * 100;
+                timerBar.style.width = percent + '%';
+
+                if (percent < 20) {
+                    timerBar.classList.add('warning');
+                }
+
+                if (state.timeRemaining <= 0) {
+                    clearInterval(state.timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const min = Math.floor(state.timeRemaining / 60);
+            const sec = state.timeRemaining % 60;
+            timerText.textContent = `⏱️ ${min}:${sec.toString().padStart(2, '0')}`;
+        }
+
+        function getArticleTypes() {
+            switch (state.selectedType) {
+                case 'ton': return ['ton'];
+                case 'tin': return ['tin'];
+                case 'enan': return ['enan'];
+                case 'all': return ['ton', 'tin', 'enan'];
+                default: return ['ton', 'tin', 'enan'];
+            }
+        }
+
+        function genderOfType(type) {
+            return type === 'tin' ? 'feminine' : 'masculine';
+        }
+
+        function generateQuestion() {
+            const types = getArticleTypes();
+            let articleType = types[Math.floor(Math.random() * types.length)];
+
+            // Avoid the same GENDER back-to-back — "ton" and "enan" are both
+            // masculine, so alternating just between those two would still
+            // read as "consecutive masculine articles" to the child.
+            const lastGender = state.recentGenders[state.recentGenders.length - 1];
+            const hasOppositeGender = types.some(t => genderOfType(t) !== genderOfType(articleType));
+            if (lastGender && genderOfType(articleType) === lastGender && hasOppositeGender) {
+                const opposite = types.filter(t => genderOfType(t) !== lastGender);
+                articleType = opposite[Math.floor(Math.random() * opposite.length)];
+            }
+
+            state.recentArticleTypes.push(articleType);
+            if (state.recentArticleTypes.length > 5) state.recentArticleTypes.shift();
+            state.recentGenders.push(genderOfType(articleType));
+            if (state.recentGenders.length > 5) state.recentGenders.shift();
+
+            // In writing, the masculine accusative (τον / έναν) always keeps the -ν,
+            // whatever letter follows. Only the feminine (την) depends on the next letter.
+            const gender = genderOfType(articleType);
+            const keepN = gender === 'masculine' ? true : Math.random() < 0.5;
+
+            const pool = gender === 'masculine'
+                ? wordBank.keepN.masculine.concat(wordBank.dropN.masculine)
+                : (keepN ? wordBank.keepN.feminine : wordBank.dropN.feminine);
+
+            // Avoid repeating recent questions
+            let availablePool = pool.filter(w => !state.usedQuestions.includes(w.word));
+            if (availablePool.length === 0) {
+                state.usedQuestions = [];
+                availablePool = pool;
+            }
+
+            const wordEntry = availablePool[Math.floor(Math.random() * availablePool.length)];
+            state.usedQuestions.push(wordEntry.word);
+
+            let withN, withoutN, typeLabel;
+            switch (articleType) {
+                case 'ton':
+                    withN = 'τον';
+                    withoutN = 'το';
+                    typeLabel = 'Αρσενικό - Αιτιατική';
+                    break;
+                case 'tin':
+                    withN = 'την';
+                    withoutN = 'τη';
+                    typeLabel = 'Θηλυκό - Αιτιατική';
+                    break;
+                case 'enan':
+                    withN = 'έναν';
+                    withoutN = 'ένα';
+                    typeLabel = 'Αρσενικό - Αόριστο';
+                    break;
+            }
+
+            return {
+                word: wordEntry.word,
+                firstLetter: wordEntry.firstLetter,
+                category: wordEntry.category,
+                gender: gender,
+                keepN: keepN,
+                withN: withN,
+                withoutN: withoutN,
+                articleType: articleType,
+                typeLabel: typeLabel,
+                correctAnswer: keepN ? withN : withoutN
+            };
+        }
+
+        function ruleExplanation(q) {
+            if (q.gender === 'masculine') {
+                return 'Στο αρσενικό (τον/έναν) το -ν μένει πάντα στον γραπτό λόγο, ό,τι κι αν ακολουθεί';
+            }
+            return `Πριν από "${q.firstLetter}" ${q.keepN ? 'κρατάμε' : 'αφαιρούμε'} το -ν (${q.category})`;
+        }
+
+        function nextQuestion() {
+            state.questionNum++;
+            state.isAnswering = false;
+
+            const question = generateQuestion();
+            state.currentQuestion = question;
+
+            // Update UI
+            articleTypeLabel.textContent = question.typeLabel;
+
+            // Highlight the first letter only when it actually matters (feminine)
+            const fl = question.firstLetter;
+            const rest = question.word.substring(fl.length);
+            wordDisplay.innerHTML = question.gender === 'masculine'
+                ? `___ ${question.word}`
+                : `___ <span class="highlight-letter">${fl}</span>${rest}`;
+
+            hintText.textContent = question.gender === 'masculine'
+                ? 'Στο αρσενικό, το -ν μένει πάντα στον γραπτό λόγο!'
+                : `Κοίτα! Η λέξη ξεκινάει από "${fl}"`;
+            hintText.style.display = 'none';
+            hintToggle.style.display = 'block';
+
+            choiceWithN.innerHTML = `${question.withN}<span class="choice-sub">με -ν</span>`;
+            choiceWithoutN.innerHTML = `${question.withoutN}<span class="choice-sub">χωρίς -ν</span>`;
+
+            // Reset buttons
+            choiceWithN.className = 'choice-btn';
+            choiceWithoutN.className = 'choice-btn';
+            choiceWithN.disabled = false;
+            choiceWithoutN.disabled = false;
+
+            // Hide feedback
+            feedback.classList.remove('show', 'correct', 'wrong');
+            nextBtn.style.display = 'none';
+
+            progressCounter.textContent = `Ερώτηση ${state.questionNum}`;
+        }
+
+        function handleAnswer(choseWithN) {
+            if (state.isAnswering) return;
+
+            const q = state.currentQuestion;
+            const isCorrect = choseWithN === q.keepN;
+            const btn = choseWithN ? choiceWithN : choiceWithoutN;
+
+            // Guards a keyboard-repeat of the same already-wrong choice —
+            // the disabled attribute alone doesn't stop keydown shortcuts.
+            if (btn.disabled) return;
+
+            if (isCorrect) {
+                // Round over — disable both choices and wait for the child
+                // to press "Next" so they have time to read the explanation.
+                state.isAnswering = true;
+                choiceWithN.disabled = true;
+                choiceWithoutN.disabled = true;
+
+                state.score++;
+                state.streak++;
+                if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+
+                scoreText.textContent = state.score;
+                streakText.textContent = state.streak;
+
+                btn.classList.add('correct');
+
+                feedback.innerHTML = 'Σωστό!';
+                feedback.innerHTML += `<span class="rule-explain">${ruleExplanation(q)}</span>`;
+                feedback.className = 'feedback show correct';
+
+                // Spawn floating stars
+                spawnStars();
+
+                if (state.streak > 0 && state.streak % 5 === 0) {
+                    launchConfetti();
+                }
+
+                nextBtn.style.display = 'block';
+            } else {
+                // Wrong pick: don't reveal the answer, just let them try the
+                // other choice — mark this one wrong and disable only it.
+                state.wrong++;
+                state.streak = 0;
+
+                wrongText.textContent = state.wrong;
+                streakText.textContent = state.streak;
+
+                btn.classList.add('wrong');
+                btn.disabled = true;
+
+                feedback.innerHTML = 'Προσπάθησε πάλι!';
+                feedback.className = 'feedback show wrong';
+
+                state.wrongAnswers.push({
+                    word: q.word,
+                    correct: q.correctAnswer + ' ' + q.word,
+                    firstLetter: q.firstLetter
+                });
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            nextBtn.style.display = 'none';
+            if (state.timeRemaining > 0) {
+                nextQuestion();
+            }
+        });
+
+        hintToggle.addEventListener('click', () => {
+            hintText.style.display = 'block';
+            hintToggle.style.display = 'none';
+        });
+
+        function endGame() {
+            showScreen(resultsScreen);
+
+            const total = state.score + state.wrong;
+            const percent = total > 0 ? Math.round((state.score / total) * 100) : 0;
+
+            $('statCorrect').textContent = state.score;
+            $('statWrong').textContent = state.wrong;
+            $('statPercent').textContent = percent + '%';
+            $('statStreak').textContent = state.maxStreak;
+
+            // Header stays the same regardless of performance — only the
+            // stats and wrong-answer review below change.
+            if (percent >= 90) {
+                launchConfetti();
+            }
+
+            $('resultsEmoji').textContent = '⭐';
+            $('resultsTitle').textContent = 'Καλή προσπάθεια!';
+            $('resultsSubtitle').textContent = 'Συνέχισε την εξάσκηση!';
+
+            // Wrong answers review
+            const wrongSection = $('wrongAnswersSection');
+            const wrongList = $('wrongAnswersList');
+            wrongList.innerHTML = '';
+
+            if (state.wrongAnswers.length > 0) {
+                wrongSection.style.display = 'block';
+                // Show up to 10 wrong answers
+                const toShow = state.wrongAnswers.slice(-10);
+                toShow.forEach(wa => {
+                    const div = document.createElement('div');
+                    div.className = 'wrong-answer-item';
+                    div.innerHTML = `
+                        <span class="wrong-word">"${wa.firstLetter}..." → ${wa.word}</span>
+                        <span class="correct-answer">${wa.correct}</span>
+                    `;
+                    wrongList.appendChild(div);
+                });
+            } else {
+                wrongSection.style.display = 'none';
+            }
+        }
+
+        // =============================================
+        // EFFECTS
+        // =============================================
+        function spawnStars() {
+            const gameCard = $('gameCard');
+            const rect = gameCard.getBoundingClientRect();
+
+            for (let i = 0; i < 3; i++) {
+                const star = document.createElement('div');
+                star.className = 'floating-star';
+                star.textContent = ['⭐', '🌟', '✨', '💫'][Math.floor(Math.random() * 4)];
+                star.style.left = (rect.left + Math.random() * rect.width) + 'px';
+                star.style.top = (rect.top + Math.random() * rect.height / 2) + 'px';
+                document.body.appendChild(star);
+
+                setTimeout(() => star.remove(), 1500);
+            }
+        }
+
+        function launchConfetti() {
+            const container = $('confettiContainer');
+            const colors = ['#6C63FF', '#FF6B9D', '#00D2FF', '#00E676', '#FFD740', '#FF5252', '#E040FB'];
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = (Math.random() * 8 + 5) + 'px';
+                confetti.style.height = (Math.random() * 8 + 5) + 'px';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+                container.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 4000);
+            }
+        }
+
+        // =============================================
+        // KEYBOARD SUPPORT
+        // =============================================
+        document.addEventListener('keydown', (e) => {
+            if (gameScreen.classList.contains('active') && !state.isAnswering) {
+                if (e.key === '1' || e.key === 'ArrowLeft') {
+                    handleAnswer(true);
+                } else if (e.key === '2' || e.key === 'ArrowRight') {
+                    handleAnswer(false);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
