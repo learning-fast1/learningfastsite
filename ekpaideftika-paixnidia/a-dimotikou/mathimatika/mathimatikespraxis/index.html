@@ -1,264 +1,220 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Λύσε τις πράξεις στο Πι και Φι!</title>
-    <link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/a-dimotikou/mathimatika/mathimatikespraxis/" />
-    <link rel="stylesheet" href="style.css?v=32">
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GCRQP2F52T"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-GCRQP2F52T');
-    </script>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S07M3VNB5N');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Παιχνίδι Πρόσθεσης &amp; Αφαίρεσης μέχρι το 20. Διαδραστικό εκπαιδευτικό παιχνίδι μαθηματικών για παιδιά από 6 ετών και άνω." />
+  <title>Παιχνίδι Πρόσθεσης &amp; Αφαίρεσης μέχρι το 20 – Learning Fast</title>
+  <link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/a-dimotikou/mathimatika/mathimatikespraxis/" />
+  <link rel="stylesheet" href="../../../../styles/main.css" />
+  <style>
+    .game-detail {
+      display: flex;
+      align-items: stretch;
+      gap: 2.5rem;
+      max-width: 1000px;
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+
+    .game-detail__frame {
+      flex: 1 1 380px;
+      display: block;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      position: relative;
+      text-decoration: none;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .game-detail__frame:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(79,110,247,.25);
+    }
+
+    .game-detail__frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .game-detail__play-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30,20,60,.35);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .game-detail__frame:hover .game-detail__play-hint { opacity: 1; }
+
+    .game-detail__play-hint span {
+      padding: .9rem 2rem;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 1.1rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    }
+
+    .game-detail__text {
+      flex: 1 1 380px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .game-detail__text h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .game-detail__text p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 1.1rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: .9rem;
+      margin: 0 1.5rem 1.5rem;
+      transition: gap var(--transition);
+      text-decoration: none;
+    }
+    .back-link:hover { gap: .8rem; }
+
+    @media (max-width: 760px) {
+      .game-detail { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Operation Selection Screen (Initial Screen) -->
-    <div id="operation-selection-screen" class="selection-screen">
-        <div class="selection-content">
-            <a href="../../../../index.html" class="site-back-link">← Learning Fast</a>
-            <img src="logo.png" alt="Logo" class="logo-bounce" style="max-width: 198px; margin-top: -30px; margin-bottom: 5px;">
-            <h2 class="game-subtitle">Πράξεις πρόσθεσης και αφαίρεσης μέχρι το 20!</h2>
-            <p style="margin-bottom: 15px; margin-top: 5px; font-size: 1.2rem;">Επίλεξε τι είδους πράξεις θέλεις να λύσεις:</p>
-            <div class="selection-buttons op-buttons">
-                <!-- 1. Addition to 10 -->
-                <button class="action-btn choice-btn op-btn" data-op="add10">
-                    <span class="btn-sign btn-sign-plus">+</span>
-                    <div class="btn-text-container">
-                        <span>Πρόσθεση</span>
-                        <small>μέχρι το 10</small>
-                    </div>
-                </button>
-                <!-- 2. Addition Bridging 10 -->
-                <button class="action-btn choice-btn op-btn" data-op="addBridge">
-                    <span class="btn-sign btn-sign-plus">+</span>
-                    <div class="btn-text-container">
-                        <span>Πρόσθεση</span>
-                        <small>με υπερπήδηση δεκάδας</small>
-                    </div>
-                </button>
-                <!-- 3. Addition 10 to 20 -->
-                <button class="action-btn choice-btn op-btn" data-op="addTeen">
-                    <span class="btn-sign btn-sign-plus">+</span>
-                    <div class="btn-text-container">
-                        <span>Πρόσθεση</span>
-                        <small>από το 10 μέχρι το 20</small>
-                    </div>
-                </button>
-                <!-- 4. Subtraction to 10 -->
-                <button class="action-btn choice-btn op-btn" data-op="sub10">
-                    <span class="btn-sign btn-sign-minus">−</span>
-                    <div class="btn-text-container">
-                        <span>Αφαίρεση</span>
-                        <small>μέχρι το 10</small>
-                    </div>
-                </button>
-                <!-- 5. Subtraction Breaking 10 -->
-                <button class="action-btn choice-btn op-btn" data-op="subBreak">
-                    <span class="btn-sign btn-sign-minus">−</span>
-                    <div class="btn-text-container">
-                        <span>Αφαίρεση</span>
-                        <small>με χαλασμό δεκάδας</small>
-                    </div>
-                </button>
-                <!-- 6. Subtraction 10 to 20 -->
-                <button class="action-btn choice-btn op-btn" data-op="subTeen">
-                    <span class="btn-sign btn-sign-minus">−</span>
-                    <div class="btn-text-container">
-                        <span>Αφαίρεση</span>
-                        <small>από το 10 μέχρι το 20</small>
-                    </div>
-                </button>
-                <!-- 7. Mixed -->
-                <button class="action-btn choice-btn op-btn" data-op="mix" style="border-color: var(--accent-purple);">
-                    <span class="btn-sign-mix"><span class="btn-sign btn-sign-plus mix-plus">+</span><span class="btn-sign btn-sign-minus mix-minus">−</span></span>
-                    <div class="btn-text-container">
-                        <span>Πρόσθεση & Αφαίρεση</span>
-                        <small>Ανακάτεμα!</small>
-                    </div>
-                </button>
-            </div>
+  <header>
+    <nav class="navbar">
+      <a href="../../../../index.html" class="navbar__logo"><img src="../../../../assets/images/logo-wordmark.png" alt="Learning Fast" /></a>
+      <button class="navbar__hamburger" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <ul class="navbar__links">
+        <li><a href="../../../../index.html">Αρχική</a></li>
+        <li class="has-dropdown"><a href="../../../../taxeis/index.html">Τάξεις</a>
+          <ul class="dropdown">
+            <li><a href="../../../../taxeis/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+            <li><a href="../../../../taxeis/a-gymnasiou/index.html">Α΄ Γυμνασίου</a></li>
+            <li><a href="../../../../taxeis/b-gymnasiou/index.html">Β΄ Γυμνασίου</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../../../../eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a>
+          <ul class="dropdown">
+            <li><a href="../../../../eidiki-ekpaideysi/kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
+            <li><a href="../../../../eidiki-ekpaideysi/leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
+            <li><a href="../../../../eidiki-ekpaideysi/fonologiki-epignosi/index.html">Φωνολογική Επίγνωση</a></li>
+          </ul>
+        </li>        <li class="has-dropdown"><a href="../../../index.html">Εκπαιδευτικά Παιχνίδια</a>
+          <ul class="dropdown">
+            <li><a href="../../../../ekpaideftika-paixnidia/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+          </ul>
+        </li>
+        <li><a href="../../../../epikoinonia/index.html">Επικοινωνία</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <div class="section__header">
+        <p class="breadcrumb">
+          <a href="../../../index.html">Εκπαιδευτικά Παιχνίδια</a> →
+          <a href="../../index.html">Α΄ Δημοτικού</a>
+        </p>
+        <span class="section__label">Μαθηματικά – Α΄ Δημοτικού</span>
+        <h1 class="section__title">Παιχνίδι Πρόσθεσης &amp; Αφαίρεσης</h1>
+      </div>
+
+      <div class="game-detail">
+        <a href="paixnidi/index.html" class="game-detail__frame" onclick="gtag('event','play_game',{event_category:'Game',event_label:'Mathimatikes Praxis'})">
+          <img src="../../../../assets/images/Screenshot%202026-03-17%20174021.png" alt="Παιχνίδι Πρόσθεσης & Αφαίρεσης μέχρι το 20" />
+          <span class="game-detail__play-hint"><span>▶ Παίξε</span></span>
+        </a>
+        <div class="game-detail__text">
+          <h2>Παιχνίδι Πρόσθεσης &amp; Αφαίρεσης μέχρι το 20</h2>
+          <p>Ένα διαδραστικό εκπαιδευτικό παιχνίδι μαθηματικών για παιδιά από 6 ετών και άνω, σχεδιασμένο για την εξάσκηση και την εμπέδωση βασικών πράξεων πρόσθεσης και αφαίρεσης μέχρι το 20.</p>
+          <p>Τα παιδιά εξασκούνται σε πράξεις με και χωρίς υπέρβαση της δεκάδας στην πρόσθεση και με και χωρίς χάλασμα της δεκάδας στην αφαίρεση, ενισχύοντας σταδιακά την ακρίβεια και την αυτοματοποίηση.</p>
+          <p>Μέσα από τη συστηματική εξάσκηση, το παιχνίδι συμβάλλει στην ανάπτυξη της διαδικαστικής επάρκειας, της υπολογιστικής ευχέρειας, της ταχύτητας επεξεργασίας και της αποτελεσματικότερης ανάκλησης βασικών αριθμητικών δεδομένων.</p>
+          <p>Στόχος είναι τα παιδιά να αποκτήσουν μεγαλύτερη ακρίβεια, ταχύτητα και αυτονομία στους νοερούς υπολογισμούς, δημιουργώντας μια σταθερή βάση για πιο σύνθετες μαθηματικές δεξιότητες.</p>
         </div>
-    </div>
+      </div>
+    </section>
+  </main>
 
-    <!-- Device Selection Screen (Hidden initially now) -->
-    <div id="selection-screen" class="selection-screen hidden">
-        <div class="selection-content">
-            <h1>Λύσε τις πράξεις στο Πι και Φι!</h1>
-            <p>Επίλεξε πως θέλετε να παίξετε:</p>
-            <div class="selection-buttons">
-                <button id="btn-single" class="action-btn choice-btn">
-                    <span class="icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"></rect><line x1="11" y1="18" x2="13" y2="18"></line></svg></span>
-                    <div class="btn-text-container">
-                        <span>Κινητό/Τάμπλετ/Διαδραστικός Πίνακας</span>
-                        <small>(Ένα παιδί)</small>
-                    </div>
-                </button>
-                <button id="btn-tablet" class="action-btn choice-btn">
-                    <span class="icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"></rect><line x1="11" y1="18" x2="13" y2="18"></line></svg></span>
-                    <div class="btn-text-container">
-                        <span>Τάμπλετ/Κινητό</span>
-                        <small>(Δύο παιδιά)</small>
-                    </div>
-                </button>
-                <button id="btn-board" class="action-btn choice-btn">
-                    <span class="icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="18" x2="12" y2="21"></line></svg></span>
-                    <div class="btn-text-container">
-                        <span>Διαδραστικός Πίνακας</span>
-                        <small>(Δύο παιδιά)</small>
-                    </div>
-                </button>
-            </div>
-            <button id="btn-back-to-op" class="cmd-btn back-btn" style="position:relative; margin-top:30px;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Πίσω στις Πράξεις</button>
-        </div>
-    </div>
+  <footer class="footer">
+    <div class="footer__logo"><img src="../../../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
+    <ul class="footer__links">
+      <li><a href="../../../../epikoinonia/index.html">Επικοινωνία</a></li>
+      <li><a href="../../../../steile-mia-idea/index.html">Στείλε μια ιδέα!</a></li>
+      <li><a href="../../../../enimeroseis/index.html">Ενημερώσεις</a></li>
+      <li><a href="../../../../oroi-xrisis/index.html">Όροι και προϋποθέσεις</a></li>
+    </ul>
+    <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
 
-    <!-- Time Selection Screen (Hidden initially) -->
-    <div id="time-selection-screen" class="selection-screen hidden">
-        <div class="selection-content">
-            <h1><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="13" x2="15" y2="15"></line><line x1="9" y1="2" x2="15" y2="2"></line><line x1="12" y1="2" x2="12" y2="5"></line></svg> Πόσο χρόνο θέλεις;</h1>
-            <p>Επίλεξε τη διάρκεια του παιχνιδιού:</p>
-            <div class="selection-buttons time-buttons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; width: 100%; max-width: 800px; padding: 0 10px;">
-                <button class="action-btn choice-btn time-btn" data-time="10" style="margin: 0; width: 100%; height: 100%; box-sizing: border-box; padding: 10px; min-height: unset; min-width: unset;">
-                    <span class="icon" style="font-size: 2.5rem;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12"></path><path d="M6 22h12"></path><path d="M7 2c0 4.5 3 6.5 5 8 2-1.5 5-3.5 5-8"></path><path d="M7 22c0-4.5 3-6.5 5-8 2 1.5 5 3.5 5 8"></path></svg></span>
-                    <span style="font-size: 1.2rem;">10 δευτ.</span>
-                </button>
-                <button class="action-btn choice-btn time-btn" data-time="20" style="margin: 0; width: 100%; height: 100%; box-sizing: border-box; padding: 10px; min-height: unset; min-width: unset;">
-                    <span class="icon" style="font-size: 2.5rem;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12"></path><path d="M6 22h12"></path><path d="M7 2c0 4.5 3 6.5 5 8 2-1.5 5-3.5 5-8"></path><path d="M7 22c0-4.5 3-6.5 5-8 2 1.5 5 3.5 5 8"></path></svg></span>
-                    <span style="font-size: 1.2rem;">20 δευτ.</span>
-                </button>
-                <button class="action-btn choice-btn time-btn" data-time="30" style="margin: 0; width: 100%; height: 100%; box-sizing: border-box; padding: 10px; min-height: unset; min-width: unset;">
-                    <span class="icon" style="font-size: 2.5rem;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12"></path><path d="M6 22h12"></path><path d="M7 2c0 4.5 3 6.5 5 8 2-1.5 5-3.5 5-8"></path><path d="M7 22c0-4.5 3-6.5 5-8 2 1.5 5 3.5 5 8"></path></svg></span>
-                    <span style="font-size: 1.2rem;">30 δευτ.</span>
-                </button>
-                <button class="action-btn choice-btn time-btn" data-time="60" style="margin: 0; width: 100%; height: 100%; box-sizing: border-box; padding: 10px; min-height: unset; min-width: unset;">
-                    <span class="icon" style="font-size: 2.5rem;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12"></path><path d="M6 22h12"></path><path d="M7 2c0 4.5 3 6.5 5 8 2-1.5 5-3.5 5-8"></path><path d="M7 22c0-4.5 3-6.5 5-8 2 1.5 5 3.5 5 8"></path></svg></span>
-                    <span style="font-size: 1.2rem;">1 λεπτό</span>
-                </button>
-                <button class="action-btn choice-btn time-btn" data-time="180" style="margin: 0; width: 100%; height: 100%; box-sizing: border-box; padding: 10px; min-height: unset; min-width: unset;">
-                    <span class="icon" style="font-size: 2.5rem;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12"></path><path d="M6 22h12"></path><path d="M7 2c0 4.5 3 6.5 5 8 2-1.5 5-3.5 5-8"></path><path d="M7 22c0-4.5 3-6.5 5-8 2 1.5 5 3.5 5 8"></path></svg></span>
-                    <span style="font-size: 1.2rem;">3 λεπτά</span>
-                </button>
-                <button class="action-btn choice-btn time-btn" data-time="300" style="margin: 0; width: 100%; height: 100%; box-sizing: border-box; padding: 10px; min-height: unset; min-width: unset;">
-                    <span class="icon" style="font-size: 2.5rem;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12"></path><path d="M6 22h12"></path><path d="M7 2c0 4.5 3 6.5 5 8 2-1.5 5-3.5 5-8"></path><path d="M7 22c0-4.5 3-6.5 5-8 2 1.5 5 3.5 5 8"></path></svg></span>
-                    <span style="font-size: 1.2rem;">5 λεπτά</span>
-                </button>
-            </div>
-            <button id="btn-back-to-mode" class="cmd-btn back-btn" style="position:relative; margin-top:30px;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Πίσω</button>
-        </div>
-    </div>
-
-    <!-- Game Screen (Hidden initially) -->
-    <div id="game-container" class="split-screen hidden">
-        
-        <!-- Player 1 -->
-        <div class="player-board player-1">
-            <header>
-                <h2>Παίκτης 1</h2>
-                <div class="score-board">Σκορ: <span id="score-p1">0</span></div>
-                <div class="timer-display"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="13" x2="15" y2="15"></line><line x1="9" y1="2" x2="15" y2="2"></line><line x1="12" y1="2" x2="12" y2="5"></line></svg> <span id="timer-p1">0</span>s</div>
-            </header>
-            
-            <main class="game-area">
-                <div class="equation-container">
-                    <span id="num1-p1" class="number">?</span>
-                    <span id="operator-p1" class="operator">+</span>
-                    <span id="num2-p1" class="number">?</span>
-                    <span class="equals">=</span>
-                    <div class="answer-box" id="answer-p1"></div>
-                </div>
-                
-                <div class="numpad">
-                    <button class="num-btn" data-player="1">1</button>
-                    <button class="num-btn" data-player="1">2</button>
-                    <button class="num-btn" data-player="1">3</button>
-                    <button class="num-btn" data-player="1">4</button>
-                    <button class="num-btn" data-player="1">5</button>
-                    <button class="num-btn" data-player="1">6</button>
-                    <button class="num-btn" data-player="1">7</button>
-                    <button class="num-btn" data-player="1">8</button>
-                    <button class="num-btn" data-player="1">9</button>
-                    <button class="cmd-btn clear" data-player="1">C</button>
-                    <button class="num-btn" data-player="1">0</button>
-                    <button class="cmd-btn check" data-player="1">✔</button>
-                </div>
-                <div id="feedback-p1" class="feedback"></div>
-            </main>
-            
-        </div>
-
-        <!-- Center Divider -->
-        <div class="divider">
-            <h1>Λύσε τις πράξεις στο Πι και Φι!</h1>
-        </div>
-
-        <!-- Player 2 (Bottom) -->
-        <div class="player-board player-2">
-            <header>
-                <h2>Παίκτης 2</h2>
-                <div class="score-board">Σκορ: <span id="score-p2">0</span></div>
-                <div class="timer-display"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="13" x2="15" y2="15"></line><line x1="9" y1="2" x2="15" y2="2"></line><line x1="12" y1="2" x2="12" y2="5"></line></svg> <span id="timer-p2">0</span>s</div>
-            </header>
-            
-            <main class="game-area">
-                <div class="equation-container">
-                    <span id="num1-p2" class="number">?</span>
-                    <span id="operator-p2" class="operator">+</span>
-                    <span id="num2-p2" class="number">?</span>
-                    <span class="equals">=</span>
-                    <div class="answer-box" id="answer-p2"></div>
-                </div>
-                
-                <div class="numpad">
-                    <button class="num-btn" data-player="2">1</button>
-                    <button class="num-btn" data-player="2">2</button>
-                    <button class="num-btn" data-player="2">3</button>
-                    <button class="num-btn" data-player="2">4</button>
-                    <button class="num-btn" data-player="2">5</button>
-                    <button class="num-btn" data-player="2">6</button>
-                    <button class="num-btn" data-player="2">7</button>
-                    <button class="num-btn" data-player="2">8</button>
-                    <button class="num-btn" data-player="2">9</button>
-                    <button class="cmd-btn clear" data-player="2">C</button>
-                    <button class="num-btn" data-player="2">0</button>
-                    <button class="cmd-btn check" data-player="2">✔</button>
-                </div>
-                <div id="feedback-p2" class="feedback"></div>
-            </main>
-
-        </div>
-
-    </div>
-    
-    <!-- Game Over Screen (Hidden initially) -->
-    <div id="game-over-screen" class="selection-screen hidden" style="z-index: 2000;">
-        <div class="selection-content">
-            <h1><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="13" x2="15" y2="15"></line><line x1="9" y1="2" x2="15" y2="2"></line><line x1="12" y1="2" x2="12" y2="5"></line></svg> Τέλος Χρόνου!</h1>
-            <div id="game-results" style="font-size: 1.5rem; margin: 20px 0; font-family: 'Comic Neue', sans-serif;">
-                <!-- Results injected here -->
-            </div>
-            <div style="margin-top: 30px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                <button id="btn-play-again" class="action-btn choice-btn" style="width: auto; padding: 10px 30px; height: auto;">
-                    <span class="icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"></path><polyline points="21 3 21 9 15 9"></polyline></svg></span>
-                    <span>Ξανά Παιχνίδι!</span>
-                </button>
-                <button id="btn-replay-mistakes" class="action-btn choice-btn hidden" style="width: auto; padding: 10px 30px; height: auto; border-color: var(--accent-orange);">
-                    <span class="icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="18" rx="2"></rect><path d="M9 4V2h6v2"></path><polyline points="9 13 11 15 15 11"></polyline></svg></span>
-                    <span>Επανάληψη Λαθών</span>
-                </button>
-                <button id="btn-home" class="action-btn choice-btn" style="width: auto; padding: 10px 30px; height: auto; border-color: var(--accent-red);">
-                    <span class="icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg></span>
-                    <span>Αρχική</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <button id="btn-back" class="cmd-btn back-btn hidden"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Πίσω</button>
-
-    <script src="script.js?v=32"></script>
+<script>
+  var btn = document.getElementById('navToggle');
+  var links = document.querySelector('.navbar__links');
+  if(btn && links){
+    btn.addEventListener('click', function(){
+      links.classList.toggle('nav-open');
+      btn.classList.toggle('nav-open');
+    });
+    document.querySelectorAll('.has-dropdown > a').forEach(function(a){
+      a.addEventListener('click', function(e){
+        if(window.innerWidth <= 768){
+          e.preventDefault();
+          var li = this.parentElement;
+          document.querySelectorAll('.has-dropdown.open').forEach(function(el){
+            if(el !== li) el.classList.remove('open');
+          });
+          li.classList.toggle('open');
+        }
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.navbar') && links.classList.contains('nav-open')){
+        links.classList.remove('nav-open');
+        btn.classList.remove('nav-open');
+      }
+    });
+  }
+</script>
 </body>
 </html>
