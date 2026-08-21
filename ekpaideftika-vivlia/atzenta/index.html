@@ -17,9 +17,15 @@
   <link rel="stylesheet" href="../../styles/main.css" />
   <style>
     .detail-wrap {
-      max-width: 680px;
+      max-width: 960px;
       margin: 0 auto 4rem;
       padding: 0 1.5rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
     }
 
     .back-link {
@@ -150,24 +156,48 @@
     <div class="detail-wrap">
       <a href="../index.html" class="back-link">← Επιστροφή στα Εκπαιδευτικά Βιβλία</a>
 
-      <div class="detail-card">
-        <div class="detail-card__header">
-          <div class="detail-card__icon">📅</div>
-          <div class="detail-card__header-info">
-            <h2>Ατζέντα</h2>
-            <p>PDF</p>
+      <div class="detail-grid">
+
+        <div class="detail-card">
+          <div class="detail-card__header">
+            <div class="detail-card__icon">🧩</div>
+            <div class="detail-card__header-info">
+              <h2>Ατζέντα Ειδικών Εκπαιδευτικών</h2>
+              <p>PDF</p>
+            </div>
+          </div>
+          <div class="detail-card__body">
+            <p class="detail-card__description">
+              Ατζέντα οργάνωσης για ειδικούς εκπαιδευτικούς — οργάνωσε το σχολικό σου έτος.
+            </p>
+            <div class="detail-card__download">
+              <a href="atzenta-eidiki-agogi.pdf" download="Ατζέντα Ειδικών Εκπαιδευτικών.pdf" class="download-btn" onclick="gtag('event','download',{event_category:'PDF',event_label:'Ατζέντα Ειδικών Εκπαιδευτικών.pdf'})">
+                ⬇ Κατέβασε το PDF
+              </a>
+            </div>
           </div>
         </div>
-        <div class="detail-card__body">
-          <p class="detail-card__description">
-            Ατζέντα για εκπαιδευτικούς — οργάνωσε το σχολικό σου έτος.
-          </p>
-          <div class="detail-card__download">
-            <a href="atzenta.pdf" download="Ατζέντα.pdf" class="download-btn" onclick="gtag('event','download',{event_category:'PDF',event_label:'Ατζέντα.pdf'})">
-              ⬇ Κατέβασε το PDF
-            </a>
+
+        <div class="detail-card">
+          <div class="detail-card__header">
+            <div class="detail-card__icon">🗣️</div>
+            <div class="detail-card__header-info">
+              <h2>Ατζέντα Λογοθεραπεύτριας</h2>
+              <p>PDF</p>
+            </div>
+          </div>
+          <div class="detail-card__body">
+            <p class="detail-card__description">
+              Ατζέντα οργάνωσης για λογοθεραπεύτριες — οργάνωσε το σχολικό σου έτος.
+            </p>
+            <div class="detail-card__download">
+              <a href="atzenta-logotherapeia.pdf" download="Ατζέντα Λογοθεραπεύτριας.pdf" class="download-btn" onclick="gtag('event','download',{event_category:'PDF',event_label:'Ατζέντα Λογοθεραπεύτριας.pdf'})">
+                ⬇ Κατέβασε το PDF
+              </a>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   </main>
