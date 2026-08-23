@@ -2228,6 +2228,41 @@ input {
         width: 34px;
         height: 34px;
     }
+
+    /* syllableSynthesis (and any other picture-choice game) stacks a
+       full 2x2 choices-grid AND a post-answer reveal footer on the same
+       screen — the single tallest combination in the app. Shrink both
+       ends of that stack a bit further than the general 600px-wide
+       tightening above already does. */
+    .game-instruction {
+        font-size: var(--text-lg);
+    }
+
+    .choice-card {
+        padding: var(--space-sm);
+    }
+
+    .choice-card .choice-emoji {
+        font-size: 40px;
+    }
+
+    .choices-grid {
+        gap: var(--space-xs);
+    }
+
+    .phoneme-bubble {
+        width: 44px;
+        height: 44px;
+        font-size: var(--text-base);
+    }
+
+    .phoneme-display {
+        gap: var(--space-sm);
+    }
+
+    .tap-area:not(.compact-tap-area), .drag-area, .sound-change-area {
+        gap: var(--space-sm);
+    }
 }
 
 @media (min-width: 768px) {
