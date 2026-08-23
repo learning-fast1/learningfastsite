@@ -301,7 +301,7 @@ Phono.app = {
             }),
             el('div', { className: 'level-select-header' }, [
                 el('h1', { textContent: 'Ποιους ήχους δουλεύουμε σήμερα;' }),
-                el('p', { textContent: `Επίπεδο 4: ${level.title} — διάλεξε τους ήχους που θέλεις να εξασκηθεί το παιδί. Χωρίς επιλογή, χρησιμοποιούνται όλοι.` }),
+                el('p', { textContent: `Επίπεδο 4: ${level.title}. Διάλεξε τους ήχους που θέλεις να εξασκηθεί το παιδί. Χωρίς επιλογή, χρησιμοποιούνται όλοι.` }),
             ]),
             chipsGrid,
             el('div', { className: 'tap-controls', style: { marginTop: 'var(--space-md)' } }, [selectAllBtn, selectNoneBtn]),

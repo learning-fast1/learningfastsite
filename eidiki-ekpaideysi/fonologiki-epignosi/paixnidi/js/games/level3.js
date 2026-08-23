@@ -424,7 +424,7 @@ Phono.games.produceRhyme = {
             el('div', { className: 'teacher-note-card' }, [
                 el('div', { className: 'teacher-note-title', textContent: '💡 Βοήθεια' }),
                 el('p', {
-                    innerHTML: `<strong>Για τον εκπαιδευτικό — αποδεκτές ρίμες:</strong> ${acceptedExamples}`,
+                    innerHTML: `<strong>Αποδεκτές ρίμες για τον εκπαιδευτικό:</strong> ${acceptedExamples}`,
                     style: { color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-sm)' },
                 }),
                 el('p', { className: 'teacher-note-text', textContent: `Άκου: ${emphasized}… ποια από αυτές τις λέξεις τελειώνει παρόμοια;` }),
