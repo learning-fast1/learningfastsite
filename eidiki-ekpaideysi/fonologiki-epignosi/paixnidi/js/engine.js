@@ -377,6 +377,40 @@ Phono.assist = {
         this.saveHighlightDisabled();
         return !this.highlightDisabled[gameId];
     },
+
+    // Written-text reveal (Level 2+ common rule): OFF by default, unlike
+    // the highlight assist above — a child who can't read yet shouldn't
+    // see the word/sentence spelled out unless the therapist deliberately
+    // turns it on for this specific stage. When on, the correct text is
+    // included in the feedback message once the round is answered (see
+    // Phono.feedback.showCorrect's extraText param) — never shown at the
+    // start of a round, since that would hand over the answer.
+    textRevealEnabled: {},
+
+    loadTextRevealEnabled() {
+        try {
+            this.textRevealEnabled = JSON.parse(localStorage.getItem('phono_textRevealEnabled')) || {};
+        } catch (e) {
+            this.textRevealEnabled = {};
+        }
+    },
+
+    saveTextRevealEnabled() {
+        try {
+            localStorage.setItem('phono_textRevealEnabled', JSON.stringify(this.textRevealEnabled));
+        } catch (e) { /* ignore */ }
+    },
+
+    isTextRevealEnabled(gameId) {
+        return !!this.textRevealEnabled[gameId];
+    },
+
+    /** Toggle for one specific stage/game. Returns the new enabled state. */
+    toggleTextReveal(gameId) {
+        this.textRevealEnabled[gameId] = !this.textRevealEnabled[gameId];
+        this.saveTextRevealEnabled();
+        return this.textRevealEnabled[gameId];
+    },
 };
 
 // Load voices when available. The list often arrives asynchronously after
@@ -563,10 +597,14 @@ Phono.feedback = {
         setTimeout(() => overlay.remove(), 1300);
     },
 
-    /** Show random encouragement message */
-    showCorrect() {
+    /** Show random encouragement message. `revealText`, when given, is
+     * appended so the therapist's "Εμφάνιση κειμένου" toggle (off by
+     * default) can surface the actual written word/sentence at the
+     * moment it's safe to — after the child has already answered —
+     * without the game needing its own separate feedback rendering. */
+    showCorrect(revealText) {
         const msg = Phono.data.getRandom(Phono.data.encouragement.correct);
-        this.show(msg, true);
+        this.show(revealText ? `${msg} («${revealText}»)` : msg, true);
     },
 
     showWrong() {
@@ -676,6 +714,83 @@ Phono.diagnostics = {
     /** Count how many times a mistake type was recorded for a game */
     countByType(gameId, type) {
         return this.getLog().filter(e => e.gameId === gameId && e.type === type).length;
+    },
+};
+
+
+/* ===========================================
+   SESSION LOG — Per-trial record for every activity: what was shown,
+   what the child answered, and whether it was right, so a therapist can
+   review or export a plain summary after the session (not just stars).
+   =========================================== */
+Phono.sessionLog = {
+    STORAGE_KEY: 'phono_sessionLog',
+
+    getLog() {
+        try {
+            const data = localStorage.getItem(this.STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        } catch {
+            return [];
+        }
+    },
+
+    /** Record one trial. `activity` is the game id (e.g. "syllableSplit"),
+     * `stimulus` is whatever was shown/spoken (a word, sentence, etc.),
+     * `response` is what the child answered (or null if not applicable),
+     * `correct` is a plain boolean. Capped so a very long session doesn't
+     * grow localStorage without bound — same pattern as the diagnostics
+     * log above. */
+    record(activity, stimulus, response, correct) {
+        const log = this.getLog();
+        log.push({ activity, stimulus, response, correct: !!correct, ts: Date.now() });
+        if (log.length > 1000) log.splice(0, log.length - 1000);
+        try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(log));
+        } catch (e) { /* ignore */ }
+    },
+
+    clear() {
+        try { localStorage.removeItem(this.STORAGE_KEY); } catch (e) { /* ignore */ }
+    },
+
+    _dateStamp() {
+        const d = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+    },
+
+    /** Triggers a browser download for `content` — no server involved,
+     * just a throwaway <a download> pointed at a Blob URL. */
+    _download(filename, content, mime) {
+        const blob = new Blob([content], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    },
+
+    exportJSON() {
+        this._download(`fonologiki-katagrafi-${this._dateStamp()}.json`, JSON.stringify(this.getLog(), null, 2), 'application/json');
+    },
+
+    /** CSV with a UTF-8 BOM so Excel opens the Greek text correctly
+     * instead of mangling it as some other encoding. */
+    exportCSV() {
+        const escape = (v) => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+        const header = 'δραστηριότητα,ερέθισμα,απάντηση,σωστό/λάθος,ημερομηνία\n';
+        const rows = this.getLog().map(e => [
+            escape(e.activity),
+            escape(e.stimulus),
+            escape(e.response),
+            e.correct ? 'σωστό' : 'λάθος',
+            escape(new Date(e.ts).toLocaleString('el-GR')),
+        ].join(','));
+        this._download(`fonologiki-katagrafi-${this._dateStamp()}.csv`, '﻿' + header + rows.join('\n'), 'text/csv;charset=utf-8');
     },
 };
 

@@ -28,6 +28,7 @@ Phono.app = {
         this.loadSettings();
         Phono.audio.loadVoiceMuted();
         Phono.assist.loadHighlightDisabled();
+        Phono.assist.loadTextRevealEnabled();
         this.navigate('home');
 
         // Ensure AudioContext is initialized on first user interaction
@@ -524,6 +525,49 @@ Phono.app = {
     },
 
     /**
+     * Create a "Εμφάνιση κειμένου" toggle (👁️/🙈) for one specific stage.
+     * OFF by default (many Level 2+ children don't read fluently yet) —
+     * when the therapist turns it on, the game's feedback call includes
+     * the actual written word/sentence (see Phono.feedback.showCorrect's
+     * revealText param) once the round is answered, never before.
+     */
+    createTextToggle(gameId) {
+        const { el } = Phono.helpers;
+        const btn = el('button', {
+            className: 'btn btn-icon voice-toggle-inline',
+            textContent: Phono.assist.isTextRevealEnabled(gameId) ? '👁️' : '🙈',
+            title: 'Εμφάνιση κειμένου στο feedback (θεραπευτής)',
+            onClick: () => {
+                const enabled = Phono.assist.toggleTextReveal(gameId);
+                btn.textContent = enabled ? '👁️' : '🙈';
+            },
+        });
+        return btn;
+    },
+
+    /**
+     * Create a "Ο θεραπευτής το είπε" button — an alternative to the
+     * app's own voice for this one round. Stops any in-progress TTS
+     * (matches what pressing mute would do) and marks the round as
+     * therapist-read so the session log records how the stimulus was
+     * actually presented, without changing anything else about the
+     * round (the child still answers the same way).
+     */
+    createTherapistReadButton(gameId, onMark) {
+        const { el } = Phono.helpers;
+        return el('button', {
+            className: 'btn btn-secondary btn-small repeat-btn-text',
+            textContent: '🗣️ Το είπε ο θεραπευτής',
+            title: 'Χρησιμοποιήθηκε η φωνή του θεραπευτή αντί της εκφώνησης',
+            onClick: () => {
+                Phono.audio.navGeneration++; // cancels any in-flight TTS, same as navigating away
+                if (typeof window.speechSynthesis !== 'undefined') window.speechSynthesis.cancel();
+                if (onMark) onMark();
+            },
+        });
+    },
+
+    /**
      * Create a repeat button ("Επανάληψη") that just re-plays whatever this
      * round's audio is — the child might not catch a word/sentence the
      * first time. Stateless (unlike the voice toggle): each game passes in
@@ -714,6 +758,36 @@ Phono.app = {
                     });
                     return range;
                 })(),
+            ]),
+
+            // Session log export — per-trial record (stimulus, answer,
+            // σωστό/λάθος) across every activity, not just the star
+            // scores above. Kept as its own group since it's a therapist
+            // reporting tool, not a play setting.
+            el('div', { className: 'setting-group', style: { marginTop: 'var(--space-xl)' } }, [
+                el('label', { textContent: `Καταγραφή συνεδρίας: ${Phono.sessionLog.getLog().length} εγγραφές` }),
+                el('div', { style: { display: 'flex', gap: 'var(--space-sm)', flexWrap: 'wrap' } }, [
+                    el('button', {
+                        className: 'btn btn-secondary btn-small',
+                        textContent: '⬇ Εξαγωγή CSV',
+                        onClick: () => Phono.sessionLog.exportCSV(),
+                    }),
+                    el('button', {
+                        className: 'btn btn-secondary btn-small',
+                        textContent: '⬇ Εξαγωγή JSON',
+                        onClick: () => Phono.sessionLog.exportJSON(),
+                    }),
+                    el('button', {
+                        className: 'btn btn-secondary btn-small',
+                        textContent: '🗑 Καθαρισμός',
+                        onClick: () => {
+                            if (confirm('Θέλεις σίγουρα να διαγραφεί η καταγραφή συνεδρίας;')) {
+                                Phono.sessionLog.clear();
+                                this.navigate('settings');
+                            }
+                        },
+                    }),
+                ]),
             ]),
 
             // Reset progress
