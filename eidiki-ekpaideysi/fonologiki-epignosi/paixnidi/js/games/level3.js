@@ -38,6 +38,23 @@ Phono.games.findRhyme = {
         const baseMeta = Phono.data.rhymeL3Word(this.currentItem.base);
 
         const instruction = el('p', { className: 'game-instruction', textContent: 'Άκουσε τη λέξη. Ποια εικόνα ομοιοκαταληκτεί μαζί της;' });
+
+        // Choices: correct rhyme + the 3 hand-picked, verified
+        // non-rhyming distractors — text stays hidden ON THE CARDS
+        // (only the picture + audio identify each choice to the
+        // child), but the words are printed here, small and
+        // unobtrusive, so the educator can read what each picture is
+        // at a glance without having to tap the reveal button — same
+        // order as the cards below.
+        const choiceWords = Phono.data.shuffle([this.currentItem.correct, ...this.currentItem.distractors]);
+        const teacherCaption = el('p', {
+            textContent: choiceWords.join(' · '),
+            style: {
+                textAlign: 'left', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)',
+                width: '100%', maxWidth: '500px', margin: '0 auto',
+            },
+        });
+
         const targetEmoji = el('div', { className: 'game-main-emoji', textContent: baseMeta.emoji });
         const targetRow = el('div', { className: 'sentence-row' }, [
             this.createVoiceToggle(),
@@ -50,10 +67,6 @@ Phono.games.findRhyme = {
             onClick: () => this.showWordList(),
         });
 
-        // Choices: correct rhyme + the 3 hand-picked, verified
-        // non-rhyming distractors — text stays hidden, only the
-        // picture + audio identify each choice.
-        const choiceWords = Phono.data.shuffle([this.currentItem.correct, ...this.currentItem.distractors]);
         const choicesGrid = el('div', { className: 'choices-grid' });
         choiceWords.forEach(word => {
             const meta = Phono.data.rhymeL3Word(word);
@@ -64,7 +77,7 @@ Phono.games.findRhyme = {
             choicesGrid.appendChild(card);
         });
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, targetEmoji, targetRow, revealBtn, choicesGrid]));
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, teacherCaption, targetEmoji, targetRow, revealBtn, choicesGrid]));
         Phono.audio.speak(this.currentItem.base);
     },
 
