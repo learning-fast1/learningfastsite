@@ -41,19 +41,18 @@ function level4AvoidLastLetter(pool, lastLetter, letterOf) {
     return filtered.length > 0 ? filtered : pool;
 }
 
-/* ===========================================
-   SOUND-ONLY MODE — shared across every Level 4 game. OFF by default
-   (buttons show the letter itself); ON replaces every sound button's
-   label with a speaker icon, for children who can't read letters yet
-   and would otherwise be pushed toward matching shapes instead of
-   listening.
-   =========================================== */
-const LEVEL4_SOUND_ONLY_KEY = 'phono_level4SoundOnlyMode';
-function level4LoadSoundOnlyMode() {
-    try { return localStorage.getItem(LEVEL4_SOUND_ONLY_KEY) === '1'; } catch (e) { return false; }
-}
-function level4SaveSoundOnlyMode(value) {
-    try { localStorage.setItem(LEVEL4_SOUND_ONLY_KEY, value ? '1' : '0'); } catch (e) { /* ignore */ }
+/**
+ * Tier for a given round index (1-3), independent of Phono.engine's
+ * currentRound — lets the whole session's rounds be pre-planned up
+ * front (round-by-round difficulty is a fixed function of round index,
+ * not of how well the child is doing), so a teacher word-list overlay
+ * can show every round's word, not just ones already seen. Mirrors
+ * Phono.engine.getDifficultyTier()'s own formula exactly.
+ */
+function level4TierForRound(round, total) {
+    if (round < Math.ceil(total / 3)) return 1;
+    if (round < Math.ceil(2 * total / 3)) return 2;
+    return 3;
 }
 
 /**
@@ -72,16 +71,15 @@ function level4SpeakPhoneme(phoneme, type) {
 }
 
 /**
- * A phoneme button: shows the letter (or a 🔊 icon in sound-only mode)
- * and always speaks the phoneme sound when pressed — "ΚΟΥΜΠΙΑ
- * ΑΚΟΥΓΟΝΤΑΙ". `onClick`, if given, also fires on every press (used
- * when the button doubles as an answer choice); the sound always plays
- * regardless of whether the press was right or wrong.
+ * A phoneme button: shows the letter and always speaks the phoneme
+ * sound when pressed — "ΚΟΥΜΠΙΑ ΑΚΟΥΓΟΝΤΑΙ". `onClick`, if given, also
+ * fires on every press (used when the button doubles as an answer
+ * choice); the sound always plays regardless of whether the press was
+ * right or wrong.
  */
 function level4CreateSoundButton(phoneme, type, opts) {
     const { el } = Phono.helpers;
     opts = opts || {};
-    const soundOnly = level4LoadSoundOnlyMode();
     const btn = el('div', {
         className: opts.className || 'choice-card',
         onClick: () => {
@@ -91,28 +89,10 @@ function level4CreateSoundButton(phoneme, type, opts) {
     }, [
         el('span', {
             className: 'choice-word',
-            textContent: soundOnly ? '🔊' : phoneme,
+            textContent: phoneme,
             style: { fontSize: opts.fontSize || 'var(--text-3xl)', fontWeight: '800' },
         }),
     ]);
-    return btn;
-}
-
-/** Toggle button for sound-only mode, placed once per game screen. */
-function level4CreateSoundOnlyToggle(onToggle) {
-    const { el } = Phono.helpers;
-    let soundOnly = level4LoadSoundOnlyMode();
-    const btn = el('button', {
-        className: 'btn btn-secondary btn-small',
-        textContent: soundOnly ? '🔊 Μόνο ήχος' : 'Αα Γράμματα',
-        title: 'Εναλλαγή: τα κουμπιά δείχνουν γράμμα ή μόνο ηχείο',
-        onClick: () => {
-            soundOnly = !soundOnly;
-            level4SaveSoundOnlyMode(soundOnly);
-            btn.textContent = soundOnly ? '🔊 Μόνο ήχος' : 'Αα Γράμματα';
-            if (onToggle) onToggle();
-        },
-    });
     return btn;
 }
 
@@ -141,15 +121,13 @@ Phono.games.findInitialPhoneme = {
     container: null,
     levelInfo: null,
     currentWord: null,
-    usedWords: [],
-    lastLetter: null,
+    roundWords: [],
 
     init(container, levelInfo, createVoiceToggle) {
         this.container = container;
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
-        this.usedWords = [];
-        this.lastLetter = null;
+        this.roundWords = level4BuildInitialPhonemeWords(Phono.engine.totalRounds);
         this.loadRound();
     },
 
@@ -157,20 +135,7 @@ Phono.games.findInitialPhoneme = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
 
-        // Progressive difficulty: continuants first (easier to hold and
-        // hear on their own), stops later — the bank has no consonant
-        // clusters yet, so this is the only axis to climb.
-        const tier = Phono.engine.getDifficultyTier();
-        const bank = Phono.data.initialPhonemesL4.filter(w => w.imageable);
-        const byTier = tier < 3 ? bank.filter(w => w.type !== 'stop') : bank;
-        const byLetter = byTier.filter(w => level4LetterAllowed(w.initial));
-        const basePool = byLetter.length > 0 ? byLetter : byTier;
-        const noRepeatLetter = level4AvoidLastLetter(basePool, this.lastLetter, w => w.initial);
-        const pool = noRepeatLetter.filter(w => !this.usedWords.includes(w.word));
-        const available = pool.length > 0 ? pool : noRepeatLetter;
-        this.currentWord = Phono.data.getRandom(available);
-        this.usedWords.push(this.currentWord.word);
-        this.lastLetter = this.currentWord.initial;
+        this.currentWord = this.roundWords[Phono.engine.currentRound];
 
         const instruction = el('p', { className: 'game-instruction', textContent: 'Από ποιο φώνημα αρχίζει η λέξη;' });
 
@@ -182,8 +147,12 @@ Phono.games.findInitialPhoneme = {
                 innerHTML: '🔊 Άκουσε',
                 onClick: () => Phono.audio.speak(this.currentWord.word),
             }),
+            el('button', {
+                className: 'btn btn-secondary btn-small',
+                textContent: '🔒 Λέξεις (δάσκαλος)',
+                onClick: () => this.showWordList(),
+            }),
         ]);
-        const soundOnlyToggle = level4CreateSoundOnlyToggle(() => this.loadRound());
 
         const distractors = level4PickPhonemeDistractors(
             Phono.data.initialPhonemesL4, 'initial', this.currentWord.initial, this.currentWord.type, 3
@@ -200,8 +169,47 @@ Phono.games.findInitialPhoneme = {
             choicesGrid.appendChild(card);
         });
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, emojiDiv, wordRow, soundOnlyToggle, choicesGrid]));
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, emojiDiv, wordRow, choicesGrid]));
         Phono.audio.speak(this.currentWord.word);
+    },
+
+    /** Teacher-only word list for the WHOLE session — same fixed-overlay
+     * pattern as syllableCounting.showWordList. */
+    showWordList() {
+        const { el } = Phono.helpers;
+        const close = () => overlay.remove();
+
+        const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', textAlign: 'left' } });
+        this.roundWords.forEach((w, i) => {
+            const isCurrent = i === Phono.engine.currentRound;
+            list.appendChild(el('div', {
+                style: {
+                    display: 'flex', justifyContent: 'space-between', gap: 'var(--space-md)',
+                    padding: 'var(--space-xs) var(--space-sm)', borderRadius: 'var(--radius-md)',
+                    background: isCurrent ? 'var(--primary-light)' : 'transparent',
+                    fontWeight: isCurrent ? '800' : '600',
+                },
+            }, [
+                el('span', { textContent: `${i + 1}. ${w.emoji} ${w.word}` }),
+                el('span', { textContent: `/${w.initial}/`, style: { color: 'var(--text-secondary)' } }),
+            ]));
+        });
+
+        const overlay = el('div', {
+            className: 'teacher-note-overlay',
+            onClick: (e) => { if (e.target === overlay) close(); },
+        }, [
+            el('div', { className: 'teacher-note-card' }, [
+                el('div', { className: 'teacher-note-title', textContent: '🔒 Λέξεις της συνεδρίας' }),
+                el('p', {
+                    textContent: 'Σημείωσε τις λέξεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
+                }),
+                list,
+                el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
+            ]),
+        ]);
+        document.getElementById('app').appendChild(overlay);
     },
 
     checkAnswer(isCorrect, cardEl) {
@@ -294,7 +302,6 @@ Phono.games.initialSoundMC = {
                 fontSize: 'var(--text-2xl)',
             }),
         ]);
-        const soundOnlyToggle = level4CreateSoundOnlyToggle(() => this.loadRound());
 
         const choicesGrid = el('div', { className: 'choices-grid' });
         allChoices.forEach(choice => {
@@ -305,7 +312,7 @@ Phono.games.initialSoundMC = {
             choicesGrid.appendChild(card);
         });
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, soundBtnRow, soundOnlyToggle, choicesGrid]));
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, soundBtnRow, choicesGrid]));
     },
 
     checkAnswer(isCorrect, cardEl) {
@@ -538,15 +545,13 @@ Phono.games.findFinalPhoneme = {
     container: null,
     levelInfo: null,
     currentWord: null,
-    usedWords: [],
-    lastLetter: null,
+    roundWords: [],
 
     init(container, levelInfo, createVoiceToggle) {
         this.container = container;
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
-        this.usedWords = [];
-        this.lastLetter = null;
+        this.roundWords = level4BuildFinalPhonemeWords(Phono.engine.totalRounds);
         this.loadRound();
     },
 
@@ -554,29 +559,7 @@ Phono.games.findFinalPhoneme = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
 
-        // Progressive difficulty: final VOWEL first (easier — most Greek
-        // words end this way), the -ς/-ν consonant family later.
-        const tier = Phono.engine.getDifficultyTier();
-        const bank = Phono.data.finalPhonemesL4.filter(w => w.imageable);
-        const byTier = tier < 3 ? bank.filter(w => w.type === 'vowel') : bank;
-        const byLetter = byTier.filter(w => level4LetterAllowed(w.final));
-        const basePool = byLetter.length > 0 ? byLetter : byTier;
-
-        // Pick the LETTER first, uniformly among distinct letters
-        // actually available — most Greek words end in α/ο/ι, so
-        // picking a random WORD would overwhelmingly land on those and
-        // barely ever touch η/ου, which reads as "always the same
-        // couple of letters" even though no single round repeats.
-        const distinctLetters = Array.from(new Set(basePool.map(w => w.final)));
-        const letterChoices = level4AvoidLastLetter(distinctLetters, this.lastLetter, l => l);
-        const chosenLetter = Phono.data.getRandom(letterChoices);
-
-        const letterPool = basePool.filter(w => w.final === chosenLetter);
-        const pool = letterPool.filter(w => !this.usedWords.includes(w.word));
-        const available = pool.length > 0 ? pool : letterPool;
-        this.currentWord = Phono.data.getRandom(available);
-        this.usedWords.push(this.currentWord.word);
-        this.lastLetter = this.currentWord.final;
+        this.currentWord = this.roundWords[Phono.engine.currentRound];
 
         const instruction = el('p', { className: 'game-instruction', textContent: 'Σε ποιο φώνημα τελειώνει η λέξη; (Μπορεί να είναι και φωνήεν!)' });
 
@@ -588,8 +571,12 @@ Phono.games.findFinalPhoneme = {
                 innerHTML: '🔊 Άκουσε',
                 onClick: () => Phono.audio.speak(this.currentWord.word),
             }),
+            el('button', {
+                className: 'btn btn-secondary btn-small',
+                textContent: '🔒 Λέξεις (δάσκαλος)',
+                onClick: () => this.showWordList(),
+            }),
         ]);
-        const soundOnlyToggle = level4CreateSoundOnlyToggle(() => this.loadRound());
 
         const distractors = level4PickPhonemeDistractors(
             Phono.data.finalPhonemesL4, 'final', this.currentWord.final, this.currentWord.type, 3
@@ -609,8 +596,47 @@ Phono.games.findFinalPhoneme = {
             choicesGrid.appendChild(card);
         });
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, emojiDiv, wordRow, soundOnlyToggle, choicesGrid]));
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, emojiDiv, wordRow, choicesGrid]));
         Phono.audio.speak(this.currentWord.word);
+    },
+
+    /** Teacher-only word list for the WHOLE session — same fixed-overlay
+     * pattern as syllableCounting.showWordList. */
+    showWordList() {
+        const { el } = Phono.helpers;
+        const close = () => overlay.remove();
+
+        const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', textAlign: 'left' } });
+        this.roundWords.forEach((w, i) => {
+            const isCurrent = i === Phono.engine.currentRound;
+            list.appendChild(el('div', {
+                style: {
+                    display: 'flex', justifyContent: 'space-between', gap: 'var(--space-md)',
+                    padding: 'var(--space-xs) var(--space-sm)', borderRadius: 'var(--radius-md)',
+                    background: isCurrent ? 'var(--primary-light)' : 'transparent',
+                    fontWeight: isCurrent ? '800' : '600',
+                },
+            }, [
+                el('span', { textContent: `${i + 1}. ${w.emoji} ${w.word}` }),
+                el('span', { textContent: `/${w.final}/`, style: { color: 'var(--text-secondary)' } }),
+            ]));
+        });
+
+        const overlay = el('div', {
+            className: 'teacher-note-overlay',
+            onClick: (e) => { if (e.target === overlay) close(); },
+        }, [
+            el('div', { className: 'teacher-note-card' }, [
+                el('div', { className: 'teacher-note-title', textContent: '🔒 Λέξεις της συνεδρίας' }),
+                el('p', {
+                    textContent: 'Σημείωσε τις λέξεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
+                }),
+                list,
+                el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
+            ]),
+        ]);
+        document.getElementById('app').appendChild(overlay);
     },
 
     checkAnswer(isCorrect, cardEl) {
@@ -638,6 +664,60 @@ Phono.games.findFinalPhoneme = {
         }
     },
 };
+
+/** Pre-plans findInitialPhoneme's whole session up front (one word per
+ * round, no letter/word repeated back-to-back) — same tier-by-round-index
+ * and no-repeat rules loadRound() used to apply lazily, just run for every
+ * round now so a teacher word-list overlay can show rounds not yet played. */
+function level4BuildInitialPhonemeWords(totalRounds) {
+    const words = [];
+    const usedWords = [];
+    let lastLetter = null;
+    for (let round = 0; round < totalRounds; round++) {
+        const tier = level4TierForRound(round, totalRounds);
+        const bank = Phono.data.initialPhonemesL4.filter(w => w.imageable);
+        const byTier = tier < 3 ? bank.filter(w => w.type !== 'stop') : bank;
+        const byLetter = byTier.filter(w => level4LetterAllowed(w.initial));
+        const basePool = byLetter.length > 0 ? byLetter : byTier;
+        const noRepeatLetter = level4AvoidLastLetter(basePool, lastLetter, w => w.initial);
+        const pool = noRepeatLetter.filter(w => !usedWords.includes(w.word));
+        const available = pool.length > 0 ? pool : noRepeatLetter;
+        const word = Phono.data.getRandom(available);
+        words.push(word);
+        usedWords.push(word.word);
+        lastLetter = word.initial;
+    }
+    return words;
+}
+
+/** Same idea as level4BuildInitialPhonemeWords, for findFinalPhoneme —
+ * picks the LETTER first each round (uniformly among distinct letters
+ * available), then a word ending in it, matching loadRound()'s old logic. */
+function level4BuildFinalPhonemeWords(totalRounds) {
+    const words = [];
+    const usedWords = [];
+    let lastLetter = null;
+    for (let round = 0; round < totalRounds; round++) {
+        const tier = level4TierForRound(round, totalRounds);
+        const bank = Phono.data.finalPhonemesL4.filter(w => w.imageable);
+        const byTier = tier < 3 ? bank.filter(w => w.type === 'vowel') : bank;
+        const byLetter = byTier.filter(w => level4LetterAllowed(w.final));
+        const basePool = byLetter.length > 0 ? byLetter : byTier;
+
+        const distinctLetters = Array.from(new Set(basePool.map(w => w.final)));
+        const letterChoices = level4AvoidLastLetter(distinctLetters, lastLetter, l => l);
+        const chosenLetter = Phono.data.getRandom(letterChoices);
+
+        const letterPool = basePool.filter(w => w.final === chosenLetter);
+        const pool = letterPool.filter(w => !usedWords.includes(w.word));
+        const available = pool.length > 0 ? pool : letterPool;
+        const word = Phono.data.getRandom(available);
+        words.push(word);
+        usedWords.push(word.word);
+        lastLetter = word.final;
+    }
+    return words;
+}
 
 /** Words used by soundOddOneOut that intentionally aren't in the clean
  * initialPhonemesL4 bank (e.g. "γραβάτα" — a real γ-word, but starts
