@@ -1,12 +1,80 @@
 /* ============================================================
    LEVEL 5 — Φωνήματα (Προχωρημένο)
-   Games: phonemeSynthesis, phonemeAnalysis, elkoninBoxes
+   Games: phonemeSynthesis, phonemeAnalysis, elkoninBoxes,
+          findMiddlePhoneme, phonemeDeletion, phonemeSubstitution
+
+   Κανόνας Διαφάνειας (ο αυστηρότερος όλων): ΚΑΘΕ λέξη πρέπει να είναι
+   φωνημικά διάφανη — κάθε γράμμα = ένας ήχος ΚΑΙ κάθε ήχος = ένα
+   γράμμα. Όλα τα ερεθίσματα τραβιούνται από Phono.data.phonemesL5
+   (js/phonemes_l5.js) — καμία λέξη με δίψηφο σύμφωνο/φωνήεν, ξ/ψ,
+   σύμπλεγμα συμφώνων ή διπλό γράμμα.
    ============================================================ */
 window.Phono = window.Phono || {};
 Phono.games = Phono.games || {};
 
+/**
+ * Phoneme "type" for Level 5's single-letter phoneme set — same
+ * continuant/stop split as Level 4 (js/games/level4.js), reused here
+ * independently so this file has no load-order dependency on level4.js.
+ * Final -ς behaves like a continuant (sustainable /s/).
+ */
+const LEVEL5_CONTINUANTS = ['μ', 'ν', 'λ', 'ρ', 'σ', 'ς', 'φ', 'θ', 'χ', 'ζ', 'β', 'γ'];
+const LEVEL5_STOPS = ['π', 'τ', 'κ', 'δ'];
+function level5PhonemeType(phoneme) {
+    if (Phono.helpers.isVowelSound(phoneme)) return 'vowel';
+    if (LEVEL5_CONTINUANTS.includes(phoneme)) return 'cont';
+    if (LEVEL5_STOPS.includes(phoneme)) return 'stop';
+    return 'cont';
+}
+
+/**
+ * Speaks an isolated phoneme — same best-effort approximation as
+ * level4SpeakPhoneme: continuants are elongated (repeated 3x, "μμμ"),
+ * stops/vowels get a trailing period for a short clipped sound instead
+ * of the TTS reading out the letter's NAME.
+ */
+function level5SpeakPhoneme(phoneme, type) {
+    const text = type === 'cont' ? phoneme.repeat(3) : (phoneme + '.');
+    Phono.audio.speak(text, 0.75);
+}
+
+/** A phoneme button: shows the letter, always speaks the phoneme sound
+ * when pressed — "ΚΟΥΜΠΙΑ ΑΚΟΥΓΟΝΤΑΙ", same as Level 4's sound buttons.
+ * `onClick`, if given, also fires on every press (the button doubles as
+ * an answer choice). */
+function level5CreateSoundButton(phoneme, type, opts) {
+    const { el } = Phono.helpers;
+    opts = opts || {};
+    const btn = el('div', {
+        className: opts.className || 'choice-card',
+        onClick: () => {
+            level5SpeakPhoneme(phoneme, type);
+            if (opts.onClick) opts.onClick(btn);
+        },
+    }, [
+        el('span', {
+            className: 'choice-word',
+            textContent: phoneme,
+            style: { fontSize: opts.fontSize || 'var(--text-3xl)', fontWeight: '800' },
+        }),
+    ]);
+    return btn;
+}
+
+/** Sound-count range (min/max phonemes) for a given difficulty tier —
+ * every Level 5 game that draws from phonemesL5 climbs 4 -> 4-5 -> 5-6
+ * sounds the same way, per the spec's "Ξεκίνα 4 ήχους → 5 → 6". */
+function level5TierRange(tier) {
+    if (tier === 1) return { min: 4, max: 4 };
+    if (tier === 2) return { min: 4, max: 5 };
+    return { min: 5, max: 6 };
+}
+
 /* ===========================================
-   GAME 1: phonemeSynthesis — Blend Phonemes
+   GAME 1: phonemeSynthesis — "Ένωσε τους Ήχους"
+   The word's sounds are SPOKEN one at a time with a pause between them
+   (in sync with the existing visual phoneme-bubble reveal) — no written
+   word anywhere. The child blends them mentally and picks the picture.
    =========================================== */
 Phono.games.phonemeSynthesis = {
     container: null,
@@ -25,31 +93,23 @@ Phono.games.phonemeSynthesis = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
 
-        // Progressive difficulty (our words have 4-10 phonemes)
         const tier = Phono.engine.getDifficultyTier();
-        let minPh, maxPh;
-        if (tier === 1)      { minPh = 4; maxPh = 4; }
-        else if (tier === 2) { minPh = 4; maxPh = 5; }
-        else                 { minPh = 5; maxPh = 8; }
-
-        const pool = Phono.data.words.filter(w =>
-            w.phonemes.length >= minPh && w.phonemes.length <= maxPh && !this.usedWords.includes(w.word)
-        );
-        const available = pool.length > 0 ? pool : Phono.data.words.filter(w => w.phonemes.length >= minPh && w.phonemes.length <= maxPh);
+        const { min, max } = level5TierRange(tier);
+        const bank = Phono.data.phonemesL5.filter(w => w.imageable && w.count >= min && w.count <= max);
+        const pool = bank.filter(w => !this.usedWords.includes(w.word));
+        const available = pool.length > 0 ? pool : bank;
         this.currentWord = Phono.data.getRandom(available);
         this.usedWords.push(this.currentWord.word);
 
-        // No audio in this stage — the sounds are shown visually as
-        // phoneme bubbles instead of being read aloud.
-        const instruction = el('p', { className: 'game-instruction', textContent: 'Δες τους ήχους. Ποια λέξη φτιάχνουν;' });
+        const instruction = el('p', { className: 'game-instruction', textContent: 'Άκου τους ήχους. Ποια λέξη φτιάχνουν;' });
 
-        // Phoneme display with animated reveal
+        // Phoneme bubbles: revealed AND spoken one at a time, same pacing.
         const phonemeDisplay = el('div', { className: 'phoneme-display', id: 'phoneme-display' });
         this.currentWord.phonemes.forEach((ph, i) => {
             if (i > 0) {
                 const sep = el('span', { className: 'phoneme-separator', textContent: '+' });
                 phonemeDisplay.appendChild(sep);
-                setTimeout(() => sep.classList.add('visible'), 400 + i * 500);
+                setTimeout(() => sep.classList.add('visible'), 400 + i * 700);
             }
             const isVowel = Phono.helpers.isVowelSound(ph);
             const bubble = el('div', {
@@ -57,10 +117,12 @@ Phono.games.phonemeSynthesis = {
                 textContent: ph,
             });
             phonemeDisplay.appendChild(bubble);
-            setTimeout(() => bubble.classList.add('visible'), 300 + i * 500);
+            setTimeout(() => {
+                bubble.classList.add('visible');
+                level5SpeakPhoneme(ph, level5PhonemeType(ph));
+            }, 300 + i * 700);
         });
 
-        // Choices: 1 correct + 3 distractors
         const distractors = Phono.data.getDistractors(this.currentWord.word, 3);
         const allChoices = Phono.data.shuffle([
             { word: this.currentWord.word, emoji: this.currentWord.emoji, correct: true },
@@ -77,8 +139,6 @@ Phono.games.phonemeSynthesis = {
         });
 
         this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, phonemeDisplay, choicesGrid]));
-
-        // No auto-speak for Level 5
     },
 
     checkAnswer(isCorrect, cardEl) {
@@ -93,8 +153,6 @@ Phono.games.phonemeSynthesis = {
             return;
         }
 
-        // Wrong pick: don't reveal the correct one — just disable this
-        // card and let them try one of the others.
         cardEl.classList.add('wrong', 'disabled');
         Phono.feedback.showWrong();
     },
@@ -110,7 +168,11 @@ Phono.games.phonemeSynthesis = {
 };
 
 /* ===========================================
-   GAME 2: phonemeAnalysis — Count Phonemes
+   GAME 2: phonemeAnalysis — "Μέτρα τους Ήχους"
+   Same mechanic as Level 2/4's counting games. Drawn only from
+   phonemesL5 (no diphthong-workaround needed — the bank has none by
+   construction). "Δύσκολο" mode hides the counting dots, same pattern
+   as Level 2's syllableCounting.
    =========================================== */
 Phono.games.phonemeAnalysis = {
     container: null,
@@ -119,11 +181,13 @@ Phono.games.phonemeAnalysis = {
     tapCount: 0,
     answered: false,
     usedWords: [],
+    hardMode: false,
 
     init(container, levelInfo) {
         this.container = container;
         this.levelInfo = levelInfo;
         this.usedWords = [];
+        try { this.hardMode = localStorage.getItem('phono_phonemeCountingHardMode') === '1'; } catch (e) { this.hardMode = false; }
         this.loadRound();
     },
 
@@ -133,23 +197,11 @@ Phono.games.phonemeAnalysis = {
         this.tapCount = 0;
         this.answered = false;
 
-        // Progressive difficulty (our words have 4-10 phonemes)
         const tier = Phono.engine.getDifficultyTier();
-        let minPh, maxPh;
-        if (tier === 1)      { minPh = 4; maxPh = 4; }
-        else if (tier === 2) { minPh = 4; maxPh = 6; }
-        else                 { minPh = 6; maxPh = 10; }
-
-        // Excludes words with a two-letter diphthong vowel (αι, ει, οι,
-        // ου, υι) — those count as ONE phoneme in the data, but a child
-        // tapping while looking at the written word sees two letters and
-        // can end up counting it as two sounds, throwing off exactly the
-        // skill this stage is meant to build.
-        const hasDiphthong = w => w.phonemes.some(p => ['αι', 'ει', 'οι', 'ου', 'υι'].includes(p));
-        const bySize = w => w.phonemes.length >= minPh && w.phonemes.length <= maxPh;
-        const sizeFiltered = Phono.data.words.filter(w => bySize(w) && !hasDiphthong(w));
-        const pool = sizeFiltered.filter(w => !this.usedWords.includes(w.word));
-        const available = pool.length > 0 ? pool : sizeFiltered;
+        const { min, max } = level5TierRange(tier);
+        const bank = Phono.data.phonemesL5.filter(w => w.imageable && w.count >= min && w.count <= max);
+        const pool = bank.filter(w => !this.usedWords.includes(w.word));
+        const available = pool.length > 0 ? pool : bank;
         this.currentWord = Phono.data.getRandom(available);
         this.usedWords.push(this.currentWord.word);
 
@@ -158,6 +210,16 @@ Phono.games.phonemeAnalysis = {
         const instruction = el('p', { className: 'game-instruction', textContent: 'Πόσους ήχους (φωνήματα) ακούς στη λέξη;' });
         const emojiDiv = el('div', { className: 'game-main-emoji', textContent: this.currentWord.emoji });
         const wordDiv = el('div', { className: 'game-main-word', textContent: this.currentWord.word });
+        const modeBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: this.hardMode ? 'Χωρίς βοήθεια (χωρίς τελείες)' : 'Βοήθεια - τελείες',
+            title: 'Εναλλαγή: οι τελείες μέτρησης κρύβονται μόλις χτυπήσει, μετράει από μνήμη',
+            onClick: () => {
+                this.hardMode = !this.hardMode;
+                try { localStorage.setItem('phono_phonemeCountingHardMode', this.hardMode ? '1' : '0'); } catch (e) { /* ignore */ }
+                this.loadRound();
+            },
+        });
         const counterDiv = el('div', { className: 'tap-counter-dots', id: 'tap-counter' });
 
         const tapBtn = el('button', {
@@ -167,10 +229,6 @@ Phono.games.phonemeAnalysis = {
             onClick: () => this.handleTap(),
         });
 
-        // Lets the child fix a miscount without restarting the whole
-        // round — hidden until the first tap, same as the answer choices.
-        // Same small round-button style as the Level 1 clap counter, for
-        // consistency across the whole game.
         const tapControls = el('div', { className: 'tap-controls', id: 'tap-controls', style: { display: 'none' } }, [
             el('button', {
                 className: 'btn btn-icon clap-reset-btn',
@@ -187,7 +245,6 @@ Phono.games.phonemeAnalysis = {
             }),
         ]);
 
-        // Pre-build answer choices (hidden until first tap)
         const checkArea = el('div', { className: 'clap-check-area', id: 'check-area', style: { display: 'none' } });
         const label = el('p', { className: 'game-instruction', textContent: 'Πόσες φορές πάτησες; Πάτησε τον αριθμό!', style: { fontSize: 'var(--text-lg)' } });
         const maxChoice = Math.max(8, correct + 2);
@@ -198,12 +255,6 @@ Phono.games.phonemeAnalysis = {
                 textContent: String(i),
                 onClick: (e) => {
                     if (this.answered) return;
-
-                    // The number picked has to match how many times the
-                    // child actually tapped — otherwise the tapping isn't
-                    // really doing the counting, they're just guessing a
-                    // number. Doesn't disable the button: they can fix
-                    // their tap count (undo/reset) and pick it again.
                     if (i !== this.tapCount) {
                         Phono.feedback.showWrong();
                         return;
@@ -227,8 +278,9 @@ Phono.games.phonemeAnalysis = {
         checkArea.appendChild(label);
         checkArea.appendChild(choicesDiv);
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, emojiDiv, wordDiv, counterDiv, tapBtn, tapControls, checkArea]));
-        // No auto-speak for Level 5
+        this.container.appendChild(el('div', { className: 'tap-area' }, [
+            instruction, emojiDiv, wordDiv, modeBtn, counterDiv, tapBtn, tapControls, checkArea,
+        ]));
     },
 
     handleTap() {
@@ -241,9 +293,11 @@ Phono.games.phonemeAnalysis = {
         btn.classList.add('tapped');
         setTimeout(() => btn.classList.remove('tapped'), 300);
 
-        document.getElementById('tap-counter').appendChild(el('div', { className: 'tap-dot' }));
+        const counter = document.getElementById('tap-counter');
+        const dot = el('div', { className: 'tap-dot' });
+        if (this.hardMode) dot.style.visibility = 'hidden';
+        counter.appendChild(dot);
 
-        // Show answer choices + reset/undo controls after the first tap
         const checkArea = document.getElementById('check-area');
         if (checkArea && checkArea.style.display === 'none') {
             checkArea.style.display = '';
@@ -295,8 +349,16 @@ Phono.games.phonemeAnalysis = {
 };
 
 /* ===========================================
-   GAME 3: elkoninBoxes — Digital Elkonin Boxes
+   GAME 3: elkoninBoxes — "Κουτάκια Ήχων"
+   Multi-round now (was a single fixed round) so the 4 -> 5 -> 6 sound
+   progression actually has room to happen. 1-2 "trap" phoneme tiles
+   that don't belong to the word are mixed in among the draggable
+   tokens — they can never match any box (their phoneme never equals
+   any of the word's own), so dropping one just bounces off, same
+   "παγίδα" idea as Level 2's syllableSplit trap tile.
    =========================================== */
+const LEVEL5_TRAP_PHONEME_POOL = ['π', 'τ', 'κ', 'δ', 'μ', 'ν', 'λ', 'ρ', 'σ', 'φ', 'θ', 'χ', 'ζ', 'β', 'γ', 'α', 'ε', 'η', 'ι', 'ο', 'ω', 'υ'];
+
 Phono.games.elkoninBoxes = {
     container: null,
     levelInfo: null,
@@ -309,11 +371,6 @@ Phono.games.elkoninBoxes = {
         this.container = container;
         this.levelInfo = levelInfo;
         this.usedWords = [];
-
-        // Single round game
-        Phono.engine.totalRounds = 1;
-        Phono.engine.currentRound = 0;
-
         this.loadRound();
     },
 
@@ -322,11 +379,11 @@ Phono.games.elkoninBoxes = {
         this.container.innerHTML = '';
         this.correctCount = 0;
 
-        // Pick word with 3-5 phonemes
-        const pool = Phono.data.words.filter(w =>
-            w.phonemes.length >= 3 && w.phonemes.length <= 5 && !this.usedWords.includes(w.word)
-        );
-        const available = pool.length > 0 ? pool : Phono.data.words.filter(w => w.phonemes.length >= 3 && w.phonemes.length <= 5);
+        const tier = Phono.engine.getDifficultyTier();
+        const { min, max } = level5TierRange(tier);
+        const bank = Phono.data.phonemesL5.filter(w => w.imageable && w.count >= min && w.count <= max);
+        const pool = bank.filter(w => !this.usedWords.includes(w.word));
+        const available = pool.length > 0 ? pool : bank;
         this.currentWord = Phono.data.getRandom(available);
         this.usedWords.push(this.currentWord.word);
         this.placed = new Array(this.currentWord.phonemes.length).fill(null);
@@ -336,7 +393,6 @@ Phono.games.elkoninBoxes = {
         const emojiDiv = el('div', { className: 'game-main-emoji', textContent: this.currentWord.emoji });
         const wordDiv = el('div', { className: 'game-main-word', textContent: this.currentWord.word, style: { fontSize: 'var(--text-2xl)' } });
 
-        // Elkonin boxes (drop zones)
         const boxesDiv = el('div', { className: 'elkonin-boxes', id: 'elkonin-boxes' });
         this.currentWord.phonemes.forEach((ph, i) => {
             const box = el('div', {
@@ -345,7 +401,6 @@ Phono.games.elkoninBoxes = {
                 'data-phoneme': ph,
                 id: `elk-box-${i}`,
             });
-            // Add number label at bottom
             box.appendChild(el('span', {
                 textContent: String(i + 1),
                 style: { position: 'absolute', bottom: '-18px', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' },
@@ -354,8 +409,16 @@ Phono.games.elkoninBoxes = {
             boxesDiv.appendChild(box);
         });
 
-        // Phoneme tokens (draggable)
-        const scrambled = Phono.data.shuffle(this.currentWord.phonemes.map((ph, i) => ({ phoneme: ph, index: i })));
+        // Trap tiles: 1-2 phonemes NOT present anywhere in this word, so
+        // they can never land on a box correctly.
+        const trapCandidates = LEVEL5_TRAP_PHONEME_POOL.filter(p => !this.currentWord.phonemes.includes(p));
+        const trapCount = Math.min(Phono.data.getRandom([1, 2]), trapCandidates.length);
+        const traps = Phono.data.shuffle(trapCandidates).slice(0, trapCount);
+
+        const realTokens = this.currentWord.phonemes.map((ph, i) => ({ phoneme: ph, index: i, trap: false }));
+        const trapTokens = traps.map(ph => ({ phoneme: ph, index: -1, trap: true }));
+        const scrambled = Phono.data.shuffle([...realTokens, ...trapTokens]);
+
         const tokensDiv = el('div', { className: 'phoneme-tokens-source', id: 'phoneme-tokens' });
         scrambled.forEach((item, i) => {
             const isVowel = Phono.helpers.isVowelSound(item.phoneme);
@@ -364,13 +427,13 @@ Phono.games.elkoninBoxes = {
                 textContent: item.phoneme,
                 'data-phoneme': item.phoneme,
                 'data-orig-index': String(item.index),
+                'data-trap': item.trap ? '1' : '0',
                 id: `ph-token-${i}`,
                 style: { borderRadius: '50%', border: 'none' },
             });
             tokensDiv.appendChild(token);
         });
 
-        // Legend
         const legend = el('div', {
             style: { display: 'flex', gap: 'var(--space-md)', justifyContent: 'center', fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' },
         }, [
@@ -379,8 +442,6 @@ Phono.games.elkoninBoxes = {
         ]);
 
         this.container.appendChild(el('div', { className: 'elkonin-container' }, [instruction, emojiDiv, wordDiv, boxesDiv, tokensDiv, legend]));
-
-        // No auto-speak for Level 5
 
         setTimeout(() => {
             Phono.dragDrop.init('#phoneme-tokens', '.phoneme-draggable', '.elkonin-box', (dragEl, dropZone) => {
@@ -395,11 +456,8 @@ Phono.games.elkoninBoxes = {
 
         const dragPhoneme = dragEl.getAttribute('data-phoneme');
         const expectedPhoneme = dropZone.getAttribute('data-phoneme');
-        const origIndex = parseInt(dragEl.getAttribute('data-orig-index'));
 
-        // Match if phoneme is correct AND (position matches OR it's the right phoneme for an unfilled box)
         if (dragPhoneme === expectedPhoneme) {
-            // Correct placement
             const isVowel = Phono.helpers.isVowelSound(dragPhoneme);
             const token = Phono.helpers.el('div', {
                 className: `phoneme-token ${isVowel ? 'vowel' : 'consonant'}`,
@@ -413,29 +471,132 @@ Phono.games.elkoninBoxes = {
             Phono.audio.playSfx('pop');
             Phono.engine.recordCorrect();
 
-            // Check if all boxes filled
             if (this.placed.every(p => p !== null)) {
                 Phono.feedback.showCorrect();
-                setTimeout(() => {
-                    Phono.app.onGameComplete('elkoninBoxes', this.levelInfo.id);
-                }, 1200);
+                setTimeout(() => this.nextOrComplete(), 1200);
             }
         } else {
             Phono.feedback.highlightElement(dropZone, false);
             Phono.audio.playSfx('wrong');
         }
     },
+
+    nextOrComplete() {
+        if (Phono.engine.nextRound()) {
+            Phono.app.updateGameProgress();
+            this.loadRound();
+        } else {
+            Phono.app.onGameComplete('elkoninBoxes', this.levelInfo.id);
+        }
+    },
 };
 
 /* ===========================================
-   GAME 4: phonemeDeletion — Remove the first
-   sound and say what remains.
+   GAME 4: findMiddlePhoneme — "Βρες τον Μεσαίο Ήχο" (NEW)
+   Isolating the MIDDLE phoneme — the hardest position to identify,
+   since it's neither first nor last. Draws from the curated
+   Phono.data.middlePhonemeItemsL5 (js/phonemes_l5.js): 2 short 3-sound
+   items plus four 5-sound items, whose distractors are always the
+   word's own OTHER sounds — so the child has to pick by POSITION, not
+   just recognize a sound present somewhere in the word.
+   =========================================== */
+Phono.games.findMiddlePhoneme = {
+    container: null,
+    levelInfo: null,
+    currentItem: null,
+    roundItems: [],
+
+    init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
+        this.container = container;
+        this.levelInfo = levelInfo;
+        this.createVoiceToggle = createVoiceToggle;
+        this.createRepeatButton = createRepeatButton;
+        this.roundItems = level5BuildMiddlePhonemeItems(Phono.engine.totalRounds);
+        this.loadRound();
+    },
+
+    loadRound() {
+        const { el } = Phono.helpers;
+        this.container.innerHTML = '';
+
+        this.currentItem = this.roundItems[Phono.engine.currentRound];
+        const item = this.currentItem;
+        const middlePhoneme = item.phonemes[item.middleIndex];
+
+        const instruction = el('p', { className: 'game-instruction', textContent: 'Ποιος είναι ο μεσαίος ήχος της λέξης;' });
+        const emojiDiv = el('div', { className: 'game-main-emoji', textContent: item.emoji });
+        const wordRow = el('div', { className: 'sentence-row' }, [
+            this.createVoiceToggle(),
+            this.createRepeatButton(() => Phono.audio.speak(item.word)),
+        ]);
+
+        const allPhonemes = Phono.data.shuffle([middlePhoneme, ...item.distractors]);
+        const choicesGrid = el('div', { className: 'choices-grid' });
+        allPhonemes.forEach(phoneme => {
+            const isCorrect = phoneme === middlePhoneme;
+            const card = level5CreateSoundButton(phoneme, level5PhonemeType(phoneme), {
+                onClick: () => this.checkAnswer(isCorrect, card),
+            });
+            choicesGrid.appendChild(card);
+        });
+
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, emojiDiv, wordRow, choicesGrid]));
+        Phono.audio.speak(item.word);
+    },
+
+    checkAnswer(isCorrect, cardEl) {
+        if (cardEl.classList.contains('disabled')) return;
+
+        if (isCorrect) {
+            document.querySelectorAll('.choice-card').forEach(c => c.classList.add('disabled'));
+            cardEl.classList.add('correct');
+            Phono.feedback.showCorrect();
+            Phono.engine.recordCorrect();
+            setTimeout(() => this.nextOrComplete(), 1500);
+            return;
+        }
+
+        cardEl.classList.add('wrong', 'disabled');
+        Phono.feedback.showWrong();
+    },
+
+    nextOrComplete() {
+        if (Phono.engine.nextRound()) {
+            Phono.app.updateGameProgress();
+            this.loadRound();
+        } else {
+            Phono.app.onGameComplete('findMiddlePhoneme', this.levelInfo.id);
+        }
+    },
+};
+
+/** Picks the whole session's middle-phoneme items up front, same
+ * reshuffle-when-exhausted pattern as Level 4's oddity items. */
+function level5BuildMiddlePhonemeItems(totalRounds) {
+    const items = [];
+    let deck = [];
+    for (let round = 0; round < totalRounds; round++) {
+        if (deck.length === 0) deck = Phono.data.shuffle(Phono.data.middlePhonemeItemsL5);
+        items.push(deck.pop());
+    }
+    return items;
+}
+
+/* ===========================================
+   GAME 5: phonemeDeletion — "Σβήσε τον Ήχο"
+   Extended from "remove only the first sound" to a togglable
+   first/last mode (starting on "last" — the easier of the two per the
+   spec). The 4 answer choices are pressable-audible buttons: tapping
+   one SPEAKS that candidate remaining-word and submits it as the
+   answer, so the child picks by listening, not by reading the letters
+   the choice would otherwise show.
    =========================================== */
 Phono.games.phonemeDeletion = {
     container: null,
     levelInfo: null,
     currentItem: null,
     roundItems: [],
+    mode: 'last',
     answered: false,
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
@@ -443,8 +604,7 @@ Phono.games.phonemeDeletion = {
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
-        // Whole session picked up front (not per-round) so the teacher's
-        // word list can show every item for the round right away.
+        try { this.mode = localStorage.getItem('phono_phonemeDeletionMode') || 'last'; } catch (e) { this.mode = 'last'; }
         this.roundItems = level5BuildPhonemeDeletionItems(Phono.engine.totalRounds);
         this.loadRound();
     },
@@ -455,42 +615,56 @@ Phono.games.phonemeDeletion = {
         this.answered = false;
 
         this.currentItem = this.roundItems[Phono.engine.currentRound];
-        const word = this.currentItem.word;
+        const item = this.currentItem;
+        const word = item.word;
+        const isLast = this.mode === 'last';
+        const targetPhoneme = isLast ? item.last : item.first;
+        const correct = isLast ? item.lastRemoved : item.firstRemoved;
+        const targetIndex = isLast ? word.length - 1 : 0;
 
         const instruction = el('p', {
             className: 'game-instruction',
             id: 'phonemedeletion-instruction',
-            innerHTML: `Πες τη λέξη χωρίς τον πρώτο ήχο <strong>/${this.currentItem.first}/</strong>. Τι μένει;`,
+            innerHTML: isLast
+                ? `Πες τη λέξη χωρίς τον ΤΕΛΕΥΤΑΙΟ ήχο <strong>/${targetPhoneme}/</strong>. Τι μένει;`
+                : `Πες τη λέξη χωρίς τον ΠΡΩΤΟ ήχο <strong>/${targetPhoneme}/</strong>. Τι μένει;`,
         });
-        const emojiDiv = el('div', { className: 'game-main-emoji', textContent: this.currentItem.emoji });
+        const emojiDiv = el('div', { className: 'game-main-emoji', textContent: item.emoji });
         const emojiRow = el('div', { className: 'sentence-row' }, [
             emojiDiv,
             this.createVoiceToggle(),
             this.createRepeatButton(() => Phono.audio.speak(word)),
         ]);
 
-        // Teacher-only peek at every word in the session and exactly
-        // what's being erased each round — the choice cards eventually
-        // show the answer among distractors, but the teacher shouldn't
-        // have to guess which one is correct.
+        const modeBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: isLast ? 'Σβήνω: Τελευταίο' : 'Σβήνω: Πρώτο',
+            title: 'Εναλλαγή: σβήνει τον πρώτο ή τον τελευταίο ήχο της λέξης',
+            onClick: () => {
+                this.mode = isLast ? 'first' : 'last';
+                try { localStorage.setItem('phono_phonemeDeletionMode', this.mode); } catch (e) { /* ignore */ }
+                this.loadRound();
+            },
+        });
         const revealBtn = el('button', {
             className: 'btn btn-secondary btn-small',
             textContent: '🔒 Λέξεις (δάσκαλος)',
             onClick: () => this.showWordList(),
         });
 
-        // Letter boxes — first letter highlighted for removal
         const letterDisplay = el('div', { className: 'letter-display', id: 'pd-letters' });
         word.split('').forEach((char, i) => {
             letterDisplay.appendChild(el('div', {
-                className: `letter-box ${i === 0 ? 'highlight' : ''}`,
+                className: `letter-box ${i === targetIndex ? 'highlight' : ''}`,
                 textContent: char,
                 'data-index': String(i),
             }));
         });
 
-        // Choices (hidden until the first sound is removed)
-        const correct = this.currentItem.remaining;
+        // Answer choices: pressable-audible, not readable text — each
+        // button SPEAKS its own candidate word when pressed and submits
+        // it immediately, same "press = hear + choose" idea as Level 4's
+        // sound buttons.
         const distractors = this.generateDistractors(correct, word);
         const allChoices = Phono.data.shuffle([
             { text: correct, correct: true },
@@ -498,41 +672,35 @@ Phono.games.phonemeDeletion = {
         ]);
 
         const choicesGrid = el('div', { className: 'choices-grid', id: 'pd-choices', style: { display: 'none' } });
-        allChoices.forEach(choice => {
+        allChoices.forEach((choice, i) => {
             const card = el('div', {
                 className: 'choice-card',
-                onClick: () => this.checkAnswer(choice.correct, card),
-            }, [el('span', { className: 'choice-word', textContent: choice.text, style: { fontSize: 'var(--text-2xl)' } })]);
+                onClick: () => {
+                    Phono.audio.speak(choice.text);
+                    this.checkAnswer(choice.correct, card);
+                },
+            }, [
+                el('span', { className: 'choice-word', textContent: '🔊 ' + (i + 1), style: { fontSize: 'var(--text-2xl)' } }),
+            ]);
             choicesGrid.appendChild(card);
         });
 
-        this.container.appendChild(el('div', { className: 'sound-change-area' }, [instruction, emojiRow, revealBtn, letterDisplay, choicesGrid]));
+        this.container.appendChild(el('div', { className: 'sound-change-area' }, [instruction, emojiRow, modeBtn, revealBtn, letterDisplay, choicesGrid]));
 
         Phono.audio.speak(word);
 
-        // Animate removal of the first sound, then reveal choices. The
-        // REST of the letters can't just sit there afterwards, though —
-        // they spell out the exact answer to the multiple-choice question
-        // below. So a second beat later, hide the whole word too and
-        // shake the instruction to pull focus back to it, forcing an
-        // answer from memory instead of just reading it off the letters.
         setTimeout(() => {
             const letterDisplayEl = document.getElementById('pd-letters');
-            const firstBox = letterDisplayEl ? letterDisplayEl.querySelector('.letter-box[data-index="0"]') : null;
-            if (firstBox) {
-                firstBox.classList.add('removing');
+            const targetBox = letterDisplayEl ? letterDisplayEl.querySelector(`.letter-box[data-index="${targetIndex}"]`) : null;
+            if (targetBox) {
+                targetBox.classList.add('removing');
                 Phono.audio.playSfx('pop');
                 setTimeout(() => {
-                    firstBox.style.visibility = 'hidden';
+                    targetBox.style.visibility = 'hidden';
                     const choices = document.getElementById('pd-choices');
                     if (choices) choices.style.display = '';
 
                     setTimeout(() => {
-                        // visibility (not just opacity) — some mobile
-                        // browsers don't reliably run the opacity
-                        // transition here, leaving the rest of the
-                        // word visible instead of hiding with the
-                        // target letter.
                         if (letterDisplayEl) { letterDisplayEl.style.opacity = '0'; letterDisplayEl.style.visibility = 'hidden'; }
                         const instructionEl = document.getElementById('phonemedeletion-instruction');
                         if (instructionEl) instructionEl.classList.add('shake-attention');
@@ -542,16 +710,19 @@ Phono.games.phonemeDeletion = {
         }, 1600);
     },
 
-    /** Teacher-only word list for the WHOLE session, not just the
-     * current round — same reasoning and fixed-overlay pattern as
-     * level2.js's syllableSynthesis.showWordList. */
+    /** Teacher-only word list for the WHOLE session — reflects whichever
+     * mode (first/last) is currently active. Same fixed-overlay pattern
+     * as syllableCounting.showWordList. */
     showWordList() {
         const { el } = Phono.helpers;
         const close = () => overlay.remove();
+        const isLast = this.mode === 'last';
 
         const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', textAlign: 'left' } });
         this.roundItems.forEach((item, i) => {
             const isCurrent = i === Phono.engine.currentRound;
+            const phoneme = isLast ? item.last : item.first;
+            const remaining = isLast ? item.lastRemoved : item.firstRemoved;
             list.appendChild(el('div', {
                 style: {
                     display: 'flex', justifyContent: 'space-between', gap: 'var(--space-md)',
@@ -560,8 +731,8 @@ Phono.games.phonemeDeletion = {
                     fontWeight: isCurrent ? '800' : '600',
                 },
             }, [
-                el('span', { textContent: `${i + 1}. ${item.emoji} ${item.word} (χωρίς /${item.first}/)` }),
-                el('span', { textContent: `→ ${item.remaining}`, style: { color: 'var(--text-secondary)' } }),
+                el('span', { textContent: `${i + 1}. ${item.emoji} ${item.word} (χωρίς /${phoneme}/)` }),
+                el('span', { textContent: `→ ${remaining}`, style: { color: 'var(--text-secondary)' } }),
             ]));
         });
 
@@ -572,7 +743,7 @@ Phono.games.phonemeDeletion = {
             el('div', { className: 'teacher-note-card' }, [
                 el('div', { className: 'teacher-note-title', textContent: '🔒 Λέξεις της συνεδρίας' }),
                 el('p', {
-                    textContent: 'Σημείωσε τις λέξεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    textContent: `Λίστα με τον ήχο που αφαιρείται σε κάθε λέξη (τρέχουσα λειτουργία: ${isLast ? 'τελευταίος' : 'πρώτος'} ήχος).`,
                     style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
                 }),
                 list,
@@ -584,9 +755,10 @@ Phono.games.phonemeDeletion = {
 
     generateDistractors(correct, word) {
         const d = new Set();
-        d.add(word);                    // whole word (forgot to remove)
-        d.add(word.slice(0, -1));       // removed the last sound instead
-        d.add(word.slice(2));           // removed two sounds
+        d.add(word);
+        d.add(word.slice(0, -1));
+        d.add(word.slice(1));
+        d.add(word.slice(2));
         d.delete(correct);
         d.delete('');
         if (d.size < 2) d.add(word.slice(1) + 'α');
@@ -606,8 +778,6 @@ Phono.games.phonemeDeletion = {
             return;
         }
 
-        // Wrong pick: don't reveal the correct one — just disable this
-        // card and let them try one of the others.
         cardEl.classList.add('wrong', 'disabled');
         Phono.feedback.showWrong();
     },
@@ -622,19 +792,155 @@ Phono.games.phonemeDeletion = {
     },
 };
 
-/** Pre-selects every item for the whole session up front (rather than
- * one per round, live) so the teacher's word list can list them all
- * before play even starts — same reasoning as level1.js's
- * level1BuildSentenceBuilderSentences. */
+/** Pre-selects every item for the whole session up front, drawn from
+ * the phonemically transparent CVCV (4-sound) words in phonemesL5 —
+ * both first- and last-sound removal are precomputed per item so the
+ * mode toggle can switch without re-deriving anything. */
 function level5BuildPhonemeDeletionItems(totalRounds) {
+    const bank = Phono.data.phonemesL5.filter(w => w.count === 4 && w.imageable);
     const used = [];
     const items = [];
     for (let round = 0; round < totalRounds; round++) {
-        const pool = Phono.data.phonemeDeletion.filter(i => !used.includes(i.word));
-        const available = pool.length > 0 ? pool : Phono.data.phonemeDeletion;
-        const item = Phono.data.getRandom(available);
-        used.push(item.word);
-        items.push(item);
+        const pool = bank.filter(w => !used.includes(w.word));
+        const available = pool.length > 0 ? pool : bank;
+        const w = Phono.data.getRandom(available);
+        used.push(w.word);
+        items.push({
+            word: w.word,
+            emoji: w.emoji,
+            first: w.phonemes[0],
+            firstRemoved: w.word.slice(1),
+            last: w.phonemes[w.phonemes.length - 1],
+            lastRemoved: w.word.slice(0, -1),
+        });
+    }
+    return items;
+}
+
+/* ===========================================
+   GAME 6: phonemeSubstitution — "Άλλαξε τον Ήχο" (NEW, LAST)
+   Substitution is the hardest phonemic skill — made PRODUCTIVE like
+   produceRhyme (level3.js), not multiple-choice: the app can't
+   evaluate a spoken answer, so the educator listens and judges the
+   outcome. Some results are real Greek words, others "αστεία λέξη"
+   (accepted nonsense) — Phono.data.phonemeSubstitutionItemsL5 marks
+   which. The "🔒 Απάντηση" button always reveals the target answer,
+   independent of the success/help buttons.
+   =========================================== */
+Phono.games.phonemeSubstitution = {
+    container: null,
+    levelInfo: null,
+    currentItem: null,
+    roundItems: [],
+
+    init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
+        this.container = container;
+        this.levelInfo = levelInfo;
+        this.createVoiceToggle = createVoiceToggle;
+        this.createRepeatButton = createRepeatButton;
+        this.roundItems = level5BuildSubstitutionItems(Phono.engine.totalRounds);
+        this.loadRound();
+    },
+
+    loadRound() {
+        const { el } = Phono.helpers;
+        this.container.innerHTML = '';
+
+        this.currentItem = this.roundItems[Phono.engine.currentRound];
+        const item = this.currentItem;
+
+        const instruction = el('p', {
+            className: 'game-instruction',
+            innerHTML: `Πες <strong>${item.base}</strong>. Τώρα άλλαξε τον πρώτο ήχο <strong>/${item.from}/</strong> σε <strong>/${item.to}/</strong>. Τι λέξη γίνεται;`,
+        });
+        const emojiDiv = el('div', { className: 'game-main-emoji', textContent: item.baseEmoji });
+        const wordRow = el('div', { className: 'sentence-row' }, [
+            this.createVoiceToggle(),
+            this.createRepeatButton(() => Phono.audio.speak(item.base)),
+        ]);
+        const micHint = el('p', {
+            className: 'game-instruction',
+            textContent: '🎤 Το παιδί λέει την απάντησή του δυνατά.',
+            style: { fontSize: 'var(--text-base)', color: 'var(--text-secondary)' },
+        });
+
+        const controlsRow = el('div', { className: 'tap-controls', id: 'phoneme-sub-controls' }, [
+            el('button', { className: 'btn btn-primary', textContent: '✓ Τα κατάφερε', onClick: () => this.markSuccess() }),
+            el('button', { className: 'btn btn-secondary', textContent: '↻ Χρειάζεται βοήθεια', onClick: () => this.markHelp() }),
+        ]);
+        const answerBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: '🔒 Απάντηση (δάσκαλος)',
+            onClick: () => this.showAnswer(),
+        });
+
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, emojiDiv, wordRow, micHint, controlsRow, answerBtn]));
+        Phono.audio.speak(item.base);
+    },
+
+    markSuccess() {
+        const controlsRow = document.getElementById('phoneme-sub-controls');
+        if (controlsRow) controlsRow.querySelectorAll('button').forEach(b => { b.disabled = true; b.classList.add('btn-disabled'); });
+
+        Phono.feedback.showCorrect();
+        Phono.engine.recordCorrect();
+        setTimeout(() => this.nextOrComplete(), 1200);
+    },
+
+    /** The child needed help — no scaffold to fall back on here (unlike
+     * produceRhyme, the target is sometimes a nonsense word with no
+     * picture), so this just moves on without crediting the round; the
+     * educator can reveal the answer separately via "🔒 Απάντηση". */
+    markHelp() {
+        const controlsRow = document.getElementById('phoneme-sub-controls');
+        if (controlsRow) controlsRow.querySelectorAll('button').forEach(b => { b.disabled = true; b.classList.add('btn-disabled'); });
+
+        setTimeout(() => this.nextOrComplete(), 800);
+    },
+
+    showAnswer() {
+        const { el } = Phono.helpers;
+        const item = this.currentItem;
+        const close = () => overlay.remove();
+
+        const overlay = el('div', {
+            className: 'teacher-note-overlay',
+            onClick: (e) => { if (e.target === overlay) close(); },
+        }, [
+            el('div', { className: 'teacher-note-card' }, [
+                el('div', { className: 'teacher-note-title', textContent: '🔒 Απάντηση (δάσκαλος)' }),
+                el('p', {
+                    className: 'teacher-note-text',
+                    innerHTML: `${item.base} → <strong>${item.result}</strong>`,
+                }),
+                el('p', {
+                    textContent: item.isReal ? 'Υπαρκτή λέξη.' : 'Αστεία λέξη (όχι πραγματική) — αποδεκτή απάντηση.',
+                    style: { color: 'var(--text-secondary)', marginTop: 'var(--space-xs)' },
+                }),
+                el('button', { className: 'btn btn-secondary btn-small', textContent: 'Κλείσιμο', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
+            ]),
+        ]);
+        document.getElementById('app').appendChild(overlay);
+    },
+
+    nextOrComplete() {
+        if (Phono.engine.nextRound()) {
+            Phono.app.updateGameProgress();
+            this.loadRound();
+        } else {
+            Phono.app.onGameComplete('phonemeSubstitution', this.levelInfo.id);
+        }
+    },
+};
+
+/** Picks the whole session's substitution items up front, same
+ * reshuffle-when-exhausted pattern as the other curated-item games. */
+function level5BuildSubstitutionItems(totalRounds) {
+    const items = [];
+    let deck = [];
+    for (let round = 0; round < totalRounds; round++) {
+        if (deck.length === 0) deck = Phono.data.shuffle(Phono.data.phonemeSubstitutionItemsL5);
+        items.push(deck.pop());
     }
     return items;
 }
