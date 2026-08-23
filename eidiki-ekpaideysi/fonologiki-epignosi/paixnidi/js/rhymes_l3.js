@@ -161,3 +161,35 @@ Phono.data.rhymeMemoryBoardsL3 = [
         ["κουτί", "παπί"],
     ],
 ];
+
+/* ----------------------------------------------------------
+   «Βρες το Διαφορετικό» round data — hand-curated (2 words from the
+   SAME family that rhyme | 1 "odd" word from a DIFFERENT family).
+   Display order is shuffled per round in the game itself — don't rely
+   on `odd` always being listed last here.
+   ---------------------------------------------------------- */
+Phono.data.rhymeOddOneOutItemsL3 = [
+    { rhyming: ["μέλι", "μπιζέλι"], odd: "φίδι" },
+    { rhyming: ["πατάτα", "ντομάτα"], odd: "φεγγάρι" },
+    { rhyming: ["μπαλόνι", "λεμόνι"], odd: "κουτάλι" },
+    { rhyming: ["φίδι", "ψαλίδι"], odd: "νερό" },
+    { rhyming: ["φεγγάρι", "καλαμάρι"], odd: "μπιζέλι" },
+    { rhyming: ["κεφάλι", "κουτάλι"], odd: "λεμόνι" },
+    { rhyming: ["βελόνα", "κολόνα"], odd: "ψαλίδι" },
+    { rhyming: ["νερό", "φτερό"], odd: "πατάτα" },
+    { rhyming: ["κουτί", "παπί"], odd: "φεγγάρι" },
+    { rhyming: ["σαλάτα", "γραβάτα"], odd: "μπαλόνι" },
+];
+
+/* ----------------------------------------------------------
+   «Φτιάξε Ρίμα» (produceRhyme) target-word pool — one representative
+   base word per family, all drawn from Phono.data.rhymesL3 above so
+   "accepted answers" and the help-modal scaffold can pull real,
+   verified same-family words instead of a separately-maintained list.
+   "χιόνι" was considered for -όνι but dropped in favor of the cleaner
+   "μπαλόνι" — χιόνι has a συνίζηση some speakers hear as 2 syllables
+   and some as 1, which muddies the rhyme for a recognition task.
+   ---------------------------------------------------------- */
+Phono.data.produceRhymeBasesL3 = [
+    "μπαλόνι", "πατάτα", "φεγγάρι", "φίδι", "μέλι", "κεφάλι", "βελόνα", "νερό", "κουτί",
+];

@@ -270,23 +270,32 @@ Phono.games.rhymeMemory = {
  * multiple-choice menu, since picking from four ready-made words would
  * just be recognition again. The app can't evaluate a spoken answer, so
  * the educator listens and marks the outcome with two buttons. If the
- * child gets stuck, "Χρειάζεται βοήθεια" reveals the target's ending
- * emphasized plus 2-3 example rhymes — but only as a hint, after the
- * child already had a free attempt.
+ * child gets stuck, "Χρειάζεται βοήθεια" reveals (a) for the educator
+ * only, 2-3 real accepted rhymes from the target's own family, so they
+ * know what to accept if the child says one of those instead of
+ * picking a card, and (b) a fallback recognition scaffold: the ending
+ * emphasized + 4 picture cards, where the correct one is always a
+ * verified same-family word and the distractors are always from other
+ * families.
+ *
+ * Target words are drawn from Phono.data.produceRhymeBasesL3 — one
+ * representative word per rhyme family in js/rhymes_l3.js — so every
+ * family lookup (accepted answers, scaffold) is guaranteed consistent
+ * with the same validated data findRhyme/rhymeMemory/rhymeOddOneOut
+ * already use.
  */
 Phono.games.produceRhyme = {
     container: null,
     levelInfo: null,
-    currentGroup: null,
     targetWord: null,
-    usedGroups: [],
+    usedWords: [],
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
-        this.usedGroups = [];
+        this.usedWords = [];
         this.loadRound();
     },
 
@@ -294,14 +303,11 @@ Phono.games.produceRhyme = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
 
-        // Needs at least 3 words in the group: 1 target + up to 3 hint
-        // examples left over if the child needs help.
-        const pool = Phono.data.rhymeGroups.filter(g => g.words.length >= 3 && !this.usedGroups.includes(g.ending));
-        const available = pool.length > 0 ? pool : Phono.data.rhymeGroups.filter(g => g.words.length >= 3);
-        this.currentGroup = Phono.data.getRandom(available);
-        this.usedGroups.push(this.currentGroup.ending);
-
-        this.targetWord = Phono.data.getRandom(this.currentGroup.words);
+        const pool = Phono.data.produceRhymeBasesL3.filter(w => !this.usedWords.includes(w));
+        const available = pool.length > 0 ? pool : Phono.data.produceRhymeBasesL3;
+        const targetText = Phono.data.getRandom(available);
+        this.usedWords.push(targetText);
+        this.targetWord = Phono.data.rhymeL3Word(targetText);
 
         const instruction = el('p', { className: 'game-instruction', textContent: 'Μπορείς να βρεις μια λέξη που να κάνει ρίμα;' });
         const targetEmoji = el('div', { className: 'game-main-emoji', textContent: this.targetWord.emoji });
@@ -344,24 +350,24 @@ Phono.games.produceRhyme = {
     showHelp() {
         const { el } = Phono.helpers;
 
+        const family = this.targetWord.family;
+        const sameFamily = Phono.data.rhymesL3ByFamily(family).filter(w => w.word !== this.targetWord.word);
+
         // Emphasize the shared ending within the target word itself, e.g.
-        // "σοκολάτα" + ending "-άτα" -> "σοκολΆΤΑ".
-        const endingLetters = this.currentGroup.ending.replace('-', '');
+        // "πατάτα" + family "άτα" -> "πατΆΤΑ".
         const word = this.targetWord.word;
-        const emphasized = word.toLowerCase().endsWith(endingLetters.toLowerCase())
-            ? word.slice(0, word.length - endingLetters.length) + word.slice(word.length - endingLetters.length).toUpperCase()
+        const emphasized = word.toLowerCase().endsWith(family.toLowerCase())
+            ? word.slice(0, word.length - family.length) + word.slice(word.length - family.length).toUpperCase()
             : word;
 
         const close = () => overlay.remove();
 
         // Falls back to recognition as a scaffold: 1 word from the same
-        // rhyme group (correct) + 3 that don't share the ending
-        // (distractors, also excluded from being an accidental rhyme).
-        const correctWord = Phono.data.getRandom(this.currentGroup.words.filter(w => w.word !== this.targetWord.word));
-        const distractorPool = Phono.data.words.filter(w =>
-            !this.currentGroup.words.some(gw => gw.word === w.word) &&
-            !w.word.toLowerCase().endsWith(endingLetters.toLowerCase())
-        );
+        // family (verified correct) + 3 from OTHER families (verified
+        // non-rhyming distractors) — never picked by ending-substring
+        // matching, which is what let a same-family word slip in before.
+        const correctWord = Phono.data.getRandom(sameFamily);
+        const distractorPool = Phono.data.rhymesL3.filter(w => w.family !== family && w.word !== correctWord.word);
         const distractors = Phono.data.shuffle(distractorPool).slice(0, 3);
         const choices = Phono.data.shuffle([
             { word: correctWord.word, emoji: correctWord.emoji, correct: true },
@@ -380,12 +386,21 @@ Phono.games.produceRhyme = {
             choicesGrid.appendChild(card);
         });
 
+        // Teacher-only line: real accepted rhymes if the child says one
+        // out loud instead of tapping a card below — not shown to the
+        // child, just informational for whoever is judging the answer.
+        const acceptedExamples = Phono.data.shuffle(sameFamily).slice(0, 3).map(w => w.word).join(', ');
+
         const overlay = el('div', {
             className: 'teacher-note-overlay',
             onClick: (e) => { if (e.target === overlay) close(); },
         }, [
             el('div', { className: 'teacher-note-card' }, [
                 el('div', { className: 'teacher-note-title', textContent: '💡 Βοήθεια' }),
+                el('p', {
+                    innerHTML: `<strong>Για τον εκπαιδευτικό — αποδεκτές ρίμες:</strong> ${acceptedExamples}`,
+                    style: { color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-sm)' },
+                }),
                 el('p', { className: 'teacher-note-text', textContent: `Άκου: ${emphasized}… ποια από αυτές τις λέξεις τελειώνει παρόμοια;` }),
                 choicesGrid,
                 el('button', { className: 'btn btn-secondary btn-small', textContent: 'Κλείσιμο', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
@@ -431,18 +446,23 @@ Phono.games.produceRhyme = {
 /* ===========================================
    GAME 4: rhymeOddOneOut — Find the word that
    does NOT rhyme with the others.
+   Draws from Phono.data.rhymeOddOneOutItemsL3 (js/rhymes_l3.js) —
+   hand-curated pairs (same family) + odd word (different family),
+   same reasoning as findRhyme: an auto-picker risks a same-family
+   word slipping in as the "odd" one, or vice versa.
    =========================================== */
 Phono.games.rhymeOddOneOut = {
     container: null,
     levelInfo: null,
-    usedGroups: [],
+    roundItems: [],
+    currentItem: null,
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
-        this.usedGroups = [];
+        this.roundItems = level3BuildOddOneOutItems(Phono.engine.totalRounds);
         this.loadRound();
     },
 
@@ -450,26 +470,13 @@ Phono.games.rhymeOddOneOut = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
 
-        // Pick a rhyme group with at least 2 words
-        const pool = Phono.data.rhymeGroups.filter(g => g.words.length >= 2 && !this.usedGroups.includes(g.ending));
-        const available = pool.length > 0 ? pool : Phono.data.rhymeGroups.filter(g => g.words.length >= 2);
-        const group = Phono.data.getRandom(available);
-        this.usedGroups.push(group.ending);
+        this.currentItem = this.roundItems[Phono.engine.currentRound];
 
-        // 2 rhyming words from the group
-        const rhyming = Phono.data.shuffle([...group.words]).slice(0, 2);
-
-        // 1 odd word that does NOT rhyme (different ending)
-        const ending = group.ending.replace(/^-/, '');
-        const oddPool = Phono.data.words.filter(w =>
-            !w.word.endsWith(ending) &&
-            !group.words.some(gw => gw.word === w.word)
-        );
-        const odd = Phono.data.getRandom(oddPool);
-
+        // Shuffled fresh every round — the odd word's position must
+        // never settle into a predictable spot (e.g. always last).
         const allChoices = Phono.data.shuffle([
-            ...rhyming.map(w => ({ word: w.word, emoji: w.emoji, isOdd: false })),
-            { word: odd.word, emoji: odd.emoji, isOdd: true },
+            ...this.currentItem.rhyming.map(w => ({ word: w, isOdd: false })),
+            { word: this.currentItem.odd, isOdd: true },
         ]);
 
         const instruction = el('p', { className: 'game-instruction', textContent: 'Δύο λέξεις ομοιοκαταληκτούν. Βρες αυτή που ΔΕΝ ταιριάζει!' });
@@ -481,12 +488,12 @@ Phono.games.rhymeOddOneOut = {
 
         const choicesGrid = el('div', { className: 'choices-grid' });
         allChoices.forEach(choice => {
+            const meta = Phono.data.rhymeL3Word(choice.word);
             const card = el('div', {
                 className: 'choice-card',
-                'data-odd': choice.isOdd ? '1' : '0',
                 onClick: () => this.checkAnswer(choice.isOdd, card),
             }, [
-                el('span', { className: 'choice-emoji', textContent: choice.emoji }),
+                el('span', { className: 'choice-emoji', textContent: meta.emoji }),
                 el('span', { className: 'choice-word', textContent: choice.word }),
             ]);
             choicesGrid.appendChild(card);
@@ -536,6 +543,19 @@ function level3BuildFindRhymeItems(totalRounds) {
     let deck = [];
     for (let round = 0; round < totalRounds; round++) {
         if (deck.length === 0) deck = Phono.data.shuffle(Phono.data.findRhymeItemsL3);
+        items.push(deck.pop());
+    }
+    return items;
+}
+
+/** Same up-front-planning/reshuffle-when-exhausted pattern as
+ * level3BuildFindRhymeItems above, for rhymeOddOneOut's curated
+ * rhyming/odd triples. */
+function level3BuildOddOneOutItems(totalRounds) {
+    const items = [];
+    let deck = [];
+    for (let round = 0; round < totalRounds; round++) {
+        if (deck.length === 0) deck = Phono.data.shuffle(Phono.data.rhymeOddOneOutItemsL3);
         items.push(deck.pop());
     }
     return items;
