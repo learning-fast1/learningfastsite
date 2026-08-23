@@ -140,6 +140,9 @@ Phono.games.findRhyme = {
 
 /* ===========================================
    GAME 2: rhymeMemory — Memory Game
+   Boards come from Phono.data.rhymeMemoryBoardsL3 (js/rhymes_l3.js) —
+   hand-curated so every pair shares a family AND no board mixes two
+   families a child could mishear as the same ending.
    =========================================== */
 Phono.games.rhymeMemory = {
     container: null,
@@ -172,24 +175,15 @@ Phono.games.rhymeMemory = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
 
-        // Pick 6 rhyme pairs
-        const shuffledPairs = Phono.data.shuffle([...Phono.data.rhymePairs]);
-        // Ensure unique pairs (no duplicate word1)
-        const usedWords = new Set();
-        const selectedPairs = [];
-        for (const pair of shuffledPairs) {
-            if (!usedWords.has(pair.word1) && !usedWords.has(pair.word2) && selectedPairs.length < this.totalPairs) {
-                selectedPairs.push(pair);
-                usedWords.add(pair.word1);
-                usedWords.add(pair.word2);
-            }
-        }
+        const board = Phono.data.getRandom(Phono.data.rhymeMemoryBoardsL3);
 
         // Create card data: each pair makes 2 cards
         this.cards = [];
-        selectedPairs.forEach((pair, pairIndex) => {
-            this.cards.push({ word: pair.word1, emoji: pair.emoji1, pairId: pairIndex, id: pairIndex * 2 });
-            this.cards.push({ word: pair.word2, emoji: pair.emoji2, pairId: pairIndex, id: pairIndex * 2 + 1 });
+        board.forEach((pair, pairIndex) => {
+            pair.forEach((word, i) => {
+                const meta = Phono.data.rhymeL3Word(word);
+                this.cards.push({ word, emoji: meta.emoji, pairId: pairIndex, id: pairIndex * 2 + i });
+            });
         });
         this.cards = Phono.data.shuffle(this.cards);
 
@@ -223,6 +217,7 @@ Phono.games.rhymeMemory = {
 
         cardEl.classList.add('flipped');
         Phono.audio.playSfx('flip');
+        Phono.audio.speak(this.cards[index].word);
         this.flippedCards.push(index);
 
         if (this.flippedCards.length === 2) {

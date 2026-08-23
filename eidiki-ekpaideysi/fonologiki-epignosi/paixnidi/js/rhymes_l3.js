@@ -134,3 +134,30 @@ Phono.data.findRhymeItemsL3 = [
     { base: "νερό", correct: "φτερό", distractors: ["μπαλόνι", "ψαλίδι", "κανάτα"] },
     { base: "σκυλάκι", correct: "γατάκι", distractors: ["κουτάλι", "λεμόνι", "κερί"], easy: true },
 ];
+
+/* ----------------------------------------------------------
+   «Memory Ρίμες» board data — hand-curated, 6 pairs (12 tiles) per
+   board. Two rules baked into the curation, not enforced at runtime:
+   (1) both words in a pair share the same family; (2) the 6 families
+   on one board are chosen to be clearly distinguishable from each
+   other (no two endings a child could mishear as the same one), so
+   don't add a 7th pair to a board without rechecking that.
+   ---------------------------------------------------------- */
+Phono.data.rhymeMemoryBoardsL3 = [
+    [ // Board 1 — families: άτα, άρι, ίδι, όνι, άλι, ό
+        ["πατάτα", "ντομάτα"],
+        ["φεγγάρι", "φανάρι"],
+        ["φίδι", "ψαλίδι"],
+        ["μπαλόνι", "λεμόνι"],
+        ["κεφάλι", "κουτάλι"],
+        ["νερό", "φτερό"],
+    ],
+    [ // Board 2 — families: άτα, άρι, έλι, όνι, όνα, ί
+        ["σαλάτα", "γραβάτα"],
+        ["καλαμάρι", "μαξιλάρι"],
+        ["μέλι", "μπιζέλι"],
+        ["σεντόνι", "πεπόνι"],
+        ["βελόνα", "κολόνα"],
+        ["κουτί", "παπί"],
+    ],
+];
