@@ -517,10 +517,7 @@ Phono.games.phonemeDeletion = {
             }));
         });
 
-        // Answer choices: pressable-audible, not readable text — each
-        // button SPEAKS its own candidate word when pressed and submits
-        // it immediately, same "press = hear + choose" idea as Level 4's
-        // sound buttons.
+        // Answer choices: the remaining-letters text, same as before.
         const distractors = this.generateDistractors(correct, word);
         const allChoices = Phono.data.shuffle([
             { text: correct, correct: true },
@@ -528,16 +525,11 @@ Phono.games.phonemeDeletion = {
         ]);
 
         const choicesGrid = el('div', { className: 'choices-grid', id: 'pd-choices', style: { display: 'none' } });
-        allChoices.forEach((choice, i) => {
+        allChoices.forEach(choice => {
             const card = el('div', {
                 className: 'choice-card',
-                onClick: () => {
-                    Phono.audio.speak(choice.text);
-                    this.checkAnswer(choice.correct, card);
-                },
-            }, [
-                el('span', { className: 'choice-word', textContent: '🔊 ' + (i + 1), style: { fontSize: 'var(--text-2xl)' } }),
-            ]);
+                onClick: () => this.checkAnswer(choice.correct, card),
+            }, [el('span', { className: 'choice-word', textContent: choice.text, style: { fontSize: 'var(--text-2xl)' } })]);
             choicesGrid.appendChild(card);
         });
 
