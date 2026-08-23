@@ -45,7 +45,7 @@ Phono.data.phonemesL5 = [
     { word: "δάσος", phonemes: ["δ", "ά", "σ", "ο", "ς"], count: 5, imageable: true, emoji: "🌲" },
     // ρόλος/νόμος: abstract nouns, not imageable — kept in the bank
     // (counting/Elkonin games work fine without a picture) but excluded
-    // from any picture-choice game (phonemeSynthesis, findMiddlePhoneme).
+    // from any picture-choice game (e.g. phonemeSynthesis).
     { word: "ρόλος", phonemes: ["ρ", "ό", "λ", "ο", "ς"], count: 5, imageable: false, emoji: null },
     { word: "λόφος", phonemes: ["λ", "ό", "φ", "ο", "ς"], count: 5, imageable: true, emoji: "⛰️" },
     { word: "κάδος", phonemes: ["κ", "ά", "δ", "ο", "ς"], count: 5, imageable: true, emoji: "🗑️" },
@@ -72,32 +72,3 @@ Phono.data.phonemesL5 = [
 Phono.data.phonemesL5ByWord = function (word) {
     return Phono.data.phonemesL5.find(w => w.word === word) || null;
 };
-
-/* ----------------------------------------------------------
-   «Βρες τον Μεσαίο Ήχο» — curated items (js prompt spec's own
-   worked examples): middleIndex is 0-based into `phonemes`, distractors
-   are 3 OTHER phonemes (for 5-sound items, the word's own other three
-   sounds — makes the child pick by POSITION, not just recognize a
-   sound that's present somewhere in the word).
-   ---------------------------------------------------------- */
-Phono.data.middlePhonemeItemsL5 = [
-    { word: "φως", phonemes: ["φ", "ω", "ς"], middleIndex: 1, distractors: ["φ", "σ", "α"], emoji: "💡" },
-    { word: "όχι", phonemes: ["ό", "χ", "ι"], middleIndex: 1, distractors: ["ό", "ι", "κ"], emoji: "🙅" },
-    { word: "χορός", phonemes: ["χ", "ο", "ρ", "ό", "ς"], middleIndex: 2, distractors: ["χ", "ο", "ς"], emoji: "💃" },
-    { word: "λύκος", phonemes: ["λ", "ύ", "κ", "ο", "ς"], middleIndex: 2, distractors: ["λ", "ύ", "ς"], emoji: "🐺" },
-    { word: "τόνος", phonemes: ["τ", "ό", "ν", "ο", "ς"], middleIndex: 2, distractors: ["τ", "ό", "ς"], emoji: "🐟" },
-    { word: "δάσος", phonemes: ["δ", "ά", "σ", "ο", "ς"], middleIndex: 2, distractors: ["δ", "ά", "ς"], emoji: "🌲" },
-];
-
-/* ----------------------------------------------------------
-   «Άλλαξε τον Ήχο» — curated first-phoneme substitution items (js
-   prompt spec's own worked examples). `isReal` marks whether `result`
-   is an actual Greek word (shown to the teacher via the "🔒 Απάντηση"
-   button) or an accepted "αστεία λέξη" (nonsense word).
-   ---------------------------------------------------------- */
-Phono.data.phonemeSubstitutionItemsL5 = [
-    { base: "πόδι", baseEmoji: "🦶", from: "π", to: "ρ", result: "ρόδι", isReal: true, resultEmoji: "🥭" },
-    { base: "μέλι", baseEmoji: "🍯", from: "μ", to: "χ", result: "χέλι", isReal: true, resultEmoji: "🐟" },
-    { base: "γάτα", baseEmoji: "🐱", from: "γ", to: "κ", result: "κάτα", isReal: false, resultEmoji: null },
-    { base: "τυρί", baseEmoji: "🧀", from: "τ", to: "κ", result: "κυρί", isReal: false, resultEmoji: null },
-];
