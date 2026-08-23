@@ -512,17 +512,16 @@ Phono.games.syllableSplit = {
             }),
         ]);
 
-        // Collection area: starts empty — a piece only appears once the
-        // child has actually placed the syllable that belongs there, so
-        // the number of syllables is never given away in advance. Pieces
-        // render flush against each other (no per-syllable box/border)
-        // so they read as one growing word instead of separate tiles —
-        // see handleDrop. The single .drop-zone here is the only target
-        // Phono.dragDrop needs to know about (order is enforced in
-        // handleDrop, not by separate per-index zones).
-        const collectedRow = el('div', { className: 'syllable-build-word', id: 'syl-collected' });
-        const dropZone = el('div', { className: 'drop-zone syl-drop-target', id: 'syl-drop-target' }, [
-            el('span', { className: 'drop-zone-hint', textContent: 'Άφησε εδώ' }),
+        // Collection area IS the drop zone — the child drags a syllable
+        // straight onto the growing word itself, and it appears exactly
+        // where they dropped it (flush against whatever's already
+        // there), instead of dropping into a separate box somewhere else
+        // and watching the syllable pop up in a different spot. Starts
+        // empty (just the hint), so the number of syllables is never
+        // given away in advance; the hint is removed once the first
+        // piece lands — see handleDrop.
+        const collectedRow = el('div', { className: 'syllable-build-word drop-zone syl-drop-target', id: 'syl-collected' }, [
+            el('span', { className: 'drop-zone-hint', id: 'syl-drop-hint', textContent: 'Άφησε εδώ τις συλλαβές' }),
         ]);
 
         // Scrambled tiles: every real syllable, PLUS one trap syllable
@@ -545,7 +544,7 @@ Phono.games.syllableSplit = {
         });
 
         this.container.appendChild(el('div', { className: 'drag-area' }, [
-            instruction, emojiDiv, wordRow, controlsRow, collectedRow, dropZone, dragContainer,
+            instruction, emojiDiv, wordRow, controlsRow, collectedRow, dragContainer,
         ]));
         Phono.audio.speak(this.currentWord.word);
 
@@ -603,12 +602,16 @@ Phono.games.syllableSplit = {
         if (dragSyl === expected) {
             // Correct next syllable, in order.
             const collected = document.getElementById('syl-collected');
+            const hint = document.getElementById('syl-drop-hint');
+            if (hint) hint.remove();
+            collected.classList.add('filled');
             collected.appendChild(el('span', { className: 'syllable-build-piece', textContent: dragSyl }));
             dragEl.remove();
             Phono.audio.playSfx('pop');
             this.nextIndex++;
 
             if (this.nextIndex >= this.currentWord.syllables.length) {
+                collected.classList.add('correct');
                 Phono.sessionLog.record('syllableSplit', this.currentWord.word, this.currentWord.syllables.join('-'), true);
                 Phono.feedback.showCorrect();
                 Phono.engine.recordCorrect();
