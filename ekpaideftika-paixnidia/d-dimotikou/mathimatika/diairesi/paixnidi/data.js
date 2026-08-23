@@ -18,7 +18,7 @@ function qMark() {
 }
 
 function equationHtml(dividend, divisor, options = {}) {
-  const { remainder = false, hideAnswer = true, quotient, rem } = options;
+  const { remainder = false, hideAnswer = true, quotient, rem, inputId } = options;
   if (!hideAnswer) {
     if (remainder) {
       return `${dividend} ÷ ${divisor} = ${quotient} <span class="eq-word">υπόλοιπο</span> ${rem}`;
@@ -28,7 +28,13 @@ function equationHtml(dividend, divisor, options = {}) {
   if (remainder) {
     return `${dividend} ÷ ${divisor} = ${answerBox()}`;
   }
-  return `${dividend} ÷ ${divisor} = ${answerBox()}`;
+  // The one real answer field lives right where the child reads it — in
+  // the equation itself — instead of a second, separate box lower down
+  // that a child has to notice and tap before typing does anything.
+  const slot = inputId
+    ? `<input type="number" class="answer-slot answer-slot-input" id="${inputId}" min="0" max="99" autocomplete="off">`
+    : answerBox();
+  return `${dividend} ÷ ${divisor} = ${slot}`;
 }
 
 const THEMES = {

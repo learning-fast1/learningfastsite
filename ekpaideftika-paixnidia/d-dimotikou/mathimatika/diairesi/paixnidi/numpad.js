@@ -20,6 +20,27 @@ const NumKeyboard = {
     this.bindFocus(input, wrap);
   },
 
+  /** Like attach(), but for an input that already lives somewhere
+   * specific in the layout (e.g. inline inside the equation) that
+   * shouldn't be moved — the keyboard is appended into `container`
+   * instead of wrapped around the input itself. Because this input is
+   * the only one on screen, buildKeyboard's fallback target makes every
+   * digit press land in it immediately, with no tap-to-select step
+   * needed first. */
+  attachRemote(input, container, options = {}) {
+    if (!input || input.dataset.numpadAttached || !container) return;
+
+    const maxLen = options.maxLength ?? 2;
+    const maxVal = options.maxValue ?? 99;
+
+    this.prepareInput(input, maxLen, maxVal);
+    container.appendChild(this.buildKeyboard([input], maxLen, maxVal, { includeDelete: true }));
+
+    this.activeInput = input;
+    input.addEventListener('focus', () => { this.activeInput = input; });
+    input.addEventListener('click', () => { this.activeInput = input; });
+  },
+
   attachDual(inputs, options = {}) {
     const targets = inputs.filter(input => input && !input.dataset.numpadAttached);
     if (targets.length < 2) return;

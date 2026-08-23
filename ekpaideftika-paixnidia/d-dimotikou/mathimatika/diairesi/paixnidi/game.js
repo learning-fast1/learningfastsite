@@ -265,7 +265,12 @@ function loadLevel() {
 
   els.answerRow.classList.remove('remainder-mode', 'hidden', 'quiz-mode');
   els.equationDisplay.classList.remove('hidden');
-  resetAnswerInputs();
+  // Remainder and quiz levels build their own answerRow content below
+  // (setupRemainderInputs / setupQuizChoices always overwrite it); for
+  // every other type the real answer field is created inline inside
+  // the equation by updateEquation(), and setupStandardAnswer() below
+  // attaches the keyboard + check button to it once it exists.
+  els.answerRow.innerHTML = '';
 
   renderLevelContent(stage, level);
 
@@ -274,24 +279,32 @@ function loadLevel() {
     setupQuizChoices(dividend, divisor);
   } else {
     updateEquation(stage, dividend, divisor);
+    if (stage.type !== 'remainder') {
+      setupStandardAnswer();
+    }
   }
 }
 
-function resetAnswerInputs() {
-  els.answerRow.innerHTML = `
-    <label for="answer-input">Απάντηση:</label>
-    <input type="number" class="answer-slot-input" id="answer-input" min="0" max="99" autocomplete="off">
-    <button class="btn-primary" id="btn-check">Έλεγχος ✓</button>
-  `;
-  bindAnswerEvents();
-}
-
-function bindAnswerEvents() {
-  NumKeyboard.attachAll(els.answerRow);
-  document.getElementById('answer-input')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkAnswer();
-  });
-  document.getElementById('btn-check')?.addEventListener('click', checkAnswer);
+/** Wires up the one real answer <input> that updateEquation() just
+ * rendered inline in the equation (id="answer-input") — the numpad and
+ * check button live in answerRow below it, but the digits themselves
+ * go straight into that inline box. No second, separate answer box,
+ * and no tap-to-select step before typing works. */
+function setupStandardAnswer() {
+  const input = document.getElementById('answer-input');
+  if (input) {
+    NumKeyboard.attachRemote(input, els.answerRow, { maxLength: 2, maxValue: 99 });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkAnswer();
+    });
+  }
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn-primary';
+  btn.id = 'btn-check';
+  btn.textContent = 'Έλεγχος ✓';
+  btn.addEventListener('click', checkAnswer);
+  els.answerRow.appendChild(btn);
 }
 
 function updateEquation(stage, dividend, divisor, hideAnswer = true) {
@@ -301,6 +314,7 @@ function updateEquation(stage, dividend, divisor, hideAnswer = true) {
     hideAnswer,
     quotient: getQuotient(dividend, divisor),
     rem: getRemainder(dividend, divisor),
+    inputId: isRem ? undefined : 'answer-input',
   });
 }
 
