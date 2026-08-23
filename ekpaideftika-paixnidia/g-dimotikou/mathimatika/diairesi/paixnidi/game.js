@@ -385,7 +385,7 @@ function groupItemsFitStyle(perGroup, divisor) {
   const scale = computeGroupScale(divisor);
   const fontSize = Math.max(1.1, (2.85 - (rows - 1) * 0.4) * scale);
   const maxWidthPx = Math.round(cols * fontSize * 16 * 1.25);
-  return `font-size:${fontSize.toFixed(2)}rem;max-width:${maxWidthPx}px;`;
+  return `display:block;font-size:${fontSize.toFixed(2)}rem;max-width:${maxWidthPx}px;`;
 }
 
 function groupBoxFitStyle(divisor) {
@@ -408,7 +408,7 @@ function renderCount(dividend, divisor, emoji) {
         ${Array.from({ length: divisor }, (_, g) => `
           <div class="static-group" style="${box.box}">
             <div class="group-label" style="${box.label}">Ομάδα ${g + 1}</div>
-            <div class="items" style="${itemsStyle}">${Array(perGroup).fill(emoji).join('')}</div>
+            <div class="items" style="${itemsStyle}">${Array(perGroup).fill(emoji).join(' ')}</div>
           </div>
         `).join('')}
       </div>
@@ -426,7 +426,7 @@ function renderRelation(dividend, divisor, emoji) {
         ${Array.from({ length: divisor }, (_, g) => `
           <div class="static-group" style="${box.box}">
             <div class="group-label" style="${box.label}">Ομάδα ${g + 1}</div>
-            <div class="items" style="${itemsStyle}">${Array(perGroup).fill(emoji).join('')}</div>
+            <div class="items" style="${itemsStyle}">${Array(perGroup).fill(emoji).join(' ')}</div>
           </div>
         `).join('')}
       </div>
@@ -482,16 +482,35 @@ function onQuizChoice(value, btn) {
   registerWrong();
 }
 
+/** Like the Stage 2 groups, .story-visual's icons are one plain text
+ * string, not separate elements — its `flex-wrap: wrap` never actually
+ * does anything, wrapping is normal text flow. And because the
+ * stylesheet sets overflow-y: auto here, the CSS overflow spec forces
+ * overflow-x to compute as auto too, so if that natural text flow
+ * doesn't wrap tightly enough the row silently grows a horizontal
+ * scrollbar instead of just moving to a new line. Sizing the icons and
+ * capping the width from the actual count fixes the wrap point, and
+ * overflow-x is pinned to hidden so a horizontal scrollbar can never
+ * appear even if this estimate runs a little wide. */
+function storyVisualFitStyle(show) {
+  const cols = Math.max(1, Math.ceil(Math.sqrt(show)));
+  const rows = Math.ceil(show / cols);
+  const fontSize = Math.max(1.3, 2.75 - (rows - 1) * 0.35);
+  const maxWidthPx = Math.round(cols * fontSize * 16 * 1.3);
+  return `display:block;font-size:${fontSize.toFixed(2)}rem;max-width:${maxWidthPx}px;overflow-x:hidden;`;
+}
+
 function renderStory(level) {
   const show = Math.min(level.dividend, 18);
   const extra = level.dividend > 18 ? level.dividend - 18 : 0;
   const text = buildStoryText(level, state.currentLevel);
+  const visualStyle = storyVisualFitStyle(show);
   els.gameArea.innerHTML = `
     <div class="story-scene">
       <div class="story-emoji">${level.emoji || '⭐'}</div>
       <p class="story-text">${text}</p>
-      <div class="story-visual">
-        ${Array(show).fill(level.emoji || '⭐').join('')}
+      <div class="story-visual" style="${visualStyle}">
+        ${Array(show).fill(level.emoji || '⭐').join(' ')}
         ${extra ? `<span class="more-badge">+${extra}</span>` : ''}
       </div>
     </div>
