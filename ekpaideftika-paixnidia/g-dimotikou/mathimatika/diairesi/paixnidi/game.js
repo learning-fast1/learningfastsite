@@ -359,16 +359,56 @@ function renderDistribute(dividend, divisor, emoji) {
   setupDragAndDrop(dividend, divisor);
 }
 
+/** .items holds its emoji as one plain string (not separate elements),
+ * so it wraps to a new row purely from the CSS `max-width` cutting off
+ * normal text flow — there's no flex/grid item wrapping happening here
+ * despite the stylesheet's `display:flex`. To keep every group's item
+ * block within a roughly-square, bounded number of rows no matter the
+ * quotient (up to 13 in this game's data), both the wrap width and the
+ * emoji size are computed from a target column count, so the whole
+ * .big-groups block fits without the parent needing to scroll to see
+ * every group. */
+/** Shared shrink factor: with more groups (up to 9 in this game's
+ * data), the boxes wrap into several rows and push the block past the
+ * visible height, on top of tall item blocks for a high quotient. Both
+ * the box chrome and the item text scale down together from this one
+ * factor as divisor grows, so more boxes share a row and the whole
+ * thing stays within roughly the same number of box-rows regardless of
+ * how many groups there are. */
+function computeGroupScale(divisor) {
+  return divisor <= 4 ? 1 : Math.max(0.5, 1 - (divisor - 4) * 0.11);
+}
+
+function groupItemsFitStyle(perGroup, divisor) {
+  const cols = Math.max(1, Math.ceil(Math.sqrt(perGroup)));
+  const rows = Math.ceil(perGroup / cols);
+  const scale = computeGroupScale(divisor);
+  const fontSize = Math.max(1.1, (2.85 - (rows - 1) * 0.4) * scale);
+  const maxWidthPx = Math.round(cols * fontSize * 16 * 1.25);
+  return `font-size:${fontSize.toFixed(2)}rem;max-width:${maxWidthPx}px;`;
+}
+
+function groupBoxFitStyle(divisor) {
+  const scale = computeGroupScale(divisor);
+  return {
+    box: `padding:${(0.85 * scale).toFixed(2)}rem ${(1 * scale).toFixed(2)}rem;min-width:${Math.round(110 * scale)}px;`,
+    label: `font-size:${(1.15 * scale).toFixed(2)}rem;margin-bottom:${(0.45 * scale).toFixed(2)}rem;`,
+    gap: `gap:${(0.6 * scale).toFixed(2)}rem;`,
+  };
+}
+
 function renderCount(dividend, divisor, emoji) {
   const perGroup = getQuotient(dividend, divisor);
+  const itemsStyle = groupItemsFitStyle(perGroup, divisor);
+  const box = groupBoxFitStyle(divisor);
   els.gameArea.innerHTML = `
     <div class="count-visual">
       <p class="hint-text">Κοίτα τις ομάδες — είναι ίσες!</p>
-      <div class="big-groups">
+      <div class="big-groups" style="${box.gap}">
         ${Array.from({ length: divisor }, (_, g) => `
-          <div class="static-group">
-            <div class="group-label">Ομάδα ${g + 1}</div>
-            <div class="items">${Array(perGroup).fill(emoji).join('')}</div>
+          <div class="static-group" style="${box.box}">
+            <div class="group-label" style="${box.label}">Ομάδα ${g + 1}</div>
+            <div class="items" style="${itemsStyle}">${Array(perGroup).fill(emoji).join('')}</div>
           </div>
         `).join('')}
       </div>
@@ -378,13 +418,15 @@ function renderCount(dividend, divisor, emoji) {
 
 function renderRelation(dividend, divisor, emoji) {
   const perGroup = getQuotient(dividend, divisor);
+  const itemsStyle = groupItemsFitStyle(perGroup, divisor);
+  const box = groupBoxFitStyle(divisor);
   els.gameArea.innerHTML = `
     <div class="relation-simple">
-      <div class="big-groups">
+      <div class="big-groups" style="${box.gap}">
         ${Array.from({ length: divisor }, (_, g) => `
-          <div class="static-group">
-            <div class="group-label">Ομάδα ${g + 1}</div>
-            <div class="items">${Array(perGroup).fill(emoji).join('')}</div>
+          <div class="static-group" style="${box.box}">
+            <div class="group-label" style="${box.label}">Ομάδα ${g + 1}</div>
+            <div class="items" style="${itemsStyle}">${Array(perGroup).fill(emoji).join('')}</div>
           </div>
         `).join('')}
       </div>
