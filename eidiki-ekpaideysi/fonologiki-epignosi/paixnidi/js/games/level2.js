@@ -512,13 +512,15 @@ Phono.games.syllableSplit = {
             }),
         ]);
 
-        // Collection area: starts empty, no placeholder slots — a syllable
-        // box only appears once the child has actually placed the piece
-        // that belongs there, so the number of syllables is never given
-        // away in advance. The single .drop-zone here is the only target
+        // Collection area: starts empty — a piece only appears once the
+        // child has actually placed the syllable that belongs there, so
+        // the number of syllables is never given away in advance. Pieces
+        // render flush against each other (no per-syllable box/border)
+        // so they read as one growing word instead of separate tiles —
+        // see handleDrop. The single .drop-zone here is the only target
         // Phono.dragDrop needs to know about (order is enforced in
         // handleDrop, not by separate per-index zones).
-        const collectedRow = el('div', { className: 'syllable-boxes', id: 'syl-collected' });
+        const collectedRow = el('div', { className: 'syllable-build-word', id: 'syl-collected' });
         const dropZone = el('div', { className: 'drop-zone syl-drop-target', id: 'syl-drop-target' }, [
             el('span', { className: 'drop-zone-hint', textContent: 'Άφησε εδώ' }),
         ]);
@@ -601,7 +603,7 @@ Phono.games.syllableSplit = {
         if (dragSyl === expected) {
             // Correct next syllable, in order.
             const collected = document.getElementById('syl-collected');
-            collected.appendChild(el('div', { className: 'syllable-box filled correct', textContent: dragSyl }));
+            collected.appendChild(el('span', { className: 'syllable-build-piece', textContent: dragSyl }));
             dragEl.remove();
             Phono.audio.playSfx('pop');
             this.nextIndex++;

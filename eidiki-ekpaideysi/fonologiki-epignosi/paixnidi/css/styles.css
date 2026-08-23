@@ -1284,6 +1284,25 @@ input {
     background: var(--success-light);
 }
 
+/* Syllables the child has already placed correctly, in "Κόψε τη
+   Λέξη" — sit flush against each other (no gap, no per-syllable
+   border) so they read as one growing word (e.g. "κό" + "τα" ->
+   "κότα") instead of separate boxed tiles glued next to each other. */
+.syllable-build-word {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    min-height: 50px;
+}
+
+.syllable-build-piece {
+    font-family: var(--font-heading);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    color: var(--text-primary);
+    animation: popIn var(--duration-normal) var(--ease-bounce);
+}
+
 /* ===========================================
    18. GAME: ELKONIN BOXES
    =========================================== */
