@@ -1292,7 +1292,14 @@ input {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    min-height: 50px;
+    /* Stays wide even with just one short syllable inside — a box that
+       shrink-wraps to its content looks "finished" the moment anything
+       lands in it, and a child has no visual cue that more syllables
+       still belong there. Wide-but-empty space (not per-syllable
+       placeholder slots, which would give the count away) reads as
+       "there's still room here". */
+    min-width: 240px;
+    min-height: 70px;
 }
 
 .syllable-build-piece {
