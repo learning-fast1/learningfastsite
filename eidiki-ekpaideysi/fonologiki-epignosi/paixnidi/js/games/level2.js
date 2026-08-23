@@ -78,7 +78,7 @@ Phono.games.syllableCounting = {
         });
         const modeBtn = el('button', {
             className: 'btn btn-secondary btn-small',
-            textContent: this.hardMode ? '🙈 Χωρίς βοήθεια (κρυφές τελείες)' : '👁️ Βοήθεια (ορατές τελείες)',
+            textContent: this.hardMode ? 'Χωρίς βοήθεια (χωρίς τελείες)' : 'Βοήθεια - τελείες',
             title: 'Εναλλαγή: οι τελείες μέτρησης κρύβονται μόλις χτυπήσει, μετράει από μνήμη',
             onClick: () => {
                 this.hardMode = !this.hardMode;

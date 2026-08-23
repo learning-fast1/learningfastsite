@@ -7,19 +7,26 @@ Phono.games = Phono.games || {};
 
 /* ===========================================
    GAME 1: findRhyme — Multiple Choice
+   Draws from Phono.data.findRhymeItemsL3 (js/rhymes_l3.js) — hand-
+   curated base/correct/distractor sets, never auto-paired, so a
+   same-family word can never slip into the distractors and a
+   different-stress word (e.g. "σπίτι"/"κουτί", which LOOK alike but
+   don't rhyme) can never be offered as the correct answer.
    =========================================== */
 Phono.games.findRhyme = {
     container: null,
     levelInfo: null,
-    currentPair: null,
-    usedPairs: [],
+    currentItem: null,
+    roundItems: [],
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
-        this.usedPairs = [];
+        // Whole session picked up front (not per-round) so the teacher's
+        // word list can show every item for the round right away.
+        this.roundItems = level3BuildFindRhymeItems(Phono.engine.totalRounds);
         this.loadRound();
     },
 
@@ -27,50 +34,86 @@ Phono.games.findRhyme = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
 
-        // Pick a rhyme pair
-        const pool = Phono.data.rhymePairs.filter(p => !this.usedPairs.includes(p.word1 + p.word2));
-        const available = pool.length > 0 ? pool : Phono.data.rhymePairs;
-        this.currentPair = Phono.data.getRandom(available);
-        this.usedPairs.push(this.currentPair.word1 + this.currentPair.word2);
+        this.currentItem = this.roundItems[Phono.engine.currentRound];
+        const baseMeta = Phono.data.rhymeL3Word(this.currentItem.base);
 
-        const instruction = el('p', { className: 'game-instruction', innerHTML: `Ποια λέξη ομοιοκαταληκτεί με <strong>"${this.currentPair.word1}"</strong>;` });
-        const targetEmoji = el('div', { className: 'game-main-emoji', textContent: this.currentPair.emoji1 });
-        const targetWord = el('div', { className: 'game-main-word', textContent: this.currentPair.word1 });
+        const instruction = el('p', { className: 'game-instruction', textContent: 'Άκουσε τη λέξη. Ποια εικόνα ομοιοκαταληκτεί μαζί της;' });
+        const targetEmoji = el('div', { className: 'game-main-emoji', textContent: baseMeta.emoji });
         const targetRow = el('div', { className: 'sentence-row' }, [
-            targetWord,
             this.createVoiceToggle(),
-            this.createRepeatButton(() => Phono.audio.speak(this.currentPair.word1)),
+            this.createRepeatButton(() => Phono.audio.speak(this.currentItem.base)),
         ]);
 
-        // Choices: correct + 3 distractors (non-rhyming)
-        const rhymeEnding = this.currentPair.ending.replace(/^-/, '').replace(/\/.*/, '');
-        const distractors = Phono.data.words
-            .filter(w => w.word !== this.currentPair.word1 && w.word !== this.currentPair.word2 && !w.word.endsWith(rhymeEnding))
-            .slice(0, 20);
-        const picked = Phono.data.shuffle(distractors).slice(0, 3);
+        const revealBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: '🔒 Λέξεις (δάσκαλος)',
+            onClick: () => this.showWordList(),
+        });
 
-        const allChoices = Phono.data.shuffle([
-            { word: this.currentPair.word2, emoji: this.currentPair.emoji2, correct: true },
-            ...picked.map(d => ({ word: d.word, emoji: d.emoji, correct: false })),
-        ]);
-
+        // Choices: correct rhyme + the 3 hand-picked, verified
+        // non-rhyming distractors — text stays hidden, only the
+        // picture + audio identify each choice.
+        const choiceWords = Phono.data.shuffle([this.currentItem.correct, ...this.currentItem.distractors]);
         const choicesGrid = el('div', { className: 'choices-grid' });
-        allChoices.forEach(choice => {
-            const card = el('div', { className: 'choice-card', onClick: () => this.checkAnswer(choice.correct, card) }, [
-                el('span', { className: 'choice-emoji', textContent: choice.emoji }),
-                el('span', { className: 'choice-word', textContent: choice.word }),
+        choiceWords.forEach(word => {
+            const meta = Phono.data.rhymeL3Word(word);
+            const card = el('div', { className: 'choice-card', onClick: () => this.checkAnswer(card) }, [
+                el('span', { className: 'choice-emoji', textContent: meta.emoji }),
             ]);
+            card._correct = word === this.currentItem.correct;
             choicesGrid.appendChild(card);
         });
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, targetEmoji, targetRow, choicesGrid]));
-        Phono.audio.speak(this.currentPair.word1);
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, targetEmoji, targetRow, revealBtn, choicesGrid]));
+        Phono.audio.speak(this.currentItem.base);
     },
 
-    checkAnswer(isCorrect, cardEl) {
+    /** Teacher-only word list for the WHOLE session, not just the
+     * current round — same reasoning and fixed-overlay pattern as
+     * level2.js's syllableSynthesis.showWordList. */
+    showWordList() {
+        const { el } = Phono.helpers;
+        const close = () => overlay.remove();
+
+        const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', textAlign: 'left' } });
+        this.roundItems.forEach((item, i) => {
+            const isCurrent = i === Phono.engine.currentRound;
+            const baseMeta = Phono.data.rhymeL3Word(item.base);
+            const correctMeta = Phono.data.rhymeL3Word(item.correct);
+            list.appendChild(el('div', {
+                style: {
+                    display: 'flex', justifyContent: 'space-between', gap: 'var(--space-md)',
+                    padding: 'var(--space-xs) var(--space-sm)', borderRadius: 'var(--radius-md)',
+                    background: isCurrent ? 'var(--primary-light)' : 'transparent',
+                    fontWeight: isCurrent ? '800' : '600',
+                },
+            }, [
+                el('span', { textContent: `${i + 1}. ${baseMeta.emoji} ${item.base}` }),
+                el('span', { textContent: `→ ${correctMeta.emoji} ${item.correct}`, style: { color: 'var(--text-secondary)' } }),
+            ]));
+        });
+
+        const overlay = el('div', {
+            className: 'teacher-note-overlay',
+            onClick: (e) => { if (e.target === overlay) close(); },
+        }, [
+            el('div', { className: 'teacher-note-card' }, [
+                el('div', { className: 'teacher-note-title', textContent: '🔒 Λέξεις της συνεδρίας' }),
+                el('p', {
+                    textContent: 'Σημείωσε τις λέξεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
+                }),
+                list,
+                el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
+            ]),
+        ]);
+        document.getElementById('app').appendChild(overlay);
+    },
+
+    checkAnswer(cardEl) {
         if (cardEl.classList.contains('disabled')) return;
 
-        if (isCorrect) {
+        if (cardEl._correct) {
             document.querySelectorAll('.choice-card').forEach(c => c.classList.add('disabled'));
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
@@ -487,3 +530,18 @@ Phono.games.rhymeOddOneOut = {
         }
     },
 };
+
+/** Picks the whole session's findRhyme items up front (not per-round)
+ * so the teacher's word list can show every item for the round right
+ * away — same reasoning as level2.js's roundWords helpers. Fisher-
+ * Yates-without-replacement: shuffle the full 10-item pool, hand out
+ * from it, reshuffle once exhausted (only matters if totalRounds > 10). */
+function level3BuildFindRhymeItems(totalRounds) {
+    const items = [];
+    let deck = [];
+    for (let round = 0; round < totalRounds; round++) {
+        if (deck.length === 0) deck = Phono.data.shuffle(Phono.data.findRhymeItemsL3);
+        items.push(deck.pop());
+    }
+    return items;
+}
