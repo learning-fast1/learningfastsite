@@ -6,13 +6,14 @@
    Κοινοί κανόνες αυτού του επιπέδου (ισχύουν σε κάθε δραστηριότητα):
      1. Ήχος πριν το κείμενο — κάθε ερέθισμα ακούγεται πρώτα
         (Phono.audio.speak / speakSyllables, lang el-GR), με 🔊 επανάληψη.
+        Εξαίρεση: το "Ένωσε τις Συλλαβές" δεν έχει καθόλου ήχο από την
+        εφαρμογή — τις συλλαβές τις λέει ο ίδιος ο εκπαιδευτικός
+        (βλ. "🔒 Λέξη (δάσκαλος)").
      2. Το γραπτό είναι κρυμμένο by default. Ο διακόπτης "Εμφάνιση
         κειμένου" (Phono.app.createTextToggle) το εμφανίζει μόνο μέσα
         στο feedback, αφού απαντήσει το παιδί — ποτέ πριν.
-     3. "Ο θεραπευτής το είπε" (Phono.app.createTherapistReadButton) ως
-        εναλλακτική της αυτόματης εκφώνησης.
-     4. Κάθε προσπάθεια καταγράφεται στο Phono.sessionLog.
-     5. Όλα τα ερεθίσματα τραβιούνται από τον ενιαίο πίνακα
+     3. Κάθε προσπάθεια καταγράφεται στο Phono.sessionLog.
+     4. Όλα τα ερεθίσματα τραβιούνται από τον ενιαίο πίνακα
         Phono.data.wordsL2 (js/words_l2.js), φιλτραρισμένα κατά stage.
    ============================================================ */
 window.Phono = window.Phono || {};
@@ -96,8 +97,6 @@ Phono.games.syllableCounting = {
             textContent: '🔒 Λέξη (δάσκαλος)',
             onClick: () => this.showAnswer(),
         });
-        const therapistBtn = Phono.app.createTherapistReadButton('syllableCounting', () => { this.therapistRead = true; });
-
         const modeBtn = el('button', {
             className: 'btn btn-secondary btn-small',
             textContent: this.hardMode ? '🙈 Δύσκολο (κρυφές τελείες)' : '👁️ Εύκολο (ορατές τελείες)',
@@ -177,10 +176,9 @@ Phono.games.syllableCounting = {
         checkArea.appendChild(label);
         checkArea.appendChild(choicesDiv);
 
-        this.therapistRead = false;
         this.container.appendChild(el('div', { className: 'tap-area' }, [
             instruction, emojiDiv, wordRow,
-            el('div', { className: 'sentence-row' }, [revealBtn, therapistBtn, modeBtn]),
+            el('div', { className: 'sentence-row' }, [revealBtn, modeBtn]),
             counterDiv, tapBtn, tapControls, checkArea,
         ]));
         Phono.audio.speak(this.currentWord.word);
@@ -280,24 +278,20 @@ Phono.games.syllableCounting = {
 
 /* ===========================================
    GAME 2: syllableSynthesis — "Ένωσε τις Συλλαβές"
-   Syllables are SPOKEN with a pause between each ("τούρ … τα") — never
-   shown — and the child picks which picture/word they spell out.
+   No audio from the app at all — the educator says the syllables out
+   loud themselves (paced however suits the child), and the child picks
+   which picture/word they spell out.
    =========================================== */
 Phono.games.syllableSynthesis = {
     container: null,
     levelInfo: null,
-    createVoiceToggle: null,
-    createRepeatButton: null,
     currentWord: null,
     usedWords: [],
     answered: false,
-    therapistRead: false,
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
-        this.createVoiceToggle = createVoiceToggle;
-        this.createRepeatButton = createRepeatButton;
         this.usedWords = [];
         this.loadRound();
     },
@@ -306,7 +300,6 @@ Phono.games.syllableSynthesis = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
         this.answered = false;
-        this.therapistRead = false;
 
         // Progressive difficulty: tier 1 -> stage A only, tier 2 -> A+B,
         // tier 3 -> the whole bank (C and D unlock together, since the
@@ -320,13 +313,10 @@ Phono.games.syllableSynthesis = {
         this.currentWord = Phono.data.getRandom(available);
         this.usedWords.push(this.currentWord.word);
 
-        const instruction = el('p', { className: 'game-instruction', textContent: 'Άκουσε τις συλλαβές. Ποια λέξη είναι;' });
+        const instruction = el('p', { className: 'game-instruction', textContent: 'Άκουσε τις συλλαβές που θα πει ο εκπαιδευτικός. Ποια λέξη είναι;' });
 
         const stimulusRow = el('div', { className: 'sentence-row' }, [
-            el('span', { className: 'game-main-emoji', textContent: '🧩' }),
-            this.createVoiceToggle(),
             Phono.app.createTextToggle('syllableSynthesis'),
-            this.createRepeatButton(() => this.speakWord()),
         ]);
 
         const controlsRow = el('div', { className: 'sentence-row' }, [
@@ -335,7 +325,6 @@ Phono.games.syllableSynthesis = {
                 textContent: '🔒 Λέξη (δάσκαλος)',
                 onClick: () => this.showAnswer(),
             }),
-            Phono.app.createTherapistReadButton('syllableSynthesis', () => { this.therapistRead = true; }),
         ]);
 
         // Choices: the target + up to 3 meaningful distractors (shares a
@@ -364,12 +353,6 @@ Phono.games.syllableSynthesis = {
         const footer = el('div', { className: 'round-footer', id: 'sylsynth-footer' });
 
         this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, stimulusRow, controlsRow, choicesGrid, footer]));
-
-        this.speakWord();
-    },
-
-    speakWord() {
-        Phono.audio.speakSyllables(this.currentWord.syllables);
     },
 
     /** Teacher-only overlay with the written word — see syllableCounting
@@ -394,7 +377,6 @@ Phono.games.syllableSynthesis = {
     checkAnswer(cardEl) {
         if (this.answered || cardEl.classList.contains('disabled')) return;
 
-        Phono.audio.speak(cardEl._word);
         const isCorrect = cardEl._correct;
         Phono.sessionLog.record('syllableSynthesis', this.currentWord.syllables.join('-'), cardEl._word, isCorrect);
 
@@ -452,7 +434,6 @@ Phono.games.syllableSplit = {
     currentWord: null,
     roundWords: [],
     nextIndex: 0,
-    therapistRead: false,
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
@@ -469,7 +450,6 @@ Phono.games.syllableSplit = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
         this.nextIndex = 0;
-        this.therapistRead = false;
 
         this.currentWord = this.roundWords[Phono.engine.currentRound];
 
@@ -487,7 +467,6 @@ Phono.games.syllableSplit = {
                 textContent: '🔒 Λέξεις (δάσκαλος)',
                 onClick: () => this.showWordList(),
             }),
-            Phono.app.createTherapistReadButton('syllableSplit', () => { this.therapistRead = true; }),
         ]);
 
         // Collection area: starts empty, no placeholder slots — a syllable
@@ -619,7 +598,6 @@ Phono.games.syllableRemoval = {
     levelInfo: null,
     currentItem: null,
     usedItems: [],
-    therapistRead: false,
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
@@ -633,7 +611,6 @@ Phono.games.syllableRemoval = {
     loadRound() {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
-        this.therapistRead = false;
 
         // Progressive difficulty by removal POSITION, not by word
         // length: tier 1 -> last syllable, tier 2 -> first, tier 3 ->
@@ -670,7 +647,6 @@ Phono.games.syllableRemoval = {
                 textContent: '🔒 Απάντηση (δάσκαλος)',
                 onClick: () => this.showAnswer(),
             }),
-            Phono.app.createTherapistReadButton('syllableRemoval', () => { this.therapistRead = true; }),
         ]);
 
         // Syllable boxes

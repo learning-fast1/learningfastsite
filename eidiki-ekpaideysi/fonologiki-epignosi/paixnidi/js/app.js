@@ -546,28 +546,6 @@ Phono.app = {
     },
 
     /**
-     * Create a "Ο θεραπευτής το είπε" button — an alternative to the
-     * app's own voice for this one round. Stops any in-progress TTS
-     * (matches what pressing mute would do) and marks the round as
-     * therapist-read so the session log records how the stimulus was
-     * actually presented, without changing anything else about the
-     * round (the child still answers the same way).
-     */
-    createTherapistReadButton(gameId, onMark) {
-        const { el } = Phono.helpers;
-        return el('button', {
-            className: 'btn btn-secondary btn-small repeat-btn-text',
-            textContent: '🗣️ Το είπε ο θεραπευτής',
-            title: 'Χρησιμοποιήθηκε η φωνή του θεραπευτή αντί της εκφώνησης',
-            onClick: () => {
-                Phono.audio.navGeneration++; // cancels any in-flight TTS, same as navigating away
-                if (typeof window.speechSynthesis !== 'undefined') window.speechSynthesis.cancel();
-                if (onMark) onMark();
-            },
-        });
-    },
-
-    /**
      * Create a repeat button ("Επανάληψη") that just re-plays whatever this
      * round's audio is — the child might not catch a word/sentence the
      * first time. Stateless (unlike the voice toggle): each game passes in
