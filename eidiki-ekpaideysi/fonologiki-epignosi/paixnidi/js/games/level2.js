@@ -739,12 +739,12 @@ Phono.games.syllableRemoval = {
                         if (boxesEl) { boxesEl.style.opacity = '0'; boxesEl.style.visibility = 'hidden'; }
                         const instructionEl = document.getElementById('sylremoval-instruction');
                         if (instructionEl) instructionEl.classList.add('shake-attention');
-                        // The remaining piece is always spoken out clearly,
-                        // syllable by syllable, regardless of whether it
-                        // happens to also be a real word on its own
-                        // (residueReal) — it's never *implied* to mean
-                        // something, just pronounced.
-                        Phono.audio.speak(this.currentItem.remaining, 0.7);
+                        // Never speak the remaining piece here — that
+                        // IS the answer the child is meant to work out.
+                        // The app only ever says the original word
+                        // (above); which syllable is being removed is
+                        // shown in writing in the instruction, not
+                        // spoken either.
                     }, 150);
                 }, 800);
             }
