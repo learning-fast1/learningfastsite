@@ -300,8 +300,8 @@ Phono.app = {
                 id: 'btn-back-levels-from-letters',
             }),
             el('div', { className: 'level-select-header' }, [
-                el('h1', { textContent: 'Ποια γράμματα δουλεύουμε σήμερα;' }),
-                el('p', { textContent: `Επίπεδο 4: ${level.title} — διάλεξε τα γράμματα που θέλεις να εξασκηθεί το παιδί. Χωρίς επιλογή, χρησιμοποιούνται όλα.` }),
+                el('h1', { textContent: 'Ποιους ήχους δουλεύουμε σήμερα;' }),
+                el('p', { textContent: `Επίπεδο 4: ${level.title} — διάλεξε τους ήχους που θέλεις να εξασκηθεί το παιδί. Χωρίς επιλογή, χρησιμοποιούνται όλοι.` }),
             ]),
             chipsGrid,
             el('div', { className: 'tap-controls', style: { marginTop: 'var(--space-md)' } }, [selectAllBtn, selectNoneBtn]),

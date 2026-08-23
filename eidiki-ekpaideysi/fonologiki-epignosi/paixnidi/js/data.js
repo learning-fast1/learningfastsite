@@ -484,149 +484,6 @@ Phono.data = {
     ],
 
     /* ----------------------------------------------------------
-       SOUND GROUPS for Level 4
-       Words grouped by initial sound for sorting activities.
-       ---------------------------------------------------------- */
-    soundGroups: {
-        "μ": [
-            { word: "μήλο", emoji: "🍎" },
-            { word: "μπάλα", emoji: "⚽" },
-            { word: "μέλι", emoji: "🍯" },
-            { word: "μύτη", emoji: "👃" },
-            { word: "μάτι", emoji: "👁️" },
-            { word: "μπανάνα", emoji: "🍌" },
-            { word: "μολύβι", emoji: "✏️" },
-            { word: "μαϊμού", emoji: "🐒" },
-            { word: "μέλισσα", emoji: "🐝" },
-            { word: "μπισκότο", emoji: "🍪" },
-            { word: "μανιτάρι", emoji: "🍄" },
-        ],
-        "σ": [
-            { word: "σπίτι", emoji: "🏠" },
-            { word: "σκύλος", emoji: "🐶" },
-            { word: "σαλάτα", emoji: "🥗" },
-            { word: "σκάλα", emoji: "🪜" },
-            { word: "σοκολάτα", emoji: "🍫" },
-            { word: "σταφύλι", emoji: "🍇" },
-            { word: "σύννεφο", emoji: "☁️" },
-            { word: "στόμα", emoji: "👄" },
-            { word: "σαλιγκάρι", emoji: "🐌" },
-        ],
-        "κ": [
-            { word: "κουνέλι", emoji: "🐰" },
-            { word: "κλειδί", emoji: "🔑" },
-            { word: "κουτί", emoji: "📦" },
-            { word: "καρπούζι", emoji: "🍉" },
-            { word: "κότα", emoji: "🐔" },
-            { word: "καρέκλα", emoji: "💺" },
-            { word: "καρότο", emoji: "🥕" },
-            { word: "καπέλο", emoji: "🎩" },
-            { word: "κεράσι", emoji: "🍒" },
-            { word: "καμήλα", emoji: "🐫" },
-            { word: "κουδούνι", emoji: "🔔" },
-            { word: "κιθάρα", emoji: "🎸" },
-            { word: "κεράκι", emoji: "🕯️" },
-            { word: "κοτόπουλο", emoji: "🍗" },
-        ],
-        "π": [
-            { word: "πουλί", emoji: "🐦" },
-            { word: "πόδι", emoji: "🦶" },
-            { word: "πεπόνι", emoji: "🍈" },
-            { word: "πεταλούδα", emoji: "🦋" },
-            { word: "πορτοκάλι", emoji: "🍊" },
-            { word: "ποτήρι", emoji: "🥤" },
-            { word: "πατάτα", emoji: "🥔" },
-            { word: "παπούτσι", emoji: "👟" },
-            { word: "πάπια", emoji: "🦆" },
-            { word: "πρόβατο", emoji: "🐑" },
-            { word: "πίτσα", emoji: "🍕" },
-            { word: "πόρτα", emoji: "🚪" },
-            { word: "παγωτό", emoji: "🍦" },
-            { word: "ποδήλατο", emoji: "🚲" },
-            { word: "παράθυρο", emoji: "🪟" },
-        ],
-        "φ": [
-            { word: "φίδι", emoji: "🐍" },
-            { word: "φανάρι", emoji: "🏮" },
-            { word: "φράουλα", emoji: "🍓" },
-            { word: "φεγγάρι", emoji: "🌙" },
-            { word: "φύλλο", emoji: "🍃" },
-        ],
-        "λ": [
-            { word: "λουλούδι", emoji: "🌸" },
-            { word: "λιοντάρι", emoji: "🦁" },
-            { word: "λεμόνι", emoji: "🍋" },
-            { word: "λάμπα", emoji: "💡" },
-            { word: "λύκος", emoji: "🐺" },
-        ],
-        "β": [
-            { word: "βιβλίο", emoji: "📖" },
-            { word: "βουνό", emoji: "🏔️" },
-            { word: "βάτραχος", emoji: "🐸" },
-            { word: "βάρκα", emoji: "⛵" },
-            { word: "βερίκοκο", emoji: "🍑" },
-        ],
-        "τ": [
-            { word: "τραπέζι", emoji: "🪑" },
-            { word: "τυρί", emoji: "🧀" },
-            { word: "τραγούδι", emoji: "🎵" },
-            { word: "τηλέφωνο", emoji: "📱" },
-            { word: "τούρτα", emoji: "🎂" },
-            { word: "τηλεόραση", emoji: "📺" },
-        ],
-        "γ": [
-            { word: "γάτα", emoji: "🐱" },
-            { word: "γάλα", emoji: "🥛" },
-            { word: "γουρούνι", emoji: "🐷" },
-            { word: "γραβάτα", emoji: "👔" },
-            { word: "γρασίδι", emoji: "🌱" },
-        ],
-        "ν": [
-            { word: "νερό", emoji: "💧" },
-            { word: "ντομάτα", emoji: "🍅" },
-            { word: "νύχι", emoji: "💅" },
-            { word: "νησί", emoji: "🏝️" },
-            { word: "ντουλάπα", emoji: "🚪" },
-            { word: "νεράιδα", emoji: "🧚" },
-        ],
-        "δ": [
-            { word: "δέντρο", emoji: "🌳" },
-            { word: "δόντι", emoji: "🦷" },
-            { word: "δελφίνι", emoji: "🐬" },
-            { word: "δώρο", emoji: "🎁" },
-            { word: "δάσος", emoji: "🌲" },
-        ],
-        "ζ": [
-            { word: "ζέβρα", emoji: "🦓" },
-            { word: "ζωγραφιά", emoji: "🎨" },
-            { word: "ζώο", emoji: "🐾" },
-            { word: "ζαμπόν", emoji: "🍖" },
-            { word: "ζάχαρη", emoji: "🧂" },
-        ],
-        "χ": [
-            { word: "χέρι", emoji: "🤚" },
-            { word: "χελώνα", emoji: "🐢" },
-            { word: "χαρταετός", emoji: "🪁" },
-            { word: "χιόνι", emoji: "❄️" },
-            { word: "χταπόδι", emoji: "🐙" },
-        ],
-        "ρ": [
-            { word: "ρόδι", emoji: "🥭" },
-            { word: "ρολόι", emoji: "⏰" },
-            { word: "ρούχο", emoji: "👕" },
-            { word: "ρόδα", emoji: "🛞" },
-            { word: "ραδιόφωνο", emoji: "📻" },
-        ],
-        "ψ": [
-            { word: "ψάρι", emoji: "🐟" },
-            { word: "ψωμί", emoji: "🍞" },
-            { word: "ψυγείο", emoji: "🧊" },
-            { word: "ψαλίδι", emoji: "✂️" },
-            { word: "ψώνια", emoji: "🛒" },
-        ],
-    },
-
-    /* ----------------------------------------------------------
        PHONEME DELETION DATA for Level 5 (Remove first sound)
        remaining = word χωρίς το πρώτο φώνημα.
        ---------------------------------------------------------- */
@@ -756,10 +613,12 @@ Phono.data = {
             colorDark: "#1976D2",
             games: [
                 { id: "findInitialPhoneme", title: "Βρίσκω το Αρχικό Φώνημα!", description: "Από ποιο φώνημα αρχίζει η λέξη;", icon: "⏮️" },
-                { id: "groupBySound", title: "Ομαδοποίησε!", description: "Βάλε τις λέξεις στη σωστή ομάδα", icon: "🧺" },
                 { id: "initialSoundMC", title: "Τι Αρχίζει από...;", description: "Βρες τη σωστή λέξη!", icon: "🆎" },
-                { id: "findFinalPhoneme", title: "Βρίσκω το Τελικό Φώνημα!", description: "Σε ποιο φώνημα τελειώνει η λέξη;", icon: "⏭️" },
+                { id: "groupBySound", title: "Ομαδοποίησε!", description: "Βάλε τις λέξεις στη σωστή ομάδα", icon: "🧺" },
                 { id: "soundOddOneOut", title: "Ο Παρείσακτος!", description: "Ποια λέξη αρχίζει διαφορετικά;", icon: "<span style=\"display: inline-grid; grid-template-columns: 1fr 1fr; gap: 1px; font-size: 0.5em; line-height: 1; vertical-align: middle;\"><span>🟥</span><span>🟥</span><span>🟥</span><span>🟦</span></span>" },
+                // Last on purpose: the FINAL sound is harder to isolate
+                // than the initial one, tackled only after the games above.
+                { id: "findFinalPhoneme", title: "Βρίσκω το Τελικό Φώνημα!", description: "Σε ποιο φώνημα τελειώνει η λέξη;", icon: "⏭️" },
             ]
         },
         {
@@ -831,11 +690,11 @@ Phono.data = {
         rhymeOddOneOut: "Το παιχνίδι λέει τρεις λέξεις (δύο ομοιοκαταληκτούν, μία όχι) και το παιδί βρίσκει ποια δεν ταιριάζει — η θέση της «διαφορετικής» λέξης αλλάζει κάθε γύρο, δεν είναι πάντα η ίδια. Χρειάζεται καθαρή, αργή εκφώνηση και των τριών. Σίγασε τη φωνή από το εικονίδιο 🔊 και πες τις λέξεις εσύ, με μικρή παύση ανάμεσά τους.",
 
         // Level 4 — Αρχικό & Τελικό Φώνημα
-        findInitialPhoneme: "Το παιδί ακούει μια λέξη και βρίσκει με ποιο φώνημα ξεκινάει. Υπάρχει και ξεχωριστό κουμπί «εικονίδιο 🔊 Άκουσε» μέσα στο στάδιο για επανάληψη. Αν σιγάσεις τη φωνή από το εικονίδιο 🔊, μπορείς να χρησιμοποιείς εσύ αυτό το σημείο για να προφέρεις τη λέξη κάθε φορά που το πατά το παιδί.",
-        groupBySound: "Το παιδί ομαδοποιεί λέξεις ανάλογα με τον αρχικό τους ήχο (δεν υπάρχει εκφώνηση φωνής σε αυτό το στάδιο, μόνο εικόνες/λέξεις). Αν δεν διαβάζει ακόμα άνετα, διάβασε εσύ κάθε λέξη πριν τη σύρει στην ομάδα της.",
-        initialSoundMC: "Ο ήχος εμφανίζεται γραπτά (π.χ. /σ/) και το παιδί βρίσκει ποια λέξη ξεκινάει από αυτόν — δεν υπάρχει εκφώνηση φωνής σε αυτό το στάδιο. Πες εσύ τον ήχο δυνατά πριν διαλέξει το παιδί. Πρόσεξε να τον πεις καθαρά, χωρίς το φωνήεν που συχνά «κολλάει» στα σύμφωνα (π.χ. «μ», όχι «μου»).",
-        findFinalPhoneme: "Ίδια λογική με το αρχικό φώνημα, αλλά το παιδί ψάχνει τώρα τον τελικό ήχο. Έχει κι αυτό κουμπί «εικονίδιο 🔊 Άκουσε» μέσα στο στάδιο. Σίγασε τη φωνή από το εικονίδιο 🔊 αν προτιμάς να το χρησιμοποιείς εσύ.",
-        soundOddOneOut: "Οι τρεις λέξεις με κοινό αρχικό ήχο εμφανίζονται γραπτά. Δεν υπάρχει εκφώνηση φωνής σε αυτό το στάδιο. Πες εσύ και τις τέσσερις λέξεις δυνατά, αργά και με μικρή παύση, ώστε το παιδί να ακούσει καθαρά ποια ξεχωρίζει.",
+        findInitialPhoneme: "Το παιδί ακούει μια λέξη και πατάει το κουμπί με τον σωστό ΗΧΟ (όχι απλό γράμμα — κάθε κουμπί εκφωνεί τον δικό του ήχο όταν πατιέται, π.χ. «μμμ»). Το κουμπί «Αα Γράμματα / 🔊 Μόνο ήχος» εναλλάσσει αν τα κουμπιά δείχνουν γράμμα ή μόνο ηχείο, για παιδιά που δεν διαβάζουν ακόμα. Ξεκινά από εξακολουθητικούς ήχους (μ,ν,λ,ρ,σ,φ,θ,χ,ζ,β,γ) και προχωρά σε στιγμιαίους (π,τ,κ,δ).",
+        groupBySound: "Το παιδί ομαδοποιεί λέξεις ανάλογα με τον αρχικό τους ήχο. Κάθε ετικέτα ομάδας είναι πατητή-ηχητική (πατάς → ακούς τον ήχο) και έχει δίπλα μια μικρή εικόνα-άγκυρα, ώστε να μη διαβάζεται λάθος (π.χ. το πεζό «ν» να μη μοιάζει με λατινικό «v»).",
+        initialSoundMC: "Δίνεται ένας ήχος σε πατητό-ηχητικό κουμπί (πατάς → τον ακούς) και το παιδί βρίσκει ποια εικόνα αρχίζει από αυτόν. Οι λανθασμένες επιλογές είναι πάντα ελεγμένες ώστε να έχουν πραγματικά διαφορετικό αρχικό ήχο.",
+        findFinalPhoneme: "Τελευταία δραστηριότητα του επιπέδου — ο τελικός ήχος είναι πιο δύσκολος από τον αρχικό. Ίδια λογική: το παιδί ακούει τη λέξη και πατάει το κουμπί με τον σωστό ΗΧΟ. Ξεκινά από τελικά φωνήεντα (πιο εύκολα), μετά το -ς. Εξήγησε στο παιδί ότι ο τελευταίος ήχος μπορεί να είναι και φωνήεν.",
+        soundOddOneOut: "Τρεις λέξεις μοιράζονται τον ίδιο αρχικό ήχο, μία διαφέρει — το παιδί βρίσκει ποια. Η θέση της «διαφορετικής» αλλάζει κάθε γύρο, δεν είναι πάντα στην ίδια θέση. Πες εσύ και τις τέσσερις λέξεις δυνατά, με μικρή παύση, ώστε το παιδί να ακούσει καθαρά ποια ξεχωρίζει.",
 
         // Level 5 — Φωνήματα (Προχωρημένο)
         phonemeSynthesis: "Οι ήχοι μιας λέξης εμφανίζονται οπτικά, έναν-έναν σε φυσαλίδες, και το παιδί τους ενώνει νοερά — δεν υπάρχει εκφώνηση φωνής σε αυτό το στάδιο. Πες εσύ κάθε ήχο δυνατά καθώς εμφανίζεται, με μικρή παύση ανάμεσά τους ανάλογα με το επίπεδο του παιδιού.",
@@ -871,35 +730,25 @@ Phono.data = {
     },
 
     /* ----------------------------------------------------------
-       HELPER: Get words by initial sound
-       ---------------------------------------------------------- */
-    getWordsByInitialSound(sound) {
-        return this.soundGroups[sound] || [];
-    },
-
-    /* ----------------------------------------------------------
        HELPER: Every letter Level 4's games could actually produce a
-       round for — the union of soundGroups keys and words' first/last
-       letters. Backs the Level 4 letter-picker screen, so it never
+       round for — every distinct initial/final phoneme in
+       initialPhonemesL4 / finalPhonemesL4. Backs the Level 4
+       letter-picker screen, so it never
        offers a letter that would just silently fall back to "no
        restriction" every round.
        ---------------------------------------------------------- */
     getLevel4AvailableLetters() {
-        // Strips accents/final-sigma so e.g. "ήλιος" (starts with accented
-        // "ή") correctly marks plain "η" as available — the letter-picker
-        // only offers plain letters, and findInitialPhoneme/
-        // findFinalPhoneme normalize the same way (level4PlainLetter in
-        // level4.js) when matching a round's correct answer.
-        const accentMap = { 'ά': 'α', 'έ': 'ε', 'ή': 'η', 'ί': 'ι', 'ό': 'ο', 'ύ': 'υ', 'ώ': 'ω', 'ς': 'σ' };
-        const plain = l => accentMap[l] || l;
-
+        // Every entry's `initial`/`final` field is already a plain
+        // (unaccented) letter or the -ς/-ου/-ς phoneme label, so no
+        // accent-stripping is needed here — see initial_phonemes_l4.js /
+        // final_phonemes_l4.js.
         const letters = new Set();
-        Object.keys(this.soundGroups).forEach(l => letters.add(plain(l)));
-        this.words.forEach(w => {
-            letters.add(plain(w.word.charAt(0)));
-            letters.add(plain(w.word.charAt(w.word.length - 1)));
-        });
-        const greekOrder = 'αβγδεζηθικλμνξοπρστυφχψω'.split('');
+        this.initialPhonemesL4.forEach(w => letters.add(w.initial));
+        this.finalPhonemesL4.forEach(w => letters.add(w.final));
+        // "ου" and "ς" are multi-character/symbol phoneme labels, not
+        // single letters — kept as their own array entries rather than
+        // folded into a string (which .split('') would break apart).
+        const greekOrder = ['α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'ι', 'κ', 'λ', 'μ', 'ν', 'ξ', 'ο', 'π', 'ρ', 'σ', 'ς', 'τ', 'υ', 'φ', 'χ', 'ψ', 'ω', 'ου'];
         return greekOrder.filter(l => letters.has(l));
     },
 
