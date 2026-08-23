@@ -23,9 +23,9 @@ Phono.games.syllableCounting = {
     container: null,
     levelInfo: null,
     currentWord: null,
+    roundWords: [],
     tapCount: 0,
     answered: false,
-    usedWords: [],
     hardMode: false,
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
@@ -33,7 +33,6 @@ Phono.games.syllableCounting = {
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
-        this.usedWords = [];
         try {
             this.hardMode = localStorage.getItem('phono_syllableCountingHardMode') === '1';
         } catch (e) {
@@ -45,6 +44,11 @@ Phono.games.syllableCounting = {
         // chance (e.g. 4 two-syllable words in a row). Planning the full
         // sequence up front lets us actively break those runs up.
         this.syllablePlan = level2BuildSyllablePlan(Phono.engine.totalRounds);
+        // The actual WORDS are planned up front too (not just the target
+        // counts above) so the teacher's word list can show every word
+        // for the round right away — same reasoning as syllableSplit's
+        // roundWords.
+        this.roundWords = level2BuildSyllableCountingWords(Phono.engine.totalRounds, this.syllablePlan);
         this.loadRound();
     },
 
@@ -54,28 +58,7 @@ Phono.games.syllableCounting = {
         this.tapCount = 0;
         this.answered = false;
 
-        const targetSyl = this.syllablePlan[Phono.engine.currentRound];
-        if (targetSyl === 1) {
-            // 1-syllable words sit outside wordsL2's A-D stages (which
-            // all start at 2 syllables) — keep drawing this one tier
-            // from the small dedicated pool, same as before.
-            const pool = Phono.data.oneSyllableWords.filter(w => !this.usedWords.includes(w.word));
-            const available = pool.length > 0 ? pool : Phono.data.oneSyllableWords;
-            this.currentWord = Phono.data.getRandom(available);
-        } else {
-            // 2+ syllables: pull from wordsL2, gated by the same
-            // difficulty tier as every other Level 2 activity, so a
-            // round never asks about a syllable cluster/diphthong the
-            // child hasn't been introduced to yet via the easier stages.
-            const tier = Phono.engine.getDifficultyTier();
-            const stage = Phono.data.wordsL2StageForTier(tier);
-            const stagePool = Phono.data.wordsL2UpToStage(stage).filter(w => w.imageable && w.syllables.length === targetSyl);
-            const pool = stagePool.filter(w => !this.usedWords.includes(w.word));
-            const available = pool.length > 0 ? pool : (stagePool.length > 0 ? stagePool : Phono.data.wordsL2.filter(w => w.imageable && w.syllables.length === targetSyl));
-            this.currentWord = Phono.data.getRandom(available);
-        }
-        this.usedWords.push(this.currentWord.word);
-
+        this.currentWord = this.roundWords[Phono.engine.currentRound];
         const correct = this.currentWord.syllables.length;
 
         const instruction = el('p', { className: 'game-instruction', textContent: 'Χτύπα για κάθε συλλαβή της λέξης!' });
@@ -90,8 +73,8 @@ Phono.games.syllableCounting = {
         ]);
         const revealBtn = el('button', {
             className: 'btn btn-secondary btn-small',
-            textContent: '🔒 Λέξη (δάσκαλος)',
-            onClick: () => this.showAnswer(),
+            textContent: '🔒 Λέξεις (δάσκαλος)',
+            onClick: () => this.showWordList(),
         });
         const modeBtn = el('button', {
             className: 'btn btn-secondary btn-small',
@@ -171,7 +154,7 @@ Phono.games.syllableCounting = {
         checkArea.appendChild(label);
         checkArea.appendChild(choicesDiv);
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [
+        this.container.appendChild(el('div', { className: 'tap-area compact-tap-area' }, [
             instruction, emojiDiv, wordRow,
             el('div', { className: 'sentence-row' }, [revealBtn, modeBtn]),
             counterDiv, tapBtn, tapControls, checkArea,
@@ -179,21 +162,40 @@ Phono.games.syllableCounting = {
         Phono.audio.speak(this.currentWord.word);
     },
 
-    /** Teacher-only overlay with the written word — same fixed-overlay
-     * pattern used across every Level 1/2 game (see wordDeletion.showAnswer
-     * in level1.js), attached to #app since the game area sits inside the
-     * .fade-in screen whose `transform` would break a fixed child. */
-    showAnswer() {
+    /** Teacher-only word list for the WHOLE session, not just the current
+     * round — same reasoning and fixed-overlay pattern as
+     * syllableSynthesis.showWordList. */
+    showWordList() {
         const { el } = Phono.helpers;
         const close = () => overlay.remove();
+
+        const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', textAlign: 'left' } });
+        this.roundWords.forEach((w, i) => {
+            const isCurrent = i === Phono.engine.currentRound;
+            list.appendChild(el('div', {
+                style: {
+                    display: 'flex', justifyContent: 'space-between', gap: 'var(--space-md)',
+                    padding: 'var(--space-xs) var(--space-sm)', borderRadius: 'var(--radius-md)',
+                    background: isCurrent ? 'var(--primary-light)' : 'transparent',
+                    fontWeight: isCurrent ? '800' : '600',
+                },
+            }, [
+                el('span', { textContent: `${i + 1}. ${w.emoji} ${w.word}` }),
+                el('span', { textContent: `${w.syllables.join('-')} (${w.syllables.length})`, style: { color: 'var(--text-secondary)' } }),
+            ]));
+        });
+
         const overlay = el('div', {
             className: 'teacher-note-overlay',
             onClick: (e) => { if (e.target === overlay) close(); },
         }, [
             el('div', { className: 'teacher-note-card' }, [
-                el('div', { className: 'teacher-note-title', textContent: '🔒 Για τον/την εκπαιδευτικό' }),
-                el('p', { innerHTML: `<strong>Λέξη:</strong> ${this.currentWord.word}` }),
-                el('p', { innerHTML: `<strong>Συλλαβές:</strong> ${this.currentWord.syllables.join('-')} (${this.currentWord.syllables.length})` }),
+                el('div', { className: 'teacher-note-title', textContent: '🔒 Λέξεις της συνεδρίας' }),
+                el('p', {
+                    textContent: 'Σημείωσε τις λέξεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
+                }),
+                list,
                 el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
             ]),
         ]);
@@ -580,6 +582,10 @@ Phono.games.syllableSplit = {
         }, [
             el('div', { className: 'teacher-note-card' }, [
                 el('div', { className: 'teacher-note-title', textContent: '🔒 Λέξεις της συνεδρίας' }),
+                el('p', {
+                    textContent: 'Σημείωσε τις λέξεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
+                }),
                 list,
                 el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
             ]),
@@ -637,14 +643,17 @@ Phono.games.syllableRemoval = {
     container: null,
     levelInfo: null,
     currentItem: null,
-    usedItems: [],
+    roundItems: [],
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
-        this.usedItems = [];
+        // Whole session picked up front (not per-round) so the teacher's
+        // word list can show every item for the round right away — same
+        // reasoning as syllableSplit's roundWords.
+        this.roundItems = level2BuildSyllableRemovalItems(Phono.engine.totalRounds);
         this.loadRound();
     },
 
@@ -652,17 +661,7 @@ Phono.games.syllableRemoval = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
 
-        // Progressive difficulty by removal POSITION, not by word
-        // length: tier 1 -> last syllable, tier 2 -> first, tier 3 ->
-        // middle (hardest, and also the smallest pool — only 3 items).
-        const tier = Phono.engine.getDifficultyTier();
-        const position = tier === 1 ? 'last' : tier === 2 ? 'first' : 'middle';
-
-        const pool = Phono.data.syllableRemovalL2.filter(item => item.position === position && !this.usedItems.includes(item.word + item.position));
-        const available = pool.length > 0 ? pool : Phono.data.syllableRemovalL2.filter(item => item.position === position);
-        this.currentItem = available.length > 0 ? Phono.data.getRandom(available) : Phono.data.getRandom(Phono.data.syllableRemovalL2);
-        this.usedItems.push(this.currentItem.word + this.currentItem.position);
-
+        this.currentItem = this.roundItems[Phono.engine.currentRound];
         const removedSyllable = this.currentItem.syllables[this.currentItem.removeIndex];
         const instruction = el('p', {
             className: 'game-instruction',
@@ -683,8 +682,8 @@ Phono.games.syllableRemoval = {
         const controlsRow = el('div', { className: 'sentence-row' }, [
             el('button', {
                 className: 'btn btn-secondary btn-small',
-                textContent: '🔒 Απάντηση (δάσκαλος)',
-                onClick: () => this.showAnswer(),
+                textContent: '🔒 Λέξεις (δάσκαλος)',
+                onClick: () => this.showWordList(),
             }),
         ]);
 
@@ -752,22 +751,42 @@ Phono.games.syllableRemoval = {
         }, 1500);
     },
 
-    /** Teacher-only overlay with exactly what's being erased this round
-     * and the correct answer. */
-    showAnswer() {
+    /** Teacher-only word list for the WHOLE session, not just the current
+     * round — same reasoning and fixed-overlay pattern as
+     * syllableSynthesis.showWordList. */
+    showWordList() {
         const { el } = Phono.helpers;
         const close = () => overlay.remove();
-        const removedSyllable = this.currentItem.syllables[this.currentItem.removeIndex];
+        const positionLabel = p => p === 'last' ? 'τελευταία' : p === 'first' ? 'πρώτη' : 'μεσαία';
+
+        const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', textAlign: 'left' } });
+        this.roundItems.forEach((item, i) => {
+            const isCurrent = i === Phono.engine.currentRound;
+            const removedSyllable = item.syllables[item.removeIndex];
+            list.appendChild(el('div', {
+                style: {
+                    display: 'flex', justifyContent: 'space-between', gap: 'var(--space-md)',
+                    padding: 'var(--space-xs) var(--space-sm)', borderRadius: 'var(--radius-md)',
+                    background: isCurrent ? 'var(--primary-light)' : 'transparent',
+                    fontWeight: isCurrent ? '800' : '600',
+                },
+            }, [
+                el('span', { textContent: `${i + 1}. ${item.word} (χωρίς "${removedSyllable}", ${positionLabel(item.position)})` }),
+                el('span', { textContent: `→ ${item.remaining}`, style: { color: 'var(--text-secondary)' } }),
+            ]));
+        });
 
         const overlay = el('div', {
             className: 'teacher-note-overlay',
             onClick: (e) => { if (e.target === overlay) close(); },
         }, [
             el('div', { className: 'teacher-note-card' }, [
-                el('div', { className: 'teacher-note-title', textContent: '🔒 Για τον/την εκπαιδευτικό' }),
-                el('p', { innerHTML: `<strong>Λέξη:</strong> ${this.currentItem.word}` }),
-                el('p', { innerHTML: `<strong>Αφαιρείται συλλαβή:</strong> ${removedSyllable} (${this.currentItem.position === 'last' ? 'τελευταία' : this.currentItem.position === 'first' ? 'πρώτη' : 'μεσαία'})` }),
-                el('p', { innerHTML: `<strong>Απάντηση:</strong> ${this.currentItem.remaining}` }),
+                el('div', { className: 'teacher-note-title', textContent: '🔒 Λέξεις της συνεδρίας' }),
+                el('p', {
+                    textContent: 'Σημείωσε τις λέξεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
+                }),
+                list,
                 el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
             ]),
         ]);
@@ -923,4 +942,60 @@ function level2BuildSyllablePlan(totalRounds) {
     });
 
     return plan;
+}
+
+/** Turns a syllablePlan (target syllable COUNT per round, from
+ * level2BuildSyllablePlan above) into actual WORD objects, one per
+ * round, picked up front — same reasoning as level2BuildSyllableSplitWords:
+ * the teacher's word list needs every round's word right away, not
+ * revealed one at a time as loadRound() used to pick them live. */
+function level2BuildSyllableCountingWords(totalRounds, syllablePlan) {
+    const used = [];
+    const words = [];
+    for (let round = 0; round < totalRounds; round++) {
+        const targetSyl = syllablePlan[round];
+        let word;
+        if (targetSyl === 1) {
+            // 1-syllable words sit outside wordsL2's A-D stages (which
+            // all start at 2 syllables) — keep drawing this one tier
+            // from the small dedicated pool, same as before.
+            const pool = Phono.data.oneSyllableWords.filter(w => !used.includes(w.word));
+            const available = pool.length > 0 ? pool : Phono.data.oneSyllableWords;
+            word = Phono.data.getRandom(available);
+        } else {
+            // 2+ syllables: pull from wordsL2, gated by the same
+            // difficulty tier as every other Level 2 activity, so a
+            // round never asks about a syllable cluster/diphthong the
+            // child hasn't been introduced to yet via the easier stages.
+            const tier = tierForRound(round, totalRounds);
+            const stage = Phono.data.wordsL2StageForTier(tier);
+            const stagePool = Phono.data.wordsL2UpToStage(stage).filter(w => w.imageable && w.syllables.length === targetSyl);
+            const pool = stagePool.filter(w => !used.includes(w.word));
+            const available = pool.length > 0 ? pool : (stagePool.length > 0 ? stagePool : Phono.data.wordsL2.filter(w => w.imageable && w.syllables.length === targetSyl));
+            word = Phono.data.getRandom(available);
+        }
+        used.push(word.word);
+        words.push(word);
+    }
+    return words;
+}
+
+/** Same up-front-planning reasoning as level2BuildSyllableSplitWords —
+ * plans every round's removal item by POSITION difficulty (tier 1 ->
+ * last, tier 2 -> first, tier 3 -> middle) so the teacher's word list
+ * can show every item for the round right away. */
+function level2BuildSyllableRemovalItems(totalRounds) {
+    const used = [];
+    const items = [];
+    for (let round = 0; round < totalRounds; round++) {
+        const tier = tierForRound(round, totalRounds);
+        const position = tier === 1 ? 'last' : tier === 2 ? 'first' : 'middle';
+
+        const pool = Phono.data.syllableRemovalL2.filter(item => item.position === position && !used.includes(item.word + item.position));
+        const available = pool.length > 0 ? pool : Phono.data.syllableRemovalL2.filter(item => item.position === position);
+        const item = available.length > 0 ? Phono.data.getRandom(available) : Phono.data.getRandom(Phono.data.syllableRemovalL2);
+        used.push(item.word + item.position);
+        items.push(item);
+    }
+    return items;
 }

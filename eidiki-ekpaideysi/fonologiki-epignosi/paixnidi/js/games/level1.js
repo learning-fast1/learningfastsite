@@ -289,6 +289,38 @@ function level1BuildSentenceBuilderSentences(totalRounds) {
     return sentences;
 }
 
+/** Replicates Phono.engine.getDifficultyTier()'s round->tier formula
+ * directly (a pure function of round/total) instead of reading the
+ * engine's live currentRound — needed because the whole session's
+ * sentences are picked up front, before the engine has actually walked
+ * through each round. */
+function level1TierForRound(round, total) {
+    if (round < Math.ceil(total / 3)) return 1;
+    if (round < Math.ceil((2 * total) / 3)) return 2;
+    return 3;
+}
+
+/** Pre-selects every sentence for the whole session up front — same
+ * reasoning as level1BuildSentenceBuilderSentences — so the teacher's
+ * reveal panel can list every sentence and its target word before play
+ * even starts, instead of only the current round's. */
+function level1BuildWordPositionSentences(totalRounds) {
+    const used = [];
+    const sentences = [];
+    for (let round = 0; round < totalRounds; round++) {
+        const tier = level1TierForRound(round, totalRounds);
+        const stage = tier === 1 ? 'A' : tier === 2 ? 'B' : 'C';
+        const matchesStage = s => stage === 'A' ? (s.words.length >= 2 && s.words.length <= 3) : s.words.length === 3;
+
+        const pool = Phono.data.sentences.filter(s => matchesStage(s) && !used.includes(s.text));
+        const available = pool.length > 0 ? pool : Phono.data.sentences.filter(matchesStage);
+        const sentence = Phono.data.getRandom(available);
+        used.push(sentence.text);
+        sentences.push(sentence);
+    }
+    return sentences;
+}
+
 /**
  * Same easy-to-hard trend as above, but with a little randomness around
  * the "ideal" length each round. Used only for the clapping game
@@ -573,7 +605,7 @@ Phono.games.wordPosition = {
     currentSentence: null,
     targetIndex: 0,
     positionLabel: '',
-    usedSentences: [],
+    roundSentences: [],
     answered: false,
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
@@ -581,7 +613,10 @@ Phono.games.wordPosition = {
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
-        this.usedSentences = [];
+        // Whole session picked up front (not per-round) so the teacher's
+        // sentence list can show every sentence for the round right away
+        // — same reasoning as sentenceBuilder's roundSentences.
+        this.roundSentences = level1BuildWordPositionSentences(Phono.engine.totalRounds);
         this.loadRound();
     },
 
@@ -595,12 +630,8 @@ Phono.games.wordPosition = {
         // for the MIDDLE word (3 words, hardest — depends on both edges).
         const tier = Phono.engine.getDifficultyTier();
         const stage = tier === 1 ? 'A' : tier === 2 ? 'B' : 'C';
-        const matchesStage = s => stage === 'A' ? (s.words.length >= 2 && s.words.length <= 3) : s.words.length === 3;
 
-        const pool = Phono.data.sentences.filter(s => matchesStage(s) && !this.usedSentences.includes(s.text));
-        const available = pool.length > 0 ? pool : Phono.data.sentences.filter(matchesStage);
-        this.currentSentence = Phono.data.getRandom(available);
-        this.usedSentences.push(this.currentSentence.text);
+        this.currentSentence = this.roundSentences[Phono.engine.currentRound];
 
         const words = this.currentSentence.words;
         this.targetIndex = stage === 'A' ? 0 : stage === 'B' ? words.length - 1 : 1;
@@ -616,13 +647,14 @@ Phono.games.wordPosition = {
             this.createRepeatButton(() => Phono.audio.speak(this.currentSentence.text, 0.5)),
         ]);
 
-        // Teacher-only peek at the sentence and the correct answer — the
-        // sentence is never shown written out, so the teacher has no way
-        // to read it herself with the sound muted without this.
+        // Teacher-only peek at every sentence in the session and its
+        // target word — the sentence is never shown written out, so the
+        // teacher has no way to read it herself with the sound muted
+        // without this.
         const revealBtn = el('button', {
             className: 'btn btn-secondary btn-small',
-            textContent: '🔒 Απάντηση (δάσκαλος)',
-            onClick: () => this.showAnswer(),
+            textContent: '🔒 Προτάσεις (δάσκαλος)',
+            onClick: () => this.showSentenceList(),
         });
 
         // Word-position boxes — as many empty boxes as words in the
@@ -642,10 +674,13 @@ Phono.games.wordPosition = {
             { word: outsideWord, correct: false },
         ]);
 
+        // No emoji on these cards — the choice IS the word, unlike a
+        // picture-choice game, and a 72px decorative "🔊" on every card
+        // was pure wasted vertical space (the word is already read aloud
+        // on tap).
         const choicesGrid = el('div', { className: 'choices-grid' });
         choices.forEach(choice => {
             const card = el('div', { className: 'choice-card', onClick: () => this.checkAnswer(card) }, [
-                el('span', { className: 'choice-emoji', textContent: '🔊' }),
                 el('span', { className: 'choice-word', textContent: choice.word }),
             ]);
             card._correct = choice.correct;
@@ -661,23 +696,47 @@ Phono.games.wordPosition = {
         Phono.audio.speak(this.currentSentence.text, 0.5);
     },
 
-    /** Teacher-only overlay with the sentence and the correct answer, as
-     * a fixed overlay attached to #app (not this.container, since the
-     * game area sits inside the .fade-in screen, whose `transform` would
-     * break a fixed-position child). */
-    showAnswer() {
+    /** Teacher-only sentence list for the WHOLE session, not just the
+     * current round, as a fixed overlay attached to #app (not
+     * this.container, since the game area sits inside the .fade-in
+     * screen, whose `transform` would break a fixed-position child). */
+    showSentenceList() {
         const { el } = Phono.helpers;
         const close = () => overlay.remove();
+        const total = this.roundSentences.length;
+
+        const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', textAlign: 'left' } });
+        this.roundSentences.forEach((s, i) => {
+            const isCurrent = i === Phono.engine.currentRound;
+            const tier = level1TierForRound(i, total);
+            const stage = tier === 1 ? 'A' : tier === 2 ? 'B' : 'C';
+            const words = s.words;
+            const targetIndex = stage === 'A' ? 0 : stage === 'B' ? words.length - 1 : 1;
+            const positionLabel = stage === 'A' ? 'πρώτη' : stage === 'B' ? 'τελευταία' : 'μεσαία';
+            list.appendChild(el('div', {
+                style: {
+                    display: 'flex', justifyContent: 'space-between', gap: 'var(--space-md)',
+                    padding: 'var(--space-xs) var(--space-sm)', borderRadius: 'var(--radius-md)',
+                    background: isCurrent ? 'var(--primary-light)' : 'transparent',
+                    fontWeight: isCurrent ? '800' : '600',
+                },
+            }, [
+                el('span', { textContent: `${i + 1}. ${s.text}` }),
+                el('span', { textContent: `${positionLabel}: ${words[targetIndex]}`, style: { color: 'var(--text-secondary)' } }),
+            ]));
+        });
 
         const overlay = el('div', {
             className: 'teacher-note-overlay',
             onClick: (e) => { if (e.target === overlay) close(); },
         }, [
             el('div', { className: 'teacher-note-card' }, [
-                el('div', { className: 'teacher-note-title', textContent: '🔒 Για τον/την εκπαιδευτικό' }),
-                el('p', { innerHTML: `<strong>Πρόταση:</strong> ${this.currentSentence.text}` }),
-                el('p', { innerHTML: `<strong>Ζητούμενη λέξη:</strong> ${this.positionLabel}` }),
-                el('p', { innerHTML: `<strong>Απάντηση:</strong> ${this.currentSentence.words[this.targetIndex]}` }),
+                el('div', { className: 'teacher-note-title', textContent: '🔒 Προτάσεις της συνεδρίας' }),
+                el('p', {
+                    textContent: 'Σημείωσε τις προτάσεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
+                }),
+                list,
                 el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
             ]),
         ]);
@@ -860,6 +919,10 @@ Phono.games.sentenceBuilder = {
         }, [
             el('div', { className: 'teacher-note-card' }, [
                 el('div', { className: 'teacher-note-title', textContent: '🔒 Προτάσεις της συνεδρίας' }),
+                el('p', {
+                    textContent: 'Σημείωσε τις προτάσεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
+                }),
                 list,
                 el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
             ]),
@@ -919,6 +982,27 @@ function wordDeletionShuffleDifferent(words) {
     return shuffled;
 }
 
+/** Pre-selects every sentence for the whole session up front — same
+ * reasoning as level1BuildWordPositionSentences — so the teacher's
+ * reveal panel can list every sentence and what's being erased before
+ * play even starts, instead of only the current round's. */
+function level1BuildWordDeletionSentences(totalRounds) {
+    const used = [];
+    const sentences = [];
+    for (let round = 0; round < totalRounds; round++) {
+        const tier = level1TierForRound(round, totalRounds);
+        const stage = tier === 1 ? 'A' : tier === 2 ? 'B' : 'C';
+        const matchesStage = s => stage === 'C' ? s.words.length === 3 : (s.words.length >= 3 && s.words.length <= 4);
+
+        const pool = Phono.data.sentences.filter(s => matchesStage(s) && !used.includes(s.text));
+        const available = pool.length > 0 ? pool : Phono.data.sentences.filter(matchesStage);
+        const sentence = Phono.data.getRandom(available);
+        used.push(sentence.text);
+        sentences.push(sentence);
+    }
+    return sentences;
+}
+
 /* ===========================================
    GAME: wordDeletion — "Πες την χωρίς μια λέξη"
    Introduces the DELETION operation on easy material (whole words) —
@@ -932,7 +1016,7 @@ Phono.games.wordDeletion = {
     createRepeatButton: null,
     currentSentence: null,
     targetIndex: 0,
-    usedSentences: [],
+    roundSentences: [],
     answered: false,
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
@@ -940,7 +1024,10 @@ Phono.games.wordDeletion = {
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
-        this.usedSentences = [];
+        // Whole session picked up front (not per-round) so the teacher's
+        // sentence list can show every sentence for the round right away
+        // — same reasoning as sentenceBuilder's roundSentences.
+        this.roundSentences = level1BuildWordDeletionSentences(Phono.engine.totalRounds);
         this.loadRound();
     },
 
@@ -955,12 +1042,8 @@ Phono.games.wordDeletion = {
         // removal games this stage is meant to lead into.
         const tier = Phono.engine.getDifficultyTier();
         const stage = tier === 1 ? 'A' : tier === 2 ? 'B' : 'C';
-        const matchesStage = s => stage === 'C' ? s.words.length === 3 : (s.words.length >= 3 && s.words.length <= 4);
 
-        const pool = Phono.data.sentences.filter(s => matchesStage(s) && !this.usedSentences.includes(s.text));
-        const available = pool.length > 0 ? pool : Phono.data.sentences.filter(matchesStage);
-        this.currentSentence = Phono.data.getRandom(available);
-        this.usedSentences.push(this.currentSentence.text);
+        this.currentSentence = this.roundSentences[Phono.engine.currentRound];
 
         const words = this.currentSentence.words;
         this.targetIndex = stage === 'A' ? words.length - 1 : stage === 'B' ? 0 : 1;
@@ -977,13 +1060,14 @@ Phono.games.wordDeletion = {
             this.createRepeatButton(() => Phono.audio.speak(this.currentSentence.text, 0.65)),
         ]);
 
-        // Teacher-only peek at exactly what's being erased this round —
-        // the choice cards eventually show the answer among distractors,
-        // but the teacher shouldn't have to guess which one is correct.
+        // Teacher-only peek at every sentence in the session and exactly
+        // what's being erased each round — the choice cards eventually
+        // show the answer among distractors, but the teacher shouldn't
+        // have to guess which one is correct.
         const revealBtn = el('button', {
             className: 'btn btn-secondary btn-small',
-            textContent: '🔒 Απάντηση (δάσκαλος)',
-            onClick: () => this.showAnswer(),
+            textContent: '🔒 Προτάσεις (δάσκαλος)',
+            onClick: () => this.showSentenceList(),
         });
 
         // Word boxes — one per word; the target box "erases" once the
@@ -1015,10 +1099,12 @@ Phono.games.wordDeletion = {
             { text: scrambledText, correct: false },
         ]);
 
+        // No emoji on these cards — same reasoning as wordPosition's
+        // choice cards: the choice IS the sentence text, so a 72px
+        // decorative "🔊" was pure wasted vertical space.
         const choicesGrid = el('div', { className: 'choices-grid' });
         choices.forEach(choice => {
             const card = el('div', { className: 'choice-card', onClick: () => this.checkAnswer(card) }, [
-                el('span', { className: 'choice-emoji', textContent: '🔊' }),
                 el('span', { className: 'choice-word', textContent: choice.text }),
             ]);
             card._correct = choice.correct;
@@ -1060,28 +1146,46 @@ Phono.games.wordDeletion = {
         });
     },
 
-    /** Teacher-only overlay with exactly what's being erased this round
-     * and the correct answer, as a fixed overlay (not inline content) so
-     * it never pushes the page around. Attached to #app rather than
-     * this.container since the game area sits inside the .fade-in
-     * screen, whose `transform` would otherwise break a fixed-position
-     * child's positioning. */
-    showAnswer() {
+    /** Teacher-only sentence list for the WHOLE session, not just the
+     * current round — same reasoning and fixed-overlay pattern as
+     * wordPosition.showSentenceList. */
+    showSentenceList() {
         const { el } = Phono.helpers;
         const close = () => overlay.remove();
-        const words = this.currentSentence.words;
-        const targetWord = words[this.targetIndex];
-        const correctText = words.filter((_, i) => i !== this.targetIndex).join(' ');
+        const total = this.roundSentences.length;
+
+        const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', textAlign: 'left' } });
+        this.roundSentences.forEach((s, i) => {
+            const isCurrent = i === Phono.engine.currentRound;
+            const tier = level1TierForRound(i, total);
+            const stage = tier === 1 ? 'A' : tier === 2 ? 'B' : 'C';
+            const words = s.words;
+            const targetIndex = stage === 'A' ? words.length - 1 : stage === 'B' ? 0 : 1;
+            const targetWord = words[targetIndex];
+            const correctText = words.filter((_, wi) => wi !== targetIndex).join(' ');
+            list.appendChild(el('div', {
+                style: {
+                    padding: 'var(--space-xs) var(--space-sm)', borderRadius: 'var(--radius-md)',
+                    background: isCurrent ? 'var(--primary-light)' : 'transparent',
+                    fontWeight: isCurrent ? '800' : '600',
+                },
+            }, [
+                el('div', { textContent: `${i + 1}. ${s.text}` }),
+                el('div', { textContent: `χωρίς «${targetWord}» → ${correctText}`, style: { color: 'var(--text-secondary)', fontWeight: '600' } }),
+            ]));
+        });
 
         const overlay = el('div', {
             className: 'teacher-note-overlay',
             onClick: (e) => { if (e.target === overlay) close(); },
         }, [
             el('div', { className: 'teacher-note-card' }, [
-                el('div', { className: 'teacher-note-title', textContent: '🔒 Για τον/την εκπαιδευτικό' }),
-                el('p', { innerHTML: `<strong>Πρόταση:</strong> ${this.currentSentence.text}` }),
-                el('p', { innerHTML: `<strong>Αφαιρείται:</strong> ${targetWord}` }),
-                el('p', { innerHTML: `<strong>Απάντηση:</strong> ${correctText}` }),
+                el('div', { className: 'teacher-note-title', textContent: '🔒 Προτάσεις της συνεδρίας' }),
+                el('p', {
+                    textContent: 'Σημείωσε τις προτάσεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
+                }),
+                list,
                 el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
             ]),
         ]);

@@ -723,8 +723,14 @@ input {
    12. GAME PLAY SCREEN
    =========================================== */
 .game-screen {
+    /* No min-height:100vh here — #app already establishes the page's
+       floor, and this screen doesn't center its content (unlike
+       .home-screen/.game-complete-screen, which do and need the full
+       viewport to center against). Stacking another 100vh floor inside
+       #app's own padding guaranteed the document was taller than the
+       viewport on every round, forcing a scroll to reach the "Επόμενο"
+       button even when the actual content was short. */
     width: 100%;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
     padding: var(--space-md);
@@ -734,8 +740,8 @@ input {
     display: flex;
     align-items: center;
     gap: var(--space-md);
-    padding: var(--space-md) 0;
-    margin-bottom: var(--space-md);
+    padding: var(--space-sm) 0;
+    margin-bottom: var(--space-sm);
     position: relative;
 }
 
@@ -999,7 +1005,7 @@ input {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-xl);
+    gap: var(--space-md);
     width: 100%;
 }
 
@@ -1858,16 +1864,16 @@ input {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-xl);
+    gap: var(--space-md);
     width: 100%;
 }
 
-/* Shared by the newer Level 1 games (wordSizeCompare, wordPosition) —
-   tighter spacing + a footer slot for a manual "next" control, so extra
-   content revealed after answering still fits in one screen instead of
-   pushing the page taller. */
+/* Extra-tight spacing for games that reveal even more content after
+   answering (a "Next" footer on top of everything else already on
+   screen) — keeps the whole round, including that footer, inside one
+   screen instead of requiring a scroll to reach it. */
 .compact-tap-area {
-    gap: var(--space-md);
+    gap: var(--space-sm);
 }
 
 .round-footer {
@@ -1949,7 +1955,7 @@ input {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-xl);
+    gap: var(--space-md);
     width: 100%;
 }
 
@@ -2183,6 +2189,44 @@ input {
 
     .level-card {
         padding: var(--space-md);
+    }
+}
+
+/* Short viewports (small phones, or a browser window that isn't very
+   tall) — the busiest round (syllableCounting: tap button + undo/reset
+   controls + a 5-way answer grid, all stacked) is the one screen that
+   can still run past one page height at these sizes even with the
+   tighter .compact-tap-area spacing above. Shrinking the tap target a
+   little further here still leaves it comfortably tappable. */
+@media (max-height: 700px) {
+    .tap-button {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+    }
+
+    .tap-dot {
+        width: 22px;
+        height: 22px;
+    }
+
+    .compact-tap-area {
+        gap: var(--space-xs);
+    }
+
+    .number-choice-btn {
+        width: 56px;
+        height: 56px;
+        font-size: var(--text-xl);
+    }
+
+    .clap-check-area {
+        gap: var(--space-xs);
+    }
+
+    .clap-reset-btn {
+        width: 34px;
+        height: 34px;
     }
 }
 

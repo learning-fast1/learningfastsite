@@ -435,7 +435,7 @@ Phono.games.phonemeDeletion = {
     container: null,
     levelInfo: null,
     currentItem: null,
-    usedItems: [],
+    roundItems: [],
     answered: false,
 
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
@@ -443,7 +443,9 @@ Phono.games.phonemeDeletion = {
         this.levelInfo = levelInfo;
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
-        this.usedItems = [];
+        // Whole session picked up front (not per-round) so the teacher's
+        // word list can show every item for the round right away.
+        this.roundItems = level5BuildPhonemeDeletionItems(Phono.engine.totalRounds);
         this.loadRound();
     },
 
@@ -452,11 +454,7 @@ Phono.games.phonemeDeletion = {
         this.container.innerHTML = '';
         this.answered = false;
 
-        const pool = Phono.data.phonemeDeletion.filter(i => !this.usedItems.includes(i.word));
-        const available = pool.length > 0 ? pool : Phono.data.phonemeDeletion;
-        this.currentItem = Phono.data.getRandom(available);
-        this.usedItems.push(this.currentItem.word);
-
+        this.currentItem = this.roundItems[Phono.engine.currentRound];
         const word = this.currentItem.word;
 
         const instruction = el('p', {
@@ -471,13 +469,14 @@ Phono.games.phonemeDeletion = {
             this.createRepeatButton(() => Phono.audio.speak(word)),
         ]);
 
-        // Teacher-only peek at exactly what's being erased this round —
-        // the choice cards eventually show the answer among distractors,
-        // but the teacher shouldn't have to guess which one is correct.
+        // Teacher-only peek at every word in the session and exactly
+        // what's being erased each round — the choice cards eventually
+        // show the answer among distractors, but the teacher shouldn't
+        // have to guess which one is correct.
         const revealBtn = el('button', {
             className: 'btn btn-secondary btn-small',
-            textContent: '🔒 Απάντηση (δάσκαλος)',
-            onClick: () => this.showAnswer(),
+            textContent: '🔒 Λέξεις (δάσκαλος)',
+            onClick: () => this.showWordList(),
         });
 
         // Letter boxes — first letter highlighted for removal
@@ -543,23 +542,40 @@ Phono.games.phonemeDeletion = {
         }, 1600);
     },
 
-    /** Teacher-only overlay with exactly what's being erased this round
-     * and the correct answer, as a fixed overlay attached to #app (not
-     * this.container, since the game area sits inside the .fade-in
-     * screen, whose `transform` would break a fixed-position child). */
-    showAnswer() {
+    /** Teacher-only word list for the WHOLE session, not just the
+     * current round — same reasoning and fixed-overlay pattern as
+     * level2.js's syllableSynthesis.showWordList. */
+    showWordList() {
         const { el } = Phono.helpers;
         const close = () => overlay.remove();
+
+        const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', textAlign: 'left' } });
+        this.roundItems.forEach((item, i) => {
+            const isCurrent = i === Phono.engine.currentRound;
+            list.appendChild(el('div', {
+                style: {
+                    display: 'flex', justifyContent: 'space-between', gap: 'var(--space-md)',
+                    padding: 'var(--space-xs) var(--space-sm)', borderRadius: 'var(--radius-md)',
+                    background: isCurrent ? 'var(--primary-light)' : 'transparent',
+                    fontWeight: isCurrent ? '800' : '600',
+                },
+            }, [
+                el('span', { textContent: `${i + 1}. ${item.emoji} ${item.word} (χωρίς /${item.first}/)` }),
+                el('span', { textContent: `→ ${item.remaining}`, style: { color: 'var(--text-secondary)' } }),
+            ]));
+        });
 
         const overlay = el('div', {
             className: 'teacher-note-overlay',
             onClick: (e) => { if (e.target === overlay) close(); },
         }, [
             el('div', { className: 'teacher-note-card' }, [
-                el('div', { className: 'teacher-note-title', textContent: '🔒 Για τον/την εκπαιδευτικό' }),
-                el('p', { innerHTML: `<strong>Λέξη:</strong> ${this.currentItem.word}` }),
-                el('p', { innerHTML: `<strong>Αφαιρείται ήχος:</strong> ${this.currentItem.first}` }),
-                el('p', { innerHTML: `<strong>Απάντηση:</strong> ${this.currentItem.remaining}` }),
+                el('div', { className: 'teacher-note-title', textContent: '🔒 Λέξεις της συνεδρίας' }),
+                el('p', {
+                    textContent: 'Σημείωσε τις λέξεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
+                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
+                }),
+                list,
                 el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
             ]),
         ]);
@@ -605,3 +621,20 @@ Phono.games.phonemeDeletion = {
         }
     },
 };
+
+/** Pre-selects every item for the whole session up front (rather than
+ * one per round, live) so the teacher's word list can list them all
+ * before play even starts — same reasoning as level1.js's
+ * level1BuildSentenceBuilderSentences. */
+function level5BuildPhonemeDeletionItems(totalRounds) {
+    const used = [];
+    const items = [];
+    for (let round = 0; round < totalRounds; round++) {
+        const pool = Phono.data.phonemeDeletion.filter(i => !used.includes(i.word));
+        const available = pool.length > 0 ? pool : Phono.data.phonemeDeletion;
+        const item = Phono.data.getRandom(available);
+        used.push(item.word);
+        items.push(item);
+    }
+    return items;
+}
