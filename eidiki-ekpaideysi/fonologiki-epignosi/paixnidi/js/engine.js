@@ -377,40 +377,6 @@ Phono.assist = {
         this.saveHighlightDisabled();
         return !this.highlightDisabled[gameId];
     },
-
-    // Written-text reveal (Level 2+ common rule): OFF by default, unlike
-    // the highlight assist above — a child who can't read yet shouldn't
-    // see the word/sentence spelled out unless the therapist deliberately
-    // turns it on for this specific stage. When on, the correct text is
-    // included in the feedback message once the round is answered (see
-    // Phono.feedback.showCorrect's extraText param) — never shown at the
-    // start of a round, since that would hand over the answer.
-    textRevealEnabled: {},
-
-    loadTextRevealEnabled() {
-        try {
-            this.textRevealEnabled = JSON.parse(localStorage.getItem('phono_textRevealEnabled')) || {};
-        } catch (e) {
-            this.textRevealEnabled = {};
-        }
-    },
-
-    saveTextRevealEnabled() {
-        try {
-            localStorage.setItem('phono_textRevealEnabled', JSON.stringify(this.textRevealEnabled));
-        } catch (e) { /* ignore */ }
-    },
-
-    isTextRevealEnabled(gameId) {
-        return !!this.textRevealEnabled[gameId];
-    },
-
-    /** Toggle for one specific stage/game. Returns the new enabled state. */
-    toggleTextReveal(gameId) {
-        this.textRevealEnabled[gameId] = !this.textRevealEnabled[gameId];
-        this.saveTextRevealEnabled();
-        return this.textRevealEnabled[gameId];
-    },
 };
 
 // Load voices when available. The list often arrives asynchronously after
@@ -597,14 +563,10 @@ Phono.feedback = {
         setTimeout(() => overlay.remove(), 1300);
     },
 
-    /** Show random encouragement message. `revealText`, when given, is
-     * appended so the therapist's "Εμφάνιση κειμένου" toggle (off by
-     * default) can surface the actual written word/sentence at the
-     * moment it's safe to — after the child has already answered —
-     * without the game needing its own separate feedback rendering. */
-    showCorrect(revealText) {
+    /** Show random encouragement message */
+    showCorrect() {
         const msg = Phono.data.getRandom(Phono.data.encouragement.correct);
-        this.show(revealText ? `${msg} («${revealText}»)` : msg, true);
+        this.show(msg, true);
     },
 
     showWrong() {

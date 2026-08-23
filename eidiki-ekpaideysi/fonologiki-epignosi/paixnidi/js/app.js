@@ -28,7 +28,6 @@ Phono.app = {
         this.loadSettings();
         Phono.audio.loadVoiceMuted();
         Phono.assist.loadHighlightDisabled();
-        Phono.assist.loadTextRevealEnabled();
         this.navigate('home');
 
         // Ensure AudioContext is initialized on first user interaction
@@ -522,27 +521,6 @@ Phono.app = {
             },
         });
         return highlightBtn;
-    },
-
-    /**
-     * Create a "Εμφάνιση κειμένου" toggle (👁️/🙈) for one specific stage.
-     * OFF by default (many Level 2+ children don't read fluently yet) —
-     * when the therapist turns it on, the game's feedback call includes
-     * the actual written word/sentence (see Phono.feedback.showCorrect's
-     * revealText param) once the round is answered, never before.
-     */
-    createTextToggle(gameId) {
-        const { el } = Phono.helpers;
-        const btn = el('button', {
-            className: 'btn btn-icon voice-toggle-inline',
-            textContent: Phono.assist.isTextRevealEnabled(gameId) ? '👁️' : '🙈',
-            title: 'Εμφάνιση κειμένου στο feedback (θεραπευτής)',
-            onClick: () => {
-                const enabled = Phono.assist.toggleTextReveal(gameId);
-                btn.textContent = enabled ? '👁️' : '🙈';
-            },
-        });
-        return btn;
     },
 
     /**
