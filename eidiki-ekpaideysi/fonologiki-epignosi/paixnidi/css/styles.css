@@ -1763,6 +1763,21 @@ input {
     z-index: 10;
 }
 
+/* findRhyme only — the current round's 4 choice words, sitting to the
+   left of the "ΟΔΗΓΙΕΣ" button so the educator can read them without
+   tapping anything. Right-aligned and offset far enough to clear that
+   button's own width instead of sitting under/behind it. */
+.findrhyme-caption {
+    position: fixed;
+    bottom: calc(var(--space-lg) + 6px);
+    right: 100px;
+    z-index: 10;
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    max-width: 180px;
+    text-align: right;
+}
+
 .teacher-note-overlay {
     position: fixed;
     inset: 0;

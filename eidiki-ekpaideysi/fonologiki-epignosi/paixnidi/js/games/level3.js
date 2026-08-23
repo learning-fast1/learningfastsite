@@ -42,18 +42,12 @@ Phono.games.findRhyme = {
         // Choices: correct rhyme + the 3 hand-picked, verified
         // non-rhyming distractors — text stays hidden ON THE CARDS
         // (only the picture + audio identify each choice to the
-        // child), but the words are printed here, small and
-        // unobtrusive, so the educator can read what each picture is
-        // at a glance without having to tap the reveal button — same
-        // order as the cards below.
+        // child). The words themselves are printed bottom-right, next
+        // to the "ΟΔΗΓΙΕΣ" button — see showTeacherCaption — so the
+        // educator can read what each picture is at a glance without
+        // tapping anything, in the same order as the cards below.
         const choiceWords = Phono.data.shuffle([this.currentItem.correct, ...this.currentItem.distractors]);
-        const teacherCaption = el('p', {
-            textContent: choiceWords.join(' · '),
-            style: {
-                textAlign: 'left', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)',
-                width: '100%', maxWidth: '500px', margin: '0 auto',
-            },
-        });
+        this.showTeacherCaption(choiceWords);
 
         const targetEmoji = el('div', { className: 'game-main-emoji', textContent: baseMeta.emoji });
         const targetRow = el('div', { className: 'sentence-row' }, [
@@ -77,8 +71,27 @@ Phono.games.findRhyme = {
             choicesGrid.appendChild(card);
         });
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, teacherCaption, targetEmoji, targetRow, revealBtn, choicesGrid]));
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, targetEmoji, targetRow, revealBtn, choicesGrid]));
         Phono.audio.speak(this.currentItem.base);
+    },
+
+    /** Small always-visible label, bottom-right next to the "ΟΔΗΓΙΕΣ"
+     * button — that button (and the sound toggle mirroring it on the
+     * opposite corner) is added by app.js as a position:fixed sibling
+     * of the game screen, not inside game-body, so this has to be
+     * attached at the #app level too and cleaned up by hand each round
+     * (this.container.innerHTML = '' at the top of loadRound only
+     * clears game-body, not #app's other fixed children). */
+    showTeacherCaption(words) {
+        const { el } = Phono.helpers;
+        const old = document.getElementById('findrhyme-caption');
+        if (old) old.remove();
+        const caption = el('div', {
+            id: 'findrhyme-caption',
+            className: 'findrhyme-caption',
+            textContent: words.join(' · '),
+        });
+        document.getElementById('app').appendChild(caption);
     },
 
     /** Teacher-only word list for the WHOLE session, not just the
