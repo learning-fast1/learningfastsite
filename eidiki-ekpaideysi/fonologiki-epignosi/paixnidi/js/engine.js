@@ -874,7 +874,14 @@ Phono.helpers = {
 
     /** Check if phoneme is a vowel sound */
     isVowelSound(phoneme) {
-        const vowelSounds = ['α', 'ε', 'η', 'ι', 'ο', 'ω', 'υ', 'ου', 'ει', 'οι', 'αι', 'αυ', 'ευ'];
+        const vowelSounds = [
+            'α', 'ε', 'η', 'ι', 'ο', 'ω', 'υ', 'ου', 'ει', 'οι', 'αι', 'αυ', 'ευ',
+            // Accented forms — Level 5's phonemesL5 bank (js/phonemes_l5.js)
+            // keeps the word's own accent on its phonemes (e.g. "μήλο" ->
+            // μ-ή-λ-ο), so a plain-letter-only list here would miscolor
+            // every accented vowel as a consonant.
+            'ά', 'έ', 'ή', 'ί', 'ό', 'ώ', 'ύ',
+        ];
         return vowelSounds.includes(phoneme.toLowerCase());
     },
 };

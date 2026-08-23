@@ -72,9 +72,9 @@ function level5TierRange(tier) {
 
 /* ===========================================
    GAME 1: phonemeSynthesis — "Ένωσε τους Ήχους"
-   The word's sounds are SPOKEN one at a time with a pause between them
-   (in sync with the existing visual phoneme-bubble reveal) — no written
-   word anywhere. The child blends them mentally and picks the picture.
+   The word's sounds are shown ONLY visually, one at a time as animated
+   phoneme bubbles — no audio, no written word. The child blends them
+   mentally (or the educator reads them aloud) and picks the picture.
    =========================================== */
 Phono.games.phonemeSynthesis = {
     container: null,
@@ -101,15 +101,15 @@ Phono.games.phonemeSynthesis = {
         this.currentWord = Phono.data.getRandom(available);
         this.usedWords.push(this.currentWord.word);
 
-        const instruction = el('p', { className: 'game-instruction', textContent: 'Άκου τους ήχους. Ποια λέξη φτιάχνουν;' });
+        const instruction = el('p', { className: 'game-instruction', textContent: 'Δες τους ήχους. Ποια λέξη φτιάχνουν;' });
 
-        // Phoneme bubbles: revealed AND spoken one at a time, same pacing.
+        // Phoneme bubbles with animated reveal — visual only, no audio.
         const phonemeDisplay = el('div', { className: 'phoneme-display', id: 'phoneme-display' });
         this.currentWord.phonemes.forEach((ph, i) => {
             if (i > 0) {
                 const sep = el('span', { className: 'phoneme-separator', textContent: '+' });
                 phonemeDisplay.appendChild(sep);
-                setTimeout(() => sep.classList.add('visible'), 400 + i * 700);
+                setTimeout(() => sep.classList.add('visible'), 400 + i * 500);
             }
             const isVowel = Phono.helpers.isVowelSound(ph);
             const bubble = el('div', {
@@ -117,10 +117,7 @@ Phono.games.phonemeSynthesis = {
                 textContent: ph,
             });
             phonemeDisplay.appendChild(bubble);
-            setTimeout(() => {
-                bubble.classList.add('visible');
-                level5SpeakPhoneme(ph, level5PhonemeType(ph));
-            }, 300 + i * 700);
+            setTimeout(() => bubble.classList.add('visible'), 300 + i * 500);
         });
 
         const distractors = Phono.data.getDistractors(this.currentWord.word, 3);
