@@ -213,11 +213,24 @@ Phono.data.wordsL2StageOrder = ["A", "B", "C", "D"];
  * -> every A and B word). Mirrors how Phono.engine.getDifficultyTier()
  * gates the rest of the app: earlier stages stay in the mix instead of
  * disappearing once a harder one unlocks, so recently-learned material
- * keeps getting reviewed. */
+ * keeps getting reviewed.
+ *
+ * Also applies the teacher's content selection (Settings -> "Επιλογή
+ * Λέξεων & Προτάσεων"), same empty/null-means-no-restriction convention
+ * as Phono.app.level4Letters. If the selection happens to contain
+ * nothing at this stage yet (e.g. teacher only picked stage-D words but
+ * the round is still at tier 1), falls back to the unrestricted stage
+ * pool rather than returning nothing. */
 Phono.data.wordsL2UpToStage = function (stage) {
     const idx = Phono.data.wordsL2StageOrder.indexOf(stage);
     const allowed = idx === -1 ? Phono.data.wordsL2StageOrder : Phono.data.wordsL2StageOrder.slice(0, idx + 1);
-    return Phono.data.wordsL2.filter(w => allowed.includes(w.stage));
+    const stagePool = Phono.data.wordsL2.filter(w => allowed.includes(w.stage));
+
+    const selection = Phono.app.contentSelection && Phono.app.contentSelection.level2Words;
+    if (!selection || selection.length === 0) return stagePool;
+    const allowedWords = new Set(selection);
+    const filtered = stagePool.filter(w => allowedWords.has(w.word));
+    return filtered.length > 0 ? filtered : stagePool;
 };
 
 /** Maps Phono.engine.getDifficultyTier() (1-3) onto this bank's 4 stages

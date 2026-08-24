@@ -278,10 +278,13 @@ function level1BuildSentenceBuilderSentences(totalRounds) {
     const sentences = [];
     for (let round = 0; round < totalRounds; round++) {
         const targetWords = level1TargetWordCountForBuilder(round, totalRounds);
-        const pool = Phono.data.sentences.filter(s => s.words.length === targetWords && !used.includes(s.text));
-        const available = pool.length > 0 ? pool : Phono.data.sentences.filter(s => s.words.length === targetWords);
-        // Last-resort fallback still excludes 1-word entries — nothing to
-        // reorder in a single word, so this stage must never show one.
+        const selPool = Phono.data.getSentencePool();
+        const pool = selPool.filter(s => s.words.length === targetWords && !used.includes(s.text));
+        const available = pool.length > 0 ? pool : selPool.filter(s => s.words.length === targetWords);
+        // Last-resort fallback ignores the teacher's selection (never let
+        // it leave this game with nothing to show) but still excludes
+        // 1-word entries — nothing to reorder in a single word, so this
+        // stage must never show one.
         const sentence = available.length > 0 ? Phono.data.getRandom(available) : Phono.data.getRandom(Phono.data.sentences.filter(s => s.words.length >= 2));
         used.push(sentence.text);
         sentences.push(sentence);
@@ -312,8 +315,13 @@ function level1BuildWordPositionSentences(totalRounds) {
         const stage = tier === 1 ? 'A' : tier === 2 ? 'B' : 'C';
         const matchesStage = s => stage === 'A' ? (s.words.length >= 2 && s.words.length <= 3) : s.words.length === 3;
 
-        const pool = Phono.data.sentences.filter(s => matchesStage(s) && !used.includes(s.text));
-        const available = pool.length > 0 ? pool : Phono.data.sentences.filter(matchesStage);
+        const selPool = Phono.data.getSentencePool();
+        const pool = selPool.filter(s => matchesStage(s) && !used.includes(s.text));
+        const stagePool = selPool.filter(matchesStage);
+        // Third-tier fallback ignores the teacher's selection entirely —
+        // needed since a narrow selection could have nothing at all
+        // matching this round's stage yet.
+        const available = pool.length > 0 ? pool : (stagePool.length > 0 ? stagePool : Phono.data.sentences.filter(matchesStage));
         const sentence = Phono.data.getRandom(available);
         used.push(sentence.text);
         sentences.push(sentence);
@@ -380,8 +388,9 @@ Phono.games.wordCounting = {
         if (this.struggledLastRound && this.lastWordCount != null) {
             targetWords = Math.min(targetWords, this.lastWordCount);
         }
-        const pool = Phono.data.sentences.filter(s => s.words.length === targetWords && !this.usedSentences.includes(s.text));
-        const available = pool.length > 0 ? pool : Phono.data.sentences.filter(s => s.words.length === targetWords);
+        const selPool = Phono.data.getSentencePool();
+        const pool = selPool.filter(s => s.words.length === targetWords && !this.usedSentences.includes(s.text));
+        const available = pool.length > 0 ? pool : selPool.filter(s => s.words.length === targetWords);
         this.currentSentence = available.length > 0 ? Phono.data.getRandom(available) : Phono.data.getRandom(Phono.data.sentences);
         this.usedSentences.push(this.currentSentence.text);
 
@@ -994,8 +1003,13 @@ function level1BuildWordDeletionSentences(totalRounds) {
         const stage = tier === 1 ? 'A' : tier === 2 ? 'B' : 'C';
         const matchesStage = s => stage === 'C' ? s.words.length === 3 : (s.words.length >= 3 && s.words.length <= 4);
 
-        const pool = Phono.data.sentences.filter(s => matchesStage(s) && !used.includes(s.text));
-        const available = pool.length > 0 ? pool : Phono.data.sentences.filter(matchesStage);
+        const selPool = Phono.data.getSentencePool();
+        const pool = selPool.filter(s => matchesStage(s) && !used.includes(s.text));
+        const stagePool = selPool.filter(matchesStage);
+        // Third-tier fallback ignores the teacher's selection entirely —
+        // needed since a narrow selection could have nothing at all
+        // matching this round's stage yet.
+        const available = pool.length > 0 ? pool : (stagePool.length > 0 ? stagePool : Phono.data.sentences.filter(matchesStage));
         const sentence = Phono.data.getRandom(available);
         used.push(sentence.text);
         sentences.push(sentence);

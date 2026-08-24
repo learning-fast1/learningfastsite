@@ -998,6 +998,94 @@ input {
     color: var(--text-light);
 }
 
+/* Content picker (Settings -> "Επιλογή Λέξεων & Προτάσεων") */
+.content-picker-screen {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-bottom: var(--space-2xl);
+}
+
+.content-picker-section {
+    margin-top: var(--space-xl);
+    text-align: left;
+}
+
+.content-picker-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    border-bottom: 2px solid var(--primary-light);
+    padding-bottom: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.content-picker-section-header h2 {
+    font-size: var(--text-xl);
+}
+
+.content-picker-section-header span {
+    font-weight: 700;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.content-picker-group {
+    margin-bottom: var(--space-lg);
+}
+
+.content-picker-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-sm);
+}
+
+.content-picker-group-header > span {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.content-picker-group-controls {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.content-chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.content-chip {
+    max-width: 220px;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    background: var(--bg-card);
+    border: 2px solid var(--primary-light);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-smooth);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.content-chip:hover {
+    border-color: var(--primary);
+}
+
+.content-chip.selected {
+    background: var(--primary);
+    border-color: var(--primary-dark);
+    color: var(--text-light);
+}
+
 /* ===========================================
    14. GAME: DRAG & DROP
    =========================================== */

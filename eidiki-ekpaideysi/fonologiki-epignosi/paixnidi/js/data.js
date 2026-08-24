@@ -483,6 +483,18 @@ Phono.data = {
         { text: "Η κυρία ψωνίζει στην αγορά.", words: ["Η", "κυρία", "ψωνίζει", "στην", "αγορά"], difficulty: 4 },
     ],
 
+    /** Sentence pool respecting the teacher's content selection (Settings
+     * -> "Επιλογή Λέξεων & Προτάσεων"). Empty/null selection = no
+     * restriction, same convention as Phono.app.level4Letters — every
+     * Level 1 game filters from THIS instead of Phono.data.sentences
+     * directly, so the picker applies everywhere at once. */
+    getSentencePool() {
+        const selection = Phono.app.contentSelection && Phono.app.contentSelection.level1Sentences;
+        if (!selection || selection.length === 0) return this.sentences;
+        const allowed = new Set(selection);
+        return this.sentences.filter(s => allowed.has(s.text));
+    },
+
     /* ----------------------------------------------------------
        WORD-SIZE PAIRS for Level 1 ("Μεγάλη ή μικρή λέξη;")
        Teaches that the WORD is not the OBJECT: the "bigger" word is

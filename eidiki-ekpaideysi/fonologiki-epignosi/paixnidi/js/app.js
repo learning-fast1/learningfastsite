@@ -22,10 +22,24 @@ Phono.app = {
     // every other level always does).
     level4Letters: null,
 
+    // Teacher-configured subset of words/sentences to draw from — set once
+    // centrally from Settings ("Επιλογή Λέξεων & Προτάσεων", see
+    // renderContentPicker), unlike level4Letters above: this is meant to
+    // stick across sessions (persisted to localStorage), not get re-picked
+    // every time a level is entered. null/empty per key means "no
+    // restriction, use everything" — same convention as level4Letters.
+    // Currently wired into Level 1 (sentences) and Level 2 (words) only —
+    // see Phono.data.getSentencePool() / Phono.data.wordsL2UpToStage().
+    contentSelection: {
+        level1Sentences: null,
+        level2Words: null,
+    },
+
     /** Initialize the app */
     init() {
         this.container = document.getElementById('app');
         this.loadSettings();
+        this.loadContentSelection();
         Phono.audio.loadVoiceMuted();
         Phono.assist.loadHighlightDisabled();
         this.navigate('home');
@@ -71,6 +85,9 @@ Phono.app = {
                 break;
             case 'settings':
                 this.renderSettings();
+                break;
+            case 'contentPicker':
+                this.renderContentPicker();
                 break;
         }
     },
@@ -716,6 +733,19 @@ Phono.app = {
                 })(),
             ]),
 
+            // Content selection — lets the teacher restrict which words
+            // (Level 2) and sentences (Level 1) the games draw from, e.g.
+            // to match what a specific child is currently working on.
+            // Persists across sessions (see contentSelection / renderContentPicker).
+            el('div', { className: 'setting-group', style: { marginTop: 'var(--space-xl)' } }, [
+                el('label', { textContent: 'Περιεχόμενο παιχνιδιού' }),
+                el('button', {
+                    className: 'btn btn-secondary btn-small w-full',
+                    textContent: '📝 Επιλογή Λέξεων & Προτάσεων',
+                    onClick: () => this.navigate('contentPicker'),
+                }),
+            ]),
+
             // Session log export — per-trial record (stimulus, answer,
             // σωστό/λάθος) across every activity, not just the star
             // scores above. Kept as its own group since it's a therapist
@@ -806,6 +836,162 @@ Phono.app = {
         };
     },
 
+    /* ===========================================
+       CONTENT PICKER (Settings -> "Επιλογή Λέξεων & Προτάσεων")
+       Lets the teacher restrict which Level 1 sentences and Level 2 words
+       every game draws from — one central screen, persisted across
+       sessions (unlike the per-entry Level 4 letter picker). Backed by
+       Phono.data.getSentencePool() / Phono.data.wordsL2UpToStage(), which
+       both fall back to "everything" when nothing is selected.
+       =========================================== */
+    renderContentPicker() {
+        const { el } = Phono.helpers;
+
+        const sentenceSelected = new Set(this.contentSelection.level1Sentences || []);
+        const wordSelected = new Set(this.contentSelection.level2Words || []);
+
+        const sentencesByDifficulty = {};
+        Phono.data.sentences.forEach(s => {
+            (sentencesByDifficulty[s.difficulty] = sentencesByDifficulty[s.difficulty] || []).push(s);
+        });
+        const difficultyLabels = { 1: '1 λέξη', 2: '2-3 λέξεις', 3: '4 λέξεις', 4: '5 λέξεις' };
+
+        const wordsByStage = {};
+        Phono.data.wordsL2.forEach(w => {
+            (wordsByStage[w.stage] = wordsByStage[w.stage] || []).push(w);
+        });
+        const stageLabels = { A: 'Στάδιο Α — δισύλλαβα απλά', B: 'Στάδιο Β — τρισύλλαβα απλά', C: 'Στάδιο Γ — δίψηφα', D: 'Στάδιο Δ — συμπλέγματα' };
+
+        const sentenceCountLabel = el('span', { textContent: `${sentenceSelected.size} / ${Phono.data.sentences.length}` });
+        const wordCountLabel = el('span', { textContent: `${wordSelected.size} / ${Phono.data.wordsL2.length}` });
+
+        const sentenceSections = Object.keys(sentencesByDifficulty).sort().map(diff => {
+            const items = sentencesByDifficulty[diff];
+            const block = this._contentPickerGroupBlock(
+                items, sentenceSelected, s => s.text, s => s.text,
+                () => { sentenceCountLabel.textContent = `${sentenceSelected.size} / ${Phono.data.sentences.length}`; }
+            );
+            return el('div', { className: 'content-picker-group' }, [
+                el('div', { className: 'content-picker-group-header' }, [
+                    el('span', { textContent: `${difficultyLabels[diff] || diff} (${items.length})` }),
+                    block.controls,
+                ]),
+                block.grid,
+            ]);
+        });
+
+        const wordSections = Phono.data.wordsL2StageOrder.filter(s => wordsByStage[s]).map(stage => {
+            const items = wordsByStage[stage];
+            const block = this._contentPickerGroupBlock(
+                items, wordSelected, w => w.word, w => w.word,
+                () => { wordCountLabel.textContent = `${wordSelected.size} / ${Phono.data.wordsL2.length}`; }
+            );
+            return el('div', { className: 'content-picker-group' }, [
+                el('div', { className: 'content-picker-group-header' }, [
+                    el('span', { textContent: `${stageLabels[stage] || stage} (${items.length})` }),
+                    block.controls,
+                ]),
+                block.grid,
+            ]);
+        });
+
+        const saveBtn = el('button', {
+            className: 'btn btn-primary',
+            textContent: 'Αποθήκευση',
+            onClick: () => {
+                Phono.audio.playSfx('pop');
+                this.contentSelection.level1Sentences = sentenceSelected.size > 0 ? Array.from(sentenceSelected) : null;
+                this.contentSelection.level2Words = wordSelected.size > 0 ? Array.from(wordSelected) : null;
+                this.saveContentSelection();
+                this.navigate('settings');
+            },
+        });
+        const cancelBtn = el('button', {
+            className: 'btn btn-secondary',
+            textContent: '✖ Ακύρωση',
+            onClick: () => this.navigate('settings'),
+        });
+
+        const screen = el('div', { className: 'level-select-screen fade-in content-picker-screen' }, [
+            el('button', {
+                className: 'btn btn-icon btn-back',
+                textContent: '←',
+                onClick: () => {
+                    Phono.audio.playSfx('click');
+                    this.navigate('settings');
+                },
+            }),
+            el('div', { className: 'level-select-header' }, [
+                el('h1', { textContent: '📝 Επιλογή Λέξεων & Προτάσεων' }),
+                el('p', { textContent: 'Διάλεξε ποιες λέξεις και προτάσεις θα χρησιμοποιούνται στα παιχνίδια. Χωρίς επιλογή σε μια ενότητα, χρησιμοποιούνται όλες.' }),
+            ]),
+            el('div', { className: 'content-picker-section' }, [
+                el('div', { className: 'content-picker-section-header' }, [
+                    el('h2', { textContent: 'Επίπεδο 1 — Προτάσεις' }),
+                    sentenceCountLabel,
+                ]),
+                ...sentenceSections,
+            ]),
+            el('div', { className: 'content-picker-section' }, [
+                el('div', { className: 'content-picker-section-header' }, [
+                    el('h2', { textContent: 'Επίπεδο 2 — Λέξεις' }),
+                    wordCountLabel,
+                ]),
+                ...wordSections,
+            ]),
+            el('div', { className: 'complete-buttons', style: { marginTop: 'var(--space-xl)' } }, [saveBtn, cancelBtn]),
+        ]);
+
+        this.container.appendChild(screen);
+    },
+
+    /** Builds one group's chip grid + "Όλα/Κανένα" controls, shared by
+     * both sections of renderContentPicker(). `keyOf`/`labelOf` extract an
+     * item's unique identity (stored in `selectedSet`) and its display
+     * text — same function for both here, but kept separate in case a
+     * future section needs a different identity than its label. */
+    _contentPickerGroupBlock(items, selectedSet, keyOf, labelOf, onChange) {
+        const { el } = Phono.helpers;
+        const grid = el('div', { className: 'content-chip-grid' });
+        items.forEach(item => {
+            const key = keyOf(item);
+            const label = labelOf(item);
+            const chip = el('button', {
+                className: `content-chip${selectedSet.has(key) ? ' selected' : ''}`,
+                textContent: label,
+                title: label,
+                onClick: () => {
+                    if (selectedSet.has(key)) selectedSet.delete(key);
+                    else selectedSet.add(key);
+                    chip.classList.toggle('selected');
+                    onChange();
+                },
+            });
+            grid.appendChild(chip);
+        });
+
+        const selectAllBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: 'Όλα',
+            onClick: () => {
+                items.forEach(item => selectedSet.add(keyOf(item)));
+                grid.querySelectorAll('.content-chip').forEach(c => c.classList.add('selected'));
+                onChange();
+            },
+        });
+        const selectNoneBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: 'Κανένα',
+            onClick: () => {
+                items.forEach(item => selectedSet.delete(keyOf(item)));
+                grid.querySelectorAll('.content-chip').forEach(c => c.classList.remove('selected'));
+                onChange();
+            },
+        });
+
+        return { grid, controls: el('div', { className: 'content-picker-group-controls' }, [selectAllBtn, selectNoneBtn]) };
+    },
+
     _settingToggle(label, key) {
         const { el } = Phono.helpers;
         const toggle = el('div', { className: `toggle-switch ${this.settings[key] ? 'active' : ''}` });
@@ -836,6 +1022,31 @@ Phono.app = {
             if (saved) {
                 Object.assign(this.settings, JSON.parse(saved));
             }
+        } catch (e) { /* ignore */ }
+    },
+
+    /** Save the teacher's content selection (words/sentences) to
+     * localStorage — a null/missing key is stored as "not set" (removed)
+     * rather than an empty array, so loadContentSelection() reliably
+     * treats it as "no restriction" on the next visit. */
+    saveContentSelection() {
+        try {
+            ['level1Sentences', 'level2Words'].forEach(key => {
+                const value = this.contentSelection[key];
+                const storageKey = `phono_contentSelection_${key}`;
+                if (value && value.length > 0) localStorage.setItem(storageKey, JSON.stringify(value));
+                else localStorage.removeItem(storageKey);
+            });
+        } catch (e) { /* ignore */ }
+    },
+
+    /** Load the teacher's content selection from localStorage. */
+    loadContentSelection() {
+        try {
+            ['level1Sentences', 'level2Words'].forEach(key => {
+                const saved = localStorage.getItem(`phono_contentSelection_${key}`);
+                this.contentSelection[key] = saved ? JSON.parse(saved) : null;
+            });
         } catch (e) { /* ignore */ }
     },
 };
