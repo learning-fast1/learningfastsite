@@ -89,6 +89,9 @@ Phono.app = {
             case 'contentPicker':
                 this.renderContentPicker();
                 break;
+            case 'contentPickerDetail':
+                this.renderContentPickerDetail(params.target);
+                break;
         }
     },
 
@@ -839,78 +842,33 @@ Phono.app = {
     /* ===========================================
        CONTENT PICKER (Settings -> "Επιλογή Λέξεων & Προτάσεων")
        Lets the teacher restrict which Level 1 sentences and Level 2 words
-       every game draws from — one central screen, persisted across
-       sessions (unlike the per-entry Level 4 letter picker). Backed by
+       every game draws from — persisted across sessions (unlike the
+       per-entry Level 4 letter picker). Backed by
        Phono.data.getSentencePool() / Phono.data.wordsL2UpToStage(), which
        both fall back to "everything" when nothing is selected.
+
+       Two-step flow: renderContentPicker() is a menu picking WHICH level
+       to configure (so the teacher isn't forced to scroll past 326 chips
+       just to look at one level), then renderContentPickerDetail(target)
+       shows only that level's chips.
        =========================================== */
     renderContentPicker() {
         const { el } = Phono.helpers;
 
-        const sentenceSelected = new Set(this.contentSelection.level1Sentences || []);
-        const wordSelected = new Set(this.contentSelection.level2Words || []);
+        const sentenceCount = (this.contentSelection.level1Sentences || []).length;
+        const wordCount = (this.contentSelection.level2Words || []).length;
 
-        const sentencesByDifficulty = {};
-        Phono.data.sentences.forEach(s => {
-            (sentencesByDifficulty[s.difficulty] = sentencesByDifficulty[s.difficulty] || []).push(s);
-        });
-        const difficultyLabels = { 1: '1 λέξη', 2: '2-3 λέξεις', 3: '4 λέξεις', 4: '5 λέξεις' };
-
-        const wordsByStage = {};
-        Phono.data.wordsL2.forEach(w => {
-            (wordsByStage[w.stage] = wordsByStage[w.stage] || []).push(w);
-        });
-        const stageLabels = { A: 'Στάδιο Α — δισύλλαβα απλά', B: 'Στάδιο Β — τρισύλλαβα απλά', C: 'Στάδιο Γ — δίψηφα', D: 'Στάδιο Δ — συμπλέγματα' };
-
-        const sentenceCountLabel = el('span', { textContent: `${sentenceSelected.size} / ${Phono.data.sentences.length}` });
-        const wordCountLabel = el('span', { textContent: `${wordSelected.size} / ${Phono.data.wordsL2.length}` });
-
-        const sentenceSections = Object.keys(sentencesByDifficulty).sort().map(diff => {
-            const items = sentencesByDifficulty[diff];
-            const block = this._contentPickerGroupBlock(
-                items, sentenceSelected, s => s.text, s => s.text,
-                () => { sentenceCountLabel.textContent = `${sentenceSelected.size} / ${Phono.data.sentences.length}`; }
-            );
-            return el('div', { className: 'content-picker-group' }, [
-                el('div', { className: 'content-picker-group-header' }, [
-                    el('span', { textContent: `${difficultyLabels[diff] || diff} (${items.length})` }),
-                    block.controls,
-                ]),
-                block.grid,
-            ]);
-        });
-
-        const wordSections = Phono.data.wordsL2StageOrder.filter(s => wordsByStage[s]).map(stage => {
-            const items = wordsByStage[stage];
-            const block = this._contentPickerGroupBlock(
-                items, wordSelected, w => w.word, w => w.word,
-                () => { wordCountLabel.textContent = `${wordSelected.size} / ${Phono.data.wordsL2.length}`; }
-            );
-            return el('div', { className: 'content-picker-group' }, [
-                el('div', { className: 'content-picker-group-header' }, [
-                    el('span', { textContent: `${stageLabels[stage] || stage} (${items.length})` }),
-                    block.controls,
-                ]),
-                block.grid,
-            ]);
-        });
-
-        const saveBtn = el('button', {
-            className: 'btn btn-primary',
-            textContent: 'Αποθήκευση',
-            onClick: () => {
-                Phono.audio.playSfx('pop');
-                this.contentSelection.level1Sentences = sentenceSelected.size > 0 ? Array.from(sentenceSelected) : null;
-                this.contentSelection.level2Words = wordSelected.size > 0 ? Array.from(wordSelected) : null;
-                this.saveContentSelection();
-                this.navigate('settings');
-            },
-        });
-        const cancelBtn = el('button', {
-            className: 'btn btn-secondary',
-            textContent: '✖ Ακύρωση',
-            onClick: () => this.navigate('settings'),
-        });
+        const menuCard = (title, subtitle, count, total, target) => el('button', {
+            className: 'btn btn-secondary content-picker-menu-card',
+            onClick: () => this.navigate('contentPickerDetail', { target }),
+        }, [
+            el('div', { className: 'content-picker-menu-card-title', textContent: title }),
+            el('div', { className: 'content-picker-menu-card-subtitle', textContent: subtitle }),
+            el('div', {
+                className: 'content-picker-menu-card-count',
+                textContent: count > 0 ? `${count} / ${total} επιλεγμένα` : `Όλα (${total}) — χωρίς επιλογή`,
+            }),
+        ]);
 
         const screen = el('div', { className: 'level-select-screen fade-in content-picker-screen' }, [
             el('button', {
@@ -923,21 +881,89 @@ Phono.app = {
             }),
             el('div', { className: 'level-select-header' }, [
                 el('h1', { textContent: '📝 Επιλογή Λέξεων & Προτάσεων' }),
-                el('p', { textContent: 'Διάλεξε ποιες λέξεις και προτάσεις θα χρησιμοποιούνται στα παιχνίδια. Χωρίς επιλογή σε μια ενότητα, χρησιμοποιούνται όλες.' }),
+                el('p', { textContent: 'Διάλεξε για ποιο επίπεδο θέλεις να περιορίσεις τις λέξεις ή τις προτάσεις. Χωρίς επιλογή, χρησιμοποιούνται όλες, κανονικά διαβαθμισμένες όπως πάντα.' }),
+            ]),
+            el('div', { className: 'content-picker-menu' }, [
+                menuCard('Επίπεδο 1 — Προτάσεις', 'Ποιες προτάσεις θα ακούγονται στα παιχνίδια', sentenceCount, Phono.data.sentences.length, 'level1Sentences'),
+                menuCard('Επίπεδο 2 — Λέξεις', 'Ποιες λέξεις θα χρησιμοποιούνται στα παιχνίδια συλλαβών', wordCount, Phono.data.wordsL2.length, 'level2Words'),
+            ]),
+        ]);
+
+        this.container.appendChild(screen);
+    },
+
+    /** Shows the chip picker for a single target ('level1Sentences' or
+     * 'level2Words'), reached from renderContentPicker()'s menu. Saving
+     * returns to that menu, not Settings, so the teacher can immediately
+     * configure the other level too if they want. */
+    renderContentPickerDetail(target) {
+        const { el } = Phono.helpers;
+        const isSentences = target === 'level1Sentences';
+
+        const selected = new Set(this.contentSelection[target] || []);
+        const allItems = isSentences ? Phono.data.sentences : Phono.data.wordsL2;
+        const keyOf = isSentences ? (s => s.text) : (w => w.word);
+
+        const grouped = {};
+        allItems.forEach(item => {
+            const groupKey = isSentences ? item.difficulty : item.stage;
+            (grouped[groupKey] = grouped[groupKey] || []).push(item);
+        });
+        const groupOrder = isSentences ? Object.keys(grouped).sort() : Phono.data.wordsL2StageOrder.filter(s => grouped[s]);
+        const groupLabels = isSentences
+            ? { 1: '1 λέξη', 2: '2-3 λέξεις', 3: '4 λέξεις', 4: '5 λέξεις' }
+            : { A: 'Στάδιο Α — δισύλλαβα απλά', B: 'Στάδιο Β — τρισύλλαβα απλά', C: 'Στάδιο Γ — δίψηφα', D: 'Στάδιο Δ — συμπλέγματα' };
+
+        const countLabel = el('span', { textContent: `${selected.size} / ${allItems.length}` });
+        const updateCount = () => { countLabel.textContent = `${selected.size} / ${allItems.length}`; };
+
+        const groupSections = groupOrder.map(groupKey => {
+            const items = grouped[groupKey];
+            const block = this._contentPickerGroupBlock(items, selected, keyOf, keyOf, updateCount);
+            return el('div', { className: 'content-picker-group' }, [
+                el('div', { className: 'content-picker-group-header' }, [
+                    el('span', { textContent: `${groupLabels[groupKey] || groupKey} (${items.length})` }),
+                    block.controls,
+                ]),
+                block.grid,
+            ]);
+        });
+
+        const saveBtn = el('button', {
+            className: 'btn btn-primary',
+            textContent: 'Αποθήκευση',
+            onClick: () => {
+                Phono.audio.playSfx('pop');
+                this.contentSelection[target] = selected.size > 0 ? Array.from(selected) : null;
+                this.saveContentSelection();
+                this.navigate('contentPicker');
+            },
+        });
+        const cancelBtn = el('button', {
+            className: 'btn btn-secondary',
+            textContent: '✖ Ακύρωση',
+            onClick: () => this.navigate('contentPicker'),
+        });
+
+        const screen = el('div', { className: 'level-select-screen fade-in content-picker-screen' }, [
+            el('button', {
+                className: 'btn btn-icon btn-back',
+                textContent: '←',
+                onClick: () => {
+                    Phono.audio.playSfx('click');
+                    this.navigate('contentPicker');
+                },
+            }),
+            el('div', { className: 'level-select-header' }, [
+                el('h1', { textContent: isSentences ? 'Επίπεδο 1 — Προτάσεις' : 'Επίπεδο 2 — Λέξεις' }),
+                el('p', { textContent: 'Χωρίς επιλογή, χρησιμοποιούνται όλες.' }),
             ]),
             el('div', { className: 'content-picker-section' }, [
                 el('div', { className: 'content-picker-section-header' }, [
-                    el('h2', { textContent: 'Επίπεδο 1 — Προτάσεις' }),
-                    sentenceCountLabel,
+                    el('h2', { textContent: isSentences ? 'Προτάσεις' : 'Λέξεις' }),
+                    countLabel,
                 ]),
-                ...sentenceSections,
-            ]),
-            el('div', { className: 'content-picker-section' }, [
-                el('div', { className: 'content-picker-section-header' }, [
-                    el('h2', { textContent: 'Επίπεδο 2 — Λέξεις' }),
-                    wordCountLabel,
-                ]),
-                ...wordSections,
+                ...groupSections,
             ]),
             el('div', { className: 'complete-buttons', style: { marginTop: 'var(--space-xl)' } }, [saveBtn, cancelBtn]),
         ]);

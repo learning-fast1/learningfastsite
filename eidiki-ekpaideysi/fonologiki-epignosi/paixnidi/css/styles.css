@@ -1005,6 +1005,39 @@ input {
     padding-bottom: var(--space-2xl);
 }
 
+.content-picker-menu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+}
+
+.content-picker-menu-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    text-align: left;
+    padding: var(--space-lg);
+    width: 100%;
+}
+
+.content-picker-menu-card-title {
+    font-family: var(--font-heading);
+    font-size: var(--text-lg);
+    font-weight: 800;
+}
+
+.content-picker-menu-card-subtitle {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+}
+
+.content-picker-menu-card-count {
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
 .content-picker-section {
     margin-top: var(--space-xl);
     text-align: left;
