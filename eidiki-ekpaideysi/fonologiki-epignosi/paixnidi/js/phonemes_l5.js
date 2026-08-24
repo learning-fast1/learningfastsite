@@ -72,3 +72,13 @@ Phono.data.phonemesL5 = [
 Phono.data.phonemesL5ByWord = function (word) {
     return Phono.data.phonemesL5.find(w => w.word === word) || null;
 };
+
+/** Word pool respecting the teacher's content selection (Settings ->
+ * "Επιλογή Λέξεων & Προτάσεων"). Empty/null selection = no restriction,
+ * same convention as Phono.data.getSentencePool() / wordsL2UpToStage(). */
+Phono.data.getPhonemesL5Pool = function () {
+    const selection = Phono.app.contentSelection && Phono.app.contentSelection.level5Words;
+    if (!selection || selection.length === 0) return Phono.data.phonemesL5;
+    const allowed = new Set(selection);
+    return Phono.data.phonemesL5.filter(w => allowed.has(w.word));
+};

@@ -45,7 +45,8 @@ Phono.games.phonemeSynthesis = {
 
         const tier = Phono.engine.getDifficultyTier();
         const { min, max } = level5TierRange(tier);
-        const bank = Phono.data.phonemesL5.filter(w => w.imageable && w.count >= min && w.count <= max);
+        const selBank = Phono.data.getPhonemesL5Pool().filter(w => w.imageable && w.count >= min && w.count <= max);
+        const bank = selBank.length > 0 ? selBank : Phono.data.phonemesL5.filter(w => w.imageable && w.count >= min && w.count <= max);
         const pool = bank.filter(w => !this.usedWords.includes(w.word));
         const available = pool.length > 0 ? pool : bank;
         this.currentWord = Phono.data.getRandom(available);
@@ -146,7 +147,8 @@ Phono.games.phonemeAnalysis = {
 
         const tier = Phono.engine.getDifficultyTier();
         const { min, max } = level5TierRange(tier);
-        const bank = Phono.data.phonemesL5.filter(w => w.imageable && w.count >= min && w.count <= max);
+        const selBank = Phono.data.getPhonemesL5Pool().filter(w => w.imageable && w.count >= min && w.count <= max);
+        const bank = selBank.length > 0 ? selBank : Phono.data.phonemesL5.filter(w => w.imageable && w.count >= min && w.count <= max);
         const pool = bank.filter(w => !this.usedWords.includes(w.word));
         const available = pool.length > 0 ? pool : bank;
         this.currentWord = Phono.data.getRandom(available);
@@ -328,7 +330,8 @@ Phono.games.elkoninBoxes = {
 
         const tier = Phono.engine.getDifficultyTier();
         const { min, max } = level5TierRange(tier);
-        const bank = Phono.data.phonemesL5.filter(w => w.imageable && w.count >= min && w.count <= max);
+        const selBank = Phono.data.getPhonemesL5Pool().filter(w => w.imageable && w.count >= min && w.count <= max);
+        const bank = selBank.length > 0 ? selBank : Phono.data.phonemesL5.filter(w => w.imageable && w.count >= min && w.count <= max);
         const pool = bank.filter(w => !this.usedWords.includes(w.word));
         const available = pool.length > 0 ? pool : bank;
         this.currentWord = Phono.data.getRandom(available);
@@ -645,7 +648,8 @@ Phono.games.phonemeDeletion = {
  * both first- and last-sound removal are precomputed per item so the
  * mode toggle can switch without re-deriving anything. */
 function level5BuildPhonemeDeletionItems(totalRounds) {
-    const bank = Phono.data.phonemesL5.filter(w => w.count === 4 && w.imageable);
+    const selBank = Phono.data.getPhonemesL5Pool().filter(w => w.count === 4 && w.imageable);
+    const bank = selBank.length > 0 ? selBank : Phono.data.phonemesL5.filter(w => w.count === 4 && w.imageable);
     const used = [];
     const items = [];
     for (let round = 0; round < totalRounds; round++) {

@@ -6,6 +6,77 @@
 
 window.Phono = window.Phono || {};
 
+/**
+ * Per-target shape for the content picker (Settings -> "Επιλογή Λέξεων &
+ * Προτάσεων") — one entry per contentSelection key. `items()` is a
+ * function (not a plain array) so it's read lazily, after data.js has
+ * populated the underlying banks. `groupOf`/`groupOrder`/`groupLabels`
+ * control how items are bucketed into sub-sections; a target with no
+ * natural grouping (Level 4's letters) uses a single 'all' bucket and
+ * omits groupLabels, which renderContentPickerDetail() treats as "skip
+ * the group header text, still show Select All/None".
+ */
+const CONTENT_PICKER_TARGETS = {
+    level1Sentences: {
+        title: 'Επίπεδο 1 — Προτάσεις',
+        subtitle: 'Ποιες προτάσεις θα ακούγονται στα παιχνίδια',
+        itemsLabel: 'Προτάσεις',
+        items: () => Phono.data.sentences,
+        keyOf: s => s.text,
+        groupOf: s => s.difficulty,
+        groupOrder: null, // sorted numerically at render time
+        groupLabels: { 1: '1 λέξη', 2: '2-3 λέξεις', 3: '4 λέξεις', 4: '5 λέξεις' },
+    },
+    level2Words: {
+        title: 'Επίπεδο 2 — Λέξεις',
+        subtitle: 'Ποιες λέξεις θα χρησιμοποιούνται στα παιχνίδια συλλαβών',
+        itemsLabel: 'Λέξεις',
+        items: () => Phono.data.wordsL2,
+        keyOf: w => w.word,
+        groupOf: w => w.stage,
+        groupOrder: Phono.data.wordsL2StageOrder,
+        groupLabels: { A: 'Στάδιο Α — δισύλλαβα απλά', B: 'Στάδιο Β — τρισύλλαβα απλά', C: 'Στάδιο Γ — δίψηφα', D: 'Στάδιο Δ — συμπλέγματα' },
+    },
+    level3Families: {
+        title: 'Επίπεδο 3 — Ομοιοκαταληξία',
+        subtitle: 'Ποιες οικογένειες ρίμας να χρησιμοποιούνται (δεν επηρεάζει το παιχνίδι Μνήμης, που έχει μόνο 2 σταθερά ταμπλό)',
+        itemsLabel: 'Οικογένειες',
+        items: () => {
+            const byFamily = {};
+            Phono.data.rhymesL3.forEach(w => {
+                if (!byFamily[w.family]) byFamily[w.family] = { family: w.family, easy: w.easy, words: [] };
+                byFamily[w.family].words.push(w.word);
+            });
+            return Object.values(byFamily);
+        },
+        keyOf: f => f.family,
+        labelOf: f => `-${f.family} (${f.words.slice(0, 3).join(', ')}${f.words.length > 3 ? '…' : ''})`,
+        groupOf: f => f.easy ? 'easy' : 'normal',
+        groupOrder: ['normal', 'easy'],
+        groupLabels: { normal: 'Οικογένειες ρίμας', easy: 'Απλές ρίμες (κοινή κατάληξη)' },
+    },
+    level4Letters: {
+        title: 'Επίπεδο 4 — Ήχοι',
+        subtitle: 'Ποιους ήχους (αρχικό/τελικό φώνημα) να δουλεύουν τα παιχνίδια',
+        itemsLabel: 'Ήχοι',
+        items: () => Phono.data.getLevel4AvailableLetters().map(l => ({ letter: l })),
+        keyOf: item => item.letter,
+        groupOf: () => 'all',
+        groupOrder: ['all'],
+        groupLabels: null,
+    },
+    level5Words: {
+        title: 'Επίπεδο 5 — Λέξεις',
+        subtitle: 'Ποιες φωνημικά διάφανες λέξεις να χρησιμοποιούνται',
+        itemsLabel: 'Λέξεις',
+        items: () => Phono.data.phonemesL5,
+        keyOf: w => w.word,
+        groupOf: w => w.count,
+        groupOrder: [4, 5, 6],
+        groupLabels: { 4: '4 ήχοι', 5: '5 ήχοι', 6: '6 ήχοι' },
+    },
+};
+
 Phono.app = {
     container: null,
     currentScreen: null,
@@ -24,15 +95,19 @@ Phono.app = {
 
     // Teacher-configured subset of words/sentences to draw from — set once
     // centrally from Settings ("Επιλογή Λέξεων & Προτάσεων", see
-    // renderContentPicker), unlike level4Letters above: this is meant to
-    // stick across sessions (persisted to localStorage), not get re-picked
-    // every time a level is entered. null/empty per key means "no
-    // restriction, use everything" — same convention as level4Letters.
-    // Currently wired into Level 1 (sentences) and Level 2 (words) only —
-    // see Phono.data.getSentencePool() / Phono.data.wordsL2UpToStage().
+    // renderContentPicker), unlike the standalone level4Letters above:
+    // this is meant to stick across sessions (persisted to localStorage),
+    // not get re-picked every time a level is entered. null/empty per key
+    // means "no restriction, use everything" — same convention as
+    // level4Letters. level4Letters (the per-entry picker) still takes
+    // priority over contentSelection.level4Letters when a teacher sets it
+    // for a specific session — see level4LetterAllowed() in level4.js.
     contentSelection: {
         level1Sentences: null,
         level2Words: null,
+        level3Families: null,
+        level4Letters: null,
+        level5Words: null,
     },
 
     /** Initialize the app */
@@ -841,34 +916,40 @@ Phono.app = {
 
     /* ===========================================
        CONTENT PICKER (Settings -> "Επιλογή Λέξεων & Προτάσεων")
-       Lets the teacher restrict which Level 1 sentences and Level 2 words
-       every game draws from — persisted across sessions (unlike the
-       per-entry Level 4 letter picker). Backed by
-       Phono.data.getSentencePool() / Phono.data.wordsL2UpToStage(), which
-       both fall back to "everything" when nothing is selected.
+       Lets the teacher restrict which words/sentences every level's
+       games draw from — persisted across sessions. Backed by
+       Phono.data.getSentencePool() / wordsL2UpToStage() /
+       getPhonemesL5Pool() and, for Level 4, level4LetterAllowed()'s
+       fallback to contentSelection.level4Letters — all of which fall
+       back to "everything" when nothing is selected.
 
        Two-step flow: renderContentPicker() is a menu picking WHICH level
-       to configure (so the teacher isn't forced to scroll past 326 chips
-       just to look at one level), then renderContentPickerDetail(target)
-       shows only that level's chips.
+       to configure (so the teacher isn't forced to scroll past hundreds
+       of chips just to look at one level), then
+       renderContentPickerDetail(target) shows only that level's chips.
+       Per-target shape (items/grouping/labels) lives in
+       CONTENT_PICKER_TARGETS below, keyed by the same contentSelection
+       key each target writes to.
        =========================================== */
     renderContentPicker() {
         const { el } = Phono.helpers;
 
-        const sentenceCount = (this.contentSelection.level1Sentences || []).length;
-        const wordCount = (this.contentSelection.level2Words || []).length;
-
-        const menuCard = (title, subtitle, count, total, target) => el('button', {
-            className: 'btn btn-secondary content-picker-menu-card',
-            onClick: () => this.navigate('contentPickerDetail', { target }),
-        }, [
-            el('div', { className: 'content-picker-menu-card-title', textContent: title }),
-            el('div', { className: 'content-picker-menu-card-subtitle', textContent: subtitle }),
-            el('div', {
-                className: 'content-picker-menu-card-count',
-                textContent: count > 0 ? `${count} / ${total} επιλεγμένα` : `Όλα (${total}) — χωρίς επιλογή`,
-            }),
-        ]);
+        const menuCard = (target) => {
+            const cfg = CONTENT_PICKER_TARGETS[target];
+            const total = cfg.items().length;
+            const count = (this.contentSelection[target] || []).length;
+            return el('button', {
+                className: 'btn btn-secondary content-picker-menu-card',
+                onClick: () => this.navigate('contentPickerDetail', { target }),
+            }, [
+                el('div', { className: 'content-picker-menu-card-title', textContent: cfg.title }),
+                el('div', { className: 'content-picker-menu-card-subtitle', textContent: cfg.subtitle }),
+                el('div', {
+                    className: 'content-picker-menu-card-count',
+                    textContent: count > 0 ? `${count} / ${total} επιλεγμένα` : `Όλα (${total}) — χωρίς επιλογή`,
+                }),
+            ]);
+        };
 
         const screen = el('div', { className: 'level-select-screen fade-in content-picker-screen' }, [
             el('button', {
@@ -883,50 +964,42 @@ Phono.app = {
                 el('h1', { textContent: '📝 Επιλογή Λέξεων & Προτάσεων' }),
                 el('p', { textContent: 'Διάλεξε για ποιο επίπεδο θέλεις να περιορίσεις τις λέξεις ή τις προτάσεις. Χωρίς επιλογή, χρησιμοποιούνται όλες, κανονικά διαβαθμισμένες όπως πάντα.' }),
             ]),
-            el('div', { className: 'content-picker-menu' }, [
-                menuCard('Επίπεδο 1 — Προτάσεις', 'Ποιες προτάσεις θα ακούγονται στα παιχνίδια', sentenceCount, Phono.data.sentences.length, 'level1Sentences'),
-                menuCard('Επίπεδο 2 — Λέξεις', 'Ποιες λέξεις θα χρησιμοποιούνται στα παιχνίδια συλλαβών', wordCount, Phono.data.wordsL2.length, 'level2Words'),
-            ]),
+            el('div', { className: 'content-picker-menu' }, Object.keys(CONTENT_PICKER_TARGETS).map(menuCard)),
         ]);
 
         this.container.appendChild(screen);
     },
 
-    /** Shows the chip picker for a single target ('level1Sentences' or
-     * 'level2Words'), reached from renderContentPicker()'s menu. Saving
-     * returns to that menu, not Settings, so the teacher can immediately
-     * configure the other level too if they want. */
+    /** Shows the chip picker for a single target, reached from
+     * renderContentPicker()'s menu. Saving returns to that menu, not
+     * Settings, so the teacher can immediately configure another level
+     * too if they want. */
     renderContentPickerDetail(target) {
         const { el } = Phono.helpers;
-        const isSentences = target === 'level1Sentences';
+        const cfg = CONTENT_PICKER_TARGETS[target];
 
         const selected = new Set(this.contentSelection[target] || []);
-        const allItems = isSentences ? Phono.data.sentences : Phono.data.wordsL2;
-        const keyOf = isSentences ? (s => s.text) : (w => w.word);
+        const allItems = cfg.items();
 
         const grouped = {};
         allItems.forEach(item => {
-            const groupKey = isSentences ? item.difficulty : item.stage;
+            const groupKey = cfg.groupOf(item);
             (grouped[groupKey] = grouped[groupKey] || []).push(item);
         });
-        const groupOrder = isSentences ? Object.keys(grouped).sort() : Phono.data.wordsL2StageOrder.filter(s => grouped[s]);
-        const groupLabels = isSentences
-            ? { 1: '1 λέξη', 2: '2-3 λέξεις', 3: '4 λέξεις', 4: '5 λέξεις' }
-            : { A: 'Στάδιο Α — δισύλλαβα απλά', B: 'Στάδιο Β — τρισύλλαβα απλά', C: 'Στάδιο Γ — δίψηφα', D: 'Στάδιο Δ — συμπλέγματα' };
+        const groupOrder = cfg.groupOrder ? cfg.groupOrder.filter(g => grouped[g]) : Object.keys(grouped).sort();
 
         const countLabel = el('span', { textContent: `${selected.size} / ${allItems.length}` });
         const updateCount = () => { countLabel.textContent = `${selected.size} / ${allItems.length}`; };
 
         const groupSections = groupOrder.map(groupKey => {
             const items = grouped[groupKey];
-            const block = this._contentPickerGroupBlock(items, selected, keyOf, keyOf, updateCount);
-            return el('div', { className: 'content-picker-group' }, [
-                el('div', { className: 'content-picker-group-header' }, [
-                    el('span', { textContent: `${groupLabels[groupKey] || groupKey} (${items.length})` }),
-                    block.controls,
-                ]),
-                block.grid,
-            ]);
+            const block = this._contentPickerGroupBlock(items, selected, cfg.keyOf, cfg.labelOf || cfg.keyOf, updateCount);
+            const label = cfg.groupLabels ? (cfg.groupLabels[groupKey] || groupKey) : cfg.itemsLabel;
+            const header = [el('div', { className: 'content-picker-group-header' }, [
+                el('span', { textContent: `${label} (${items.length})` }),
+                block.controls,
+            ])];
+            return el('div', { className: 'content-picker-group' }, [...header, block.grid]);
         });
 
         const saveBtn = el('button', {
@@ -955,12 +1028,12 @@ Phono.app = {
                 },
             }),
             el('div', { className: 'level-select-header' }, [
-                el('h1', { textContent: isSentences ? 'Επίπεδο 1 — Προτάσεις' : 'Επίπεδο 2 — Λέξεις' }),
-                el('p', { textContent: 'Χωρίς επιλογή, χρησιμοποιούνται όλες.' }),
+                el('h1', { textContent: cfg.title }),
+                el('p', { textContent: 'Χωρίς επιλογή, χρησιμοποιούνται όλα.' }),
             ]),
             el('div', { className: 'content-picker-section' }, [
                 el('div', { className: 'content-picker-section-header' }, [
-                    el('h2', { textContent: isSentences ? 'Προτάσεις' : 'Λέξεις' }),
+                    el('h2', { textContent: cfg.itemsLabel }),
                     countLabel,
                 ]),
                 ...groupSections,
@@ -1057,7 +1130,7 @@ Phono.app = {
      * treats it as "no restriction" on the next visit. */
     saveContentSelection() {
         try {
-            ['level1Sentences', 'level2Words'].forEach(key => {
+            ['level1Sentences', 'level2Words', 'level3Families', 'level4Letters', 'level5Words'].forEach(key => {
                 const value = this.contentSelection[key];
                 const storageKey = `phono_contentSelection_${key}`;
                 if (value && value.length > 0) localStorage.setItem(storageKey, JSON.stringify(value));
@@ -1069,7 +1142,7 @@ Phono.app = {
     /** Load the teacher's content selection from localStorage. */
     loadContentSelection() {
         try {
-            ['level1Sentences', 'level2Words'].forEach(key => {
+            ['level1Sentences', 'level2Words', 'level3Families', 'level4Letters', 'level5Words'].forEach(key => {
                 const saved = localStorage.getItem(`phono_contentSelection_${key}`);
                 this.contentSelection[key] = saved ? JSON.parse(saved) : null;
             });

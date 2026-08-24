@@ -115,6 +115,48 @@ Phono.data.rhymeL3Word = function (word) {
     return Phono.data.rhymesL3.find(w => w.word === word);
 };
 
+/** true if `family` is allowed under the teacher's content selection
+ * (Settings -> "Επιλογή Λέξεων & Προτάσεων" -> Phono.app.contentSelection.
+ * level3Families). Empty/null selection = no restriction — same
+ * convention as level4LetterAllowed() in level4.js. */
+Phono.data.rhymeFamilyAllowed = function (family) {
+    const selected = Phono.app.contentSelection && Phono.app.contentSelection.level3Families;
+    if (!selected || selected.length === 0) return true;
+    return selected.includes(family);
+};
+
+/** findRhymeItemsL3, restricted to items whose base word's family is
+ * allowed — falls back to the full list if that would leave nothing
+ * (never let a narrow selection break the game). */
+Phono.data.findRhymeItemsL3Pool = function () {
+    const filtered = Phono.data.findRhymeItemsL3.filter(item => {
+        const meta = Phono.data.rhymeL3Word(item.base);
+        return meta && Phono.data.rhymeFamilyAllowed(meta.family);
+    });
+    return filtered.length > 0 ? filtered : Phono.data.findRhymeItemsL3;
+};
+
+/** Same idea as findRhymeItemsL3Pool, for rhymeOddOneOut's curated
+ * rhyming/odd triples — filtered by the "rhyming" pair's family (the
+ * odd word is, by construction, always from a different family). */
+Phono.data.rhymeOddOneOutItemsL3Pool = function () {
+    const filtered = Phono.data.rhymeOddOneOutItemsL3.filter(item => {
+        const meta = Phono.data.rhymeL3Word(item.rhyming[0]);
+        return meta && Phono.data.rhymeFamilyAllowed(meta.family);
+    });
+    return filtered.length > 0 ? filtered : Phono.data.rhymeOddOneOutItemsL3;
+};
+
+/** produceRhymeBasesL3, restricted to bases whose family is allowed —
+ * same empty-selection/empty-result fallback as the two pools above. */
+Phono.data.produceRhymeBasesL3Pool = function () {
+    const filtered = Phono.data.produceRhymeBasesL3.filter(word => {
+        const meta = Phono.data.rhymeL3Word(word);
+        return meta && Phono.data.rhymeFamilyAllowed(meta.family);
+    });
+    return filtered.length > 0 ? filtered : Phono.data.produceRhymeBasesL3;
+};
+
 /* ----------------------------------------------------------
    «Βρες τη Ρίμα» round data — hand-curated (base | correct | 3
    distractors), NOT auto-generated from the families above, since an

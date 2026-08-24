@@ -15,12 +15,18 @@ Phono.games = Phono.games || {};
 
 /**
  * true if `letter` is allowed under the educator's Level 4 letter
- * selection (Phono.app.level4Letters, set by renderLevel4LetterPicker).
- * No selection at all (null/empty) means no restriction — every letter
- * is allowed, same as before that picker existed.
+ * selection. Two layers, same as everywhere else in the app: a SESSION
+ * override (Phono.app.level4Letters, re-picked fresh each time the
+ * teacher enters the level via renderLevel4LetterPicker) takes priority
+ * when set; otherwise falls back to the PERSISTED central selection from
+ * Settings ("Επιλογή Λέξεων & Προτάσεων" -> Phono.app.contentSelection.
+ * level4Letters). No selection at all, at either layer, means no
+ * restriction — every letter is allowed, same as before either picker
+ * existed.
  */
 function level4LetterAllowed(letter) {
-    const selected = Phono.app.level4Letters;
+    const selected = Phono.app.level4Letters
+        || (Phono.app.contentSelection && Phono.app.contentSelection.level4Letters);
     if (!selected || selected.length === 0) return true;
     return selected.includes(letter);
 }

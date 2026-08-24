@@ -329,8 +329,9 @@ Phono.games.produceRhyme = {
         const { el } = Phono.helpers;
         this.container.innerHTML = '';
 
-        const pool = Phono.data.produceRhymeBasesL3.filter(w => !this.usedWords.includes(w));
-        const available = pool.length > 0 ? pool : Phono.data.produceRhymeBasesL3;
+        const selBases = Phono.data.produceRhymeBasesL3Pool();
+        const pool = selBases.filter(w => !this.usedWords.includes(w));
+        const available = pool.length > 0 ? pool : selBases;
         const targetText = Phono.data.getRandom(available);
         this.usedWords.push(targetText);
         this.targetWord = Phono.data.rhymeL3Word(targetText);
@@ -565,10 +566,11 @@ Phono.games.rhymeOddOneOut = {
  * Yates-without-replacement: shuffle the full 10-item pool, hand out
  * from it, reshuffle once exhausted (only matters if totalRounds > 10). */
 function level3BuildFindRhymeItems(totalRounds) {
+    const pool = Phono.data.findRhymeItemsL3Pool();
     const items = [];
     let deck = [];
     for (let round = 0; round < totalRounds; round++) {
-        if (deck.length === 0) deck = Phono.data.shuffle(Phono.data.findRhymeItemsL3);
+        if (deck.length === 0) deck = Phono.data.shuffle(pool);
         items.push(deck.pop());
     }
     return items;
@@ -578,10 +580,11 @@ function level3BuildFindRhymeItems(totalRounds) {
  * level3BuildFindRhymeItems above, for rhymeOddOneOut's curated
  * rhyming/odd triples. */
 function level3BuildOddOneOutItems(totalRounds) {
+    const pool = Phono.data.rhymeOddOneOutItemsL3Pool();
     const items = [];
     let deck = [];
     for (let round = 0; round < totalRounds; round++) {
-        if (deck.length === 0) deck = Phono.data.shuffle(Phono.data.rhymeOddOneOutItemsL3);
+        if (deck.length === 0) deck = Phono.data.shuffle(pool);
         items.push(deck.pop());
     }
     return items;
