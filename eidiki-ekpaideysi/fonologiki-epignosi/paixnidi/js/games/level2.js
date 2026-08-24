@@ -963,9 +963,11 @@ function level2BuildSyllableCountingWords(totalRounds, syllablePlan) {
         if (targetSyl === 1) {
             // 1-syllable words sit outside wordsL2's A-D stages (which
             // all start at 2 syllables) — keep drawing this one tier
-            // from the small dedicated pool, same as before.
-            const pool = Phono.data.oneSyllableWords.filter(w => !used.includes(w.word));
-            const available = pool.length > 0 ? pool : Phono.data.oneSyllableWords;
+            // from the small dedicated pool, same as before, respecting
+            // the teacher's content selection like every other tier does.
+            const selOnes = Phono.data.getOneSyllableWordsPool();
+            const pool = selOnes.filter(w => !used.includes(w.word));
+            const available = pool.length > 0 ? pool : selOnes;
             word = Phono.data.getRandom(available);
         } else {
             // 2+ syllables: pull from wordsL2, gated by the same
@@ -996,9 +998,14 @@ function level2BuildSyllableRemovalItems(totalRounds) {
         const tier = tierForRound(round, totalRounds);
         const position = tier === 1 ? 'last' : tier === 2 ? 'first' : 'middle';
 
-        const pool = Phono.data.syllableRemovalL2.filter(item => item.position === position && !used.includes(item.word + item.position));
-        const available = pool.length > 0 ? pool : Phono.data.syllableRemovalL2.filter(item => item.position === position);
-        const item = available.length > 0 ? Phono.data.getRandom(available) : Phono.data.getRandom(Phono.data.syllableRemovalL2);
+        const selPool = Phono.data.getSyllableRemovalL2Pool();
+        const pool = selPool.filter(item => item.position === position && !used.includes(item.word + item.position));
+        const posPool = selPool.filter(item => item.position === position);
+        // Third-tier fallback ignores the teacher's selection entirely —
+        // needed since a narrow selection could have nothing at all for
+        // this round's position yet.
+        const available = pool.length > 0 ? pool : (posPool.length > 0 ? posPool : Phono.data.syllableRemovalL2.filter(item => item.position === position));
+        const item = Phono.data.getRandom(available);
         used.push(item.word + item.position);
         items.push(item);
     }

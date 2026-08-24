@@ -302,6 +302,19 @@ Phono.data = {
         { word: "μη", syllables: ["μη"], emoji: "🚫" },
     ],
 
+    /** oneSyllableWords, filtered by the teacher's Level 2 content
+     * selection (same contentSelection.level2Words array wordsL2UpToStage()
+     * reads — this list is shown as its own "Μονοσύλλαβες" group in the
+     * same picker target, not a separate one). Falls back to the full
+     * list if the selection excludes every 1-syllable word. */
+    getOneSyllableWordsPool() {
+        const selection = Phono.app.contentSelection && Phono.app.contentSelection.level2Words;
+        if (!selection || selection.length === 0) return this.oneSyllableWords;
+        const allowed = new Set(selection);
+        const filtered = this.oneSyllableWords.filter(w => allowed.has(w.word));
+        return filtered.length > 0 ? filtered : this.oneSyllableWords;
+    },
+
     /* ----------------------------------------------------------
        SENTENCES for Level 1
        Simple sentences (3-6 words) for word counting

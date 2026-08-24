@@ -340,3 +340,15 @@ Phono.data.syllableRemovalL2 = [
     { word: "καμήλα", syllables: ["κα", "μή", "λα"], position: "middle", removeIndex: 1, remaining: "καλα", residueReal: false, distractors: ["μη", "μηκα"] },
     { word: "πεπόνι", syllables: ["πε", "πό", "νι"], position: "middle", removeIndex: 1, remaining: "πενι", residueReal: false, distractors: ["πο", "πόπε"] },
 ];
+
+/** syllableRemovalL2, filtered by the teacher's Level 2 content selection
+ * (same contentSelection.level2Words array wordsL2UpToStage() reads —
+ * this bank's words mostly overlap with wordsL2 itself). Falls back to
+ * the full list if the selection excludes every entry. */
+Phono.data.getSyllableRemovalL2Pool = function () {
+    const selection = Phono.app.contentSelection && Phono.app.contentSelection.level2Words;
+    if (!selection || selection.length === 0) return Phono.data.syllableRemovalL2;
+    const allowed = new Set(selection);
+    const filtered = Phono.data.syllableRemovalL2.filter(item => allowed.has(item.word));
+    return filtered.length > 0 ? filtered : Phono.data.syllableRemovalL2;
+};

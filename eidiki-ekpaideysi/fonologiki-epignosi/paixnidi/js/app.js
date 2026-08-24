@@ -31,11 +31,15 @@ const CONTENT_PICKER_TARGETS = {
         title: 'Επίπεδο 2 — Λέξεις',
         subtitle: 'Ποιες λέξεις θα χρησιμοποιούνται στα παιχνίδια συλλαβών',
         itemsLabel: 'Λέξεις',
-        items: () => Phono.data.wordsL2,
+        // oneSyllableWords is a separate small bank (js/data.js) that only
+        // "Μέτρα τις Συλλαβές" draws from for its 1-syllable rounds — shown
+        // here as its own group ('1') so the teacher can actually see/pick
+        // it too, since it's otherwise invisible in the wordsL2 A-D stages.
+        items: () => [...Phono.data.wordsL2, ...Phono.data.oneSyllableWords.map(w => ({ ...w, stage: '1' }))],
         keyOf: w => w.word,
         groupOf: w => w.stage,
-        groupOrder: Phono.data.wordsL2StageOrder,
-        groupLabels: { A: 'Στάδιο Α — δισύλλαβα απλά', B: 'Στάδιο Β — τρισύλλαβα απλά', C: 'Στάδιο Γ — δίψηφα', D: 'Στάδιο Δ — συμπλέγματα' },
+        groupOrder: ['1', ...Phono.data.wordsL2StageOrder],
+        groupLabels: { '1': 'Μονοσύλλαβες (μόνο "Μέτρα τις Συλλαβές")', A: 'Στάδιο Α — δισύλλαβα απλά', B: 'Στάδιο Β — τρισύλλαβα απλά', C: 'Στάδιο Γ — δίψηφα', D: 'Στάδιο Δ — συμπλέγματα' },
     },
     level3Families: {
         title: 'Επίπεδο 3 — Ομοιοκαταληξία',
