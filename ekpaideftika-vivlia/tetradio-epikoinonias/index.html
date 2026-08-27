@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S07M3VNB5N');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Τετράδιο Επικοινωνίας λογοθεραπευτή/ύτριας και ειδικού παιδαγωγού — δωρεάν φύλλα συμπλήρωσης από το Learning Fast. Διαθέσιμο μετά από εγγραφή στο newsletter." />
+  <title>Τετράδιο Επικοινωνίας Λογοθεραπευτή/ύτριας &amp; Ειδικού Παιδαγωγού – Εκπαιδευτικά Βιβλία – Learning Fast</title>
+  <link rel="canonical" href="https://learning-fast.com/ekpaideftika-vivlia/tetradio-epikoinonias/" />
+  <link rel="stylesheet" href="../../styles/main.css" />
+  <!-- Brevo newsletter form assets (same embedded form/list as the sitewide popup) -->
+  <style>
+    @font-face {
+      font-display: block;
+      font-family: Roboto;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/7529907e9eaf8ebb5220c5f9850e3811.woff2) format("woff2"), url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/25c678feafdc175a70922a116c9be3e7.woff) format("woff")
+    }
+    @font-face {
+      font-display: fallback;
+      font-family: Roboto;
+      font-weight: 600;
+      src: url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/6e9caeeafb1f3491be3e32744bc30440.woff2) format("woff2"), url(https://assets.brevo.com/font/Roboto/Latin/medium/normal/71501f0d8d5aa95960f6475d5487d4c2.woff) format("woff")
+    }
+    :where(.sib-form-message-panel) { display: none; }
+    :where(.sib-form-message-panel .sib-notification__icon) { width: 20px; height: 20px; }
+
+    .detail-wrap {
+      max-width: 960px;
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: .9rem;
+      margin-bottom: 2rem;
+      transition: gap var(--transition);
+      text-decoration: none;
+    }
+    .back-link:hover { gap: .8rem; }
+
+    .detail-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,.05);
+    }
+
+    .detail-card__header {
+      background: linear-gradient(135deg, #f59e0b, #fcd34d);
+      padding: 2.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .detail-card__header-info h2 {
+      color: #fff;
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: .3rem;
+    }
+
+    .detail-card__header-info p {
+      color: rgba(255,255,255,.85);
+      font-size: .95rem;
+    }
+
+    .detail-card__body {
+      padding: 2rem;
+    }
+
+    .detail-card__preview {
+      display: block;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.08);
+      margin-bottom: 1.2rem;
+      filter: blur(3px);
+    }
+
+    .detail-card__description {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .gate-note {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      margin-top: 1.25rem;
+      padding: .6rem 1rem;
+      border-radius: 999px;
+      background: #fff7e6;
+      color: #92610c;
+      font-size: .85rem;
+      font-weight: 700;
+    }
+
+    .signup-card {
+      max-width: 620px;
+      margin: 3rem auto 0;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,.05);
+      padding: 2.25rem 2rem;
+      text-align: center;
+    }
+    .signup-card h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: .6rem;
+    }
+    .signup-card p {
+      color: var(--muted);
+      font-size: .98rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .gated-download-inline {
+      display: none;
+      text-align: left;
+      background: #f0f9f7;
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .gated-download-inline.is-visible { display: block; }
+    .gated-download-inline h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: .8rem; }
+    .gated-download-inline .links { display: grid; gap: .6rem; }
+    .gated-download-inline .links a {
+      display: block;
+      padding: .8rem 1rem;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      border: 1px solid rgba(0,0,0,.06);
+      transition: transform var(--transition);
+    }
+    .gated-download-inline .links a:hover { transform: translateY(-2px); }
+  </style>
+  <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <a href="../../index.html" class="navbar__logo"><img src="../../assets/images/logo-wordmark.png" alt="Learning Fast" /></a>
+      <button class="navbar__hamburger" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <ul class="navbar__links">
+        <li><a href="../../index.html">Αρχική</a></li>        <li class="has-dropdown"><a href="../../eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a>
+          <ul class="dropdown">
+            <li><a href="../../eidiki-ekpaideysi/kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
+            <li><a href="../../eidiki-ekpaideysi/leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
+            <li><a href="../../eidiki-ekpaideysi/fonologiki-epignosi/index.html">Φωνολογική Επίγνωση</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../../ekpaideftika-paixnidia/index.html">Εκπαιδευτικά Παιχνίδια</a>
+          <ul class="dropdown">
+            <li><a href="../../ekpaideftika-paixnidia/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../ekpaideftika-paixnidia/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../ekpaideftika-paixnidia/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+
+            <li><a href="../../ekpaideftika-paixnidia/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../ekpaideftika-paixnidia/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../ekpaideftika-paixnidia/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../index.html" class="active">Εκπαιδευτικά Βιβλία</a>
+          <ul class="dropdown">
+            <li><a href="../atzenta/index.html">Ατζέντα</a></li>
+            <li><a href="../tetradio-epikoinonias/index.html">Τετράδιο Επικοινωνίας</a></li>
+          </ul>
+        </li>
+        <li><a href="../../epikoinonia/index.html">Επικοινωνία</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="section__header">
+      <span class="section__label">Βιβλιοθήκη</span>
+      <h1 class="section__title">Τετράδιο Επικοινωνίας</h1>
+    </div>
+
+    <div class="detail-wrap">
+      <a href="../index.html" class="back-link">← Επιστροφή στα Εκπαιδευτικά Βιβλία</a>
+
+      <div class="detail-grid">
+
+        <div class="detail-card">
+          <div class="detail-card__header">
+            <div class="detail-card__header-info">
+              <h2>Τετράδιο Επικοινωνίας Λογοθεραπευτή/ύτριας</h2>
+              <p>PDF</p>
+            </div>
+          </div>
+          <div class="detail-card__body">
+            <img class="detail-card__preview" src="preview-logotherapeia.png" alt="Προεπισκόπηση Τετραδίου Επικοινωνίας Λογοθεραπευτή/ύτριας" loading="lazy" />
+            <p class="detail-card__description">
+              Φύλλο συμπλήρωσης για την καθημερινή επικοινωνία λογοθεραπευτή/ύτριας με γονείς.
+            </p>
+            <span class="gate-note">🔒 Διαθέσιμο μετά από εγγραφή στο newsletter</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-card__header">
+            <div class="detail-card__header-info">
+              <h2>Τετράδιο Επικοινωνίας Ειδικού Παιδαγωγού</h2>
+              <p>PDF</p>
+            </div>
+          </div>
+          <div class="detail-card__body">
+            <img class="detail-card__preview" src="preview-eidikou-paidagogou.png" alt="Προεπισκόπηση Τετραδίου Επικοινωνίας Ειδικού Παιδαγωγού" loading="lazy" />
+            <p class="detail-card__description">
+              Φύλλο συμπλήρωσης για την καθημερινή επικοινωνία ειδικού παιδαγωγού με γονείς.
+            </p>
+            <span class="gate-note">🔒 Διαθέσιμο μετά από εγγραφή στο newsletter</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="signup-card">
+        <h2>Γράψου για να κατεβάσεις τα τετράδια</h2>
+        <p>Γράψε το email σου παρακάτω. Μόλις πατήσεις «Εγγραφή», θα μπορείς αμέσως να κατεβάσεις και τα δύο τετράδια επικοινωνίας.</p>
+
+        <div class="sib-form" style="text-align: center; background-color: transparent;">
+          <div id="sib-form-container" class="sib-form-container">
+            <div id="error-message" class="sib-form-message-panel" style="font-family:Helvetica, sans-serif; font-size:16px; text-align:left; color:#661d1d; background-color:#ffeded; border-color:#ff4949; border-radius:3px; max-width:540px;">
+              <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                <svg viewBox="0 0 512 512" class="sib-icon sib-notification__icon"><path d="M256 40c118.621 0 216 96.075 216 216 0 119.291-96.61 216-216 216-119.244 0-216-96.562-216-216 0-119.203 96.602-216 216-216m0-32C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm-11.49 120h22.979c6.823 0 12.274 5.682 11.99 12.5l-7 168c-.268 6.428-5.556 11.5-11.99 11.5h-8.979c-6.433 0-11.722-5.073-11.99-11.5l-7-168c-.283-6.818 5.167-12.5 11.99-12.5zM256 340c-15.464 0-28 12.536-28 28s12.536 28 28 28 28-12.536 28-28-12.536-28-28-28z" /></svg>
+                <span class="sib-form-message-panel__inner-text">Η εγγραφή σας δεν ολοκληρώθηκε. Δοκιμάστε ξανά.</span>
+              </div>
+            </div>
+            <div></div>
+            <div id="success-message" class="sib-form-message-panel" style="font-family:Helvetica, sans-serif; font-size:16px; text-align:left; color:#085229; background-color:#e7faf0; border-color:#13ce66; border-radius:3px; max-width:540px;">
+              <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                <svg viewBox="0 0 512 512" class="sib-icon sib-notification__icon"><path d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 464c-118.664 0-216-96.055-216-216 0-118.663 96.055-216 216-216 118.664 0 216 96.055 216 216 0 118.663-96.055 216-216 216zm141.63-274.961L217.15 376.071c-4.705 4.667-12.303 4.637-16.97-.068l-85.878-86.572c-4.667-4.705-4.637-12.303.068-16.97l8.52-8.451c4.705-4.667 12.303-4.637 16.97.068l68.976 69.533 163.441-162.13c4.705-4.667 12.303-4.637 16.97.068l8.451 8.52c4.668 4.705 4.637 12.303-.068 16.97z" /></svg>
+                <span class="sib-form-message-panel__inner-text">Η εγγραφή σας έγινε με επιτυχία!</span>
+              </div>
+            </div>
+            <div></div>
+            <div id="sib-container" class="sib-container--large sib-container--vertical" style="max-width:540px; margin:0 auto; text-align:center; background-color:rgba(255,255,255,1); border-width:1px; border-style:solid; border-color:#C0CCD9; border-radius:3px; direction:ltr">
+              <form id="sib-form" method="POST" action="https://d08b92c1.sibforms.com/serve/MUIFAE_XrYWCLBWxiYWnLW8v5XI8rMbEPf8fFotqWTbbMehUCVz7hbSwbRwCyTbUaHbzx4V5_9w9U6rzHejJ60PPH3Oar6TAgFF4cU-EgvO5X4pX4SLJlODsBaZfpNplYqsToVhfULnEky-D5Bnm3lVHkSQxp340oob6U0Ykg-4pGkHZb9HDOHMmbV3rX8ZBkNNxkpXbEnz81ovqqA==" data-type="subscription">
+                <div style="padding: 8px 0;">
+                  <div class="sib-input sib-form-block">
+                    <div class="form__entry entry_block">
+                      <div class="form__label-row ">
+                        <label class="entry__label" style="font-weight: 700; text-align: left; font-family:Helvetica, sans-serif; font-size:16px; font-weight:700; text-align:left; color:#3c4858;" for="EMAIL" data-required="*">Η διεύθυνση email σου</label>
+                        <div class="entry__field">
+                          <input class="input " type="text" id="EMAIL" name="EMAIL" autocomplete="off" value="" placeholder="Το email σου" data-required="true" required />
+                        </div>
+                      </div>
+                      <label class="entry__error entry__error--primary" style="font-family:Helvetica, sans-serif; font-size:16px; text-align:left; color:#661d1d; background-color:#ffeded; border-color:#ff4949; border-radius:3px;"></label>
+                      <label class="entry__specification" style="font-family:Helvetica, sans-serif; font-size:12px; text-align:left; color:#8390A4; text-align: left ">Γράψε το email σου για εγγραφή. Για παράδειγμα maria@gmail.com</label>
+                    </div>
+                  </div>
+                </div>
+                <div style="padding: 8px 0;">
+                  <div class="sib-form-block" style="text-align: center">
+                    <button class="sib-form-block__button sib-form-block__button-with-loader" style="font-family:Helvetica, sans-serif; font-size:16px; font-weight:700; text-align:left; color:#FFFFFF; background-color:#3E4857; border-width:0px; border-radius:3px;" form="sib-form" type="submit">
+                      <svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon" viewBox="0 0 512 512"><path d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" /></svg>
+                      Εγγραφή
+                    </button>
+                  </div>
+                </div>
+                <input type="text" name="email_address_check" value="" class="input--hidden">
+                <input type="hidden" name="locale" value="en">
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="gated-download-inline" id="gatedDownloadInline">
+          <h3>Τα τετράδια είναι έτοιμα για κατέβασμα:</h3>
+          <div class="links">
+            <a href="tetradio-epikoinonias-logotherapeia.pdf">Τετράδιο Επικοινωνίας Λογοθεραπευτή/ύτριας (PDF)</a>
+            <a href="tetradio-epikoinonias-eidikou-paidagogou.pdf">Τετράδιο Επικοινωνίας Ειδικού Παιδαγωγού (PDF)</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__logo"><img src="../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
+    <ul class="footer__links">
+      <li><a href="../../epikoinonia/index.html">Επικοινωνία</a></li>
+      <li><a href="../../steile-mia-idea/index.html">Στείλε μια ιδέα!</a></li>
+      <li><a href="../../enimeroseis/index.html">Ενημερώσεις</a></li>
+      <li><a href="../../oroi-xrisis/index.html">Όροι και προϋποθέσεις</a></li>
+    </ul>
+    <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
+
+<script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
+<script>
+  // Marks that this specific visitor is signing up in order to unlock
+  // the Τετράδιο Επικοινωνίας downloads — newsletter-thanks.html reads
+  // this flag (and clears it) to show the download links ONLY to
+  // people who came from this page, not to every newsletter subscriber
+  // sitewide. Set on submit (not just on page load) so it reflects an
+  // actual signup attempt, not just a visit. Kept as a fallback in case
+  // the list is ever switched back to double opt-in (Brevo would then
+  // redirect the confirmation-email click to newsletter-thanks.html).
+  (function () {
+    var form = document.getElementById('sib-form');
+    if (!form) return;
+    form.addEventListener('submit', function () {
+      try { localStorage.setItem('lfPendingDownload', 'tetradio-epikoinonias'); } catch (e) { /* ignore */ }
+    });
+  })();
+
+  // Single opt-in: the visitor never leaves this page (Brevo's script
+  // shows an inline success message via AJAX, no email/redirect
+  // involved). So reveal the download right here the moment that
+  // success message becomes visible, instead of relying on a later
+  // page. Watches for Brevo's own script un-hiding #success-message.
+  (function () {
+    var successEl = document.getElementById('success-message');
+    var downloadEl = document.getElementById('gatedDownloadInline');
+    if (!successEl || !downloadEl) return;
+    function reveal() {
+      if (getComputedStyle(successEl).display !== 'none') {
+        downloadEl.classList.add('is-visible');
+      }
+    }
+    new MutationObserver(reveal).observe(successEl, { attributes: true, attributeFilter: ['style', 'class'] });
+  })();
+
+  var btn = document.getElementById('navToggle');
+  var links = document.querySelector('.navbar__links');
+  if(btn && links){
+    btn.addEventListener('click', function(){
+      links.classList.toggle('nav-open');
+      btn.classList.toggle('nav-open');
+    });
+    document.querySelectorAll('.has-dropdown > a').forEach(function(a){
+      a.addEventListener('click', function(e){
+        if(window.innerWidth <= 768){
+          e.preventDefault();
+          var li = this.parentElement;
+          document.querySelectorAll('.has-dropdown.open').forEach(function(el){
+            if(el !== li) el.classList.remove('open');
+          });
+          li.classList.toggle('open');
+        }
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.navbar') && links.classList.contains('nav-open')){
+        links.classList.remove('nav-open');
+        btn.classList.remove('nav-open');
+      }
+    });
+  }
+</script>
+</body>
+</html>

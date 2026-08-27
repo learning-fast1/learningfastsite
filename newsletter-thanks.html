@@ -121,6 +121,18 @@
     .badge path{stroke-dashoffset:0}
     .links a{transition:none}
   }
+  .gated-download{
+    display:none;
+    text-align:left;
+    background:var(--mint);
+    border-radius:16px;
+    padding:20px 22px;
+    margin:0 0 26px;
+  }
+  .gated-download.is-visible{display:block}
+  .gated-download h2{margin-bottom:14px;text-align:left}
+  .gated-download .links a{background:#fff}
+  .gated-download .links a:hover,.gated-download .links a:focus-visible{background:var(--teal);color:#fff}
 </style>
 </head>
 <body>
@@ -150,6 +162,7 @@
         <li class="has-dropdown"><a href="ekpaideftika-vivlia/index.html">Εκπαιδευτικά Βιβλία</a>
           <ul class="dropdown">
             <li><a href="ekpaideftika-vivlia/atzenta/index.html">Ατζέντα</a></li>
+            <li><a href="ekpaideftika-vivlia/tetradio-epikoinonias/index.html">Τετράδιο Επικοινωνίας</a></li>
           </ul>
         </li>
         <li><a href="epikoinonia/index.html">Επικοινωνία</a></li>
@@ -166,6 +179,14 @@
     <h1>Γράφτηκες!</h1>
     <p class="lead">Θα λάβεις email μόλις βγει το επόμενο δωρεάν εκπαιδευτικό παιχνίδι/υλικό. Αυτή την περίοδο ετοιμάζουμε ένα τεστ ταχείας κατονομασίας, ένα παιχνίδι αναγνώρισης συναισθημάτων και ένα εκπαιδευτικό βιβλίο μαθηματικών!</p>
     <span class="promise">Ένα email τον μήνα · Διαγραφή με ένα κλικ</span>
+
+    <div class="gated-download" id="gatedDownloadTetradio">
+      <h2>Το τετράδιο επικοινωνίας σου είναι έτοιμο:</h2>
+      <div class="links">
+        <a href="ekpaideftika-vivlia/tetradio-epikoinonias/tetradio-epikoinonias-logotherapeia.pdf">Τετράδιο Επικοινωνίας Λογοθεραπευτή/ύτριας (PDF)</a>
+        <a href="ekpaideftika-vivlia/tetradio-epikoinonias/tetradio-epikoinonias-eidikou-paidagogou.pdf">Τετράδιο Επικοινωνίας Ειδικού Παιδαγωγού (PDF)</a>
+      </div>
+    </div>
 
     <hr class="divider">
 
@@ -192,6 +213,20 @@
   </footer>
 
 <script>
+  // Reveals the gated PDF download(s) only for the visitor who just signed
+  // up from a specific gated page (flag set on that page's form submit),
+  // not for every newsletter subscriber who lands here. Cleared immediately
+  // so it does not persist across unrelated future visits.
+  (function () {
+    var pending;
+    try { pending = localStorage.getItem('lfPendingDownload'); } catch (e) { pending = null; }
+    if (pending === 'tetradio-epikoinonias') {
+      var section = document.getElementById('gatedDownloadTetradio');
+      if (section) section.classList.add('is-visible');
+    }
+    try { localStorage.removeItem('lfPendingDownload'); } catch (e) { /* ignore */ }
+  })();
+
   var btn = document.getElementById('navToggle');
   var links = document.querySelector('.navbar__links');
   if(btn && links){
