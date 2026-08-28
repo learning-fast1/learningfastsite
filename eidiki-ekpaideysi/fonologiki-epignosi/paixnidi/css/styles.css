@@ -1876,22 +1876,25 @@ input {
     z-index: 10;
 }
 
-/* Teacher-note toggle — mirrors sound-toggle on the opposite corner */
+/* Teacher-note toggle — kept as a sibling of the animated .game-screen
+   (not nested in the header) so it doesn't slide/jitter on every
+   per-round fade-in transition; pinned near the title at the top
+   instead of the old bottom corner so it reads as "next to the
+   title" on every stage. */
 .teacher-info-toggle {
     position: fixed;
-    bottom: var(--space-lg);
+    top: var(--space-lg);
     right: var(--space-lg);
     z-index: 10;
 }
 
-/* findRhyme only — the current round's 4 choice words, sitting to the
-   left of the "ΟΔΗΓΙΕΣ" button so the educator can read them without
-   tapping anything. Right-aligned and offset far enough to clear that
-   button's own width instead of sitting under/behind it. */
+/* findRhyme only — the current round's 4 choice words, previously
+   offset to clear the ΟΔΗΓΙΕΣ button when it sat in this same corner;
+   that button now lives at the top, so this can sit flush right. */
 .findrhyme-caption {
     position: fixed;
     bottom: calc(var(--space-lg) + 6px);
-    right: 100px;
+    right: var(--space-lg);
     z-index: 10;
     font-size: var(--text-xs);
     color: var(--text-secondary);
