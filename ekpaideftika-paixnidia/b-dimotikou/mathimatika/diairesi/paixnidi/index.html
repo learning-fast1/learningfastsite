@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-VH4HQ38KJJ');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Μαθαίνω τη Διαίρεση</title>
+  <link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/b-dimotikou/mathimatika/diairesi/paixnidi/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=10">
+</head>
+<body>
+  <div class="app">
+    <section id="screen-home" class="screen active">
+      <a href="../../../../../index.html" class="site-back-link">← Learning Fast</a>
+      <div class="hero">
+        <img class="hero-logo" src="logo.png" alt="Μαθαίνω τη Διαίρεση" width="180" height="180">
+        <h1>Μαθαίνω τη Διαίρεση</h1>
+        <p class="subtitle">Μοιράζουμε τα ίδια σε όλους — έτσι μαθαίνουμε τη διαίρεση!</p>
+      </div>
+
+      <div class="home-toolbar home-toolbar--compact">
+        <button type="button" class="btn-difficulty" id="btn-difficulty" aria-pressed="false" title="Σειρά ασκήσεων">🎲 Τυχαία σειρά</button>
+        <button type="button" class="btn-sound" id="btn-sound" aria-label="Ήχοι">🔊</button>
+      </div>
+
+      <div class="times-table-panel">
+        <div class="times-table-header">
+          <span class="picker-label">Διαίρεση</span>
+          <span class="picker-hint">Επέλεξε τουλάχιστον έναν διαιρέτη. Οι μεγαλύτεροι βγαίνουν πιο συχνά στις ασκήσεις.</span>
+        </div>
+        <div class="times-table-options" id="times-table-options" role="group" aria-label="Επιλογή διαιρέτη"></div>
+        <p class="times-table-summary" id="times-table-summary" aria-live="polite"></p>
+      </div>
+
+      <button type="button" class="duel-banner" id="btn-duel">
+        <span class="duel-banner-text">
+          <strong>Παίζω με φίλο</strong>
+          <small>Μονομαχία 2 παικτών</small>
+        </span>
+        <span class="duel-banner-arrow">→</span>
+      </button>
+
+      <div class="stages-map" id="stages-map"></div>
+      <div class="stats-bar">
+        <span id="total-stars">⭐ 0</span>
+        <span id="progress-text">0 / 6 στάδια</span>
+      </div>
+    </section>
+
+    <section id="screen-game" class="screen screen-fit">
+      <header class="game-header">
+        <button class="btn-back" id="btn-back" aria-label="Πίσω">←</button>
+        <div class="stage-info">
+          <span class="stage-badge" id="stage-badge">Στάδιο 1</span>
+          <h2 id="stage-title">Μοιράζω ίσα με εικόνες</h2>
+        </div>
+        <div class="level-counter">
+          <span id="level-current">1</span> / <span id="level-total">8</span>
+        </div>
+      </header>
+
+      <div class="instruction-box" id="instruction"></div>
+      <main class="game-area" id="game-area"></main>
+
+      <footer class="game-footer">
+        <div class="equation-display" id="equation-display"></div>
+        <div class="answer-row" id="answer-row">
+          <label for="answer-input">Απάντηση:</label>
+          <input type="number" id="answer-input" min="0" max="99" autocomplete="off" class="answer-slot-input">
+          <button class="btn-primary" id="btn-check">Έλεγχος ✓</button>
+        </div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+        <div class="hint-zone hidden" id="hint-zone"></div>
+        <button class="btn-secondary hidden" id="btn-next">Επόμενο →</button>
+      </footer>
+    </section>
+
+    <section id="screen-complete" class="screen">
+      <div class="celebration" id="celebration">
+        <div class="confetti" id="complete-confetti">🎉</div>
+        <h2 id="complete-title">Μπράβο!</h2>
+        <p id="complete-message"></p>
+        <div class="stars-earned" id="stars-earned"></div>
+        <div class="certificate-name hidden" id="certificate-name"></div>
+        <button class="btn-primary" id="btn-continue">Συνέχεια</button>
+        <button class="btn-secondary hidden no-print" id="btn-print">🖨️ Εκτύπωση διπλώματος</button>
+      </div>
+    </section>
+
+    <section id="screen-duel-setup" class="screen">
+      <header class="game-header">
+        <button class="btn-back" id="duel-back-setup" aria-label="Πίσω">←</button>
+        <div class="stage-info">
+          <span class="stage-badge">Μονομαχία</span>
+          <h2>Παίζω με φίλο</h2>
+        </div>
+      </header>
+      <div class="duel-setup-card">
+        <p class="setup-desc">Δύο παίκτες εναλλάσσονται. Σωστή απάντηση = +1 πόντος!</p>
+        <div class="name-inputs">
+          <label>Παίκτης 1 <input type="text" id="duel-name-1" maxlength="16" placeholder="Παίκτης 1"></label>
+          <label>Παίκτης 2 <input type="text" id="duel-name-2" maxlength="16" placeholder="Παίκτης 2"></label>
+        </div>
+        <div class="duel-stage-picker">
+          <span class="setup-label">Στάδια</span>
+          <p class="setup-hint">Διάλεξε τουλάχιστον ένα στάδιο. (Το «Μοιράζω με εικόνες» δεν είναι διαθέσιμο στη μονομαχία.)</p>
+          <div class="grade-options" id="duel-stage-options" role="group" aria-label="Επιλογή σταδίων"></div>
+          <p class="duel-stage-summary" id="duel-stage-summary" aria-live="polite"></p>
+          <p class="setup-hint duel-divisors-note" id="duel-divisors-note">Διαιρέτες: όσους επέλεξες στην αρχική οθόνη.</p>
+        </div>
+        <div class="setup-row">
+          <label for="duel-rounds">Γύροι</label>
+          <select id="duel-rounds">
+            <option value="6">6 γύροι</option>
+            <option value="10" selected>10 γύροι</option>
+            <option value="15">15 γύροι</option>
+          </select>
+        </div>
+        <button class="btn-primary btn-large" id="duel-start">Ξεκινάμε! 🎮</button>
+      </div>
+    </section>
+
+    <section id="screen-duel" class="screen screen-fit">
+      <header class="game-header">
+        <button class="btn-back" id="duel-back-game" aria-label="Πίσω">←</button>
+        <div class="stage-info">
+          <span class="stage-badge" id="duel-player-badge">Σειρά παίκτη</span>
+          <span class="level-counter" id="duel-round-info">Γύρος 1/10</span>
+        </div>
+      </header>
+
+      <div class="duel-scoreboard">
+        <div class="duel-player-card active" data-player="0">
+          <span class="duel-name" id="duel-label-1">Παίκτης 1</span>
+          <span class="duel-score" id="duel-score-1">0</span>
+        </div>
+        <div class="duel-vs">VS</div>
+        <div class="duel-player-card" data-player="1">
+          <span class="duel-name" id="duel-label-2">Παίκτης 2</span>
+          <span class="duel-score" id="duel-score-2">0</span>
+        </div>
+      </div>
+
+      <main class="game-area duel-area" id="duel-area"></main>
+      <footer class="game-footer">
+        <div class="equation-display" id="duel-equation"></div>
+        <div class="answer-row" id="duel-answer-row"></div>
+        <div class="feedback" id="duel-feedback" aria-live="polite"></div>
+      </footer>
+    </section>
+
+    <section id="screen-duel-end" class="screen">
+      <div class="celebration">
+        <div class="confetti">🏆</div>
+        <h2 id="duel-end-title">Νικητής!</h2>
+        <p id="duel-end-message"></p>
+        <button class="btn-primary" id="duel-rematch">Ξανά! 🔄</button>
+        <button class="btn-secondary" id="duel-home">Αρχική</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="sounds.js?v=10"></script>
+  <script src="data.js?v=10"></script>
+  <script src="numpad.js?v=10"></script>
+  <script src="game.js?v=10"></script>
+  <script src="duel.js?v=10"></script>
+</body>
+</html>

@@ -1,0 +1,2033 @@
+:root {
+  --bg: #f5f0eb;
+  --surface: #fffcf8;
+  --mint: #b8e0d2;
+  --mint-dark: #7eb8a4;
+  --lavender: #d4c8e8;
+  --lavender-dark: #9b8ab8;
+  --peach: #f5d5c8;
+  --peach-dark: #e8a898;
+  --sky: #c5dff8;
+  --sky-dark: #7aafd4;
+  --text: #4a5568;
+  --text-light: #718096;
+  --success: #68b88a;
+  --error: #e8a0a0;
+  --shadow: rgba(74, 85, 104, 0.08);
+  --radius: 20px;
+  --radius-sm: 12px;
+  /* Μεγέθη φιλικά προς παιδιά (touch targets ≥ 48px) */
+  --item-size: 70px;
+  --item-font: 2.85rem;
+  --group-min-w: 150px;
+  --group-min-h: 135px;
+  --font-game: 1.35rem;
+  --font-heading: 1.35rem;
+  --eq-size: 2.6rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  font-size: 17px;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 15%, rgba(184, 224, 210, 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 50% at 85% 85%, rgba(212, 200, 232, 0.4) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 92% 12%, rgba(197, 223, 248, 0.35) 0%, transparent 50%),
+    radial-gradient(ellipse 45% 35% at 8% 88%, rgba(245, 213, 200, 0.3) 0%, transparent 50%),
+    linear-gradient(155deg, #f8f4ef 0%, #ebe6f2 42%, #e6f0eb 100%);
+  height: 100%;
+  min-height: 100dvh;
+  color: var(--text);
+  overflow: hidden;
+  position: relative;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::before {
+  width: min(520px, 55vw);
+  height: min(520px, 55vw);
+  top: -140px;
+  left: -100px;
+  background: radial-gradient(circle, rgba(184, 224, 210, 0.22) 0%, transparent 68%);
+}
+
+body::after {
+  width: min(480px, 50vw);
+  height: min(480px, 50vw);
+  bottom: -120px;
+  right: -80px;
+  background: radial-gradient(circle, rgba(212, 200, 232, 0.25) 0%, transparent 68%);
+}
+
+.app {
+  max-width: 980px;
+  width: 100%;
+  margin: 0 auto;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding: clamp(0.35rem, 1dvh, 0.75rem) clamp(0.75rem, 2vw, 1.25rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.screen {
+  display: none;
+  animation: fadeIn 0.4s ease;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.screen.active {
+  display: flex;
+}
+
+#screen-home.screen.active {
+  overflow: hidden;
+  background: rgba(255, 252, 248, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 12px 40px rgba(74, 85, 104, 0.07);
+  padding: 0.2rem 0.85rem 0.45rem;
+}
+
+#screen-home .hero {
+  padding: clamp(0.04rem, 0.2dvh, 0.22rem) 0.35rem clamp(0.02rem, 0.12dvh, 0.15rem);
+}
+
+#screen-home .hero-logo {
+  width: clamp(132px, 22dvh, 220px);
+  max-height: clamp(132px, 22dvh, 220px);
+  margin-bottom: clamp(0.02rem, 0.1dvh, 0.1rem);
+}
+
+#screen-home .hero h1 {
+  font-size: clamp(1.75rem, 5.8dvh, 2.65rem);
+  margin-bottom: 0.02rem;
+  line-height: 1.05;
+}
+
+#screen-home .subtitle {
+  font-size: clamp(0.85rem, 1.85dvh, 1.05rem);
+  line-height: 1.3;
+}
+
+#screen-home .home-toolbar {
+  margin-bottom: clamp(0.2rem, 0.55dvh, 0.4rem);
+  padding: clamp(0.3rem, 0.75dvh, 0.5rem) 0.55rem;
+}
+
+#screen-home .duel-banner {
+  margin-bottom: clamp(0.2rem, 0.55dvh, 0.4rem);
+  padding: clamp(0.35rem, 0.95dvh, 0.65rem) 0.75rem;
+}
+
+#screen-home .duel-banner-text strong {
+  font-size: clamp(1rem, 2.2dvh, 1.2rem);
+}
+
+#screen-home .duel-banner-text small {
+  font-size: clamp(0.78rem, 1.7dvh, 0.98rem);
+}
+
+#screen-home .stages-map {
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: clamp(0.18rem, 0.5dvh, 0.42rem);
+  margin: clamp(0.15rem, 0.45dvh, 0.45rem) 0;
+  overflow: hidden;
+}
+
+#screen-home .stage-card {
+  flex: 1 1 0;
+  min-height: 0;
+  padding: clamp(0.28rem, 0.85dvh, 0.55rem) 0.7rem;
+  gap: 0.35rem;
+}
+
+#screen-home .stage-card .info h3 {
+  font-size: clamp(0.95rem, 2.2dvh, 1.15rem);
+  margin-bottom: 0;
+}
+
+#screen-home .stage-card .info p {
+  font-size: clamp(0.75rem, 1.65dvh, 0.92rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#screen-home .stage-card .stars {
+  font-size: clamp(0.95rem, 2dvh, 1.1rem);
+}
+
+#screen-home .stats-bar {
+  padding: clamp(0.25rem, 0.65dvh, 0.45rem) 0.55rem;
+  margin-bottom: 0;
+  font-size: clamp(0.88rem, 1.9dvh, 1.05rem);
+}
+
+.screen-fit.screen.active,
+#screen-complete.screen.active,
+#screen-duel-setup.screen.active,
+#screen-duel-end.screen.active {
+  overflow: hidden;
+  background: rgba(255, 252, 248, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10px 36px rgba(74, 85, 104, 0.06);
+  padding: 0.35rem 1rem 0.75rem;
+}
+
+.screen-fit .game-header {
+  flex-shrink: 0;
+  margin-bottom: 0.35rem;
+}
+
+.screen-fit .instruction-box {
+  flex-shrink: 0;
+  margin-bottom: 0.4rem;
+  padding: 0.65rem 0.85rem;
+  font-size: clamp(1.3rem, 3.8vmin, 1.65rem);
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.screen-fit .game-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  -webkit-overflow-scrolling: touch;
+}
+
+.screen-fit .game-footer {
+  flex-shrink: 0;
+  padding: 0.5rem 0.65rem;
+}
+
+.screen-fit .equation-display {
+  font-size: clamp(2.2rem, 6vmin, 3.2rem);
+  margin-bottom: 0.5rem;
+  gap: 0.55rem;
+}
+
+.screen-fit .equation-display .answer-slot {
+  width: clamp(3rem, 6.5vmin, 3.85rem);
+  height: clamp(3rem, 6.5vmin, 3.85rem);
+  min-width: 52px;
+  min-height: 52px;
+  border-width: 3px;
+  border-radius: 12px;
+}
+
+.screen-fit .answer-row label {
+  font-size: clamp(1.15rem, 2.6vmin, 1.4rem);
+}
+
+.screen-fit .answer-slot-input,
+.screen-fit #answer-input {
+  width: clamp(68px, 9.5vmin, 84px);
+  height: clamp(58px, 8vmin, 72px);
+  font-size: clamp(1.6rem, 4.2vmin, 2rem);
+  border-radius: 12px;
+}
+
+.screen-fit .feedback {
+  margin-top: 0.35rem;
+  font-size: 1.02rem;
+  min-height: 1.3rem;
+}
+
+.screen-fit .btn-secondary {
+  margin-top: 0.35rem;
+  padding: 0.6rem;
+  font-size: 1.05rem;
+}
+
+.screen-fit .btn-primary {
+  padding: 0.6rem 1.15rem;
+  font-size: 1.05rem;
+}
+
+.screen-fit .duel-scoreboard {
+  flex-shrink: 0;
+  margin-bottom: 0.4rem;
+}
+
+.screen-fit .duel-player-card {
+  padding: 0.5rem;
+}
+
+.screen-fit .duel-score {
+  font-size: 1.75rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Αρχική */
+.hero {
+  text-align: center;
+  padding: 0.5rem 0.5rem 0.35rem;
+  flex-shrink: 0;
+}
+
+.hero-logo {
+  display: block;
+  width: 230px;
+  height: auto;
+  max-height: 230px;
+  margin: 0 auto 0.12rem;
+  object-fit: contain;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.hero h1 {
+  font-size: 2.35rem;
+  font-weight: 800;
+  color: var(--lavender-dark);
+  margin-bottom: 0.06rem;
+  line-height: 1.05;
+}
+
+.subtitle {
+  color: var(--text-light);
+  font-size: 1.02rem;
+  line-height: 1.4;
+}
+
+.stages-map {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0.65rem 0;
+}
+
+.stage-card {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px var(--shadow);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.stage-card:hover:not(.locked) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.stage-card.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.stage-card.completed {
+  border-color: var(--mint-dark);
+}
+
+.stage-card .info {
+  flex: 1;
+  min-width: 0;
+}
+
+.stage-card .info h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.1rem;
+}
+
+.stage-card .info p {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.stage-card .stars {
+  margin-left: auto;
+  font-size: 1.1rem;
+}
+
+/* Αρχική — ρυθμίσεις & μονομαχία */
+.home-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+.home-toolbar--compact {
+  justify-content: flex-end;
+  margin-bottom: clamp(0.15rem, 0.4dvh, 0.35rem);
+  padding: clamp(0.2rem, 0.5dvh, 0.35rem) 0.55rem;
+  background: transparent;
+  box-shadow: none;
+}
+
+.grade-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.picker-label,
+.grade-picker label {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-light);
+  flex-shrink: 0;
+}
+
+.grade-picker {
+  flex-wrap: wrap;
+}
+
+.grade-options--home {
+  flex: 1;
+  min-width: 0;
+}
+
+.grade-options--home .grade-option-name {
+  font-size: 0.82rem;
+}
+
+.grade-options--home .grade-option {
+  padding: 0.5rem 0.3rem;
+}
+
+.grade-picker select,
+.setup-row select,
+#duel-grade {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.45rem 0.75rem;
+  border: 2px solid var(--lavender);
+  border-radius: var(--radius-sm);
+  background: white;
+  color: var(--text);
+  flex: 1;
+  max-width: 100%;
+}
+
+.btn-sound {
+  width: 46px;
+  height: 46px;
+  border: none;
+  background: var(--mint);
+  border-radius: 50%;
+  font-size: 1.45rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.btn-sound:hover { transform: scale(1.05); }
+.btn-sound.muted { opacity: 0.5; background: var(--bg); }
+
+.btn-difficulty {
+  border: 2px solid var(--lavender);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+  touch-action: manipulation;
+}
+
+.btn-difficulty:hover { transform: translateY(-1px); border-color: var(--mint-dark); }
+
+.btn-difficulty.active {
+  background: linear-gradient(180deg, #f0faf6 0%, #fff 100%);
+  border-color: var(--mint-dark);
+  color: var(--mint-dark);
+}
+
+.home-toolbar--compact { justify-content: space-between; gap: 0.5rem; }
+
+.duel-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--lavender) 0%, var(--sky) 100%);
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 4px 16px var(--shadow);
+  transition: transform 0.2s;
+  font-family: inherit;
+}
+
+.duel-banner:hover { transform: translateY(-2px); }
+
+.duel-banner-text {
+  display: flex;
+  flex-direction: column;
+  color: var(--text);
+}
+
+.duel-banner-text strong { font-size: 1.2rem; }
+.duel-banner-text small { color: var(--text-light); font-size: 0.98rem; }
+
+.duel-banner-arrow {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--lavender-dark);
+}
+
+.stage-card.grade-locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.stage-card.no-levels {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.stage-card.no-levels .info p {
+  color: var(--peach-dark);
+}
+
+/* Επιλογή διαιρέτη (εκπαιδευτικός) */
+.times-table-panel {
+  flex-shrink: 0;
+  margin-bottom: clamp(0.2rem, 0.55dvh, 0.45rem);
+  padding: clamp(0.35rem, 0.85dvh, 0.55rem) 0.65rem;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 12px var(--shadow);
+  border: 1px solid rgba(212, 200, 232, 0.45);
+}
+
+.times-table-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.65rem;
+  margin-bottom: 0.45rem;
+}
+
+.times-table-header .picker-label {
+  color: var(--lavender-dark);
+}
+
+.picker-hint {
+  flex: 1 1 100%;
+  font-size: 0.82rem;
+  color: var(--text-light);
+  line-height: 1.3;
+}
+
+.times-table-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin-bottom: 0.4rem;
+}
+
+@media (min-width: 520px) {
+  .times-table-grid {
+    grid-template-columns: repeat(11, minmax(0, 1fr));
+  }
+}
+
+.times-table-option {
+  min-height: 42px;
+  padding: 0.35rem 0.2rem;
+  border: 2px solid var(--lavender);
+  border-radius: 10px;
+  background: #fff;
+  font-family: inherit;
+  font-size: clamp(0.85rem, 1.8dvh, 0.98rem);
+  font-weight: 800;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  touch-action: manipulation;
+}
+
+.times-table-option:hover {
+  border-color: var(--mint-dark);
+  transform: translateY(-1px);
+}
+
+.times-table-option.selected {
+  border-color: var(--mint-dark);
+  background: linear-gradient(180deg, #f0faf6 0%, #fff 100%);
+  color: var(--mint-dark);
+  box-shadow: 0 2px 8px rgba(126, 184, 164, 0.25);
+}
+
+.times-table-actions {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.times-table-action {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border: 2px solid var(--sky-dark);
+  border-radius: 999px;
+  background: var(--sky);
+  color: var(--text);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.times-table-action:hover {
+  background: #d8ebfa;
+}
+
+.times-table-summary {
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-light);
+  line-height: 1.35;
+}
+
+.times-table-summary.warning {
+  color: var(--peach-dark);
+}
+
+#screen-home .times-table-panel {
+  margin-bottom: clamp(0.15rem, 0.4dvh, 0.35rem);
+  padding: clamp(0.3rem, 0.7dvh, 0.5rem) 0.55rem;
+}
+
+#screen-home .picker-hint {
+  font-size: clamp(0.68rem, 1.45dvh, 0.82rem);
+}
+
+#screen-home .times-table-option {
+  min-height: clamp(36px, 5dvh, 42px);
+}
+
+#screen-home .times-table-summary {
+  font-size: clamp(0.68rem, 1.45dvh, 0.82rem);
+  margin-top: 0.3rem;
+}
+
+.stats-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0.65rem;
+  flex-shrink: 0;
+  margin-bottom: 0.25rem;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.hint-text {
+  color: var(--text-light);
+  margin-bottom: 0.65rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.hint-text.center { text-align: center; margin-top: 1rem; }
+
+.more-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  background: var(--lavender);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--lavender-dark);
+}
+
+.group-box.shake-anim {
+  animation: shakeBox 0.3s ease;
+}
+
+@keyframes shakeBox {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+/* Παιχνίδι */
+.game-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn-back {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: none;
+  background: var(--surface);
+  border-radius: 50%;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: background 0.2s;
+}
+
+.btn-back:hover {
+  background: var(--lavender);
+}
+
+.stage-info {
+  flex: 1;
+}
+
+.stage-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--lavender-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stage-info h2 {
+  font-size: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.level-counter {
+  font-weight: 700;
+  color: var(--mint-dark);
+  background: var(--mint);
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.instruction-box {
+  background: var(--surface);
+  padding: 0.75rem 0.95rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.5rem;
+  font-size: var(--font-game);
+  font-weight: 700;
+  line-height: 1.45;
+  border-left: 4px solid var(--mint-dark);
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+.game-area {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+/* Αντικείμενα & ομάδες */
+.objects-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: center;
+  align-content: flex-start;
+  padding: 0.65rem;
+  background: linear-gradient(180deg, #faf8f5 0%, var(--bg) 100%);
+  border-radius: var(--radius-sm);
+  min-height: 0;
+  margin-bottom: 0.5rem;
+  border: 2px dashed var(--mint);
+  max-height: 38vh;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.groups-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+  align-content: center;
+  flex: 1 1 auto;
+}
+
+.group-box {
+  background: linear-gradient(180deg, #fff 0%, #f8f6f3 100%);
+  border: 2px solid var(--lavender);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.65rem;
+  min-width: var(--group-min-w);
+  min-height: var(--group-min-h);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.group-box.highlight {
+  border-color: var(--mint-dark);
+  transform: scale(1.02);
+}
+
+.group-box.full {
+  border-color: var(--mint-dark);
+  background: linear-gradient(180deg, #f0faf6 0%, #fff 100%);
+}
+
+.group-label {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--lavender-dark);
+  text-align: center;
+  margin-bottom: 0.45rem;
+}
+
+.group-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  align-content: center;
+  min-height: 56px;
+}
+
+.draggable-item {
+  width: var(--item-size);
+  height: var(--item-size);
+  font-size: var(--item-font);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: transform 0.15s;
+  user-select: none;
+  touch-action: none;
+}
+
+.draggable-item:hover {
+  transform: scale(1.1);
+}
+
+.draggable-item.dragging {
+  opacity: 0.6;
+  cursor: grabbing;
+}
+
+.draggable-item.placed {
+  cursor: default;
+}
+
+/* Μεγαλύτερα στοιχεία στις οθόνες παιχνιδιού */
+.screen-fit .game-area .draggable-item {
+  width: clamp(64px, 9vmin, 84px);
+  height: clamp(64px, 9vmin, 84px);
+  font-size: clamp(2.45rem, 6.5vmin, 3.2rem);
+}
+
+.screen-fit .game-area .group-box {
+  min-width: clamp(135px, 16vmin, 175px);
+  min-height: clamp(125px, 15vmin, 160px);
+  padding: 0.75rem 0.85rem;
+}
+
+.screen-fit .game-area .group-label {
+  font-size: clamp(1.15rem, 3vmin, 1.4rem);
+}
+
+.screen-fit .game-area .static-group {
+  min-width: clamp(150px, 19vmin, 210px);
+  padding: clamp(0.85rem, 2vmin, 1.15rem) clamp(0.95rem, 2.4vmin, 1.25rem);
+}
+
+.screen-fit .game-area .static-group .items,
+.screen-fit .game-area .story-visual {
+  font-size: clamp(2.6rem, 7.5vmin, 3.6rem);
+}
+
+.screen-fit .game-area .story-emoji {
+  font-size: clamp(3.5rem, 8.5vmin, 4.5rem);
+}
+
+.screen-fit .hint-text {
+  font-size: clamp(1.25rem, 3.5vmin, 1.55rem);
+}
+
+/* Στάδιο 2 - μέτρηση */
+.count-visual {
+  text-align: center;
+}
+
+.big-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  justify-content: center;
+  margin: 0.65rem 0;
+}
+
+.static-group {
+  background: var(--mint);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  border: 3px solid var(--mint-dark);
+  min-width: 145px;
+}
+
+.static-group .items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: center;
+  font-size: 2.85rem;
+  line-height: 1.2;
+  max-width: 340px;
+}
+
+/* Στάδιο 3 - σχέση με πολλαπλασιασμό (απλοποιημένο) */
+.relation-simple {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  text-align: center;
+}
+
+.fact-family {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.fact-line {
+  font-size: clamp(1.5rem, 4.2vmin, 2.1rem);
+  font-weight: 800;
+  color: var(--lavender-dark);
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.fact-arrow {
+  color: var(--peach-dark);
+  margin: 0 0.15em;
+}
+
+.relation-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.85rem;
+  align-items: center;
+  text-align: center;
+  font-size: 1.35rem;
+}
+
+.relation-box {
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+
+.relation-box.groups-side {
+  background: var(--lavender);
+}
+
+.relation-box.total-side {
+  background: var(--sky);
+}
+
+.relation-symbol {
+  font-size: 1.25rem;
+  color: var(--lavender-dark);
+}
+
+.relation-items {
+  font-size: 1.25rem;
+  margin-top: 0.3rem;
+  line-height: 1.4;
+}
+
+/* Στάδιο 4 - πολλαπλή επιλογή */
+.quiz-scene {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0.75rem 0.5rem;
+}
+
+.quiz-equation {
+  font-size: clamp(2.4rem, 7vmin, 3.5rem);
+  font-weight: 800;
+  color: var(--lavender-dark);
+  text-align: center;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.quiz-equation .answer-slot {
+  width: clamp(3rem, 7vmin, 4rem);
+  height: clamp(3rem, 7vmin, 4rem);
+  min-width: 52px;
+  min-height: 52px;
+}
+
+.answer-row.quiz-mode {
+  display: block;
+}
+
+.quiz-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.quiz-choice {
+  min-height: 68px;
+  padding: 0.65rem 0.5rem;
+  font-family: inherit;
+  font-size: clamp(1.75rem, 4.5vmin, 2.2rem);
+  font-weight: 800;
+  color: var(--lavender-dark);
+  background: #fff;
+  border: 3px solid var(--lavender);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: 0 3px 10px var(--shadow);
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+  touch-action: manipulation;
+}
+
+.quiz-choice:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--mint-dark);
+}
+
+.quiz-choice:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.quiz-choice.correct {
+  border-color: var(--success);
+  background: linear-gradient(180deg, #f0faf6 0%, #fff 100%);
+}
+
+.quiz-choice.wrong {
+  border-color: var(--error);
+  background: #fff5f5;
+  opacity: 0.65;
+}
+
+/* Στάδιο 5 - πρόβλημα */
+.story-scene {
+  text-align: center;
+  padding: 0.35rem;
+}
+
+.story-emoji {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+.story-text {
+  font-size: 1.35rem;
+  line-height: 1.5;
+  color: var(--text);
+  max-width: 100%;
+  margin: 0 auto 0.5rem;
+}
+
+.story-visual {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  font-size: 2.75rem;
+  line-height: 1.2;
+  padding: 0.75rem;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  max-height: 28vh;
+  overflow-y: auto;
+}
+
+/* Στάδιο 6 - υπόλοιπο (μικρότερα στοιχεία ώστε να φαίνεται το κουτί υπολοίπου) */
+.remainder-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.remainder-area .objects-pool {
+  max-height: 20vh;
+  padding: 0.4rem;
+  gap: 0.3rem;
+  margin-bottom: 0.35rem;
+  flex-shrink: 1;
+}
+
+.remainder-area .groups-container {
+  margin-bottom: 0.45rem;
+  gap: 0.4rem;
+  flex: 0 1 auto;
+  max-height: 28vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.remainder-area .group-box {
+  min-width: 86px;
+  min-height: 76px;
+  padding: 0.38rem 0.42rem;
+}
+
+.remainder-area .group-label {
+  font-size: 0.82rem;
+  margin-bottom: 0.22rem;
+}
+
+.remainder-area .group-items {
+  min-height: 36px;
+  gap: 0.22rem;
+}
+
+.remainder-area .draggable-item {
+  width: 44px;
+  height: 44px;
+  font-size: 1.65rem;
+}
+
+.remainder-area .leftover-box {
+  background: var(--peach);
+  border: 2px dashed var(--peach-dark);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem;
+  text-align: center;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.remainder-area .leftover-box .label {
+  font-weight: 700;
+  color: var(--peach-dark);
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
+.remainder-area .leftover-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.screen-fit .game-area .remainder-area .objects-pool {
+  max-height: clamp(72px, 16vmin, 118px);
+}
+
+.screen-fit .game-area .remainder-area .groups-container {
+  max-height: clamp(96px, 22vmin, 150px);
+}
+
+.screen-fit .game-area .remainder-area .draggable-item {
+  width: clamp(38px, 5.2vmin, 50px);
+  height: clamp(38px, 5.2vmin, 50px);
+  font-size: clamp(1.3rem, 3.2vmin, 1.65rem);
+}
+
+.screen-fit .game-area .remainder-area .group-box {
+  min-width: clamp(74px, 9.5vmin, 96px);
+  min-height: clamp(66px, 8.5vmin, 86px);
+  padding: 0.32rem 0.38rem;
+}
+
+.screen-fit .game-area .remainder-area .group-label {
+  font-size: clamp(0.72rem, 1.8vmin, 0.86rem);
+}
+
+.screen-fit .game-area .remainder-area .leftover-box .label {
+  font-size: clamp(0.78rem, 2vmin, 0.92rem);
+}
+
+.answer-row.remainder-mode {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.answer-row.remainder-mode .answer-part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.answer-row.remainder-mode .answer-slot-input {
+  width: 76px;
+}
+
+.leftover-box {
+  background: var(--peach);
+  border: 2px dashed var(--peach-dark);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem;
+  text-align: center;
+  margin-top: 0.45rem;
+  flex-shrink: 0;
+}
+
+.leftover-box .label {
+  font-weight: 700;
+  color: var(--peach-dark);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.leftover-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  min-height: 56px;
+}
+
+/* Footer */
+.game-footer {
+  background: var(--surface);
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px var(--shadow);
+}
+
+.equation-display {
+  text-align: center;
+  font-size: var(--eq-size);
+  font-weight: 800;
+  color: var(--lavender-dark);
+  margin-bottom: 0.55rem;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  line-height: 1.2;
+}
+
+/* Κουτάκι αντί για ? */
+.answer-slot {
+  display: inline-block;
+  width: 3.35rem;
+  height: 3.35rem;
+  min-width: 52px;
+  min-height: 52px;
+  border: 3px solid var(--lavender-dark);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: inset 0 2px 4px rgba(74, 85, 104, 0.06);
+  vertical-align: middle;
+}
+
+.answer-slot--sm {
+  width: 2.65rem;
+  height: 2.65rem;
+  min-width: 42px;
+  min-height: 42px;
+  border-width: 2px;
+  border-radius: 8px;
+}
+
+.answer-slot--inline {
+  width: 1.85rem;
+  height: 1.85rem;
+  min-width: 30px;
+  min-height: 30px;
+  border-width: 2px;
+  border-radius: 6px;
+  margin: 0 0.12em;
+  vertical-align: -0.15em;
+}
+
+.boxes-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: center;
+}
+
+.static-group .items .boxes-row {
+  width: 100%;
+  padding: 0.25rem 0;
+}
+
+.eq-word {
+  font-size: 0.88em;
+  font-weight: 700;
+  color: var(--text-light);
+  margin: 0 0.15em;
+}
+
+/* Σύμβολο αγνώστου «?» */
+.q-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7em;
+  height: 1.7em;
+  min-width: 1.7em;
+  border-radius: 50%;
+  background: var(--peach);
+  color: var(--peach-dark);
+  font-weight: 800;
+  vertical-align: -0.4em;
+  line-height: 1;
+}
+
+.instruction-box .q-mark { vertical-align: -0.35em; }
+
+.q-mark.q-filled {
+  background: var(--mint);
+  color: var(--mint-dark);
+}
+
+.instruction-box .answer-slot--inline {
+  width: 2.1rem;
+  height: 2.1rem;
+  min-width: 34px;
+  min-height: 34px;
+  transform: translateY(1px);
+}
+
+.relation-grid .answer-slot--inline,
+.relation-items .answer-slot--inline {
+  width: 2rem;
+  height: 2rem;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.relation-items .boxes-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+
+.answer-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.answer-row label {
+  font-weight: 700;
+  font-size: 1.35rem;
+}
+
+.answer-slot-input,
+#answer-input {
+  width: 76px;
+  height: 64px;
+  font-size: 1.85rem;
+  font-family: inherit;
+  font-weight: 700;
+  text-align: center;
+  border: 3px solid var(--lavender-dark);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--text);
+  box-shadow: inset 0 2px 4px rgba(74, 85, 104, 0.06);
+}
+
+.answer-slot-input:focus,
+#answer-input:focus {
+  outline: none;
+  border-color: var(--mint-dark);
+}
+
+.num-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.num-input-wrap.is-active .answer-slot-input {
+  border-color: var(--mint-dark);
+  box-shadow: 0 0 0 3px rgba(126, 184, 164, 0.25);
+}
+
+.num-keyboard {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0.15rem 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.num-keyboard::-webkit-scrollbar {
+  display: none;
+}
+
+.num-key {
+  flex: 0 0 auto;
+  min-width: 2.15rem;
+  height: 2.15rem;
+  padding: 0;
+  border: 2px solid var(--lavender-dark);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fff 0%, var(--lavender) 100%);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.12s, border-color 0.12s;
+  touch-action: manipulation;
+}
+
+.num-key:hover {
+  background: #fff;
+  border-color: var(--mint-dark);
+}
+
+.num-key:active {
+  transform: scale(0.94);
+  background: var(--mint);
+  color: #fff;
+  border-color: var(--mint-dark);
+}
+
+.num-key--del {
+  min-width: 2.5rem;
+  font-size: 1.15rem;
+  background: linear-gradient(180deg, #fff5f5 0%, #fed7d7 100%);
+  border-color: #fc8181;
+  color: #c53030;
+}
+
+.answer-row.remainder-mode .num-input-wrap {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.answer-row:not(.remainder-mode) .num-input-wrap {
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 640px) {
+  .num-key {
+    min-width: 1.95rem;
+    height: 1.95rem;
+    font-size: 0.95rem;
+    border-radius: 8px;
+  }
+
+  .num-key--del {
+    min-width: 2.25rem;
+  }
+}
+
+.screen-fit .num-key {
+  min-width: clamp(1.85rem, 4.2vmin, 2.35rem);
+  height: clamp(1.85rem, 4.2vmin, 2.35rem);
+  font-size: clamp(0.9rem, 2.4vmin, 1.1rem);
+}
+
+.screen-fit .num-key--del {
+  min-width: clamp(2.1rem, 4.8vmin, 2.75rem);
+}
+
+.btn-primary, .btn-secondary {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--mint-dark), var(--mint));
+  color: white;
+  box-shadow: 0 4px 12px rgba(126, 184, 164, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--lavender);
+  color: var(--lavender-dark);
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.feedback {
+  text-align: center;
+  margin-top: 0.35rem;
+  font-weight: 700;
+  font-size: 1.02rem;
+  min-height: 1.25rem;
+}
+
+.feedback.success { color: var(--success); }
+.feedback.error { color: var(--error); }
+
+/* Υπόδειξη μετά από λάθη */
+.hint-zone {
+  text-align: center;
+  margin-top: 0.35rem;
+}
+
+.btn-hint {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.98rem;
+  padding: 0.5rem 1.1rem;
+  border: 2px dashed var(--peach-dark);
+  border-radius: 999px;
+  background: var(--peach);
+  color: var(--peach-dark);
+  cursor: pointer;
+  touch-action: manipulation;
+  animation: bounce 0.6s ease;
+}
+
+.btn-hint:hover { background: #f8e2d8; }
+
+.hint-message {
+  background: #fffaf6;
+  border: 2px solid var(--peach);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Ολοκλήρωση */
+#screen-complete.screen.active,
+#screen-duel-end.screen.active,
+#screen-duel-setup.screen.active {
+  justify-content: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.celebration {
+  text-align: center;
+  padding: 1rem 0.75rem;
+}
+
+.confetti {
+  font-size: 2.5rem;
+  animation: bounce 0.6s ease infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); }
+}
+
+.celebration h2 {
+  font-size: 1.35rem;
+  color: var(--mint-dark);
+  margin: 0.5rem 0 0.35rem;
+}
+
+.celebration p {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.stars-earned {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Δίπλωμα ολοκλήρωσης */
+.celebration.certificate {
+  border: 4px double var(--lavender-dark);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #fffefb 0%, #faf6ff 100%);
+  margin: 0.5rem auto;
+  max-width: 560px;
+  padding: 1.5rem 1.25rem;
+  box-shadow: 0 8px 28px var(--shadow);
+}
+
+.celebration.certificate h2 {
+  font-size: 1.6rem;
+}
+
+.certificate-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--lavender-dark);
+  margin: 0.35rem 0 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+@media print {
+  body { overflow: visible; background: #fff; }
+  body::before, body::after { display: none; }
+  .app { height: auto; max-height: none; overflow: visible; }
+  .no-print { display: none !important; }
+  #screen-complete.screen { display: flex !important; }
+  .celebration.certificate { box-shadow: none; }
+  .celebration .btn-primary, .celebration .btn-secondary { display: none !important; }
+}
+
+/* Μονομαχία */
+.duel-setup-card {
+  background: var(--surface);
+  padding: 0.85rem;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px var(--shadow);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.duel-grade-picker,
+.duel-stage-picker {
+  margin-bottom: 0.85rem;
+  display: block;
+  width: 100%;
+}
+
+.duel-grade-picker .setup-label,
+.setup-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.setup-hint {
+  color: var(--text-light);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin-bottom: 0.55rem;
+}
+
+.duel-divisors-note {
+  margin-top: 0.45rem;
+  margin-bottom: 0;
+}
+
+.duel-stage-summary {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--mint-dark);
+  margin-top: 0.45rem;
+  line-height: 1.4;
+}
+
+.duel-stage-summary.warning {
+  color: var(--error);
+}
+
+#duel-grade-options,
+#duel-stage-options {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 5.5rem;
+  visibility: visible;
+  opacity: 1;
+}
+
+.grade-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  width: 100%;
+}
+
+#screen-duel-setup .grade-option {
+  display: flex !important;
+  min-height: 3.5rem;
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (max-width: 520px) {
+  .grade-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.grade-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.55rem 0.4rem;
+  border: 2px solid var(--lavender);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  touch-action: manipulation;
+}
+
+.grade-option:hover {
+  border-color: var(--mint-dark);
+  transform: translateY(-1px);
+}
+
+.grade-option.selected {
+  border-color: var(--mint-dark);
+  background: linear-gradient(180deg, #f0faf6 0%, #fff 100%);
+  box-shadow: 0 2px 10px rgba(126, 184, 164, 0.35);
+}
+
+.grade-option-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+  width: 100%;
+}
+
+.grade-option-desc {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-align: center;
+  line-height: 1.25;
+  width: 100%;
+}
+
+.setup-desc {
+  color: var(--text-light);
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.name-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.name-inputs label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+.name-inputs input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.6rem 0.85rem;
+  border: 2px solid var(--lavender);
+  border-radius: var(--radius-sm);
+}
+
+.setup-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.setup-row label {
+  font-weight: 700;
+  min-width: 4rem;
+}
+
+.btn-large {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.85rem;
+  font-size: 1.1rem;
+}
+
+.duel-scoreboard {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.duel-player-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 3px solid transparent;
+  box-shadow: 0 2px 12px var(--shadow);
+  transition: border-color 0.25s, transform 0.25s;
+}
+
+.duel-player-card.active {
+  border-color: var(--mint-dark);
+  transform: scale(1.03);
+  background: linear-gradient(180deg, #f0faf6 0%, var(--surface) 100%);
+}
+
+.duel-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 0.35rem;
+  text-align: center;
+}
+
+.duel-score {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--lavender-dark);
+}
+
+.duel-vs {
+  display: flex;
+  align-items: center;
+  font-weight: 800;
+  color: var(--peach-dark);
+  font-size: 0.9rem;
+}
+
+.duel-area { min-height: 0; }
+
+.duel-story .story-text { font-size: 1.15rem; }
+
+#duel-answer-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+#duel-answer-row .answer-part {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.celebration .btn-secondary { margin-top: 0.5rem; }
+
+/* Μεγάλες οθόνες — πιο πλατύ layout (μόνο όταν χωράει στο ύψος) */
+@media (min-width: 768px) and (min-height: 780px) {
+  .app {
+    max-width: 1040px;
+    padding: 1rem 2rem;
+  }
+
+  #screen-home.screen.active,
+  .screen-fit.screen.active,
+  #screen-complete.screen.active,
+  #screen-duel-setup.screen.active,
+  #screen-duel-end.screen.active {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  #screen-home .hero h1 { font-size: 2.65rem; }
+  #screen-home .subtitle { font-size: 1.05rem; }
+
+  #screen-home .stage-card {
+    padding: 0.75rem 1.1rem;
+  }
+
+  #screen-home .stage-card .info h3 { font-size: 1.15rem; }
+  #screen-home .stage-card .info p { font-size: 0.92rem; }
+
+  .grade-options--home .grade-option-name {
+    font-size: 0.88rem;
+  }
+
+  #screen-home .duel-banner {
+    padding: 0.75rem 1.1rem;
+  }
+}
+
+/* Μικρές οθόνες / χαμηλό ύψος */
+@media (max-height: 720px) {
+  #screen-home .hero-logo {
+    width: clamp(118px, 18.5dvh, 185px);
+    max-height: clamp(118px, 18.5dvh, 185px);
+  }
+
+  #screen-home .hero h1 {
+    font-size: clamp(1.55rem, 5dvh, 2.25rem);
+  }
+
+  #screen-home .subtitle {
+    display: none;
+  }
+
+  #screen-home .stage-card .info p {
+    display: none;
+  }
+
+  #screen-home .duel-banner-text small {
+    display: none;
+  }
+}
+
+@media (max-height: 700px) {
+  .screen-fit .instruction-box { font-size: clamp(1.15rem, 3.2vmin, 1.4rem); }
+  .screen-fit .hint-text { font-size: clamp(1.1rem, 3vmin, 1.3rem); }
+  .screen-fit .equation-display { font-size: 2rem; }
+  .screen-fit .equation-display .answer-slot {
+    width: 2.65rem;
+    height: 2.65rem;
+    min-width: 46px;
+    min-height: 46px;
+  }
+  .screen-fit .answer-slot-input,
+  .screen-fit #answer-input {
+    width: 64px;
+    height: 54px;
+    font-size: 1.55rem;
+  }
+  .draggable-item { width: 60px; height: 60px; font-size: 2.35rem; }
+  .group-box { min-width: 125px; min-height: 115px; }
+  .static-group { min-width: 130px; }
+  .static-group .items { font-size: 2.25rem; }
+  .story-visual { font-size: 2.1rem; max-height: 22vh; }
+  .objects-pool { max-height: 34vh; }
+  .remainder-area .objects-pool { max-height: 15vh; }
+  .remainder-area .groups-container { max-height: 22vh; }
+  .remainder-area .draggable-item { width: 40px; height: 40px; font-size: 1.45rem; }
+  .remainder-area .group-box { min-width: 78px; min-height: 68px; }
+}
+
+@media (max-width: 500px) {
+  .app { padding: 0.35rem 0.5rem; }
+  .group-box { min-width: 100px; min-height: 92px; }
+  .draggable-item { width: 54px; height: 54px; font-size: 2.1rem; }
+}
+
+.site-back-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 50;
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--lavender-dark);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: transform 0.15s ease;
+}
+
+.site-back-link:hover {
+  transform: translateY(-2px);
+}
