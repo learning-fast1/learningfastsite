@@ -70,8 +70,14 @@ test('Objects familiarity instruction matches the locked wording exactly', () =>
 test('Objects practice instruction matches the locked wording exactly', () => {
     assert.strictEqual(
         RAN.wording.RAN_OBJECTS_V1.practiceInstruction,
-        'Ονόμασε τις εικόνες με τη σειρά, από αριστερά προς τα δεξιά, όσο πιο γρήγορα μπορείς χωρίς να κάνεις λάθη.'
+        'Ονόμασε τις εικόνες με τη σειρά, από αριστερά προς τα δεξιά.'
     );
+});
+
+test('Objects practice instruction no longer carries a speed/error-avoidance clause (wording correction)', () => {
+    const text = RAN.wording.RAN_OBJECTS_V1.practiceInstruction;
+    assert.ok(!text.includes('γρήγορα'), 'practiceInstruction must not contain "γρήγορα"');
+    assert.ok(!text.includes('χωρίς να κάνεις λάθη'), 'practiceInstruction must not contain "χωρίς να κάνεις λάθη"');
 });
 
 test('Familiarity-failed message matches spec §17 verbatim', () => {

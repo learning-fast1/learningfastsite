@@ -178,7 +178,7 @@ test('every RAN_OBJECTS_V1 stimulus ID resolves to a real image asset file', () 
     const def = RAN.getDefinition('RAN_OBJECTS_V1');
     const assetsDir = path.join(__dirname, '..', 'assets', 'objects');
     def.stimuli.forEach(id => {
-        const file = path.join(assetsDir, `${id}.svg`);
+        const file = path.join(assetsDir, `${id}.png`);
         assert.ok(fs.existsSync(file), `missing image asset for stimulus "${id}": ${file}`);
     });
 });

@@ -38,14 +38,16 @@
             practiceInstruction: 'Τώρα θα δεις τα χρώματα σε σειρές. Ξεκίνα από εδώ και πες τα ένα-ένα, πηγαίνοντας από αριστερά προς τα δεξιά. Όταν τελειώσεις την πρώτη σειρά, συνέχισε από την αρχή της επόμενης.',
         },
         RAN_OBJECTS_V1: {
-            // Objects round — both lines are the examiner's own proposed
-            // text from the locked spec, used verbatim (not paraphrased).
-            // Note: unlike Digits/Colors, this practiceInstruction does
-            // include a speed/error-avoidance clause — that is the text
-            // as explicitly proposed and approved for this assessment,
-            // not an oversight to "fix" for consistency.
+            // Objects round.
             familiarityInstruction: 'Πες μου τι βλέπεις σε κάθε εικόνα.',
-            practiceInstruction: 'Ονόμασε τις εικόνες με τη σειρά, από αριστερά προς τα δεξιά, όσο πιο γρήγορα μπορείς χωρίς να κάνεις λάθη.',
+            // Wording correction (post visual-approval pass): the original
+            // proposed text carried a speed/error-avoidance clause ("όσο πιο
+            // γρήγορα μπορείς χωρίς να κάνεις λάθη") — removed here because
+            // Practice is untimed and only verifies procedural/serial-scan
+            // understanding; a speed demand at this stage would contaminate
+            // that purpose. Now consistent with the Digits/Colors practice
+            // instructions' own no-speed-wording rule.
+            practiceInstruction: 'Ονόμασε τις εικόνες με τη σειρά, από αριστερά προς τα δεξιά.',
         },
         // spec §17, verbatim
         familiarityFailed: {

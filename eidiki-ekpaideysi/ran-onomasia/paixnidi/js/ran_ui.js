@@ -567,7 +567,7 @@ window.RAN = window.RAN || {};
                 }, [
                     el('img', {
                         className: 'ran-stimulus-object-img',
-                        src: `assets/objects/${stimulus}.svg`,
+                        src: `assets/objects/${stimulus}.png`,
                         alt: '',
                     }),
                 ]);
@@ -616,7 +616,7 @@ window.RAN = window.RAN || {};
                     }, [
                         el('div', { className: 'ran-assessment-motif' }, RAN.getDefinition('RAN_OBJECTS_V1').stimuli.slice(0, 3).map(id => el('img', {
                             className: 'ran-assessment-motif-object',
-                            src: `assets/objects/${id}.svg`,
+                            src: `assets/objects/${id}.png`,
                             alt: '',
                         }))),
                         el('div', { className: 'ran-assessment-card-title', textContent: 'Αντικείμενα' }),

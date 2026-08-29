@@ -111,8 +111,10 @@
        label a child is expected to say lives separately in
        `stimulusLabels`, exactly like RAN_COLORS_V1's own pattern.
        Rendering is image-based (see ran_ui.js renderStimulus) —
-       `assets/objects/<id>.svg` is the fixed filename convention, one
-       file per canonical ID. Form A/B sequences below were verified
+       `assets/objects/<id>.png` is the fixed filename convention, one
+       file per canonical ID. PNG (not SVG) because that's the real
+       format the final approved artwork was supplied in. Form A/B
+       sequences below were verified
        against RAN.validateFormSequence's exact invariants (occurrence
        counts, no unknown IDs) plus additionally hand-checked for zero
        immediate repeats and no shared/duplicate rows between Form A
