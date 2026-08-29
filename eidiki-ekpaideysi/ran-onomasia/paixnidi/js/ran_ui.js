@@ -27,21 +27,10 @@ window.RAN = window.RAN || {};
         RAN_OBJECTS_V1: 'Αντικείμενα',
     };
 
-    // Results/History presentation pass: the raw RAN.STATUS enum value
-    // must never be shown to the examiner as-is (e.g. literal
-    // "COMPLETED_FLAGGED") — every status gets a short Greek label here.
-    // Internal enum values themselves are completely untouched; this is
-    // presentation only, used by the History table (renderProfileHistory).
-    // Deliberately its own compact map, not a reuse of Results' own
-    // STATUS_PRESENTATION titles — History needs shorter text than the
-    // full Results banner title for the same status.
-    const HISTORY_STATUS_LABELS = {
-        [RAN.STATUS.COMPLETED]: 'Ολοκληρώθηκε',
-        [RAN.STATUS.COMPLETED_FLAGGED]: 'Ολοκληρώθηκε · με σημείωση',
-        [RAN.STATUS.INCOMPLETE]: 'Ημιτελής χορήγηση',
-        [RAN.STATUS.INVALID]: 'Άκυρη χορήγηση',
-        [RAN.STATUS.PREPARATION_FAILED]: 'Δεν πραγματοποιήθηκε χρονομετρούμενη δοκιμασία',
-    };
+    // History status labels moved to RAN.wording.historyStatusLabels /
+    // RAN.wording.resolveHistoryStatusLabel() — single source of truth,
+    // Node-testable, and guarantees an unknown status can never leak
+    // as raw enum text (see js/ran_wording.js).
 
     // Per-assessment-type wording lives in RAN.wording (js/ran_wording.js)
     // — the single locked source of truth, also directly Node-testable
@@ -1391,9 +1380,9 @@ window.RAN = window.RAN || {};
                 autoAbortNotice,
                 el('p', { textContent: 'Επίλεξε την αιτία που ταιριάζει καλύτερα. Η κατηγορία (Ημιτελής / Άκυρη) καθορίζεται αυτόματα από την επιλογή.' }),
                 el('div', { className: 'ran-radio-group' }, [
-                    el('div', { className: 'ran-radio-group-heading', textContent: 'Ημιτελής δοκιμασία (INCOMPLETE)' }),
+                    el('div', { className: 'ran-radio-group-heading', textContent: 'Ημιτελής δοκιμασία' }),
                     ...incompleteRows,
-                    el('div', { className: 'ran-radio-group-heading', textContent: 'Άκυρη δοκιμασία (INVALID)' }),
+                    el('div', { className: 'ran-radio-group-heading', textContent: 'Άκυρη δοκιμασία' }),
                     ...invalidRows,
                 ]),
                 el('div', { className: 'ran-actions' }, [confirmBtn]),
@@ -1657,9 +1646,9 @@ window.RAN = window.RAN || {};
             }[admin.status];
 
             const reasonLine = admin.incompleteReason
-                ? el('p', { className: 'ran-status-line', textContent: 'Αιτία: ' + RAN.wording.incompleteReasonLabels[admin.incompleteReason] })
+                ? el('p', { className: 'ran-status-line', textContent: 'Αιτία διακοπής: ' + RAN.wording.incompleteReasonLabels[admin.incompleteReason] })
                 : admin.invalidReason
-                    ? el('p', { className: 'ran-status-line', textContent: 'Αιτία: ' + RAN.wording.invalidReasonLabels[admin.invalidReason] })
+                    ? el('p', { className: 'ran-status-line', textContent: 'Αιτία διακοπής: ' + RAN.wording.invalidReasonLabels[admin.invalidReason] })
                     : null;
 
             const primaryMetric = results.completionTimeSec != null
@@ -1951,7 +1940,7 @@ window.RAN = window.RAN || {};
                         el('td', { 'data-label': 'Μορφή', textContent: a.form }),
                         el('td', { 'data-label': 'Χρόνος (δευτ.)', textContent: a.durationMs != null ? fmtNum(a.durationMs / 1000, 2) : '—' }),
                         el('td', { 'data-label': 'Ανεξάρτητα σωστά', textContent: a.independentCorrect != null ? String(a.independentCorrect) : '—' }),
-                        el('td', { 'data-label': 'Κατάσταση', textContent: HISTORY_STATUS_LABELS[a.status] || a.status }),
+                        el('td', { 'data-label': 'Κατάσταση', textContent: RAN.wording.resolveHistoryStatusLabel(a.status) }),
                     ]))),
                 ]);
                 body.push(table);

@@ -176,6 +176,35 @@ test('invalidReasonLabels covers every RAN.INVALID_REASON value with the exact l
     assert.strictEqual(Object.keys(RAN.wording.invalidReasonLabels).length, Object.keys(RAN.INVALID_REASON).length, 'no extra/missing labels');
 });
 
+test('historyStatusLabels covers every RAN.STATUS value with a real Greek label (never the raw enum string)', () => {
+    Object.values(RAN.STATUS).forEach(status => {
+        const label = RAN.wording.historyStatusLabels[status];
+        assert.ok(label, `missing historyStatusLabels entry for status "${status}"`);
+        assert.notStrictEqual(label, status, `historyStatusLabels[${status}] must not just echo the raw enum value`);
+    });
+});
+
+test('resolveHistoryStatusLabel: known status returns its historyStatusLabels entry', () => {
+    assert.strictEqual(RAN.wording.resolveHistoryStatusLabel(RAN.STATUS.COMPLETED), RAN.wording.historyStatusLabels[RAN.STATUS.COMPLETED]);
+    assert.strictEqual(RAN.wording.resolveHistoryStatusLabel(RAN.STATUS.PREPARATION_FAILED), RAN.wording.historyStatusLabels[RAN.STATUS.PREPARATION_FAILED]);
+});
+
+test('resolveHistoryStatusLabel: unknown/corrupted/legacy status NEVER leaks the raw value — falls back to a neutral Greek label', () => {
+    const bogusStatuses = ['SOME_FUTURE_STATUS', 'CORRUPTED_LEGACY_VALUE', '', null, undefined, 42];
+    bogusStatuses.forEach(bogus => {
+        const label = RAN.wording.resolveHistoryStatusLabel(bogus);
+        assert.strictEqual(label, RAN.wording.unknownStatusLabel, `resolveHistoryStatusLabel(${JSON.stringify(bogus)}) must fall back to unknownStatusLabel`);
+        if (typeof bogus === 'string' && bogus) {
+            assert.ok(!label.includes(bogus), `resolved label must not contain the raw bogus status "${bogus}"`);
+        }
+    });
+});
+
+test('unknownStatusLabel itself is a plain Greek sentence, not ALL_CAPS/enum-looking text', () => {
+    const label = RAN.wording.unknownStatusLabel;
+    assert.ok(!/^[A-Z0-9_]+$/.test(label), 'unknownStatusLabel must not look like a raw internal enum');
+});
+
 /* ============================================================
    SCIENTIFIC DISCLAIMER — locked in the Phase 4 correction pass.
    ============================================================ */

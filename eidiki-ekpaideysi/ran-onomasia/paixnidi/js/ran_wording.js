@@ -120,6 +120,37 @@
         [RAN.INVALID_REASON.OTHER_PROCEDURAL_DEVIATION]: 'Άλλη σημαντική απόκλιση από τη διαδικασία',
     };
 
+    // Results/History presentation pass: the raw RAN.STATUS enum value
+    // must never be shown to the examiner as-is (e.g. literal
+    // "COMPLETED_FLAGGED") — every status gets a short Greek label here.
+    // Internal enum values themselves are completely untouched; this is
+    // presentation only, used by the History table. Deliberately its
+    // own compact map, not a reuse of Results' own STATUS_PRESENTATION
+    // titles — History needs shorter text than the full Results banner
+    // title for the same status.
+    wording.historyStatusLabels = {
+        [RAN.STATUS.COMPLETED]: 'Ολοκληρώθηκε',
+        [RAN.STATUS.COMPLETED_FLAGGED]: 'Ολοκληρώθηκε · με σημείωση',
+        [RAN.STATUS.INCOMPLETE]: 'Ημιτελής χορήγηση',
+        [RAN.STATUS.INVALID]: 'Άκυρη χορήγηση',
+        [RAN.STATUS.PREPARATION_FAILED]: 'Δεν πραγματοποιήθηκε χρονομετρούμενη δοκιμασία',
+    };
+
+    // User-facing raw-enum-leak safeguard: shown ONLY when a stored
+    // administration carries a status value that isn't one of the 5
+    // known RAN.STATUS values (e.g. corrupted/legacy/foreign imported
+    // data) — never the raw status string itself. The underlying
+    // record/status field is untouched; this is presentation-only.
+    wording.unknownStatusLabel = 'Μη διαθέσιμη κατάσταση';
+
+    /** Resolves a stored administration's `status` to its History-table
+     * label. Deliberately the ONLY place that reads historyStatusLabels
+     * with a fallback, so raw enum text can never leak through a
+     * `|| rawValue` pattern at a render call site. */
+    wording.resolveHistoryStatusLabel = function (status) {
+        return wording.historyStatusLabels[status] || wording.unknownStatusLabel;
+    };
+
     // Locked in the Phase 5 kickoff — exact text, do not alter. Must be
     // shown clearly wherever data is actually persisted/viewed (the
     // profiles/export screen, and the History screen). Never present
