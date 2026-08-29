@@ -428,6 +428,14 @@ h2.ran-checklist-heading {
     margin-top: var(--space-3);
     align-items: center;
 }
+/* Back-to-home action placed at the very top of a screen (Profiles &
+   History) instead of buried at the bottom — no top margin since
+   nothing precedes it, small bottom margin to separate it from the
+   hero below. */
+.ran-actions-top {
+    margin-top: 0;
+    margin-bottom: var(--space-3);
+}
 /* Practice's specific checklist -> actions gap (adjacent-sibling
    selector, matches only that exact DOM pairing — every other
    screen's .ran-actions keeps the margin-top above). */
@@ -490,7 +498,7 @@ h2.ran-checklist-heading {
    consistent with the existing "no branding in Measurement Mode" rule. */
 .ran-brand-logo {
     display: block;
-    height: 32px;
+    height: 64px;
     width: auto;
     margin-bottom: var(--space-2);
 }

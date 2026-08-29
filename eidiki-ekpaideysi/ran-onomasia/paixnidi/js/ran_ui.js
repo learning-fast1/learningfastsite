@@ -586,7 +586,6 @@ window.RAN = window.RAN || {};
         renderAssessmentSelect() {
             const screen = el('div', { className: 'ran-screen' }, [
                 el('div', { className: 'ran-hero' }, [
-                    renderBlob('leaf', { top: '-24px', right: '-16px' }),
                     el('img', { className: 'ran-brand-logo', src: 'assets/brand/logo.png', alt: 'Learning Fast' }),
                     el('h1', { textContent: 'Ταχεία Κατονομασία (RAN)' }),
                     el('p', { className: 'ran-subtitle', textContent: 'Αξιολογήστε και παρακολουθήστε την ταχύτητα με την οποία το παιδί κατονομάζει σειριακά γνωστά οπτικά ερεθίσματα.' }),
@@ -1750,6 +1749,9 @@ window.RAN = window.RAN || {};
             const available = RAN.storage.isAvailable();
 
             const body = [];
+            body.push(el('div', { className: 'ran-actions ran-actions-top' }, [
+                el('button', { className: 'ran-btn ran-btn-secondary', textContent: '← Αρχική', onClick: () => this.navigate('assessmentSelect') }),
+            ]));
             body.push(el('div', { className: 'ran-hero' }, [
                 renderBlob('dot', { top: '-6px', right: '8px' }),
                 el('img', { className: 'ran-brand-logo ran-brand-logo-small', src: 'assets/brand/logo.png', alt: 'Learning Fast' }),
@@ -1759,9 +1761,6 @@ window.RAN = window.RAN || {};
 
             if (!available) {
                 body.push(el('div', { className: 'ran-disclaimer', textContent: 'Η τοπική αποθήκευση δεν είναι διαθέσιμη σε αυτόν τον browser σε αυτή τη στιγμή.' }));
-                body.push(el('div', { className: 'ran-actions' }, [
-                    el('button', { className: 'ran-btn ran-btn-secondary', textContent: '← Αρχική', onClick: () => this.navigate('assessmentSelect') }),
-                ]));
                 this.container.appendChild(el('div', { className: 'ran-screen' }, body));
                 return;
             }
@@ -1855,10 +1854,6 @@ window.RAN = window.RAN || {};
                 el('p', { className: 'ran-field-hint', textContent: 'Προαιρετική εξαγωγή/εισαγωγή δεδομένων ως αρχείο. Δεν πραγματοποιείται καμία αυτόματη μεταφόρτωση (cloud upload).' }),
                 el('div', { className: 'ran-actions' }, [exportBtn, importLabel]),
                 el('p', { className: 'ran-status-line', textContent: this.lastImportReport || '' }),
-            ]));
-
-            body.push(el('div', { className: 'ran-actions' }, [
-                el('button', { className: 'ran-btn ran-btn-secondary', textContent: '← Αρχική', onClick: () => this.navigate('assessmentSelect') }),
             ]));
 
             this.container.appendChild(el('div', { className: 'ran-screen' }, body));
