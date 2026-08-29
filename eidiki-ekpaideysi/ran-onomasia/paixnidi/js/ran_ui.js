@@ -587,7 +587,7 @@ window.RAN = window.RAN || {};
             const screen = el('div', { className: 'ran-screen' }, [
                 el('div', { className: 'ran-hero' }, [
                     renderBlob('leaf', { top: '-24px', right: '-16px' }),
-                    el('div', { className: 'ran-hero-brand', textContent: 'Learning Fast' }),
+                    el('img', { className: 'ran-brand-logo', src: 'assets/brand/logo.png', alt: 'Learning Fast' }),
                     el('h1', { textContent: 'Ταχεία Κατονομασία (RAN)' }),
                     el('p', { className: 'ran-subtitle', textContent: 'Αξιολογήστε και παρακολουθήστε την ταχύτητα με την οποία το παιδί κατονομάζει σειριακά γνωστά οπτικά ερεθίσματα.' }),
                 ]),
@@ -1064,7 +1064,7 @@ window.RAN = window.RAN || {};
 
             const screen = el('div', { className: 'ran-screen' }, [
                 renderStepper('timed'),
-                el('div', { className: 'ran-eyebrow', textContent: 'Learning Fast' }),
+                el('img', { className: 'ran-brand-logo ran-brand-logo-small', src: 'assets/brand/logo.png', alt: 'Learning Fast' }),
                 el('h1', { textContent: `${ASSESSMENT_LABELS[session.assessmentId]} — Μορφή ${draft.form}` }),
                 el('div', { className: 'ran-examiner-instruction' }, [
                     el('p', { textContent: RAN.wording.preStartReminder }),
@@ -1752,7 +1752,7 @@ window.RAN = window.RAN || {};
             const body = [];
             body.push(el('div', { className: 'ran-hero' }, [
                 renderBlob('dot', { top: '-6px', right: '8px' }),
-                el('div', { className: 'ran-eyebrow', textContent: 'Learning Fast' }),
+                el('img', { className: 'ran-brand-logo ran-brand-logo-small', src: 'assets/brand/logo.png', alt: 'Learning Fast' }),
                 el('h1', { textContent: 'Προφίλ & Ιστορικό' }),
             ]));
             body.push(el('div', { className: 'ran-info-card', textContent: RAN.wording.storageWarning }));

@@ -484,6 +484,21 @@ h2.ran-checklist-heading {
     margin-bottom: var(--space-2);
 }
 
+/* Actual Learning Fast logo image, top-left of a screen — replaces the
+   plain-text "Learning Fast" brand label. Kept small and out of
+   Measurement Mode entirely (renderTimedRunning never renders this),
+   consistent with the existing "no branding in Measurement Mode" rule. */
+.ran-brand-logo {
+    display: block;
+    height: 32px;
+    width: auto;
+    margin-bottom: var(--space-2);
+}
+.ran-brand-logo-small {
+    height: 22px;
+    margin-bottom: var(--space-1);
+}
+
 .ran-assessment-picker {
     display: grid;
     /* 3 balanced cards on wide screens, gracefully narrowing to 2 then
