@@ -80,11 +80,11 @@ test('Objects practice instruction no longer carries a speed/error-avoidance cla
     assert.ok(!text.includes('χωρίς να κάνεις λάθη'), 'practiceInstruction must not contain "χωρίς να κάνεις λάθη"');
 });
 
-test('Familiarity-failed message matches spec §17 verbatim', () => {
-    assert.strictEqual(RAN.wording.familiarityFailed.heading, 'Η εξοικείωση δεν επιβεβαιώθηκε');
+test('Familiarity-failed message matches the corrected wording exactly (no internal enum text)', () => {
+    assert.strictEqual(RAN.wording.familiarityFailed.heading, 'Η εξοικείωση δεν ολοκληρώθηκε επιτυχώς.');
     assert.strictEqual(
         RAN.wording.familiarityFailed.message,
-        'Η χρονομετρούμενη δοκιμασία δεν συνιστάται, καθώς η επίδοση μπορεί να επηρεάζεται από μη επαρκή γνώση των ερεθισμάτων.'
+        'Το παιδί παρουσίασε δυσκολία στην κατονομασία ενός ή περισσότερων ερεθισμάτων. Η χρονομετρούμενη δοκιμασία δεν πραγματοποιήθηκε.'
     );
 });
 

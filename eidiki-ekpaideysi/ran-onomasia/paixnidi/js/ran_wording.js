@@ -49,10 +49,12 @@
             // instructions' own no-speed-wording rule.
             practiceInstruction: 'Ονόμασε τις εικόνες με τη σειρά, από αριστερά προς τα δεξιά.',
         },
-        // spec §17, verbatim
+        // Wording correction pass: re-worded to plain, non-technical
+        // user-facing text (previous heading/message retired). Reason
+        // stays purely procedural — no diagnostic/causal language.
         familiarityFailed: {
-            heading: 'Η εξοικείωση δεν επιβεβαιώθηκε',
-            message: 'Η χρονομετρούμενη δοκιμασία δεν συνιστάται, καθώς η επίδοση μπορεί να επηρεάζεται από μη επαρκή γνώση των ερεθισμάτων.',
+            heading: 'Η εξοικείωση δεν ολοκληρώθηκε επιτυχώς.',
+            message: 'Το παιδί παρουσίασε δυσκολία στην κατονομασία ενός ή περισσότερων ερεθισμάτων. Η χρονομετρούμενη δοκιμασία δεν πραγματοποιήθηκε.',
         },
         // Locked in the Phase 2 correction pass (previously PROVISIONAL).
         // Deliberately procedural only — no causal wording (attention,

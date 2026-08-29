@@ -830,7 +830,6 @@ window.RAN = window.RAN || {};
                     el('h2', { textContent: heading }),
                     el('p', { textContent: message }),
                 ]),
-                el('p', { className: 'ran-status-line', textContent: `Κατάσταση εγγραφής: PREPARATION_FAILED / ${session.failureReason}` }),
                 el('div', { className: 'ran-actions' }, actions),
             ]);
             this.container.appendChild(screen);
@@ -838,10 +837,13 @@ window.RAN = window.RAN || {};
 
         renderPreparationEnded() {
             const session = this.session;
+            const endedReasonHeading = (session.failureReason === RAN.PREPARATION_FAILURE_REASON.FAMILIARITY_NOT_ESTABLISHED
+                ? RAN.wording.familiarityFailed
+                : RAN.wording.serialProcedureFailed).heading;
             const screen = el('div', { className: 'ran-screen' }, [
                 el('h1', { textContent: 'Η προετοιμασία τερματίστηκε' }),
                 el('p', { textContent: `Δοκιμασία: ${ASSESSMENT_LABELS[session.assessmentId]}. Δεν πραγματοποιήθηκε χρονομετρούμενη δοκιμασία.` }),
-                el('p', { className: 'ran-status-line', textContent: `Κατάσταση εγγραφής: PREPARATION_FAILED / ${session.failureReason} (τερματισμένη)` }),
+                el('p', { className: 'ran-status-line', textContent: endedReasonHeading }),
                 el('div', { className: 'ran-actions' }, [
                     el('button', {
                         className: 'ran-btn ran-btn-secondary',
