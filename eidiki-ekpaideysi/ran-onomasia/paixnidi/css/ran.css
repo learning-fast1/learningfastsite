@@ -1,0 +1,1404 @@
+/* ============================================================
+   RAN — visual design system (UI/UX only)
+
+   Same structural design language as eidiki-ekpaideysi/fonologiki-
+   epignosi (rounded cards, pill buttons, soft shadows, generous
+   spacing, Outfit/Nunito typography) — recolored to a calmer, more
+   professional palette: soft light-blue as the primary/brand accent,
+   soft earthy sand/ochre/sage as secondary accents. Deliberately
+   WITHOUT fonologiki-epignosi's game-specific decoration (no bounce/
+   confetti animations, no floating background shapes, no mascots,
+   no gradient buttons with colored glow) — RAN is an assessment tool
+   for educators, not a child-facing game, and Measurement Mode has a
+   separately re-approved requirement to stay free of any decoration/
+   animation around the stimuli.
+
+   IMPORTANT — this file is presentation only. It must never be the
+   place status is communicated by color alone (every status pairs a
+   color with an icon + text elsewhere in the DOM), and it must never
+   change the fixed dimensions/spacing of .ran-stimulus/.ran-timed-
+   matrix — those numbers are part of the scientific presentation,
+   not decoration, and are deliberately left untouched here. The 5
+   Colors stimulus hex values (RED/BLUE/GREEN/YELLOW/BLACK) are the
+   scientific stimulus signal, not decoration — never altered here.
+
+   Measurement Mode (.ran-measurement-mode, toggled on <body> only for
+   renderTimedRunning): background flips to a near-white neutral and
+   every decorative element (blobs, stepper, branding) is simply never
+   rendered into that screen's DOM — not hidden via CSS, actually
+   absent — so there is no chance of a stray decorative element
+   leaking into the child-facing measurement surface.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Nunito:wght@400;600;700;800&subset=greek&display=swap');
+
+:root {
+    --ran-bg: #F5F8F9;
+    --ran-card: #FFFFFF;
+
+    /* Primary — soft light-blue (brand/interactive accent) */
+    --ran-blue: #6FA0C4;
+    --ran-blue-dark: #3E6D8F;
+    --ran-blue-pale: #E4EFF5;
+
+    /* Secondary — soft earthy tones */
+    --ran-sand: #C9A47C;
+    --ran-ochre: #D9B36C;
+    --ran-ochre-dark: #8C6A38;
+    --ran-sage: #8FAD97;
+    --ran-sage-dark: #4C6B57;
+
+    --ran-text: #2E3D46;
+    --ran-text-muted: #57707A;
+    --ran-border: #DCE4E8;
+    /* A deeper, still-earthy terracotta-red for the small number of
+       true danger/terminate actions — never a jarring pure red.
+       Verified ≥5:1 contrast with white/cream text. */
+    --ran-danger: #B15A45;
+    --ran-danger-dark: #954A38;
+
+    /* Pale tints for status banners — always paired with a dark,
+       already-contrast-checked text token, never used as text color
+       themselves. */
+    --ran-ok-bg: #EAF3EE; --ran-ok-border: var(--ran-sage); --ran-ok-text: var(--ran-sage-dark);
+    --ran-flagged-bg: #FAF1DE; --ran-flagged-border: var(--ran-ochre); --ran-flagged-text: var(--ran-ochre-dark);
+    --ran-invalid-bg: #F5EAE3; --ran-invalid-border: var(--ran-sand); --ran-invalid-text: var(--ran-danger-dark);
+
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --shadow-soft: 0 2px 10px rgba(46, 61, 70, 0.07);
+    --shadow-soft-hover: 0 6px 18px rgba(46, 61, 70, 0.11);
+
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+    --space-5: 24px; --space-6: 32px; --space-7: 48px;
+
+    --font-heading: 'Outfit', 'Segoe UI', sans-serif;
+    --font-body: 'Nunito', 'Segoe UI', Arial, sans-serif;
+
+    --transition-fast: 150ms ease;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: var(--ran-bg);
+    color: var(--ran-text);
+    /* Decorative blobs are deliberately positioned partially outside
+       their .ran-hero container (a soft "bleed" effect) — without this,
+       narrow viewports get a horizontal scrollbar from that overflow. */
+    overflow-x: hidden;
+}
+
+#ran-app {
+    max-width: 900px;
+    margin: 0 auto;
+    /* Density pass (examiner/management screens should fit a typical
+       1366x768 laptop at 100% zoom without scrolling wherever content
+       reasonably permits it): trimmed from space-6/space-5/space-7.
+       Measurement Mode (renderTimedRunning, body.ran-measurement-mode)
+       has its own re-measured/re-optimized padding+max-width further
+       below (Timed-screen viewport correction) — this rule only
+       affects the OTHER screens. */
+    padding: var(--space-4) var(--space-4) var(--space-5);
+}
+
+/* Practice final compact-layout correction: a wider content column
+   ONLY while Practice is showing (armed/cleared in ran_ui.js), so its
+   checklist and action buttons can use the available horizontal
+   width instead of wrapping to extra vertical lines. Scoped to this
+   one class — every other screen keeps the 900px column above. */
+#ran-app.ran-practice-wide {
+    max-width: 1180px;
+}
+
+@media (max-width: 640px) {
+    #ran-app { padding: var(--space-4) var(--space-3) var(--space-5); }
+}
+
+/* ============================================================
+   TYPOGRAPHY HIERARCHY
+   ============================================================ */
+
+.ran-screen h1 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.9rem;
+    color: var(--ran-text);
+    margin: 0 0 var(--space-2);
+    letter-spacing: -0.01em;
+}
+
+.ran-screen h2 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--ran-text);
+    margin: var(--space-3) 0 var(--space-2);
+}
+/* Practice-only, tighter than the shared h2 rule above. Specificity
+   matched to ".ran-screen h2" (element+class) so this reliably wins
+   regardless of source order — a bare single-class selector would
+   silently lose to it, the same pitfall fixed earlier for
+   .ran-stimulus-current. */
+h2.ran-checklist-heading {
+    margin: var(--space-2) 0 var(--space-1);
+}
+
+.ran-subtitle {
+    font-size: 1.05rem;
+    color: var(--ran-text-muted);
+    max-width: 60ch;
+    margin: 0 0 var(--space-3);
+    line-height: 1.5;
+}
+
+.ran-status-line {
+    font-size: 0.9rem;
+    color: var(--ran-text-muted);
+    margin: var(--space-1) 0;
+    line-height: 1.5;
+}
+
+.ran-field-hint {
+    font-size: 0.82rem;
+    color: var(--ran-text-muted);
+    margin-top: var(--space-1);
+}
+
+.ran-eyebrow {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ran-blue-dark);
+    margin: 0 0 var(--space-1);
+}
+
+/* ============================================================
+   CARDS (the one reusable card treatment)
+   ============================================================ */
+
+.ran-card {
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: var(--space-4);
+    margin: var(--space-3) 0;
+}
+
+.ran-examiner-instruction {
+    background: var(--ran-blue-pale);
+    border: 1px solid var(--ran-blue);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    margin: var(--space-3) 0;
+}
+.ran-examiner-instruction .ran-eyebrow { color: var(--ran-blue-dark); }
+.ran-examiner-instruction p {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ran-text);
+    margin: 0;
+    line-height: 1.5;
+}
+/* Practice-only, slightly more compact than the shared instruction
+   card above (also used by Familiarity, which this correction must
+   not change) — compound selector so it reliably overrides the base
+   rule's padding/margin regardless of source order. */
+.ran-examiner-instruction.ran-practice-instruction {
+    padding: var(--space-2) var(--space-3);
+    margin: var(--space-2) 0;
+}
+
+.ran-disclaimer {
+    background: var(--ran-card);
+    border: 1px dashed var(--ran-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    margin: var(--space-3) 0;
+    font-size: 0.9rem;
+    color: var(--ran-text-muted);
+    line-height: 1.5;
+}
+
+.ran-failure-banner {
+    background: var(--ran-invalid-bg);
+    border: 1px solid var(--ran-invalid-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    margin: var(--space-3) 0;
+}
+.ran-failure-banner h2 { margin-top: 0; color: var(--ran-invalid-text); font-size: 1.1rem; }
+.ran-failure-banner p { margin: 0; color: var(--ran-text); }
+
+/* ============================================================
+   STIMULUS RENDERING — dimensions/spacing intentionally UNCHANGED
+   from Phase 1-5 (shared by Familiarity/Practice/timed screens; the
+   timed matrix must never reflow, resize, or reorder). Only the
+   neutral (non-color) stimulus's border/background are recolored
+   onto the new tokens — a palette swap, not a structural change.
+   ============================================================ */
+
+.ran-stimulus-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    /* This base margin only ever applies to Familiarity's bare (un-
+       wrapped) row — Practice/timed matrices override it to 0 via
+       their own wrapper rules below, so trimming it here is a density
+       change scoped to Familiarity only, never the timed matrix. */
+    margin: 10px 0;
+}
+
+.ran-stimulus {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--ran-card);
+    border: 2px solid var(--ran-border);
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    color: var(--ran-text);
+}
+
+/* Colors: identical circle shape/size for every stimulus — only the
+   fill color varies (spec §5.2). These 5 hex values ARE the scientific
+   stimulus signal, not decoration — never altered here. */
+.ran-stimulus.ran-stimulus-circle {
+    border-radius: 50%;
+    border: 2px solid #9ca3af;
+}
+.ran-stimulus-circle[data-stimulus="RED"] { background: #dc2626; }
+.ran-stimulus-circle[data-stimulus="BLUE"] { background: #2563eb; }
+.ran-stimulus-circle[data-stimulus="GREEN"] { background: #16a34a; }
+.ran-stimulus-circle[data-stimulus="YELLOW"] { background: #eab308; }
+.ran-stimulus-circle[data-stimulus="BLACK"] { background: #111827; }
+
+/* Objects: the image fits WITHIN the existing fixed .ran-stimulus box
+   (object-fit: contain) rather than resizing the box — box dimensions
+   are locked for Digits/Colors and must stay identical here too. */
+.ran-stimulus-object-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* ---- Familiarity: sequential examiner recording ----
+   Two conceptual areas (see ran_ui.js renderFamiliarity): the plain
+   .ran-stimulus-row above is the child-facing presentation area (no
+   per-stimulus controls, no correctness feedback); everything below
+   is the examiner-only recording panel. */
+
+.ran-stimulus.ran-stimulus-current {
+    /* Neutral "this is the one being recorded" emphasis — brand blue,
+       never green/red/success/error. Compound selector (matches the
+       specificity of .ran-stimulus.ran-stimulus-circle's own border
+       rule above) so this reliably wins for BOTH plain digit tiles
+       and color circles — a single-class .ran-stimulus-current would
+       silently lose to the circle's own border color otherwise. */
+    border-color: var(--ran-blue-dark);
+    box-shadow: 0 0 0 2px var(--ran-blue-pale);
+}
+
+.ran-familiarity-panel h2 { margin-top: 0; }
+
+.ran-familiarity-progress {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin: var(--space-2) 0 var(--space-3);
+}
+.ran-familiarity-dot {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--font-body);
+    border: 2px solid var(--ran-border);
+    background: var(--ran-card);
+    color: var(--ran-text-muted);
+}
+/* Recorded = neutral muted fill regardless of Known/Difficulty — the
+   progress indicator communicates ONLY recorded/current/pending,
+   never which judgment was given (no correct/incorrect signal). */
+.ran-familiarity-dot-recorded { background: var(--ran-text-muted); border-color: var(--ran-text-muted); color: #fff; }
+.ran-familiarity-dot-current { border-color: var(--ran-blue-dark); color: var(--ran-blue-dark); background: var(--ran-blue-pale); }
+
+.ran-familiarity-current-label {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--ran-text);
+    margin: 0 0 var(--space-3);
+}
+
+.ran-mark-btn {
+    padding: 12px 28px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-radius: 999px;
+    border: 2px solid var(--ran-border);
+    background: var(--ran-card);
+    color: var(--ran-text-muted);
+    cursor: pointer;
+    transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+.ran-mark-btn:hover { transform: translateY(-1px); }
+.ran-mark-btn.ran-mark-known.active { background: var(--ran-sage-dark); border-color: var(--ran-sage-dark); color: #fff; }
+.ran-mark-btn.ran-mark-difficulty.active { background: var(--ran-ochre); border-color: var(--ran-ochre); color: var(--ran-text); }
+
+/* ---- Practice matrix (multi-row) ---- */
+
+.ran-practice-matrix {
+    display: flex;
+    flex-direction: column;
+    /* Compacted vertically for the Practice final-layout correction —
+       the two stimulus ROWS stay their full, unchanged readable size
+       (.ran-stimulus is shared with the timed matrix and never
+       touched); only the card's own chrome (surrounding padding/
+       margin/row-gap) is tightened. */
+    gap: 8px;
+    margin: var(--space-2) 0;
+    padding: var(--space-3);
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+.ran-practice-matrix .ran-stimulus-row { margin: 0; }
+
+/* Practice's checklist (the only place .ran-checklist is used) lays
+   its 3 items out in a row on the wider Practice column so they use
+   the available width instead of stacking as 3 full-width lines —
+   falls back to a column on narrow viewports. Scoping every override
+   below to ".ran-checklist .ran-check-row" (not the bare .ran-check-
+   row, which Error Capture's unrelated single sequence-loss row also
+   uses) keeps this entirely local to Practice. */
+.ran-checklist {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: var(--space-2) 0;
+}
+@media (max-width: 640px) {
+    .ran-checklist { flex-direction: column; }
+}
+.ran-checklist .ran-check-row {
+    flex: 1 1 260px;
+    padding: 6px var(--space-3);
+}
+.ran-check-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    cursor: pointer;
+}
+.ran-check-row input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    accent-color: var(--ran-blue-dark);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* ---- Buttons ---- */
+
+.ran-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-top: var(--space-3);
+    align-items: center;
+}
+/* Practice's specific checklist -> actions gap (adjacent-sibling
+   selector, matches only that exact DOM pairing — every other
+   screen's .ran-actions keeps the margin-top above). */
+.ran-checklist + .ran-actions {
+    margin-top: var(--space-2);
+}
+
+.ran-btn {
+    font-family: var(--font-body);
+    padding: 11px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
+}
+.ran-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-soft); }
+.ran-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.ran-btn-primary { background: var(--ran-blue-dark); color: #fff; }
+.ran-btn-secondary { background: var(--ran-card); color: var(--ran-text); border: 1px solid var(--ran-border); }
+.ran-btn-danger { background: var(--ran-danger); color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+    .ran-btn, .ran-mark-btn, .ran-assessment-card, .ran-profile-row {
+        transition: none !important;
+    }
+    .ran-btn:hover, .ran-assessment-card:hover, .ran-profile-row:hover {
+        transform: none !important;
+    }
+}
+
+/* ============================================================
+   LANDING — assessmentSelect
+   ============================================================ */
+
+.ran-hero {
+    position: relative;
+    padding: var(--space-3) 0 var(--space-2);
+    /* Clips the decorative blob to this container's own bounds — it's
+       deliberately positioned partially outside the padding box for a
+       soft "bleed" look, but must never expand the page's scrollable
+       width on narrow viewports. */
+    overflow: hidden;
+}
+.ran-hero-brand {
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ran-blue-dark);
+    margin-bottom: var(--space-2);
+}
+
+.ran-assessment-picker {
+    display: grid;
+    /* 3 balanced cards on wide screens, gracefully narrowing to 2 then
+       1 as space shrinks — minimal adjustment from the old fixed
+       "1fr 1fr" (Objects round: now 3 cards, not 2). */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+}
+@media (max-width: 640px) {
+    .ran-assessment-picker { grid-template-columns: 1fr; }
+}
+
+.ran-assessment-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    text-align: left;
+    padding: var(--space-4);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-lg);
+    background: var(--ran-card);
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.ran-assessment-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft-hover); border-color: var(--ran-blue); }
+
+.ran-assessment-motif {
+    display: flex;
+    gap: 8px;
+    margin-bottom: var(--space-1);
+}
+.ran-assessment-motif-digit {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--ran-blue-dark);
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--ran-blue-pale);
+    border-radius: 50%;
+}
+.ran-assessment-motif-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    margin-top: 6px;
+}
+.ran-assessment-motif-object {
+    width: 34px; height: 34px;
+    object-fit: contain;
+    background: var(--ran-blue-pale);
+    border-radius: 50%;
+    padding: 4px;
+}
+
+.ran-assessment-card-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--ran-text);
+}
+.ran-assessment-card-desc {
+    font-size: 0.95rem;
+    color: var(--ran-text-muted);
+    line-height: 1.5;
+}
+.ran-assessment-card-cta {
+    font-weight: 700;
+    color: var(--ran-blue-dark);
+    margin-top: var(--space-2);
+}
+
+.ran-section-secondary {
+    margin-top: var(--space-4);
+}
+.ran-profile-entry-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+/* Title text uses the same high-contrast --ran-text as every other
+   card title. */
+.ran-profile-entry-card .ran-assessment-card-title { font-size: 1.1rem; color: var(--ran-text); }
+.ran-profile-entry-card .ran-assessment-card-desc { margin: var(--space-1) 0 0; }
+
+/* ============================================================
+   STEPPER — non-interactive, plain divs (no navigation shortcuts)
+   ============================================================ */
+
+.ran-stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+    flex-wrap: wrap;
+}
+.ran-step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ran-text-muted);
+}
+.ran-step-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    background: var(--ran-card);
+    border: 2px solid var(--ran-border);
+    color: var(--ran-text-muted);
+}
+.ran-step.is-done .ran-step-dot { background: var(--ran-blue-dark); border-color: var(--ran-blue-dark); color: #fff; }
+.ran-step.is-current .ran-step-dot { border-color: var(--ran-blue-dark); color: var(--ran-blue-dark); }
+.ran-step.is-current { color: var(--ran-text); }
+.ran-step-sep {
+    width: 16px; height: 1px;
+    background: var(--ran-border);
+}
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+
+.ran-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--ran-blue-pale);
+    color: var(--ran-blue-dark);
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+
+/* ============================================================
+   DECORATIVE BLOBS — sparse, landing/section-header/Results/Profiles
+   only, aria-hidden, never in Measurement Mode
+   ============================================================ */
+
+.ran-blob {
+    position: absolute;
+    z-index: -1;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Standard "visually hidden but still in the accessibility tree /
+   tab order" pattern — unlike display:none or visibility:hidden,
+   this keeps a real native control (e.g. an <input type="file">
+   wrapped by a styled <label>) focusable and keyboard-operable while
+   showing nothing of its own on screen. Used by the Profile Import
+   control (accessibility fix, A/B + Profile review pass). */
+.ran-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ============================================================
+   FORM CONTROLS
+   ============================================================ */
+
+.ran-form-field {
+    margin: var(--space-2) 0;
+}
+.ran-form-field label {
+    display: block;
+    font-weight: 700;
+    color: var(--ran-text);
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+}
+.ran-form-field input[type="text"],
+.ran-form-field input[type="number"],
+.ran-form-field textarea,
+select {
+    width: 100%;
+    max-width: 320px;
+    padding: 10px 12px;
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-family: var(--font-body);
+    background: var(--ran-card);
+    color: var(--ran-text);
+}
+.ran-form-field textarea { max-width: 100%; min-height: 60px; }
+
+.ran-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: var(--space-2) 0 var(--space-3);
+}
+.ran-radio-group-heading {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-top: var(--space-3);
+    color: var(--ran-text);
+}
+.ran-radio-group label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    font-size: 0.95rem;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+}
+.ran-radio-group label:hover { background: var(--ran-card); }
+.ran-radio-group input[type="radio"] { accent-color: var(--ran-blue-dark); width: 18px; height: 18px; margin-top: 1px; }
+
+.ran-validation-problems {
+    background: var(--ran-invalid-bg);
+    border: 1px solid var(--ran-invalid-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    margin: var(--space-3) 0;
+    font-size: 0.9rem;
+    color: var(--ran-invalid-text);
+}
+.ran-validation-problems ul { margin: 6px 0 0; padding-left: 20px; }
+
+/* ============================================================
+   POST-ADMINISTRATION SIMPLE MODE — UX refinement pass (compact
+   stepper counters + read-only procedural summary). Scoped to
+   .ran-error-capture-screen so nothing here touches any other
+   screen's .ran-card/.ran-form-field/.ran-actions look.
+   ============================================================ */
+
+/* Two-column layout on wide-enough viewports (error counters next to
+   the read-only procedural summary) so the screen needs far less
+   vertical space; stacks back to one column when narrow. */
+.ran-error-capture-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+}
+@media (max-width: 720px) {
+    .ran-error-capture-grid { grid-template-columns: 1fr; }
+}
+
+/* Compact form-field row: label + stepper side by side instead of
+   label-above-full-width-input, cutting each field from two lines to
+   one. Scoped to this screen's fields only via the compact class. */
+.ran-error-capture-screen .ran-card { padding: var(--space-3) var(--space-4); margin: var(--space-2) 0; }
+.ran-error-capture-screen .ran-card h2 { margin: 0 0 var(--space-2); font-size: 1.05rem; }
+.ran-form-field.ran-form-field-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin: var(--space-1) 0;
+}
+.ran-form-field.ran-form-field-compact label {
+    margin-bottom: 0;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+/* Named ran-count-stepper (not ran-stepper) — that name already
+   belongs to the unrelated top-of-screen progress breadcrumb
+   (.ran-stepper/.ran-step/.ran-step-dot above); reusing it here would
+   silently collide with that component's own rules. */
+.ran-count-stepper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.ran-count-stepper-btn {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-sm);
+    background: var(--ran-card);
+    color: var(--ran-blue-dark);
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: var(--font-body);
+    line-height: 1;
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.ran-count-stepper-btn:hover { background: var(--ran-blue-pale); border-color: var(--ran-blue); }
+/* Compound selector (class + type attribute) so this reliably beats
+   the shared ".ran-form-field input[type=number]" width:100% rule
+   above regardless of source order — the same specificity pitfall
+   already documented for .ran-stimulus-current elsewhere in this file. */
+.ran-count-stepper input.ran-count-stepper-input[type="number"] {
+    width: 52px;
+    max-width: 52px;
+    padding: 5px 4px;
+    text-align: center;
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.98rem;
+    font-family: var(--font-body);
+    background: var(--ran-card);
+    color: var(--ran-text);
+}
+
+/* Read-only procedural-events summary — already captured live during
+   timedRunning, never re-editable here (decision: UX refinement pass). */
+.ran-procedural-summary .ran-summary-list {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+    row-gap: var(--space-1);
+    margin: 0;
+}
+.ran-summary-list dt {
+    color: var(--ran-text-muted);
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+.ran-summary-list dd {
+    margin: 0;
+    font-weight: 700;
+    color: var(--ran-text);
+    font-size: 0.92rem;
+    text-align: right;
+}
+
+.ran-notes-textarea {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 56px;
+    padding: 10px 12px;
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-family: var(--font-body);
+    background: var(--ran-card);
+    color: var(--ran-text);
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.ran-record-summary {
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin: var(--space-3) 0;
+}
+.ran-record-summary dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 16px;
+    margin: 0;
+    font-size: 0.9rem;
+}
+.ran-record-summary dt { font-weight: 700; color: var(--ran-text-muted); }
+.ran-record-summary dd { margin: 0; color: var(--ran-text); }
+
+/* ============================================================
+   PRE-START / TIMED RUNNING (matrix wrapper — dimensions/spacing
+   logic of the matrix itself is untouched; this only styles the
+   surrounding card/whitespace).
+   ============================================================ */
+
+.ran-timed-matrix {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* Timed-screen viewport correction: trimmed from var(--space-5)
+       [24px top+bottom] — this is whitespace AROUND the matrix wrapper,
+       not the matrix's own row gap (still 12px, untouched) or any
+       stimulus dimension. */
+    margin: 8px 0;
+}
+.ran-timed-matrix .ran-stimulus-row { margin: 0; }
+
+.ran-prestart-matrix-wrap {
+    padding: var(--space-4);
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+/* ---- Measurement Mode: near-white, zero decoration, matrix untouched ---- */
+body.ran-measurement-mode {
+    background: #FBFCFD;
+}
+body.ran-measurement-mode #ran-app {
+    max-width: 760px;
+    /* Timed-screen viewport correction: re-measured and reduced from
+       space-6/space-5/space-7 [32/24/48] — see MATRIX_MIN_HEIGHT's doc
+       comment in ran_ui.js for the new measured budget this reflects.
+       Whitespace only; matrix dimensions are untouched. */
+    padding: var(--space-3) var(--space-4) var(--space-4);
+}
+@media (max-width: 640px) {
+    body.ran-measurement-mode #ran-app { padding: var(--space-2) var(--space-3) var(--space-3); }
+}
+/* Timed-screen side-by-side correction: matrix (child-facing) on the
+   left, a fixed-width vertical examiner toolbar on the right. Neither
+   column shrinks or wraps — isViewportSafeForMatrix()'s width
+   threshold (see MATRIX_MIN_WIDTH's doc comment) is set so this
+   layout is only ever reached with room for both, never squeezed. */
+.ran-timed-layout {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-4);
+}
+.ran-timed-layout .ran-measurement-matrix-wrap {
+    flex: 0 0 auto;
+}
+
+.ran-measurement-matrix-wrap {
+    padding: var(--space-3) var(--space-5);
+    display: flex;
+    justify-content: center;
+}
+
+.ran-toolbar {
+    /* UI refinement pass: gap/padding trimmed slightly (var(--space-3)
+       -> var(--space-2), var(--space-4) top/bottom -> var(--space-3))
+       so the panel reads a little more compact/quiet — buttons and the
+       timer keep their own full size (.ran-btn/.ran-timer-display are
+       untouched here), only the whitespace between sections shrank. */
+    flex: 0 0 260px;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: #EEF2F4;
+    border: 1px solid #DCE4E8;
+    border-radius: var(--radius-lg);
+}
+.ran-toolbar .ran-actions {
+    margin-top: var(--space-1);
+    flex-direction: column;
+    align-items: stretch;
+}
+.ran-toolbar .ran-actions .ran-btn {
+    width: 100%;
+    text-align: center;
+}
+
+.ran-timer-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: var(--space-2);
+    background: #fff;
+    border: 1px solid #DCE4E8;
+    border-radius: var(--radius-md);
+}
+.ran-timer-display {
+    /* "αρκετά μεγάλο ώστε να διαβάζεται άμεσα" — enlarged now that the
+       timer has its own dedicated column instead of sharing a row. */
+    font-family: 'Courier New', monospace;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--ran-text);
+    font-variant-numeric: tabular-nums;
+}
+.ran-timer-label {
+    color: var(--ran-text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.ran-redirect-panel,
+.ran-sequence-loss-panel,
+.ran-answer-given-panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px var(--space-2);
+}
+/* Forces the control button onto its own full-width line below the
+   label+value row, in the narrow vertical column — no JS/markup
+   change needed, both buttons already carry .ran-btn. */
+.ran-redirect-panel .ran-btn,
+.ran-sequence-loss-panel .ran-btn,
+.ran-answer-given-panel .ran-btn {
+    flex-basis: 100%;
+}
+.ran-toolbar-row-label {
+    font-size: 0.85rem;
+    color: var(--ran-text-muted);
+    font-weight: 700;
+}
+.ran-redirect-count {
+    font-weight: 700;
+    font-size: 1.2rem;
+    min-width: 20px;
+    text-align: center;
+    color: var(--ran-text);
+    margin-left: auto;
+}
+.ran-sequence-loss-indicator {
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+    color: var(--ran-text);
+    margin-left: auto;
+}
+/* Toolbar buttons stay muted/neutral — never compete visually with
+   the matrix (explicit instruction: no sand/ochre here). */
+.ran-toolbar .ran-btn-secondary { background: #fff; border-color: #CFDBE0; }
+/* Abort styled as a quieter, outlined secondary action — visually
+   less prominent than Finish's solid primary fill. Only a styling
+   change; the abort/safety logic is unchanged (see ran_ui.js). */
+.ran-toolbar .ran-timed-abort-btn {
+    color: var(--ran-danger);
+    border-color: var(--ran-danger);
+}
+
+/* ============================================================
+   STATUS BANNERS — color is always paired with an icon + text
+   ============================================================ */
+
+.ran-status-banner {
+    display: flex;
+    gap: var(--space-3);
+    align-items: flex-start;
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-4);
+    margin: var(--space-3) 0;
+    border: 1px solid;
+}
+.ran-status-banner-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.ran-status-banner h2 { margin: 0 0 4px; font-size: 1.1rem; font-family: var(--font-heading); }
+.ran-status-banner p { margin: 0; }
+.ran-status-banner-ok { background: var(--ran-ok-bg); border-color: var(--ran-ok-border); color: var(--ran-ok-text); }
+.ran-status-banner-flagged { background: var(--ran-flagged-bg); border-color: var(--ran-flagged-border); color: var(--ran-flagged-text); }
+.ran-status-banner-invalid { background: var(--ran-invalid-bg); border-color: var(--ran-invalid-border); color: var(--ran-invalid-text); }
+
+/* ============================================================
+   RESULTS — big primary metric + secondary metrics
+   ============================================================ */
+
+.ran-metric-primary {
+    text-align: center;
+    padding: var(--space-4) var(--space-5);
+    margin: var(--space-3) 0;
+    background: linear-gradient(155deg, var(--ran-blue-pale), var(--ran-card));
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+.ran-metric-primary-value {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 3rem;
+    color: var(--ran-blue-dark);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+.ran-metric-primary-label {
+    margin-top: var(--space-2);
+    font-weight: 700;
+    color: var(--ran-text-muted);
+}
+
+.ran-metrics-secondary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin: var(--space-3) 0;
+}
+@media (max-width: 480px) {
+    .ran-metrics-secondary { grid-template-columns: 1fr; }
+}
+.ran-metric-card {
+    text-align: center;
+    padding: var(--space-3);
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-md);
+}
+.ran-metric-card-value {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--ran-text);
+    font-variant-numeric: tabular-nums;
+}
+.ran-metric-card-label {
+    font-size: 0.85rem;
+    color: var(--ran-text-muted);
+    margin-top: 2px;
+}
+
+/* Latest-administration metric on History — same visual family as
+   Results' primary metric, smaller. */
+.ran-metric-latest {
+    text-align: center;
+    padding: var(--space-3);
+    margin: var(--space-2) 0;
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-md);
+}
+.ran-metric-latest-value {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.9rem;
+    color: var(--ran-blue-dark);
+    font-variant-numeric: tabular-nums;
+}
+.ran-metric-latest-label {
+    color: var(--ran-text-muted);
+    font-size: 0.85rem;
+}
+
+/* Comparison line — deliberately NO color-coding for faster/slower;
+   descriptive difference, not a normative judgement. */
+.ran-comparison-line {
+    font-size: 0.95rem;
+    color: var(--ran-text);
+    margin: var(--space-2) 0 0;
+}
+/* Mandatory disclaimer shown immediately below the comparison line
+   (Results/History presentation pass) — always paired with it, never
+   shown alone. */
+.ran-comparison-note {
+    font-size: 0.82rem;
+    color: var(--ran-text-muted);
+    margin: 2px 0 var(--space-3);
+}
+/* A/B longitudinal policy: shown INSTEAD of .ran-comparison-line/-note
+   when the two most recent eligible administrations differ in form —
+   muted like .ran-comparison-note, not alarming (this is an expected,
+   normal outcome, not an error). */
+.ran-comparison-unavailable {
+    font-size: 0.9rem;
+    color: var(--ran-text-muted);
+    margin: var(--space-2) 0 var(--space-3);
+    font-style: italic;
+}
+
+/* ============================================================
+   SAVE / BACKUP SECTIONS
+   ============================================================ */
+
+.ran-save-section {
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: var(--space-4);
+    margin: var(--space-3) 0;
+}
+.ran-save-section h2 { margin-top: 0; }
+
+.ran-backup-section {
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--ran-border);
+}
+.ran-backup-section h2 { font-size: 1rem; color: var(--ran-text-muted); }
+
+/* ============================================================
+   PROFILES
+   ============================================================ */
+
+.ran-info-card {
+    background: var(--ran-blue-pale);
+    border: 1px solid var(--ran-blue);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-4);
+    margin: var(--space-2) 0 var(--space-3);
+    font-size: 0.88rem;
+    color: var(--ran-text);
+}
+
+.ran-profile-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: var(--space-2) 0;
+}
+.ran-profile-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    transition: transform var(--transition-fast);
+}
+.ran-profile-row:hover { transform: translateY(-1px); }
+.ran-profile-label {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--ran-text);
+}
+.ran-profile-meta {
+    font-size: 0.8rem;
+    color: var(--ran-text-muted);
+    margin-top: 2px;
+}
+
+/* ============================================================
+   HISTORY TABLE — responsive card fallback on narrow screens
+   ============================================================ */
+
+.ran-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-3) 0 var(--space-2);
+    font-size: 0.9rem;
+}
+.ran-history-table th,
+.ran-history-table td {
+    text-align: left;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--ran-border);
+}
+.ran-history-table th {
+    color: var(--ran-text-muted);
+    font-weight: 700;
+    background: transparent;
+}
+
+@media (max-width: 640px) {
+    .ran-history-table thead { display: none; }
+    .ran-history-table, .ran-history-table tbody, .ran-history-table tr, .ran-history-table td {
+        display: block; width: 100%;
+    }
+    .ran-history-table tr {
+        margin-bottom: var(--space-3);
+        border: 1px solid var(--ran-border);
+        border-radius: var(--radius-md);
+        padding: var(--space-2) var(--space-3);
+        background: var(--ran-card);
+    }
+    .ran-history-table td {
+        border-bottom: none;
+        padding: 4px 0;
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-3);
+    }
+    .ran-history-table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--ran-text-muted);
+    }
+}
+
+/* ============================================================
+   PHASE 6 — LONGITUDINAL GRAPH
+   Restrained palette, no decorative blobs inside/behind the chart
+   (per the approved design). Fully responsive (no Measurement Mode
+   gate applies here) — the SVG scales via viewBox, and
+   .ran-graph-svg-wrap scrolls horizontally as a fallback once a long
+   history's minimum per-point width exceeds the viewport, rather
+   than squeezing points into illegibility.
+   ============================================================ */
+
+.ran-graph-section {
+    background: var(--ran-card);
+    border: 1px solid var(--ran-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: var(--space-4);
+    margin: var(--space-3) 0;
+}
+.ran-graph-section h3 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin: 0 0 var(--space-1);
+    color: var(--ran-text);
+}
+
+.ran-graph-chart-row {
+    display: flex;
+    align-items: stretch;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+}
+.ran-graph-y-axis-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 0.78rem;
+    color: var(--ran-text-muted);
+    text-align: center;
+    flex-shrink: 0;
+    padding: var(--space-2) 0;
+}
+.ran-graph-x-axis-label {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--ran-text-muted);
+    margin-top: var(--space-1);
+}
+.ran-graph-axis-helper {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--ran-blue-dark);
+    font-weight: 700;
+    margin: var(--space-2) 0 var(--space-3);
+}
+/* A/B longitudinal policy: quiet, factual note under the graph legend
+   — deliberately NOT styled like .ran-graph-axis-helper (that's a bold
+   reading-instruction hint; this is a caution, not an instruction). */
+.ran-graph-form-note {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--ran-text-muted);
+    margin: var(--space-2) 0 0;
+}
+
+.ran-graph-svg-wrap {
+    position: relative;
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.ran-graph-svg-wrap svg {
+    display: block;
+    height: auto;
+}
+.ran-graph-point {
+    cursor: pointer;
+    transition: transform var(--transition-fast);
+}
+.ran-graph-point:hover,
+.ran-graph-point:focus {
+    outline: 2px solid var(--ran-blue);
+    outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+    .ran-graph-point { transition: none !important; }
+}
+
+.ran-graph-tooltip {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    background: var(--ran-text);
+    color: #fff;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-fast);
+    z-index: 5;
+    margin-top: -8px;
+}
+.ran-graph-tooltip.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ran-graph-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    justify-content: center;
+    font-size: 0.82rem;
+    color: var(--ran-text-muted);
+}
+.ran-graph-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.ran-legend-circle {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: #3E6D8F;
+    border: 1px solid #2C4E66;
+    display: inline-block;
+}
+.ran-legend-diamond {
+    width: 11px; height: 11px;
+    background: #D9B36C;
+    border: 1px solid #8C6A38;
+    transform: rotate(45deg);
+    display: inline-block;
+}
+
+@media (max-width: 640px) {
+    .ran-graph-y-axis-label { display: none; }
+}

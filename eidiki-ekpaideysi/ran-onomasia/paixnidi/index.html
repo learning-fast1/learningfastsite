@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAN — Ταχεία Αυτοματοποιημένη Κατονομασία (Phase 5 preview)</title>
+    <link rel="stylesheet" href="css/ran.css">
+</head>
+<body>
+    <div id="ran-app"></div>
+
+    <!-- Load order matters: definitions -> engine -> preparation -> timed -> storage -> wording -> dom -> ui -->
+    <script src="js/ran_definitions.js"></script>
+    <script src="js/ran_engine.js"></script>
+    <script src="js/ran_preparation.js"></script>
+    <script src="js/ran_timed.js"></script>
+    <script src="js/ran_storage.js"></script>
+    <script src="js/ran_wording.js"></script>
+    <script src="js/ran_dom.js"></script>
+    <script src="js/ran_ui.js"></script>
+    <script>
+        RAN.app.init();
+    </script>
+</body>
+</html>
