@@ -855,6 +855,7 @@ window.RAN = window.RAN || {};
                         el('div', { className: 'ran-assessment-card-cta', textContent: 'Προβολή προφίλ →' }),
                     ]),
                 ]),
+                el('div', { className: 'ran-disclaimer', textContent: RAN.wording.intendedAudienceNote }),
             ]);
             this.container.appendChild(screen);
         },

@@ -126,6 +126,12 @@
     // recommendation, norms/percentiles, or a named professional title.
     wording.scientificDisclaimer = 'Η δοκιμασία παρέχει περιγραφικές πληροφορίες για την ταχύτητα σειριακής κατονομασίας ήδη γνωστών ερεθισμάτων. Δεν αποτελεί από μόνη της διαγνωστικό εργαλείο μαθησιακής ή αναπτυξιακής διαταραχής και τα αποτελέσματα πρέπει να συνεκτιμώνται με άλλες πληροφορίες αξιολόγησης.';
 
+    // Home-screen-only note on intended professional audience — distinct
+    // from scientificDisclaimer above (which deliberately names no
+    // profession): this one exists specifically to name who the tool is
+    // meant for, not to qualify what the results mean.
+    wording.intendedAudienceNote = 'Απευθύνεται σε ψυχολόγους, εκπαιδευτικούς ειδικής αγωγής, λογοθεραπευτές/ύτριες και εργοθεραπευτές, ως εργαλείο δομημένης παρατήρησης.';
+
     wording.invalidReasonLabels = {
         // Re-worded (A/B + INVALID-reason review pass) to clearly read
         // as a DEVIATION from procedure — never confused with the
