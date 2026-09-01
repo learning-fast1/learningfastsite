@@ -91,6 +91,18 @@
 
 * { box-sizing: border-box; }
 
+/* Mobile touch fix: every real click target in this app is a <button>
+   (even card-styled ones, e.g. .ran-assessment-card) plus native
+   checkbox/radio inputs — none of them need the browser's default
+   double-tap-to-zoom gesture, which otherwise fires when an examiner
+   taps two buttons in quick succession on a touch device. This only
+   suppresses that double-tap/delay gesture on these elements; pinch-
+   zoom on the page itself is untouched (no user-scalable=no), so the
+   page remains zoomable for accessibility. */
+button, input[type="checkbox"], input[type="radio"] {
+    touch-action: manipulation;
+}
+
 body {
     margin: 0;
     font-family: var(--font-body);
