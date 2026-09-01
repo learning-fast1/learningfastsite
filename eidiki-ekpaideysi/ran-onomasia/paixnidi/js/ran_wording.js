@@ -130,7 +130,7 @@
     // from scientificDisclaimer above (which deliberately names no
     // profession): this one exists specifically to name who the tool is
     // meant for, not to qualify what the results mean.
-    wording.intendedAudienceNote = 'Απευθύνεται σε ψυχολόγους, εκπαιδευτικούς ειδικής αγωγής, λογοθεραπευτές/ύτριες και εργοθεραπευτές, ως εργαλείο δομημένης παρατήρησης.';
+    wording.intendedAudienceNote = 'Απευθύνεται σε ψυχολόγους, εκπαιδευτικούς ειδικής αγωγής, λογοθεραπευτές/ύτριες και εργοθεραπευτές/ύτριες, ως εργαλείο δομημένης παρατήρησης.';
 
     wording.invalidReasonLabels = {
         // Re-worded (A/B + INVALID-reason review pass) to clearly read
