@@ -170,8 +170,15 @@ test('RAN_OBJECTS_V1 type is "objects"', () => {
     assert.strictEqual(RAN.getDefinition('RAN_OBJECTS_V1').type, 'objects');
 });
 
-test('RAN.CURRENT_VERSIONS.objects points at RAN_OBJECTS_V1', () => {
-    assert.strictEqual(RAN.CURRENT_VERSIONS.objects, 'RAN_OBJECTS_V1');
+// Versioning (V2): CURRENT_VERSIONS was bumped to the new semi-random
+// V2 arrays for every type — every NEW administration starts from
+// here, while RAN_*_V1 stays fully addressable/frozen/unchanged for
+// historical records (see the "V1 definitions remain byte-for-byte
+// unchanged" and "V2 forms" test blocks below).
+test('RAN.CURRENT_VERSIONS points at the V2 definition for every type', () => {
+    assert.strictEqual(RAN.CURRENT_VERSIONS.digits, 'RAN_DIGITS_V2');
+    assert.strictEqual(RAN.CURRENT_VERSIONS.colors, 'RAN_COLORS_V2');
+    assert.strictEqual(RAN.CURRENT_VERSIONS.objects, 'RAN_OBJECTS_V2');
 });
 
 test('every RAN_OBJECTS_V1 stimulus ID resolves to a real image asset file', () => {
@@ -246,7 +253,9 @@ test('createAdministration fills every §42 field', () => {
         'form', 'stimulusSequence', 'dateISO', 'durationMs', 'totalStimuli', 'independentCorrect',
         'substitutions', 'omissions', 'repetitions', 'selfCorrections', 'examinerRedirects',
         'examinerProvidedAnswers',
-        'sequenceLoss', 'familiarityPassed', 'practicePassed', 'status', 'validityFlags', 'notes',
+        'sequenceLoss', 'familiarityPassed', 'practicePassed', 'gradeAtAdministration',
+        'examinerReviewAdjusted', 'familiarityRetriesUsed',
+        'status', 'validityFlags', 'notes',
     ];
     expectedFields.forEach(f => assert.ok(f in admin, `missing field ${f}`));
     assert.ok(!('initialCorrect' in admin), 'old field name must not linger alongside the new one');
@@ -533,6 +542,39 @@ test('mixed case: substitutions + omissions + examinerProvidedAnswers + selfCorr
 });
 
 /* ============================================================
+   ITEM 20 audit — confirms the engine ALREADY enforces substitutions +
+   omissions + examinerProvidedAnswers <= totalStimuli (this is the
+   existing rule the item-20 UI-level prevention in ran_ui.js mirrors,
+   not a second/different one). Boundary = exactly totalStimuli (20 for
+   RAN_DIGITS_V1); attempted = 21, one over.
+   ============================================================ */
+console.log('\nItem 20 — primary-error-sum boundary (substitutions + omissions + examinerProvidedAnswers <= totalStimuli):');
+
+test('boundary: sum exactly 20 (10 + 5 + 5) is VALID, independentCorrect is 0', () => {
+    const admin = RAN.createAdministration(baseInput({
+        durationMs: 15000, substitutions: 10, omissions: 5, examinerProvidedAnswers: 5,
+    }));
+    assert.deepStrictEqual(RAN.validateAdministration(admin), []);
+    assert.strictEqual(admin.independentCorrect, 0);
+});
+
+test('attempted: sum of 21 (10 + 5 + 6, one over totalStimuli=20) is REJECTED with the exact locked message', () => {
+    const admin = RAN.createAdministration(baseInput({
+        durationMs: 15000, substitutions: 10, omissions: 5, examinerProvidedAnswers: 6,
+    }));
+    const problems = RAN.validateAdministration(admin);
+    assert.ok(problems.includes('substitutions + omissions + examinerProvidedAnswers must not exceed totalStimuli'));
+});
+
+test('repetitions/selfCorrections are never part of this sum — a huge repetitions/selfCorrections count alone never triggers this rule', () => {
+    const admin = RAN.createAdministration(baseInput({
+        durationMs: 15000, substitutions: 5, omissions: 5, examinerProvidedAnswers: 5, // sum 15, well under 20
+        repetitions: 500, selfCorrections: 500,
+    }));
+    assert.deepStrictEqual(RAN.validateAdministration(admin), []);
+});
+
+/* ============================================================
    SCORING — spec §44-§46
    ============================================================ */
 console.log('\nScoring:');
@@ -608,6 +650,116 @@ test('calcResults withholds rate for PREPARATION_FAILED', () => {
 });
 
 /* ============================================================
+   INCOMPLETE/INVALID correctness fix: an aborted run's raw
+   independentCorrect (computed at creation time assuming every
+   totalStimuli item was reached) must never surface as a performance
+   result, and INVALID's raw elapsed time must never surface as a
+   completion time. Regression tests for that fix.
+   ============================================================ */
+console.log('\nINCOMPLETE/INVALID correctness fix (calcResults):');
+
+test('calcResults: INCOMPLETE with few recorded errors does NOT show a fictitious independentCorrect', () => {
+    // Simulates the real bug: an administration aborted after only a
+    // handful of stimuli, with just 1 substitution recorded so far —
+    // the old formula would have reported independentCorrect = 19/20,
+    // implying near-perfect performance on a run that never finished.
+    const admin = RAN.createAdministration(baseInput({
+        status: RAN.STATUS.INCOMPLETE, incompleteReason: RAN.INCOMPLETE_REASON.CHILD_STOPPED_PARTICIPATING,
+        durationMs: 6100, substitutions: 1,
+    }));
+    assert.strictEqual(admin.independentCorrect, 19, 'the raw stored field is unaffected — schema/derivation unchanged');
+    const results = RAN.calcResults(admin);
+    assert.strictEqual(results.independentCorrect, null, 'calcResults must withhold the misleading derived count for INCOMPLETE');
+});
+
+test('calcResults: INCOMPLETE never gets an independentNamingRate', () => {
+    const admin = RAN.createAdministration(baseInput({
+        status: RAN.STATUS.INCOMPLETE, incompleteReason: RAN.INCOMPLETE_REASON.CHILD_STOPPED_PARTICIPATING,
+        durationMs: 6100, substitutions: 1,
+    }));
+    const results = RAN.calcResults(admin);
+    assert.strictEqual(results.independentNamingRate, null);
+    assert.strictEqual(results.rateEligible, false, 'not rate/comparison/graph eligible — every eligibility check in the UI keys off this same flag');
+});
+
+test('calcResults: INCOMPLETE never reports completionTimeSec, but exposes the same raw elapsed time separately as interruptedAtTimeSec', () => {
+    const admin = RAN.createAdministration(baseInput({
+        status: RAN.STATUS.INCOMPLETE, incompleteReason: RAN.INCOMPLETE_REASON.SERIAL_PROCEDURE_LOST,
+        durationMs: 6100,
+    }));
+    const results = RAN.calcResults(admin);
+    assert.strictEqual(results.completionTimeSec, null, 'must never be presented as a completion time');
+    assert.strictEqual(results.interruptedAtTimeSec, 6.1, 'the real observed elapsed time is preserved under its own distinct name');
+});
+
+test('calcResults: INCOMPLETE with no recorded durationMs gets interruptedAtTimeSec null too (nothing to show)', () => {
+    const admin = RAN.createAdministration(baseInput({
+        status: RAN.STATUS.INCOMPLETE, incompleteReason: RAN.INCOMPLETE_REASON.TECHNICAL_ISSUE,
+    }));
+    const results = RAN.calcResults(admin);
+    assert.strictEqual(results.interruptedAtTimeSec, null);
+});
+
+test('calcResults: INVALID never reports completionTimeSec (no raw elapsed time as a performance result)', () => {
+    const admin = RAN.createAdministration(baseInput({
+        status: RAN.STATUS.INVALID, invalidReason: RAN.INVALID_REASON.ACCIDENTAL_TIMER_STOP,
+        durationMs: 6100, substitutions: 1,
+    }));
+    const results = RAN.calcResults(admin);
+    assert.strictEqual(results.completionTimeSec, null);
+    assert.strictEqual(admin.durationMs, 6100, 'the raw duration remains stored internally as audit data — only the presentation layer withholds it');
+});
+
+test('calcResults: INVALID also never reports interruptedAtTimeSec (that label is INCOMPLETE-only)', () => {
+    const admin = RAN.createAdministration(baseInput({
+        status: RAN.STATUS.INVALID, invalidReason: RAN.INVALID_REASON.TECHNICAL_MALFUNCTION,
+        durationMs: 6100,
+    }));
+    const results = RAN.calcResults(admin);
+    assert.strictEqual(results.interruptedAtTimeSec, null);
+});
+
+test('calcResults: INVALID never reports independentCorrect', () => {
+    const admin = RAN.createAdministration(baseInput({
+        status: RAN.STATUS.INVALID, invalidReason: RAN.INVALID_REASON.WRONG_FORM_SHOWN,
+        substitutions: 1,
+    }));
+    const results = RAN.calcResults(admin);
+    assert.strictEqual(results.independentCorrect, null);
+});
+
+test('calcResults: INVALID is not rate/comparison/graph eligible', () => {
+    const admin = RAN.createAdministration(baseInput({
+        status: RAN.STATUS.INVALID, invalidReason: RAN.INVALID_REASON.OTHER_PROCEDURAL_DEVIATION,
+        durationMs: 6100,
+    }));
+    const results = RAN.calcResults(admin);
+    assert.strictEqual(results.rateEligible, false);
+});
+
+test('calcResults: COMPLETED behavior is completely unchanged by the INCOMPLETE/INVALID fix', () => {
+    const admin = RAN.createAdministration(baseInput({ durationMs: 18420, substitutions: 1 }));
+    const results = RAN.calcResults(admin);
+    assert.strictEqual(results.completionTimeSec, 18.42);
+    assert.strictEqual(results.independentCorrect, 19);
+    assert.strictEqual(results.interruptedAtTimeSec, null, 'interruptedAtTimeSec is INCOMPLETE-only, never populated for COMPLETED');
+    assert.strictEqual(results.rateEligible, true);
+    assert.notStrictEqual(results.independentNamingRate, null);
+});
+
+test('calcResults: COMPLETED_FLAGGED behavior is completely unchanged by the INCOMPLETE/INVALID fix', () => {
+    const admin = RAN.createAdministration(baseInput({
+        status: RAN.STATUS.COMPLETED_FLAGGED, durationMs: 20000, substitutions: 2, sequenceLoss: true,
+    }));
+    const results = RAN.calcResults(admin);
+    assert.strictEqual(results.completionTimeSec, 20);
+    assert.strictEqual(results.independentCorrect, 18);
+    assert.strictEqual(results.interruptedAtTimeSec, null);
+    assert.strictEqual(results.rateEligible, true);
+    assert.notStrictEqual(results.independentNamingRate, null);
+});
+
+/* ============================================================
    LONGITUDINAL COMPARISON — spec §51, corrected formula
    percentChange = ((currentMs - previousMs) / previousMs) * 100
    negative = faster (less time), positive = slower (more time)
@@ -651,6 +803,204 @@ test('calcTimeDifference does not use the old absoluteDiffSec/percentChangeAsSpe
     const diff = RAN.calcTimeDifference(20000, 17000);
     assert.ok(!('absoluteDiffSec' in diff));
     assert.ok(!('percentChangeAsSpecFormula' in diff));
+});
+
+/* ============================================================
+   VERSIONING (V2) — new semi-random Forms A/B, added ALONGSIDE the
+   frozen V1 definitions (never mutated in place). V1's own Form A/B
+   exact-sequence tests above already guarantee it stays byte-for-byte
+   unchanged; this block covers what's new: the V2 forms themselves,
+   and that a fresh administration built against a V1 ID still
+   validates/imports correctly (backward compatibility).
+   ============================================================ */
+console.log('\nVersioning (V2):');
+
+test('V1 definitions remain byte-for-byte unchanged (spot check against the locked V1 arrays)', () => {
+    const d1 = RAN.getDefinition('RAN_DIGITS_V1');
+    assert.deepStrictEqual(d1.forms.A, [
+        ['2', '5', '1', '4', '3'], ['4', '2', '5', '3', '1'], ['3', '1', '4', '5', '2'], ['5', '3', '2', '1', '4'],
+    ]);
+    assert.deepStrictEqual(d1.forms.B, [
+        ['3', '1', '5', '2', '4'], ['5', '4', '2', '1', '3'], ['2', '5', '3', '4', '1'], ['4', '2', '1', '3', '5'],
+    ]);
+    assert.strictEqual(d1.version, 1);
+    assert.ok(Object.isFrozen(d1) && Object.isFrozen(d1.forms) && Object.isFrozen(d1.forms.A), 'V1 definitions stay deep-frozen');
+});
+
+['RAN_DIGITS_V2', 'RAN_COLORS_V2', 'RAN_OBJECTS_V2'].forEach(id => {
+    test(`${id} exists with version 2, same stimuli/itemsPerStimulus/layout as its V1 counterpart`, () => {
+        const v2 = RAN.getDefinition(id);
+        const v1 = RAN.getDefinition(id.replace('_V2', '_V1'));
+        assert.strictEqual(v2.version, 2);
+        assert.deepStrictEqual(v2.stimuli, v1.stimuli);
+        assert.strictEqual(v2.itemsPerStimulus, v1.itemsPerStimulus);
+        assert.deepStrictEqual(v2.layout, v1.layout);
+        assert.strictEqual(v2.totalStimuli, v1.totalStimuli);
+    });
+
+    ['A', 'B'].forEach(form => {
+        test(`${id} Form ${form}: 20 items, each stimulus exactly 4×, no adjacent duplicate (incl. row boundaries)`, () => {
+            const def = RAN.getDefinition(id);
+            const flat = RAN.flattenForm(def, form);
+            assert.strictEqual(flat.length, 20);
+            const counts = {};
+            flat.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
+            def.stimuli.forEach(s => assert.strictEqual(counts[s], 4, `stimulus ${s} should appear 4 times`));
+            for (let i = 1; i < flat.length; i++) {
+                assert.notStrictEqual(flat[i], flat[i - 1], `adjacent duplicate "${flat[i]}" at position ${i}`);
+            }
+        });
+    });
+
+    test(`${id}: Form B is not a rotation, reversal, or fixed relabeling of Form A`, () => {
+        const def = RAN.getDefinition(id);
+        const a = RAN.flattenForm(def, 'A');
+        const b = RAN.flattenForm(def, 'B');
+        const isRotation = Array.from({ length: a.length }, (_, shift) => shift)
+            .some(shift => a.every((v, i) => v === b[(i + shift) % b.length]));
+        assert.ok(!isRotation, 'Form B must not be a rotation of Form A');
+        assert.notDeepStrictEqual(a, b.slice().reverse(), 'Form B must not be a reversal of Form A');
+        const map = {};
+        let isFixedRelabeling = true;
+        for (let i = 0; i < a.length; i++) {
+            if (map[a[i]] === undefined) map[a[i]] = b[i];
+            else if (map[a[i]] !== b[i]) { isFixedRelabeling = false; break; }
+        }
+        assert.ok(!isFixedRelabeling, 'Form B must not be a fixed 1:1 relabeling of Form A');
+    });
+});
+
+test('RAN.validateAllDefinitions() reports V1 AND V2 definitions as valid together', () => {
+    const result = RAN.validateAllDefinitions();
+    assert.strictEqual(result.valid, true, JSON.stringify(result.problems));
+    assert.strictEqual(Object.keys(RAN.definitions).length, 6, 'exactly 3 V1 + 3 V2 definitions registered');
+});
+
+test('a fresh administration built against a V1 assessmentId still validates correctly (backward compatibility)', () => {
+    const admin = RAN.createAdministration(baseInput({
+        assessmentId: 'RAN_DIGITS_V1', assessmentVersion: 1, durationMs: 15000,
+    }));
+    const problems = RAN.validateAdministration(admin);
+    assert.deepStrictEqual(problems, [], 'a V1 administration must keep validating with zero problems');
+});
+
+test('a fresh administration built against a V2 assessmentId validates correctly, with its own version', () => {
+    const admin = RAN.createAdministration(baseInput({
+        assessmentId: 'RAN_DIGITS_V2', assessmentVersion: 2, durationMs: 15000,
+    }));
+    const problems = RAN.validateAdministration(admin);
+    assert.deepStrictEqual(problems, []);
+    assert.strictEqual(admin.assessmentVersion, 2);
+});
+
+test('V1 and V2 administrations for the same type are never mixed: assessmentId<->assessmentVersion stays 1:1', () => {
+    // This is the exact invariant the History/comparison/graph code in
+    // ran_ui.js relies on: rows filtered by ONE fixed assessmentId can
+    // never carry a foreign assessmentVersion, so a naive numeric
+    // longitudinal comparison across versions is structurally
+    // impossible, not just policy.
+    Object.keys(RAN.definitions).forEach(id => {
+        assert.strictEqual(RAN.definitions[id].id, id);
+        // Every definition's own version matches what RAN.createAdministration
+        // would derive/require for that exact id — verified via createAdministration's
+        // own assessmentVersion-mismatch guard.
+        assert.throws(
+            () => RAN.createAdministration(baseInput({ assessmentId: id, assessmentVersion: 999 })),
+            /does not match/,
+            `${id}: a mismatched assessmentVersion must be rejected`
+        );
+    });
+});
+
+/* ============================================================
+   GRADE — strict-write/tolerant-read metadata (RAN.GRADE,
+   RAN.isValidGrade). Purely contextual: never read by scoring, so no
+   test here touches calcResults/comparison/graph eligibility.
+   ============================================================ */
+console.log('\nGrade (RAN.GRADE / RAN.isValidGrade):');
+
+test('RAN.GRADE contains the 10 school grades (item 7: + Νηπιαγωγείο/Προδημοτική, + Γ΄ Γυμνασίου) plus the explicit OTHER_UNSPECIFIED choice', () => {
+    const values = Object.values(RAN.GRADE);
+    assert.strictEqual(values.length, 11);
+    assert.ok(values.includes('OTHER_UNSPECIFIED'));
+    assert.ok(values.includes('NIPIAGOGEIO'));
+    assert.ok(values.includes('G_GYMNASIOU'));
+});
+
+test('RAN.isValidGrade: null (nothing chosen) is valid', () => {
+    assert.strictEqual(RAN.isValidGrade(null), true);
+});
+
+test('RAN.isValidGrade: every real RAN.GRADE value is valid', () => {
+    Object.values(RAN.GRADE).forEach(g => assert.strictEqual(RAN.isValidGrade(g), true, g));
+});
+
+test('RAN.isValidGrade: an unrecognized/corrupt value is invalid (strict-write gate)', () => {
+    assert.strictEqual(RAN.isValidGrade('NOT_A_REAL_GRADE'), false);
+    assert.strictEqual(RAN.isValidGrade(undefined), false);
+    assert.strictEqual(RAN.isValidGrade(''), false);
+});
+
+test('createAdministration fills gradeAtAdministration, defaulting to null (not known at creation time)', () => {
+    const admin = RAN.createAdministration(baseInput());
+    assert.ok('gradeAtAdministration' in admin);
+    assert.strictEqual(admin.gradeAtAdministration, null);
+});
+
+test('createAdministration honors an explicitly-passed gradeAtAdministration', () => {
+    const admin = RAN.createAdministration(baseInput({ gradeAtAdministration: RAN.GRADE.G_DIMOTIKOU }));
+    assert.strictEqual(admin.gradeAtAdministration, RAN.GRADE.G_DIMOTIKOU);
+});
+
+test('RAN.validateAdministration does NOT reject an unrecognized gradeAtAdministration (tolerant read for legacy/imported data)', () => {
+    const admin = RAN.createAdministration(baseInput({ durationMs: 15000 }));
+    admin.gradeAtAdministration = 'SOME_LEGACY_UNRECOGNIZED_VALUE';
+    const problems = RAN.validateAdministration(admin);
+    assert.deepStrictEqual(problems, [], 'grade validity is intentionally NOT part of the shared validateAdministration gate — see RAN.isValidGrade for the separate strict-write guard used by the live save path');
+});
+
+/* ============================================================
+   ITEM 16 — familiarityRetriesUsed at the createAdministration/
+   validateAdministration level (ran_timed.js's own forwarding is
+   covered separately in tests/ran_timed.test.js).
+   ============================================================ */
+console.log('\nItem 16 — familiarityRetriesUsed (createAdministration/validateAdministration):');
+
+test('createAdministration defaults familiarityRetriesUsed to null when not supplied', () => {
+    const admin = RAN.createAdministration(baseInput());
+    assert.ok('familiarityRetriesUsed' in admin);
+    assert.strictEqual(admin.familiarityRetriesUsed, null);
+});
+
+[0, 1, 4].forEach(n => {
+    test(`createAdministration honors an explicitly-passed familiarityRetriesUsed=${n}`, () => {
+        const admin = RAN.createAdministration(baseInput({ familiarityRetriesUsed: n }));
+        assert.strictEqual(admin.familiarityRetriesUsed, n);
+    });
+});
+
+test('familiarityRetriesUsed never influences scoring/status: two administrations differing only in it are otherwise identical', () => {
+    const a = RAN.createAdministration(baseInput({ durationMs: 12000, substitutions: 2, familiarityRetriesUsed: 0 }));
+    const b = RAN.createAdministration(baseInput({ durationMs: 12000, substitutions: 2, familiarityRetriesUsed: 4 }));
+    assert.strictEqual(a.status, b.status);
+    assert.strictEqual(a.independentCorrect, b.independentCorrect);
+    const ra = RAN.calcResults(a), rb = RAN.calcResults(b);
+    assert.strictEqual(ra.rateEligible, rb.rateEligible);
+    assert.strictEqual(ra.independentNamingRate, rb.independentNamingRate);
+});
+
+test('RAN.validateAdministration accepts familiarityRetriesUsed 0/1/multiple, rejects negative/non-integer, tolerates a missing field', () => {
+    [0, 1, 6].forEach(n => {
+        const admin = RAN.createAdministration(baseInput({ durationMs: 10000, familiarityRetriesUsed: n }));
+        assert.deepStrictEqual(RAN.validateAdministration(admin), []);
+    });
+    const negative = RAN.createAdministration(baseInput({ durationMs: 10000 }));
+    negative.familiarityRetriesUsed = -2;
+    assert.ok(RAN.validateAdministration(negative).some(p => p.includes('familiarityRetriesUsed')));
+
+    const legacy = RAN.createAdministration(baseInput({ durationMs: 10000 }));
+    delete legacy.familiarityRetriesUsed; // simulates a pre-item-16 stored record
+    assert.deepStrictEqual(RAN.validateAdministration(legacy), [], 'a legacy record missing this field entirely must still validate cleanly');
 });
 
 /* ============================================================ */

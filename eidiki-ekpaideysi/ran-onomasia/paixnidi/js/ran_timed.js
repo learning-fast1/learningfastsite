@@ -97,6 +97,16 @@
                 examinerRedirects: input.examinerRedirects || 0,
                 examinerProvidedAnswers: input.examinerProvidedAnswers || 0,
                 sequenceLoss: !!input.sequenceLoss,
+                // Post-trial correction (item 15): forwarded verbatim —
+                // the caller (ran_ui.js renderTimedErrorCapture) is the
+                // one place that compares reviewed-vs-live values and
+                // decides this boolean; this function never re-derives
+                // it and never looks at "the live value" itself.
+                examinerReviewAdjusted: !!input.examinerReviewAdjusted,
+                // Item 16: forwarded verbatim from the caller (ran_ui.js
+                // reads it off session.familiarity.retriesUsed) — this
+                // function never touches RAN.preparation state itself.
+                familiarityRetriesUsed: input.familiarityRetriesUsed != null ? input.familiarityRetriesUsed : null,
                 familiarityPassed: true,
                 practicePassed: true,
                 notes: input.notes || '',
@@ -148,6 +158,12 @@
                 examinerRedirects: input.examinerRedirects || 0,
                 examinerProvidedAnswers: input.examinerProvidedAnswers || 0,
                 sequenceLoss: !!input.sequenceLoss,
+                // Item 16: same forwarding as buildCompletedAdministration
+                // — an aborted (INCOMPLETE/INVALID) run still went through
+                // Familiarity/Practice first (this function is only ever
+                // reachable post-READY_FOR_TIMED_ASSESSMENT), so the same
+                // context is just as meaningful here.
+                familiarityRetriesUsed: input.familiarityRetriesUsed != null ? input.familiarityRetriesUsed : null,
                 familiarityPassed: true,
                 practicePassed: true,
                 notes: input.notes || '',

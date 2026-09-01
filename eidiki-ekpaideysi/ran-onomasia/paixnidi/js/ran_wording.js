@@ -49,12 +49,35 @@
             // instructions' own no-speed-wording rule.
             practiceInstruction: 'Ονόμασε τις εικόνες με τη σειρά, από αριστερά προς τα δεξιά.',
         },
-        // Wording correction pass: re-worded to plain, non-technical
-        // user-facing text (previous heading/message retired). Reason
-        // stays purely procedural — no diagnostic/causal language.
+        // V2 (new semi-random Forms A/B) reuses the exact same locked
+        // instructions as its V1 counterpart — the array randomization
+        // pass changed ONLY the stimulus sequences (ran_definitions.js),
+        // never the instruction wording, which is per assessment TYPE,
+        // not per version.
+        RAN_DIGITS_V2: {
+            familiarityInstruction: 'Πες μου ποιος είναι κάθε αριθμός.',
+            practiceInstruction: 'Τώρα θα δεις τους αριθμούς σε σειρές. Ξεκίνα από εδώ και πες τους έναν-έναν, πηγαίνοντας από αριστερά προς τα δεξιά. Όταν τελειώσεις την πρώτη σειρά, συνέχισε από την αρχή της επόμενης.',
+        },
+        RAN_COLORS_V2: {
+            familiarityInstruction: 'Πες μου τι χρώμα είναι το καθένα.',
+            practiceInstruction: 'Τώρα θα δεις τα χρώματα σε σειρές. Ξεκίνα από εδώ και πες τα ένα-ένα, πηγαίνοντας από αριστερά προς τα δεξιά. Όταν τελειώσεις την πρώτη σειρά, συνέχισε από την αρχή της επόμενης.',
+        },
+        RAN_OBJECTS_V2: {
+            familiarityInstruction: 'Πες μου τι βλέπεις σε κάθε εικόνα.',
+            practiceInstruction: 'Ονόμασε τις εικόνες με τη σειρά, από αριστερά προς τα δεξιά.',
+        },
+        // Familiarity gate wording correction (item 16, locked): re-
+        // worded to the examiner-facing text explicitly specified for
+        // this pass. Reason stays purely procedural — no diagnostic/
+        // causal language, same as every prior wording pass on this
+        // string. The underlying gate mechanism itself (finalizeFamiliarityCheck
+        // -> PREPARATION_FAILED whenever any stimulus isn't Known) was
+        // NOT changed here — it already existed exactly as requested;
+        // only this presentation text and the two action button labels
+        // in renderPreparationFailed were updated to match.
         familiarityFailed: {
             heading: 'Η εξοικείωση δεν ολοκληρώθηκε επιτυχώς.',
-            message: 'Το παιδί παρουσίασε δυσκολία στην κατονομασία ενός ή περισσότερων ερεθισμάτων. Η χρονομετρούμενη δοκιμασία δεν πραγματοποιήθηκε.',
+            message: 'Ένα ή περισσότερα ερεθίσματα δεν κατονομάστηκαν με επάρκεια κατά τον έλεγχο εξοικείωσης. Η RAN προϋποθέτει ήδη γνωστά ερεθίσματα.',
         },
         // Locked in the Phase 2 correction pass (previously PROVISIONAL).
         // Deliberately procedural only — no causal wording (attention,
@@ -170,38 +193,134 @@
      * choice not explicitly covered by the instruction, flagged in the
      * Phase 5 report.
      */
-    // A/B longitudinal policy (locked): shown INSTEAD of a numerical
-    // comparison whenever the two most recent rate-eligible same-
-    // version administrations used different forms (A vs B) — never a
-    // fallback to an older same-form pair. Deliberately does not claim
-    // or imply that Form A and Form B ARE (or aren't) equivalent —
-    // only states the factual reason no number is shown.
-    wording.timeComparisonFormMismatch = 'Δεν εμφανίζεται συγκριτική μεταβολή, επειδή οι δύο πιο πρόσφατες χορηγήσεις πραγματοποιήθηκαν με διαφορετική μορφή (Α/Β).';
-
     // A/B longitudinal policy (locked): shown once below every
     // longitudinal graph that mixes Form A/B points. Purely factual —
     // never says or implies the forms are equivalent/interchangeable,
     // and never tells the examiner what to do with that fact.
     wording.graphFormEquivalenceNote = 'Κάθε σημείο του γραφήματος επισημαίνει τη Μορφή (Α/Β) που χορηγήθηκε. Οι Μορφές Α και Β δεν έχουν τεκμηριωμένη ψυχομετρική ισοδυναμία.';
 
-    // Results/History presentation pass (locked): a single neutral,
-    // descriptive sentence — no "ταχύτερη/βραδύτερη" framing (that read
-    // as an implicit value judgement) and Greek comma decimals to match
-    // the rest of the app's number formatting (ran_ui.js's fmtNum()).
-    // comparisonNote is the mandatory disclaimer shown immediately below
-    // it, every time a comparison is shown — same locked text always.
-    wording.formatTimeComparison = function (deltaSec, percentChange) {
-        function fmtComma(n) { return Math.abs(n).toFixed(2).replace('.', ','); }
-        function signOf(n) { return n > 0 ? '+' : (n < 0 ? '-' : ''); }
+    /* ============================================================
+       PASS 2 — numeric comparison wording (locked exact pair rule).
+       Comparison is evaluated ONLY between the two chronologically
+       LAST administrations of one assessment type + version — never a
+       backward search for an older eligible/same-form pair (see
+       ran_ui.js's classifyComparisonPair()). Exactly one of the
+       functions/strings below is shown, depending on why (or whether)
+       a number can be shown; never more than one at once.
+       ============================================================ */
 
-        const comparisonLine = (deltaSec === 0 && percentChange === 0)
-            ? 'Χωρίς μεταβολή χρόνου μεταξύ των δύο τελευταίων συγκρίσιμων χορηγήσεων.'
-            : 'Μεταβολή χρόνου μεταξύ των δύο τελευταίων συγκρίσιμων χορηγήσεων: '
-                + signOf(deltaSec) + fmtComma(deltaSec) + ' sec ('
-                + signOf(percentChange) + fmtComma(percentChange) + '%)';
-        const comparisonNote = 'Η μεταβολή είναι περιγραφική και δεν αποτελεί από μόνη της ένδειξη βελτίωσης ή επιδείνωσης.';
+    // Percentage change is intentionally never rendered anywhere in the
+    // UI (PASS 2 decision) — RAN.calcTimeDifference() in ran_engine.js
+    // still computes percentChange internally (removing it there would
+    // be an unrelated engine change, not requested), this module simply
+    // never surfaces it. Only the signed absolute difference is shown,
+    // and never characterized as improvement/decline/progress.
+    wording.formatTimeComparison = function (deltaSec) {
+        function fmtComma(n) { return Math.abs(n).toFixed(2).replace('.', ','); }
+        function signOf(n) { return n > 0 ? '+' : (n < 0 ? '−' : ''); }
+
+        const comparisonLine = deltaSec === 0
+            ? 'Καμία διαφορά χρόνου από την προηγούμενη χορήγηση.'
+            : `Διαφορά χρόνου από την προηγούμενη χορήγηση: ${signOf(deltaSec)}${fmtComma(deltaSec)} sec`;
+        const comparisonNote = 'Περιγραφική διαφορά μεταξύ δύο χορηγήσεων. Δεν αποτελεί από μόνη της ένδειξη βελτίωσης ή επιδείνωσης.';
         return { comparisonLine, comparisonNote };
     };
+
+    // Shown directly above a valid numeric comparison, so the examiner
+    // never has to infer which version/form pair produced the number.
+    wording.comparisonHeader = function (form) {
+        return `Σύγκριση ίδιας έκδοσης και μορφής: Μορφή ${form} → Μορφή ${form}`;
+    };
+
+    // The three reasons a numeric comparison is withheld even though
+    // there ARE two administrations to compare — each states the exact
+    // reason, never a generic "no comparison available".
+    wording.comparisonBlockedFlagged = 'Δεν εμφανίζεται αριθμητική σύγκριση επειδή μία ή περισσότερες από τις δύο τελευταίες χορηγήσεις φέρουν διαδικαστική επισήμανση.';
+    wording.comparisonFormMismatch = function (previousForm, currentForm) {
+        return `Δεν εμφανίζεται αριθμητική σύγκριση επειδή οι δύο τελευταίες χορηγήσεις χρησιμοποιούν διαφορετική μορφή (Μορφή ${previousForm} → Μορφή ${currentForm}).`;
+    };
+    wording.comparisonBlockedIneligibleStatus = 'Δεν εμφανίζεται αριθμητική σύγκριση επειδή οι δύο τελευταίες χορηγήσεις δεν πληρούν τα κριτήρια αριθμητικής σύγκρισης.';
+
+    // PASS 2 §7 — shown once per type/version visualization when >=2
+    // graph-eligible administrations share the same calendar day.
+    // Deliberately no causal claim, no minimum-retest-interval rule.
+    wording.sameDayWarning = 'Πολλαπλές χορηγήσεις πραγματοποιήθηκαν την ίδια ημέρα. Η επαναλαμβανόμενη έκθεση στη διαδικασία μπορεί να επηρεάσει την επίδοση· οι διαφορές χρειάζονται ιδιαίτερα προσεκτική ερμηνεία.';
+
+    // PASS 2 §10 — shown exactly once, at the top of Profile History
+    // (never repeated per assessment type section).
+    wording.crossTypeWarning = 'Τα αποτελέσματα διαφορετικών τύπων RAN δεν συγκρίνονται αριθμητικά μεταξύ τους.';
+
+    // PASS 2 §12 — shown per type/version when exactly 1 graph-eligible
+    // administration exists (COMPLETED_FLAGGED counts toward this too).
+    wording.insufficientGraphDataMessage = 'Η οπτικοποίηση εμφανίζεται όταν υπάρχουν τουλάχιστον 2 επιλέξιμες χορηγήσεις του ίδιου τύπου και της ίδιας έκδοσης εργαλείου.';
+
+    // PASS 2 §9 — graph section intro, replacing the old "εξέλιξη"
+    // framing (which read as implying a trend/trajectory rather than a
+    // plain record of observations).
+    wording.graphIntro = 'Οπτικοποίηση καταγεγραμμένων χορηγήσεων. Το γράφημα περιλαμβάνει επιλέξιμες ολοκληρωμένες χορηγήσεις. Οι χορηγήσεις με διαδικαστική επισήμανση εμφανίζονται με διαφορετικό σύμβολο.';
+
+    // Grade proposal — display labels only. Purely contextual metadata
+    // presentation; grade is never read by scoring/norms/cut-offs/risk
+    // classification/comparison/graph eligibility anywhere in this
+    // codebase (see RAN.GRADE's own note in ran_engine.js).
+    wording.gradeLabels = {
+        [RAN.GRADE.NIPIAGOGEIO]: 'Νηπιαγωγείο / Προδημοτική',
+        [RAN.GRADE.A_DIMOTIKOU]: 'Α΄ Δημοτικού',
+        [RAN.GRADE.B_DIMOTIKOU]: 'Β΄ Δημοτικού',
+        [RAN.GRADE.G_DIMOTIKOU]: 'Γ΄ Δημοτικού',
+        [RAN.GRADE.D_DIMOTIKOU]: 'Δ΄ Δημοτικού',
+        [RAN.GRADE.E_DIMOTIKOU]: 'Ε΄ Δημοτικού',
+        [RAN.GRADE.ST_DIMOTIKOU]: 'ΣΤ΄ Δημοτικού',
+        [RAN.GRADE.A_GYMNASIOU]: 'Α΄ Γυμνασίου',
+        [RAN.GRADE.B_GYMNASIOU]: 'Β΄ Γυμνασίου',
+        [RAN.GRADE.G_GYMNASIOU]: 'Γ΄ Γυμνασίου',
+        // The one EXPLICIT examiner choice — never used as a fallback
+        // for an absent/unknown/corrupt value (that's unknownGradeLabel
+        // below, via resolveGradeLabel). Keeping these two visually and
+        // semantically distinct is a locked requirement, not a detail.
+        [RAN.GRADE.OTHER_UNSPECIFIED]: 'Άλλο / Μη προσδιορισμένο',
+    };
+
+    // Tolerant-read fallback — shown for: no grade set (null/undefined),
+    // and any legacy/imported/corrupt value that isn't a real RAN.GRADE
+    // member. Deliberately NEVER "Άλλο/Μη προσδιορισμένο" — that label
+    // is reserved for OTHER_UNSPECIFIED, an explicit examiner choice,
+    // not an absence of data (grade data-flow correction).
+    wording.unknownGradeLabel = 'Μη διαθέσιμη τάξη';
+
+    /** Resolves a stored profile.grade / administration.
+     * gradeAtAdministration value to its display label. The ONLY place
+     * that reads gradeLabels with a fallback, so an unknown/corrupt
+     * value can never leak as raw enum text, and can never silently
+     * become "Άλλο/Μη προσδιορισμένο" (grade data-flow correction —
+     * tolerant reading must stay distinguishable from an explicit
+     * OTHER_UNSPECIFIED choice). */
+    wording.resolveGradeLabel = function (grade) {
+        if (grade === null || grade === undefined) return wording.unknownGradeLabel;
+        return wording.gradeLabels[grade] || wording.unknownGradeLabel;
+    };
+
+    // Item 16 (audit/context metadata) — display resolver for
+    // administration.familiarityRetriesUsed, same tolerant-fallback
+    // shape as resolveGradeLabel/resolveHistoryStatusLabel above.
+    // Deliberately distinguishes an EXPLICIT 0 (we know no re-check was
+    // needed) from anything else not a real non-negative integer
+    // (legacy record predating this field, or corrupt/imported data) —
+    // the latter must read as "not recorded", never silently as 0,
+    // since we genuinely don't know what happened for those records.
+    wording.resolveFamiliarityRetriesLabel = function (value) {
+        if (typeof value !== 'number' || !Number.isInteger(value) || value < 0) return 'Δεν καταγράφηκε';
+        if (value === 0) return 'Όχι';
+        return 'Ναι (' + value + ' ' + (value === 1 ? 'επανέλεγχος' : 'επανέλεγχοι') + ')';
+    };
+
+    // Item 26 — Colors-only examiner-facing reminder, shown in
+    // Familiarity (never child-facing, never framed as a diagnostic
+    // statement). Deliberately does not name/describe any specific
+    // color-vision condition, does not offer screening or risk
+    // classification — it only points back at the existing Familiarity
+    // gate (Γνωστό/Δυσκολία) as the real procedural safeguard.
+    wording.colorVisionReminder = 'Πριν συνεχίσετε, επιβεβαιώστε ότι το παιδί διακρίνει και κατονομάζει με συνέπεια όλα τα χρώματα. Γνωστή ή πιθανή δυσκολία χρωματικής αντίληψης μπορεί να επηρεάσει την επίδοση.';
 
     RAN.wording = RAN.deepFreeze(wording);
 

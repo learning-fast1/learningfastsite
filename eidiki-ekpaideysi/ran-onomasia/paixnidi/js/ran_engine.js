@@ -56,6 +56,46 @@
         OTHER: 'OTHER',
     });
 
+    /** Grade/context metadata enum (spec: grade proposal). Purely
+     * contextual — never read by scoring, norms, cut-offs, risk
+     * classification, comparison eligibility, or graph eligibility
+     * anywhere in this codebase. OTHER_UNSPECIFIED is an EXPLICIT
+     * examiner choice ("Άλλο/Μη προσδιορισμένο") and must stay
+     * distinct from an absent/unknown/corrupt value — see
+     * RAN.isValidGrade and RAN.wording.resolveGradeLabel, which never
+     * coerce one into the other. */
+    RAN.GRADE = RAN.deepFreeze({
+        // Item 7: additive-only expansion (two new members, everything
+        // else byte-for-byte unchanged) — existing keys/values keep
+        // their exact string identity, so legacy stored profile.grade/
+        // gradeAtAdministration values remain valid RAN.GRADE members
+        // and RAN.isValidGrade below needs no change at all (it already
+        // just checks membership in Object.values(RAN.GRADE)).
+        NIPIAGOGEIO: 'NIPIAGOGEIO',
+        A_DIMOTIKOU: 'A_DIMOTIKOU',
+        B_DIMOTIKOU: 'B_DIMOTIKOU',
+        G_DIMOTIKOU: 'G_DIMOTIKOU',
+        D_DIMOTIKOU: 'D_DIMOTIKOU',
+        E_DIMOTIKOU: 'E_DIMOTIKOU',
+        ST_DIMOTIKOU: 'ST_DIMOTIKOU',
+        A_GYMNASIOU: 'A_GYMNASIOU',
+        B_GYMNASIOU: 'B_GYMNASIOU',
+        G_GYMNASIOU: 'G_GYMNASIOU',
+        OTHER_UNSPECIFIED: 'OTHER_UNSPECIFIED',
+    });
+
+    /** Strict-write gate for NEW/live-written grade data (profile.grade
+     * and administration.gradeAtAdministration): valid only as `null`
+     * (nothing chosen) or a real RAN.GRADE value. Deliberately NOT
+     * used by RAN.validateAdministration (the shared gate import also
+     * goes through) — that stays fully tolerant of any legacy/unknown
+     * grade value, per the strict-write/tolerant-read split. Only the
+     * live write paths (RAN.storage.createProfile/updateProfileGrade/
+     * saveAdministration) call this. */
+    RAN.isValidGrade = function (value) {
+        return value === null || Object.values(RAN.GRADE).includes(value);
+    };
+
     /** Statuses for which a naming-rate result may be calculated and
      * shown (spec §46: INVALID/INCOMPLETE must not get a normal
      * naming-rate comparison; PREPARATION_FAILED never reached a timed
@@ -252,6 +292,48 @@
             sequenceLoss: !!input.sequenceLoss,
             familiarityPassed: input.familiarityPassed != null ? !!input.familiarityPassed : null,
             practicePassed: input.practicePassed != null ? !!input.practicePassed : null,
+            // Grade proposal: not known yet at record-creation time (no
+            // profile has been chosen — that happens later, on the
+            // Results save screen). Always present as an explicit field
+            // (never silently missing), defaulting to null here; the
+            // UI/save-flow is responsible for overwriting it with the
+            // examiner's explicit choice before RAN.storage.
+            // saveAdministration is called (see ran_ui.js
+            // renderSaveSection) — this function never reads
+            // profile.grade itself.
+            gradeAtAdministration: input.gradeAtAdministration !== undefined ? input.gradeAtAdministration : null,
+            // Post-trial correction (item 15, locked): additive-only
+            // audit marker — true iff the examiner changed at least one
+            // of sequenceLoss/examinerRedirects/examinerProvidedAnswers
+            // during the post-timing error-capture/review stage,
+            // compared to what was live-recorded during timedRunning.
+            // Never a free-text log — a single boolean is the entire
+            // audit trail requested. durationMs/stimulusSequence are
+            // never touched by this review step (set independently,
+            // earlier, from the live timer/definition) — this field
+            // only ever describes substitutions/omissions/repetitions/
+            // selfCorrections/examinerRedirects/examinerProvidedAnswers/
+            // sequenceLoss review, never time or sequence data.
+            examinerReviewAdjusted: input.examinerReviewAdjusted != null ? !!input.examinerReviewAdjusted : false,
+            // Item 16 (audit/context metadata, additive-only): how many
+            // FAMILIARITY_NOT_ESTABLISHED re-checks preceded this
+            // administration (RAN.preparation session.familiarity.
+            // retriesUsed, forwarded verbatim by ran_timed.js). Always a
+            // real number (>=0) for anything built through the live
+            // flow — null here only covers a caller that genuinely
+            // doesn't know (never happens today, but matches the same
+            // "never silently missing, explicit null when unknown"
+            // convention as gradeAtAdministration). Distinct from a
+            // LEGACY stored record that predates this field entirely —
+            // that case never goes through this function at all (it's
+            // loaded directly from storage), so it keeps whatever
+            // shape it already has (the field simply absent), which is
+            // exactly what lets the tolerant-read side (wording.
+            // resolveFamiliarityRetriesLabel) tell "explicitly 0" apart
+            // from "not recorded". Purely descriptive — never read by
+            // scoring, status derivation, comparison/graph eligibility,
+            // or any risk classification anywhere in this codebase.
+            familiarityRetriesUsed: input.familiarityRetriesUsed != null ? input.familiarityRetriesUsed : null,
             status: input.status,
             preparationFailureReason: input.preparationFailureReason || null,
             invalidReason: input.invalidReason || null,
@@ -266,7 +348,7 @@
      * treatment instead of five near-duplicate checks. */
     const NON_NEGATIVE_INTEGER_FIELDS = [
         'totalStimuli', 'substitutions', 'omissions', 'repetitions', 'selfCorrections', 'examinerRedirects',
-        'examinerProvidedAnswers',
+        'examinerProvidedAnswers', 'familiarityRetriesUsed',
     ];
 
     function isNonNegativeInteger(value) {
@@ -327,6 +409,10 @@
                 problems.push(`Field "${field}" must be a non-negative integer, got ${JSON.stringify(admin[field])}`);
             }
         });
+
+        if (admin.examinerReviewAdjusted !== undefined && typeof admin.examinerReviewAdjusted !== 'boolean') {
+            problems.push(`Field "examinerReviewAdjusted" must be a boolean, got ${JSON.stringify(admin.examinerReviewAdjusted)}`);
+        }
 
         const hasCountFields = isNonNegativeInteger(admin.totalStimuli)
             && isNonNegativeInteger(admin.substitutions)
@@ -441,12 +527,42 @@
      * the Results screen (Phase 4) — just the numbers, with
      * independentNamingRate forced to null for any status not eligible
      * for a rate.
+     *
+     * INCOMPLETE/INVALID correctness fix: `independentCorrect` is a
+     * derived snapshot computed at record-creation time as
+     * totalStimuli - substitutions - omissions - examinerProvidedAnswers
+     * (see RAN.deriveIndependentCorrect). That arithmetic assumes every
+     * one of the `totalStimuli` items was actually reached/attempted —
+     * true for a COMPLETED/COMPLETED_FLAGGED run, but NOT true for an
+     * aborted one, where stimuli never reached would otherwise be
+     * silently counted as "independently correct". So this function
+     * only surfaces `independentCorrect` (and, unchanged from before,
+     * `independentNamingRate`) when `eligible` — i.e. exactly
+     * COMPLETED/COMPLETED_FLAGGED, same set as RATE_ELIGIBLE_STATUSES.
+     * `admin.independentCorrect` itself is NOT changed/deleted — the
+     * raw stored field is untouched (schema/storage unaffected); only
+     * this descriptive/presentation layer stops surfacing it as a
+     * performance result for a non-eligible status.
+     *
+     * `completionTimeSec` similarly now only reflects a genuine
+     * completion time (COMPLETED/COMPLETED_FLAGGED) — for any other
+     * status it's null, since raw elapsed time is not a "time to
+     * complete" for a run that was never completed. INCOMPLETE keeps
+     * its own separate, distinctly-named `interruptedAtTimeSec` (still
+     * derived from the same stored admin.durationMs — real observed
+     * data, not discarded) for the Results/History screens to label
+     * "Χρόνος μέχρι τη διακοπή", never "Χρόνος ολοκλήρωσης". INVALID
+     * gets neither — no elapsed-time figure is surfaced as a
+     * performance result at all (admin.durationMs itself remains
+     * stored, untouched, as raw audit data).
      */
     RAN.calcResults = function (admin) {
         const eligible = RATE_ELIGIBLE_STATUSES.includes(admin.status);
+        const isIncomplete = admin.status === RAN.STATUS.INCOMPLETE;
         return {
-            completionTimeSec: admin.durationMs != null ? admin.durationMs / 1000 : null,
-            independentCorrect: admin.independentCorrect,
+            completionTimeSec: eligible && admin.durationMs != null ? admin.durationMs / 1000 : null,
+            interruptedAtTimeSec: isIncomplete && admin.durationMs != null ? admin.durationMs / 1000 : null,
+            independentCorrect: eligible ? admin.independentCorrect : null,
             totalStimuli: admin.totalStimuli,
             substitutions: admin.substitutions,
             omissions: admin.omissions,
@@ -459,6 +575,10 @@
             // that's excluded from those formulas.
             examinerProvidedAnswers: admin.examinerProvidedAnswers,
             sequenceLoss: admin.sequenceLoss,
+            // Post-trial correction (item 15): pure passthrough, same as
+            // the other raw fields above — purely descriptive, never
+            // itself part of the rate/eligibility math.
+            examinerReviewAdjusted: !!admin.examinerReviewAdjusted,
             independentNamingRate: eligible ? RAN.calcIndependentNamingRate(admin.independentCorrect, admin.durationMs) : null,
             rateEligible: eligible,
         };

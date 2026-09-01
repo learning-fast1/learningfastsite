@@ -158,10 +158,119 @@
         },
     };
 
+    /* ----------------------------------------------------------
+       V2 definitions — new semi-random Forms A/B (approved candidate
+       arrays, audited for: exact 4x occurrences per stimulus, zero
+       adjacent duplicates including row boundaries, zero repeated
+       2/3/4-item chunks, Form A and Form B independently generated
+       (not a rotation/reversal/fixed relabeling of one another). Same
+       stimulus sets, itemsPerStimulus, totalStimuli and layout as V1
+       — ONLY the sequence arrangement changed. V1 definitions above
+       are left completely untouched: they remain a separate, frozen,
+       independently addressable set of IDs so every administration
+       ever performed under V1 keeps validating/importing against the
+       exact sequence it was actually shown (RAN.validateAdministration
+       re-derives stimulusSequence from definition+form — mutating a
+       version's sequence in place would silently break every
+       historical record under that ID, which is exactly what
+       introducing a new version ID avoids).
+       ---------------------------------------------------------- */
+    const RAN_DIGITS_V2 = {
+        id: 'RAN_DIGITS_V2',
+        type: 'digits',
+        version: 2,
+        label: 'Αριθμοί',
+        stimuli: ['1', '2', '3', '4', '5'],
+        itemsPerStimulus: 4,
+        totalStimuli: 20,
+        layout: { rows: 4, columns: 5 },
+        forms: {
+            A: [
+                ['5', '2', '1', '5', '1'],
+                ['3', '1', '4', '3', '2'],
+                ['3', '4', '1', '2', '5'],
+                ['4', '2', '4', '5', '3'],
+            ],
+            B: [
+                ['5', '3', '1', '5', '2'],
+                ['5', '4', '5', '1', '2'],
+                ['4', '3', '2', '1', '3'],
+                ['4', '1', '4', '2', '3'],
+            ],
+        },
+    };
+
+    const RAN_COLORS_V2 = {
+        id: 'RAN_COLORS_V2',
+        type: 'colors',
+        version: 2,
+        label: 'Χρώματα',
+        stimuli: ['RED', 'BLUE', 'GREEN', 'YELLOW', 'BLACK'],
+        stimulusLabels: {
+            RED: 'κόκκινο',
+            BLUE: 'μπλε',
+            GREEN: 'πράσινο',
+            YELLOW: 'κίτρινο',
+            BLACK: 'μαύρο',
+        },
+        itemsPerStimulus: 4,
+        totalStimuli: 20,
+        layout: { rows: 4, columns: 5 },
+        forms: {
+            A: [
+                ['BLACK', 'YELLOW', 'RED', 'BLACK', 'BLUE'],
+                ['YELLOW', 'GREEN', 'BLUE', 'BLACK', 'GREEN'],
+                ['RED', 'BLUE', 'RED', 'GREEN', 'YELLOW'],
+                ['BLUE', 'GREEN', 'BLACK', 'RED', 'YELLOW'],
+            ],
+            B: [
+                ['BLUE', 'BLACK', 'RED', 'BLUE', 'YELLOW'],
+                ['RED', 'BLACK', 'GREEN', 'YELLOW', 'BLACK'],
+                ['BLUE', 'RED', 'YELLOW', 'GREEN', 'BLACK'],
+                ['YELLOW', 'BLUE', 'GREEN', 'RED', 'GREEN'],
+            ],
+        },
+    };
+
+    const RAN_OBJECTS_V2 = {
+        id: 'RAN_OBJECTS_V2',
+        type: 'objects',
+        version: 2,
+        label: 'Αντικείμενα',
+        stimuli: ['apple', 'hen', 'vase', 'gift', 'ball'],
+        stimulusLabels: {
+            apple: 'μήλο',
+            hen: 'κότα',
+            vase: 'βάζο',
+            gift: 'δώρο',
+            ball: 'μπάλα',
+        },
+        itemsPerStimulus: 4,
+        totalStimuli: 20,
+        layout: { rows: 4, columns: 5 },
+        forms: {
+            A: [
+                ['gift', 'hen', 'apple', 'vase', 'ball'],
+                ['apple', 'gift', 'vase', 'gift', 'ball'],
+                ['hen', 'vase', 'hen', 'ball', 'apple'],
+                ['hen', 'gift', 'apple', 'ball', 'vase'],
+            ],
+            B: [
+                ['ball', 'hen', 'gift', 'ball', 'apple'],
+                ['vase', 'gift', 'hen', 'vase', 'apple'],
+                ['hen', 'apple', 'gift', 'apple', 'ball'],
+                ['vase', 'ball', 'gift', 'vase', 'hen'],
+            ],
+        },
+    };
+
     RAN.definitions = {
         RAN_DIGITS_V1: deepFreeze(RAN_DIGITS_V1),
         RAN_COLORS_V1: deepFreeze(RAN_COLORS_V1),
         RAN_OBJECTS_V1: deepFreeze(RAN_OBJECTS_V1),
+        RAN_DIGITS_V2: deepFreeze(RAN_DIGITS_V2),
+        RAN_COLORS_V2: deepFreeze(RAN_COLORS_V2),
+        RAN_OBJECTS_V2: deepFreeze(RAN_OBJECTS_V2),
     };
     deepFreeze(RAN.definitions);
 
@@ -169,11 +278,13 @@
      * future code ask "give me the current Digits assessment" without
      * hardcoding a version number, while still keeping every version
      * ever administered individually addressable by its own fixed ID
-     * (spec §12). */
+     * (spec §12). Bumped to V2: every NEW administration now uses the
+     * V2 semi-random arrays; V1 stays fully addressable/valid for
+     * every administration performed under it before this switch. */
     RAN.CURRENT_VERSIONS = deepFreeze({
-        digits: 'RAN_DIGITS_V1',
-        colors: 'RAN_COLORS_V1',
-        objects: 'RAN_OBJECTS_V1',
+        digits: 'RAN_DIGITS_V2',
+        colors: 'RAN_COLORS_V2',
+        objects: 'RAN_OBJECTS_V2',
     });
 
     /** Looks up a definition by its fixed ID. Throws rather than

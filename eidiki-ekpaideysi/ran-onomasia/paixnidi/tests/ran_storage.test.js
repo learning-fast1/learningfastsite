@@ -173,6 +173,126 @@ test('listAdministrations filters strictly to the given profile', () => {
     assert.ok(RAN.storage.listAdministrations(p1.profileId).every(a => a.studentId === p1.profileId));
 });
 
+console.log('\nItem 23 — deleteAdministration:');
+
+test('deleteAdministration removes exactly one administration by id, leaving others untouched', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile();
+    const a1 = RAN.storage.saveAdministration(profile.profileId, completedAdmin({ form: 'A' })).administration;
+    const a2 = RAN.storage.saveAdministration(profile.profileId, completedAdmin({ form: 'B' })).administration;
+    const result = RAN.storage.deleteAdministration(a1.administrationId);
+    assert.strictEqual(result.deleted, true);
+    const remaining = RAN.storage.listAllAdministrations();
+    assert.strictEqual(remaining.length, 1);
+    assert.strictEqual(remaining[0].administrationId, a2.administrationId);
+});
+
+test('deleteAdministration on an unknown id returns {deleted:false} without throwing and without changing storage', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile();
+    RAN.storage.saveAdministration(profile.profileId, completedAdmin());
+    const before = RAN.storage.listAllAdministrations().length;
+    const result = RAN.storage.deleteAdministration('ran_does_not_exist_1');
+    assert.strictEqual(result.deleted, false);
+    assert.ok(result.problems.length > 0);
+    assert.strictEqual(RAN.storage.listAllAdministrations().length, before, 'nothing was removed');
+});
+
+test('deleteAdministration is reflected immediately by listAdministrations/listAllAdministrations (no separate refresh step needed)', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile();
+    const admin = RAN.storage.saveAdministration(profile.profileId, completedAdmin()).administration;
+    assert.strictEqual(RAN.storage.listAdministrations(profile.profileId).length, 1);
+    RAN.storage.deleteAdministration(admin.administrationId);
+    assert.strictEqual(RAN.storage.listAdministrations(profile.profileId).length, 0, 'derived live from storage — deletion is visible on the very next read');
+});
+
+test('deleting one administration never removes its profile or any other administration of the same profile', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile('Stays');
+    const a1 = RAN.storage.saveAdministration(profile.profileId, completedAdmin({ form: 'A' })).administration;
+    RAN.storage.saveAdministration(profile.profileId, completedAdmin({ form: 'B' }));
+    RAN.storage.deleteAdministration(a1.administrationId);
+    assert.strictEqual(RAN.storage.getProfile(profile.profileId).displayLabel, 'Stays', 'profile itself untouched');
+    assert.strictEqual(RAN.storage.listAdministrations(profile.profileId).length, 1, 'the other administration survives');
+});
+
+console.log('\nItem 23 — deleteProfile (cascade):');
+
+test('deleteProfile removes the profile AND every administration referencing it, returns the correct count', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile('To Delete');
+    RAN.storage.saveAdministration(profile.profileId, completedAdmin({ form: 'A' }));
+    RAN.storage.saveAdministration(profile.profileId, completedAdmin({ form: 'B' }));
+    RAN.storage.saveAdministration(profile.profileId, completedAdmin({ assessmentId: 'RAN_COLORS_V1' }));
+    const result = RAN.storage.deleteProfile(profile.profileId);
+    assert.strictEqual(result.deleted, true);
+    assert.strictEqual(result.deletedAdministrationsCount, 3);
+    assert.strictEqual(RAN.storage.getProfile(profile.profileId), null, 'profile itself is gone');
+    assert.strictEqual(RAN.storage.listAllAdministrations().length, 0, 'no orphan administrations left behind');
+});
+
+test('deleteProfile with zero administrations still deletes the profile cleanly, count 0', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile('Empty');
+    const result = RAN.storage.deleteProfile(profile.profileId);
+    assert.strictEqual(result.deleted, true);
+    assert.strictEqual(result.deletedAdministrationsCount, 0);
+    assert.strictEqual(RAN.storage.getProfile(profile.profileId), null);
+});
+
+test('deleteProfile never touches a DIFFERENT profile or its administrations', () => {
+    RAN.storage.configure(mockStorage());
+    const doomed = RAN.storage.createProfile('Doomed');
+    const safe = RAN.storage.createProfile('Safe');
+    RAN.storage.saveAdministration(doomed.profileId, completedAdmin());
+    RAN.storage.saveAdministration(safe.profileId, completedAdmin());
+    RAN.storage.saveAdministration(safe.profileId, completedAdmin({ form: 'B' }));
+    RAN.storage.deleteProfile(doomed.profileId);
+    assert.strictEqual(RAN.storage.getProfile(safe.profileId).displayLabel, 'Safe', 'the other profile survives untouched');
+    assert.strictEqual(RAN.storage.listAdministrations(safe.profileId).length, 2, 'its administrations survive untouched');
+    assert.strictEqual(RAN.storage.listAllAdministrations().length, 2, 'only the doomed profile\'s administration is gone');
+});
+
+test('deleteProfile on an unknown profileId returns {deleted:false} without throwing and without changing storage', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile();
+    RAN.storage.saveAdministration(profile.profileId, completedAdmin());
+    const result = RAN.storage.deleteProfile('profile_does_not_exist');
+    assert.strictEqual(result.deleted, false);
+    assert.ok(result.problems.length > 0);
+    assert.strictEqual(RAN.storage.listProfiles().length, 1, 'nothing removed');
+    assert.strictEqual(RAN.storage.listAllAdministrations().length, 1, 'nothing removed');
+});
+
+test('exportAll after deleteProfile never includes the deleted profile or its administrations', () => {
+    RAN.storage.configure(mockStorage());
+    const doomed = RAN.storage.createProfile('Doomed');
+    RAN.storage.saveAdministration(doomed.profileId, completedAdmin());
+    const safe = RAN.storage.createProfile('Safe');
+    RAN.storage.saveAdministration(safe.profileId, completedAdmin());
+    RAN.storage.deleteProfile(doomed.profileId);
+    const dump = RAN.storage.exportAll();
+    assert.strictEqual(dump.profiles.length, 1);
+    assert.strictEqual(dump.profiles[0].profileId, safe.profileId);
+    assert.strictEqual(dump.administrations.length, 1);
+    assert.strictEqual(dump.administrations[0].studentId, safe.profileId);
+});
+
+test('importAll still rejects an orphan administration after deleteProfile exists in the codebase (integrity regression check)', () => {
+    // Not a deleteProfile call itself — confirms the pre-existing
+    // orphan-rejection invariant (the very one deleteProfile's cascade
+    // design is meant to never violate) still holds unmodified.
+    RAN.storage.configure(mockStorage());
+    const admin = Object.assign({}, completedAdmin(), { studentId: 'profile_never_existed', administrationId: 'ran_orphan_after_delete_1' });
+    const report = RAN.storage.importAll({
+        formatVersion: 1, exportedAt: new Date().toISOString(),
+        profiles: [], administrations: [admin],
+    });
+    assert.strictEqual(report.skippedAdministrations.length, 1);
+    assert.ok(report.skippedAdministrations[0].reason.includes('profileId'));
+});
+
 console.log('\nExport / Import:');
 
 test('exportAll returns the locked shape with formatVersion/exportedAt/profiles/administrations', () => {
@@ -344,6 +464,110 @@ test('importAll migrates an old-shaped exported administration before validating
     const stored = RAN.storage.listAllAdministrations()[0];
     assert.strictEqual(stored.independentCorrect, 19);
     assert.ok(!('initialCorrect' in stored));
+});
+
+console.log('\nGrade — strict write / tolerant read:');
+
+test('createProfile stores an optional grade; defaults to null when omitted', () => {
+    RAN.storage.configure(mockStorage());
+    const withGrade = RAN.storage.createProfile('A', RAN.GRADE.G_DIMOTIKOU);
+    assert.strictEqual(withGrade.grade, RAN.GRADE.G_DIMOTIKOU);
+    const withoutGrade = RAN.storage.createProfile('B');
+    assert.strictEqual(withoutGrade.grade, null);
+});
+
+test('createProfile throws on an invalid grade value (strict write — never silently coerced/dropped)', () => {
+    RAN.storage.configure(mockStorage());
+    assert.throws(() => RAN.storage.createProfile('X', 'NOT_A_REAL_GRADE'));
+});
+
+test('updateProfileGrade updates profile.grade; throws on an invalid value; throws on an unknown profileId', () => {
+    RAN.storage.configure(mockStorage());
+    const p = RAN.storage.createProfile('A', RAN.GRADE.A_DIMOTIKOU);
+    const updated = RAN.storage.updateProfileGrade(p.profileId, RAN.GRADE.B_DIMOTIKOU);
+    assert.strictEqual(updated.grade, RAN.GRADE.B_DIMOTIKOU);
+    assert.strictEqual(RAN.storage.getProfile(p.profileId).grade, RAN.GRADE.B_DIMOTIKOU);
+    assert.throws(() => RAN.storage.updateProfileGrade(p.profileId, 'GARBAGE'));
+    assert.throws(() => RAN.storage.updateProfileGrade('profile_does_not_exist', RAN.GRADE.A_DIMOTIKOU));
+});
+
+test('saveAdministration persists an explicit gradeAtAdministration verbatim — never inferred/defaulted from profile.grade', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile('A', RAN.GRADE.A_DIMOTIKOU);
+    const admin = completedAdmin();
+    admin.gradeAtAdministration = RAN.GRADE.G_DIMOTIKOU; // deliberately differs from profile.grade
+    const result = RAN.storage.saveAdministration(profile.profileId, admin);
+    assert.strictEqual(result.saved, true, JSON.stringify(result.problems));
+    assert.strictEqual(result.administration.gradeAtAdministration, RAN.GRADE.G_DIMOTIKOU, 'the explicit value is kept exactly as given, not silently replaced by profile.grade (A_DIMOTIKOU)');
+});
+
+test('saveAdministration rejects an invalid gradeAtAdministration instead of silently dropping/defaulting it', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile('A');
+    const admin = completedAdmin();
+    admin.gradeAtAdministration = 'NOT_A_REAL_GRADE';
+    const result = RAN.storage.saveAdministration(profile.profileId, admin);
+    assert.strictEqual(result.saved, false);
+    assert.strictEqual(RAN.storage.listAllAdministrations().length, 0);
+});
+
+test('saveAdministration accepts a null/absent gradeAtAdministration (examiner left it unset)', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile('A');
+    const result = RAN.storage.saveAdministration(profile.profileId, completedAdmin());
+    assert.strictEqual(result.saved, true, JSON.stringify(result.problems));
+    assert.strictEqual(result.administration.gradeAtAdministration, null);
+});
+
+test('grade snapshot immutability: changing profile.grade afterwards never alters an already-saved gradeAtAdministration', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile('A', RAN.GRADE.A_DIMOTIKOU);
+    const admin = completedAdmin();
+    admin.gradeAtAdministration = RAN.GRADE.A_DIMOTIKOU;
+    const saved = RAN.storage.saveAdministration(profile.profileId, admin);
+    RAN.storage.updateProfileGrade(profile.profileId, RAN.GRADE.ST_DIMOTIKOU);
+    const stored = RAN.storage.listAdministrations(profile.profileId).find(a => a.administrationId === saved.administration.administrationId);
+    assert.strictEqual(stored.gradeAtAdministration, RAN.GRADE.A_DIMOTIKOU, 'snapshot unchanged');
+    assert.strictEqual(RAN.storage.getProfile(profile.profileId).grade, RAN.GRADE.ST_DIMOTIKOU, 'profile.grade itself did change');
+});
+
+test('export/import round-trip preserves both profile.grade and gradeAtAdministration exactly', () => {
+    RAN.storage.configure(mockStorage());
+    const profile = RAN.storage.createProfile('A', RAN.GRADE.D_DIMOTIKOU);
+    const admin = completedAdmin();
+    admin.gradeAtAdministration = RAN.GRADE.E_DIMOTIKOU;
+    const saved = RAN.storage.saveAdministration(profile.profileId, admin);
+    const dump = RAN.storage.exportAll();
+
+    RAN.storage.configure(mockStorage());
+    const report = RAN.storage.importAll(dump);
+    assert.strictEqual(report.importedProfiles.length, 1);
+    assert.strictEqual(report.importedAdministrations.length, 1);
+    assert.strictEqual(RAN.storage.getProfile(profile.profileId).grade, RAN.GRADE.D_DIMOTIKOU);
+    const imported = RAN.storage.listAllAdministrations().find(a => a.administrationId === saved.administration.administrationId);
+    assert.strictEqual(imported.gradeAtAdministration, RAN.GRADE.E_DIMOTIKOU);
+});
+
+test('importAll allowlist includes grade — a profile record with an unrecognized legacy grade still imports (tolerant read)', () => {
+    RAN.storage.configure(mockStorage());
+    const report = RAN.storage.importAll({
+        formatVersion: 1, exportedAt: new Date().toISOString(),
+        profiles: [{ profileId: 'profile_legacy_1', displayLabel: 'Legacy', createdAt: new Date().toISOString(), grade: 'SOME_OLD_UNRECOGNIZED_CODE' }],
+        administrations: [],
+    });
+    assert.strictEqual(report.importedProfiles.length, 1);
+    assert.strictEqual(RAN.storage.getProfile('profile_legacy_1').grade, 'SOME_OLD_UNRECOGNIZED_CODE', 'raw value preserved as-is, not rejected/rewritten');
+});
+
+test('importAll allowlist: a profile record with NO grade field at all (pre-grade export) imports with grade: null', () => {
+    RAN.storage.configure(mockStorage());
+    const report = RAN.storage.importAll({
+        formatVersion: 1, exportedAt: new Date().toISOString(),
+        profiles: [{ profileId: 'profile_pregrade_1', displayLabel: 'Pre-grade', createdAt: new Date().toISOString() }],
+        administrations: [],
+    });
+    assert.strictEqual(report.importedProfiles.length, 1);
+    assert.strictEqual(RAN.storage.getProfile('profile_pregrade_1').grade, null, 'never left undefined/silently dropped — an explicit null');
 });
 
 /* ============================================================ */

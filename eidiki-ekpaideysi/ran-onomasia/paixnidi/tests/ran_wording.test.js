@@ -80,11 +80,11 @@ test('Objects practice instruction no longer carries a speed/error-avoidance cla
     assert.ok(!text.includes('χωρίς να κάνεις λάθη'), 'practiceInstruction must not contain "χωρίς να κάνεις λάθη"');
 });
 
-test('Familiarity-failed message matches the corrected wording exactly (no internal enum text)', () => {
+test('Familiarity-failed message matches the item-16 corrected wording exactly (no internal enum text)', () => {
     assert.strictEqual(RAN.wording.familiarityFailed.heading, 'Η εξοικείωση δεν ολοκληρώθηκε επιτυχώς.');
     assert.strictEqual(
         RAN.wording.familiarityFailed.message,
-        'Το παιδί παρουσίασε δυσκολία στην κατονομασία ενός ή περισσότερων ερεθισμάτων. Η χρονομετρούμενη δοκιμασία δεν πραγματοποιήθηκε.'
+        'Ένα ή περισσότερα ερεθίσματα δεν κατονομάστηκαν με επάρκεια κατά τον έλεγχο εξοικείωσης. Η RAN προϋποθέτει ήδη γνωστά ερεθίσματα.'
     );
 });
 
@@ -200,6 +200,100 @@ test('resolveHistoryStatusLabel: unknown/corrupted/legacy status NEVER leaks the
     });
 });
 
+/* ============================================================
+   GRADE — resolveGradeLabel: same tolerant-fallback pattern as
+   resolveHistoryStatusLabel above, plus the one extra requirement the
+   grade data-flow correction locked in: an unknown/absent value must
+   NEVER resolve to the same label as the explicit OTHER_UNSPECIFIED
+   choice — those two stay visually and semantically distinct always.
+   ============================================================ */
+console.log('\nGrade labels (resolveGradeLabel):');
+
+test('gradeLabels has an entry for every RAN.GRADE value, none of which is empty/a raw enum echo', () => {
+    Object.values(RAN.GRADE).forEach(g => {
+        const label = RAN.wording.gradeLabels[g];
+        assert.ok(label, `gradeLabels[${g}] must not be empty`);
+        assert.notStrictEqual(label, g, `gradeLabels[${g}] must not just echo the raw enum value`);
+    });
+});
+
+test('resolveGradeLabel: known grade returns its gradeLabels entry', () => {
+    assert.strictEqual(RAN.wording.resolveGradeLabel(RAN.GRADE.G_DIMOTIKOU), RAN.wording.gradeLabels[RAN.GRADE.G_DIMOTIKOU]);
+    assert.strictEqual(RAN.wording.resolveGradeLabel(RAN.GRADE.OTHER_UNSPECIFIED), RAN.wording.gradeLabels[RAN.GRADE.OTHER_UNSPECIFIED]);
+});
+
+test('resolveGradeLabel: null/undefined/unknown/corrupt values fall back to the neutral unknownGradeLabel', () => {
+    const bogusGrades = ['SOME_FUTURE_GRADE', 'CORRUPTED_LEGACY_VALUE', '', null, undefined, 42];
+    bogusGrades.forEach(bogus => {
+        const label = RAN.wording.resolveGradeLabel(bogus);
+        assert.strictEqual(label, RAN.wording.unknownGradeLabel, `resolveGradeLabel(${JSON.stringify(bogus)}) must fall back to unknownGradeLabel`);
+    });
+});
+
+test('resolveGradeLabel: an unknown/absent grade is NEVER presented as OTHER_UNSPECIFIED (the two must stay distinct)', () => {
+    const otherUnspecifiedLabel = RAN.wording.resolveGradeLabel(RAN.GRADE.OTHER_UNSPECIFIED);
+    [null, undefined, 'SOME_LEGACY_CODE', ''].forEach(bogus => {
+        assert.notStrictEqual(RAN.wording.resolveGradeLabel(bogus), otherUnspecifiedLabel,
+            `resolveGradeLabel(${JSON.stringify(bogus)}) must not equal the explicit OTHER_UNSPECIFIED label`);
+    });
+    assert.notStrictEqual(RAN.wording.unknownGradeLabel, otherUnspecifiedLabel);
+});
+
+/* ============================================================
+   ITEM 16 — resolveFamiliarityRetriesLabel. Same tolerant-fallback
+   pattern as the two resolvers above, plus the specific distinction
+   the user locked: an EXPLICIT 0 ("we know no re-check was needed")
+   must read differently from "not recorded" (legacy/corrupt/absent) —
+   the latter must never silently display as 0.
+   ============================================================ */
+console.log('\nfamiliarityRetriesUsed labels (resolveFamiliarityRetriesLabel):');
+
+test('resolveFamiliarityRetriesLabel(0) -> "Όχι" (explicitly known: no re-check needed)', () => {
+    assert.strictEqual(RAN.wording.resolveFamiliarityRetriesLabel(0), 'Όχι');
+});
+
+test('resolveFamiliarityRetriesLabel(1) -> "Ναι (1 επανέλεγχος)" (singular)', () => {
+    assert.strictEqual(RAN.wording.resolveFamiliarityRetriesLabel(1), 'Ναι (1 επανέλεγχος)');
+});
+
+test('resolveFamiliarityRetriesLabel(2, 3, ...) -> "Ναι (N επανέλεγχοι)" (plural)', () => {
+    assert.strictEqual(RAN.wording.resolveFamiliarityRetriesLabel(2), 'Ναι (2 επανέλεγχοι)');
+    assert.strictEqual(RAN.wording.resolveFamiliarityRetriesLabel(3), 'Ναι (3 επανέλεγχοι)');
+    assert.strictEqual(RAN.wording.resolveFamiliarityRetriesLabel(7), 'Ναι (7 επανέλεγχοι)');
+});
+
+test('resolveFamiliarityRetriesLabel: legacy/missing/corrupt values -> "Δεν καταγράφηκε", NEVER silently 0', () => {
+    [null, undefined, -1, 1.5, 'zero', NaN].forEach(bogus => {
+        assert.strictEqual(RAN.wording.resolveFamiliarityRetriesLabel(bogus), 'Δεν καταγράφηκε',
+            `resolveFamiliarityRetriesLabel(${JSON.stringify(bogus)}) must resolve to "Δεν καταγράφηκε"`);
+    });
+});
+
+test('resolveFamiliarityRetriesLabel: "Δεν καταγράφηκε" (unknown) is distinct from "Όχι" (known zero) — never conflated', () => {
+    assert.notStrictEqual(RAN.wording.resolveFamiliarityRetriesLabel(undefined), RAN.wording.resolveFamiliarityRetriesLabel(0));
+});
+
+/* ============================================================
+   ITEM 26 — Colors examiner-facing color-vision reminder. Exact locked
+   text, and a content check that it stays a neutral reminder (never a
+   diagnostic/screening/risk-classification statement).
+   ============================================================ */
+console.log('\nItem 26 — colorVisionReminder:');
+
+test('colorVisionReminder matches the exact locked wording', () => {
+    assert.strictEqual(
+        RAN.wording.colorVisionReminder,
+        'Πριν συνεχίσετε, επιβεβαιώστε ότι το παιδί διακρίνει και κατονομάζει με συνέπεια όλα τα χρώματα. Γνωστή ή πιθανή δυσκολία χρωματικής αντίληψης μπορεί να επηρεάσει την επίδοση.'
+    );
+});
+
+test('colorVisionReminder names no specific condition/diagnosis and contains no risk/screening language', () => {
+    const text = RAN.wording.colorVisionReminder;
+    ['αχρωματοψία', 'δαλτωνισμός', 'διάγνωση', 'screening', 'κίνδυνος', 'διαταραχή'].forEach(term => {
+        assert.ok(!text.toLowerCase().includes(term.toLowerCase()), `must not contain "${term}"`);
+    });
+});
+
 test('unknownStatusLabel itself is a plain Greek sentence, not ALL_CAPS/enum-looking text', () => {
     const label = RAN.wording.unknownStatusLabel;
     assert.ok(!/^[A-Z0-9_]+$/.test(label), 'unknownStatusLabel must not look like a raw internal enum');
@@ -256,55 +350,113 @@ test('storageWarning never frames storage as cloud/account backup', () => {
 /* ============================================================
    TIME COMPARISON WORDING — locked in the Phase 5 kickoff.
    ============================================================ */
-console.log('\nTime comparison wording (locked, Phase 5):');
+console.log('\nTime comparison wording (PASS 2 — absolute difference only, no percentage):');
 
-// Results/History presentation pass: formatTimeComparison no longer
-// uses "ταχύτερη/βραδύτερη ολοκλήρωση" framing (read as an implicit
-// value judgement) — a single neutral sentence with signed sec/%, plus
-// a mandatory disclaimer note, both with Greek comma decimals.
-test('formatTimeComparison: faster (negative deltaSec) uses the locked neutral sentence with a leading minus sign', () => {
+// PASS 2: percentage change removed from user-facing wording entirely
+// — formatTimeComparison now takes only deltaSec and renders the
+// signed absolute difference, never a %.
+test('formatTimeComparison: faster (negative deltaSec) uses the locked absolute-difference sentence with a minus sign', () => {
     const diff = RAN.calcTimeDifference(20000, 17000); // 20.0s -> 17.0s
-    const out = RAN.wording.formatTimeComparison(diff.deltaSec, diff.percentChange);
-    assert.strictEqual(out.comparisonLine, 'Μεταβολή χρόνου μεταξύ των δύο τελευταίων συγκρίσιμων χορηγήσεων: -3,00 sec (-15,00%)');
+    const out = RAN.wording.formatTimeComparison(diff.deltaSec);
+    assert.strictEqual(out.comparisonLine, 'Διαφορά χρόνου από την προηγούμενη χορήγηση: −3,00 sec');
 });
 
-test('formatTimeComparison: slower (positive deltaSec) uses the locked neutral sentence with an explicit + sign', () => {
+test('formatTimeComparison: slower (positive deltaSec) uses the locked sentence with an explicit + sign', () => {
     const diff = RAN.calcTimeDifference(17000, 20000); // 17.0s -> 20.0s
-    const out = RAN.wording.formatTimeComparison(diff.deltaSec, diff.percentChange);
-    assert.strictEqual(out.comparisonLine, 'Μεταβολή χρόνου μεταξύ των δύο τελευταίων συγκρίσιμων χορηγήσεων: +3,00 sec (+17,65%)');
+    const out = RAN.wording.formatTimeComparison(diff.deltaSec);
+    assert.strictEqual(out.comparisonLine, 'Διαφορά χρόνου από την προηγούμενη χορήγηση: +3,00 sec');
 });
 
-test('formatTimeComparison: exact tie (deltaSec === 0 and percentChange === 0) uses a neutral no-change sentence', () => {
-    const out = RAN.wording.formatTimeComparison(0, 0);
-    assert.strictEqual(out.comparisonLine, 'Χωρίς μεταβολή χρόνου μεταξύ των δύο τελευταίων συγκρίσιμων χορηγήσεων.');
+test('formatTimeComparison: exact tie (deltaSec === 0) uses a neutral no-difference sentence', () => {
+    const out = RAN.wording.formatTimeComparison(0);
+    assert.strictEqual(out.comparisonLine, 'Καμία διαφορά χρόνου από την προηγούμενη χορήγηση.');
+});
+
+test('formatTimeComparison never renders a percentage anywhere in its output', () => {
+    [RAN.wording.formatTimeComparison(-3), RAN.wording.formatTimeComparison(3), RAN.wording.formatTimeComparison(0)].forEach(out => {
+        assert.ok(!out.comparisonLine.includes('%'), 'comparisonLine must never contain a % sign');
+        assert.ok(!out.comparisonNote.includes('%'), 'comparisonNote must never contain a % sign');
+    });
 });
 
 test('formatTimeComparison always returns the locked mandatory disclaimer note, verbatim, for every input', () => {
-    const NOTE = 'Η μεταβολή είναι περιγραφική και δεν αποτελεί από μόνη της ένδειξη βελτίωσης ή επιδείνωσης.';
+    const NOTE = 'Περιγραφική διαφορά μεταξύ δύο χορηγήσεων. Δεν αποτελεί από μόνη της ένδειξη βελτίωσης ή επιδείνωσης.';
     [
-        RAN.wording.formatTimeComparison(-3, -15),
-        RAN.wording.formatTimeComparison(3, 17.65),
-        RAN.wording.formatTimeComparison(0, 0),
+        RAN.wording.formatTimeComparison(-3),
+        RAN.wording.formatTimeComparison(3),
+        RAN.wording.formatTimeComparison(0),
     ].forEach(out => assert.strictEqual(out.comparisonNote, NOTE));
 });
 
-test('formatTimeComparison never uses forbidden interpretive wording', () => {
+test('formatTimeComparison never uses forbidden interpretive wording (βελτίωση/επιδείνωση/πρόοδος/εξέλιξη as an assertion)', () => {
     // Note: "βελτίωση"/"επιδείνωση" legitimately appear INSIDE the
     // mandatory disclaimer itself ("δεν αποτελεί... ένδειξη βελτίωσης ή
     // επιδείνωσης") — that's the disclaimer explicitly denying an
-    // interpretation, not asserting one, so those two words are not
-    // checked here. What's actually forbidden: any wording that
-    // ASSERTS a judgement (clinical-sounding phrasing, or the old
-    // "ταχύτερη/βραδύτερη" framing this pass deliberately removed).
+    // interpretation, not asserting one. "πρόοδος"/"εξέλιξη" must never
+    // appear at all (PASS 2 explicit ban).
     const cases = [
-        RAN.wording.formatTimeComparison(-3, -15),
-        RAN.wording.formatTimeComparison(3, 17.65),
-        RAN.wording.formatTimeComparison(0, 0),
+        RAN.wording.formatTimeComparison(-3),
+        RAN.wording.formatTimeComparison(3),
+        RAN.wording.formatTimeComparison(0),
     ];
     const text = cases.map(c => c.comparisonLine + ' ' + c.comparisonNote).join(' ').toLowerCase();
-    ['σημαντική αλλαγή', 'κλινικά σημαντική', 'ταχύτερη', 'βραδύτερη'].forEach(forbidden => {
+    ['σημαντική αλλαγή', 'κλινικά σημαντική', 'ταχύτερη', 'βραδύτερη', 'πρόοδος', 'εξέλιξη'].forEach(forbidden => {
         assert.ok(!text.includes(forbidden), `must not contain "${forbidden}"`);
     });
+});
+
+console.log('\nComparison-blocked wording (PASS 2 exact-pair rule):');
+
+test('comparisonHeader states the same version/form comparison explicitly', () => {
+    assert.strictEqual(RAN.wording.comparisonHeader('A'), 'Σύγκριση ίδιας έκδοσης και μορφής: Μορφή A → Μορφή A');
+});
+
+test('comparisonBlockedFlagged is the exact locked message', () => {
+    assert.strictEqual(
+        RAN.wording.comparisonBlockedFlagged,
+        'Δεν εμφανίζεται αριθμητική σύγκριση επειδή μία ή περισσότερες από τις δύο τελευταίες χορηγήσεις φέρουν διαδικαστική επισήμανση.'
+    );
+});
+
+test('comparisonFormMismatch interpolates the actual forms in order', () => {
+    assert.strictEqual(
+        RAN.wording.comparisonFormMismatch('A', 'B'),
+        'Δεν εμφανίζεται αριθμητική σύγκριση επειδή οι δύο τελευταίες χορηγήσεις χρησιμοποιούν διαφορετική μορφή (Μορφή A → Μορφή B).'
+    );
+});
+
+test('comparisonBlockedIneligibleStatus is the exact locked message', () => {
+    assert.strictEqual(
+        RAN.wording.comparisonBlockedIneligibleStatus,
+        'Δεν εμφανίζεται αριθμητική σύγκριση επειδή οι δύο τελευταίες χορηγήσεις δεν πληρούν τα κριτήρια αριθμητικής σύγκρισης.'
+    );
+});
+
+test('sameDayWarning does not assert causality and contains no minimum-interval rule', () => {
+    const text = RAN.wording.sameDayWarning.toLowerCase();
+    assert.ok(text.includes('ίδια ημέρα'));
+    ['προκαλεί', 'εξαιτίας', 'λόγω κόπωσης', 'ελάχιστο διάστημα'].forEach(forbidden => {
+        assert.ok(!text.includes(forbidden), `must not contain "${forbidden}"`);
+    });
+});
+
+test('crossTypeWarning is the exact locked message', () => {
+    assert.strictEqual(RAN.wording.crossTypeWarning, 'Τα αποτελέσματα διαφορετικών τύπων RAN δεν συγκρίνονται αριθμητικά μεταξύ τους.');
+});
+
+test('insufficientGraphDataMessage is the exact locked message', () => {
+    assert.strictEqual(
+        RAN.wording.insufficientGraphDataMessage,
+        'Η οπτικοποίηση εμφανίζεται όταν υπάρχουν τουλάχιστον 2 επιλέξιμες χορηγήσεις του ίδιου τύπου και της ίδιας έκδοσης εργαλείου.'
+    );
+});
+
+test('graphIntro replaces the old "εξέλιξη" framing and matches the locked text', () => {
+    assert.ok(!RAN.wording.graphIntro.toLowerCase().includes('εξέλιξη'));
+    assert.strictEqual(
+        RAN.wording.graphIntro,
+        'Οπτικοποίηση καταγεγραμμένων χορηγήσεων. Το γράφημα περιλαμβάνει επιλέξιμες ολοκληρωμένες χορηγήσεις. Οι χορηγήσεις με διαδικαστική επισήμανση εμφανίζονται με διαφορετικό σύμβολο.'
+    );
 });
 
 /* ============================================================
@@ -315,13 +467,6 @@ test('formatTimeComparison never uses forbidden interpretive wording', () => {
    ============================================================ */
 console.log('\nA/B longitudinal policy wording (locked):');
 
-test('timeComparisonFormMismatch is the exact locked neutral message', () => {
-    assert.strictEqual(
-        RAN.wording.timeComparisonFormMismatch,
-        'Δεν εμφανίζεται συγκριτική μεταβολή, επειδή οι δύο πιο πρόσφατες χορηγήσεις πραγματοποιήθηκαν με διαφορετική μορφή (Α/Β).'
-    );
-});
-
 test('graphFormEquivalenceNote is the exact locked note', () => {
     assert.strictEqual(
         RAN.wording.graphFormEquivalenceNote,
@@ -330,7 +475,7 @@ test('graphFormEquivalenceNote is the exact locked note', () => {
 });
 
 test('A/B policy wording never claims or implies the forms ARE equivalent/interchangeable', () => {
-    const text = (RAN.wording.timeComparisonFormMismatch + ' ' + RAN.wording.graphFormEquivalenceNote).toLowerCase();
+    const text = (RAN.wording.comparisonFormMismatch('A', 'B') + ' ' + RAN.wording.graphFormEquivalenceNote).toLowerCase();
     // "ισοδυναμία" legitimately appears once, negated ("δεν έχουν...
     // ισοδυναμία") — that's stating the ABSENCE of documented
     // equivalence, the opposite of claiming it. What must never appear

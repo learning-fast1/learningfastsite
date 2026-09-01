@@ -347,6 +347,129 @@ test('buildAbortedAdministration: preserves familiarityPassed/practicePassed = t
     assert.strictEqual(administration.practicePassed, true);
 });
 
+/* ============================================================
+   POST-TRIAL CORRECTION (item 15) — examinerReviewAdjusted.
+   ran_ui.js renderTimedErrorCapture is the only caller that computes
+   this flag (by comparing the reviewed/final values against the
+   live-recorded `run.*` ones); buildCompletedAdministration itself
+   just forwards whatever boolean it's given, verbatim.
+   ============================================================ */
+console.log('\nPost-trial correction (examinerReviewAdjusted):');
+
+test('buildCompletedAdministration: examinerReviewAdjusted defaults to false when not supplied', () => {
+    const { administration } = RAN.timed.buildCompletedAdministration(baseCompletedInput());
+    assert.strictEqual(administration.examinerReviewAdjusted, false);
+});
+
+test('buildCompletedAdministration: examinerReviewAdjusted is forwarded verbatim when true', () => {
+    const { administration } = RAN.timed.buildCompletedAdministration(baseCompletedInput({ examinerReviewAdjusted: true }));
+    assert.strictEqual(administration.examinerReviewAdjusted, true);
+});
+
+test('examinerReviewAdjusted does not affect status derivation — only sequenceLoss/examinerRedirects/examinerProvidedAnswers do', () => {
+    // A reviewed-but-unchanged record (examinerReviewAdjusted: true, but
+    // zero procedural events) must still be plain COMPLETED, not
+    // COMPLETED_FLAGGED — the flag is purely a "was this reviewed and
+    // edited" marker, never itself a procedural event.
+    const { administration } = RAN.timed.buildCompletedAdministration(baseCompletedInput({
+        examinerReviewAdjusted: true, sequenceLoss: false,
+    }));
+    assert.strictEqual(administration.status, RAN.STATUS.COMPLETED);
+});
+
+test('examinerReviewAdjusted does not change durationMs/stimulusSequence/independentCorrect derivation', () => {
+    const unreviewed = RAN.timed.buildCompletedAdministration(baseCompletedInput({ substitutions: 2 })).administration;
+    const reviewed = RAN.timed.buildCompletedAdministration(baseCompletedInput({ substitutions: 2, examinerReviewAdjusted: true })).administration;
+    assert.strictEqual(reviewed.durationMs, unreviewed.durationMs);
+    assert.deepStrictEqual(reviewed.stimulusSequence, unreviewed.stimulusSequence);
+    assert.strictEqual(reviewed.independentCorrect, unreviewed.independentCorrect);
+});
+
+test('a corrected sequenceLoss/examinerRedirects/examinerProvidedAnswers value correctly flips status/flagging (recompute follows the FINAL value, not a live one)', () => {
+    // Simulates: live-recorded sequenceLoss=false, examiner corrects it
+    // to true during review — buildCompletedAdministration only ever
+    // sees the FINAL value (this module has no notion of "live" vs
+    // "reviewed" itself), so status must reflect the corrected input.
+    const { administration } = RAN.timed.buildCompletedAdministration(baseCompletedInput({
+        substitutions: 0, sequenceLoss: true, examinerReviewAdjusted: true,
+    }));
+    assert.strictEqual(administration.status, RAN.STATUS.COMPLETED_FLAGGED);
+    assert.strictEqual(administration.sequenceLoss, true);
+});
+
+test('RAN.validateAdministration rejects a non-boolean examinerReviewAdjusted', () => {
+    const { administration } = RAN.timed.buildCompletedAdministration(baseCompletedInput());
+    administration.examinerReviewAdjusted = 'yes';
+    const problems = RAN.validateAdministration(administration);
+    assert.ok(problems.some(p => p.includes('examinerReviewAdjusted')));
+});
+
+test('RAN.calcResults exposes examinerReviewAdjusted as a plain passthrough (never affects rateEligible/independentNamingRate)', () => {
+    const { administration } = RAN.timed.buildCompletedAdministration(baseCompletedInput({ examinerReviewAdjusted: true }));
+    const results = RAN.calcResults(administration);
+    assert.strictEqual(results.examinerReviewAdjusted, true);
+    assert.strictEqual(results.rateEligible, true);
+});
+
+/* ============================================================
+   ITEM 16 — familiarityRetriesUsed forwarding. ran_timed.js never
+   touches RAN.preparation state itself; it just forwards whatever
+   number (or null) the caller (ran_ui.js, reading session.familiarity.
+   retriesUsed) passes in.
+   ============================================================ */
+console.log('\nItem 16 — familiarityRetriesUsed forwarding:');
+
+test('buildCompletedAdministration: familiarityRetriesUsed defaults to null when not supplied', () => {
+    const { administration } = RAN.timed.buildCompletedAdministration(baseCompletedInput());
+    assert.strictEqual(administration.familiarityRetriesUsed, null);
+});
+
+[0, 1, 2, 5].forEach(n => {
+    test(`buildCompletedAdministration: familiarityRetriesUsed=${n} is forwarded verbatim`, () => {
+        const { administration } = RAN.timed.buildCompletedAdministration(baseCompletedInput({ familiarityRetriesUsed: n }));
+        assert.strictEqual(administration.familiarityRetriesUsed, n);
+    });
+});
+
+test('buildCompletedAdministration: familiarityRetriesUsed does not affect status/independentCorrect/durationMs derivation', () => {
+    const zero = RAN.timed.buildCompletedAdministration(baseCompletedInput({ substitutions: 1, familiarityRetriesUsed: 0 })).administration;
+    const three = RAN.timed.buildCompletedAdministration(baseCompletedInput({ substitutions: 1, familiarityRetriesUsed: 3 })).administration;
+    assert.strictEqual(zero.status, three.status);
+    assert.strictEqual(zero.independentCorrect, three.independentCorrect);
+    assert.strictEqual(zero.durationMs, three.durationMs);
+});
+
+test('buildAbortedAdministration: familiarityRetriesUsed is forwarded verbatim too (context survives an aborted run)', () => {
+    const { administration } = RAN.timed.buildAbortedAdministration({
+        studentId: 'stu01', assessmentId: 'RAN_DIGITS_V1', form: 'A',
+        reasonCategory: 'incomplete', reason: RAN.INCOMPLETE_REASON.CHILD_STOPPED_PARTICIPATING,
+        familiarityRetriesUsed: 2,
+    });
+    assert.strictEqual(administration.familiarityRetriesUsed, 2);
+});
+
+test('buildAbortedAdministration: familiarityRetriesUsed defaults to null when not supplied', () => {
+    const { administration } = RAN.timed.buildAbortedAdministration({
+        studentId: 'stu01', assessmentId: 'RAN_DIGITS_V1', form: 'A',
+        reasonCategory: 'invalid', reason: RAN.INVALID_REASON.TECHNICAL_MALFUNCTION,
+    });
+    assert.strictEqual(administration.familiarityRetriesUsed, null);
+});
+
+test('RAN.validateAdministration rejects a negative or non-integer familiarityRetriesUsed', () => {
+    const { administration } = RAN.timed.buildCompletedAdministration(baseCompletedInput());
+    administration.familiarityRetriesUsed = -1;
+    assert.ok(RAN.validateAdministration(administration).some(p => p.includes('familiarityRetriesUsed')));
+    administration.familiarityRetriesUsed = 1.5;
+    assert.ok(RAN.validateAdministration(administration).some(p => p.includes('familiarityRetriesUsed')));
+});
+
+test('RAN.validateAdministration tolerates a MISSING familiarityRetriesUsed (legacy record predating this field)', () => {
+    const { administration } = RAN.timed.buildCompletedAdministration(baseCompletedInput());
+    delete administration.familiarityRetriesUsed;
+    assert.deepStrictEqual(RAN.validateAdministration(administration), []);
+});
+
 /* ============================================================ */
 console.log(`\n${passed} passed, ${process.exitCode === 1 ? 'with failures above' : '0 failed'}`);
 if (process.exitCode !== 1) console.log('ALL TESTS PASSED');

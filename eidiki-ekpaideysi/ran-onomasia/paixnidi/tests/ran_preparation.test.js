@@ -118,6 +118,76 @@ ASSESSMENTS.forEach(assessmentId => {
         assert.strictEqual(s.state, RAN.PREP_STATE.PRACTICE);
     });
 
+    console.log('Item 16 — familiarityRetriesUsed audit counter:');
+
+    test(`[${assessmentId}] createSession starts familiarityRetriesUsed at 0 (no re-check happened yet)`, () => {
+        const s = P.createSession(assessmentId);
+        assert.strictEqual(s.familiarity.retriesUsed, 0);
+    });
+
+    test(`[${assessmentId}] a clean pass (all Known first try) never increments familiarityRetriesUsed — stays 0`, () => {
+        let s = passFamiliarity(assessmentId);
+        assert.strictEqual(s.familiarity.retriesUsed, 0);
+    });
+
+    test(`[${assessmentId}] one Δυσκολία -> repeatFamiliarityCheck increments familiarityRetriesUsed to 1`, () => {
+        const definition = RAN.getDefinition(assessmentId);
+        let s = P.beginFamiliarity(P.createSession(assessmentId));
+        s = P.markFamiliarity(s, definition.stimuli[0], RAN.FAMILIARITY_MARK.DIFFICULTY);
+        definition.stimuli.slice(1).forEach(stim => { s = P.markFamiliarity(s, stim, RAN.FAMILIARITY_MARK.KNOWN); });
+        s = P.finalizeFamiliarityCheck(s);
+        s = P.repeatFamiliarityCheck(s);
+        assert.strictEqual(s.familiarity.retriesUsed, 1);
+        // and it's carried through a clean pass afterward
+        s = markAllKnown(s);
+        s = P.finalizeFamiliarityCheck(s);
+        assert.strictEqual(s.state, RAN.PREP_STATE.PRACTICE);
+        assert.strictEqual(s.familiarity.retriesUsed, 1, 'retriesUsed must survive into the passed session, not reset on a successful re-check');
+    });
+
+    test(`[${assessmentId}] multiple consecutive re-checks accumulate familiarityRetriesUsed (2, then 3)`, () => {
+        const definition = RAN.getDefinition(assessmentId);
+        function failOnceAndRetry(s) {
+            s = P.markFamiliarity(s, definition.stimuli[0], RAN.FAMILIARITY_MARK.DIFFICULTY);
+            definition.stimuli.slice(1).forEach(stim => { s = P.markFamiliarity(s, stim, RAN.FAMILIARITY_MARK.KNOWN); });
+            s = P.finalizeFamiliarityCheck(s);
+            assert.strictEqual(s.state, RAN.PREP_STATE.PREPARATION_FAILED);
+            return P.repeatFamiliarityCheck(s);
+        }
+        let s = P.beginFamiliarity(P.createSession(assessmentId));
+        s = failOnceAndRetry(s);
+        assert.strictEqual(s.familiarity.retriesUsed, 1);
+        s = failOnceAndRetry(s);
+        assert.strictEqual(s.familiarity.retriesUsed, 2);
+        s = failOnceAndRetry(s);
+        assert.strictEqual(s.familiarity.retriesUsed, 3);
+        s = markAllKnown(s);
+        s = P.finalizeFamiliarityCheck(s);
+        assert.strictEqual(s.state, RAN.PREP_STATE.PRACTICE);
+        assert.strictEqual(s.familiarity.retriesUsed, 3, 'all 3 re-checks are preserved through to the passed session');
+    });
+
+    test(`[${assessmentId}] returnToFamiliarityFromPractice does NOT increment familiarityRetriesUsed (different trigger — naming errors during Practice, not a Δυσκολία mark)`, () => {
+        let s = passFamiliarity(assessmentId);
+        assert.strictEqual(s.familiarity.retriesUsed, 0);
+        s = P.returnToFamiliarityFromPractice(s);
+        assert.strictEqual(s.familiarity.retriesUsed, 0, 'this path must not count as a familiarity re-check for item 16 purposes');
+    });
+
+    test(`[${assessmentId}] returnToFamiliarityFromPractice carries an existing familiarityRetriesUsed count forward unchanged (never resets/loses it)`, () => {
+        const definition = RAN.getDefinition(assessmentId);
+        let s = P.beginFamiliarity(P.createSession(assessmentId));
+        s = P.markFamiliarity(s, definition.stimuli[0], RAN.FAMILIARITY_MARK.DIFFICULTY);
+        definition.stimuli.slice(1).forEach(stim => { s = P.markFamiliarity(s, stim, RAN.FAMILIARITY_MARK.KNOWN); });
+        s = P.finalizeFamiliarityCheck(s);
+        s = P.repeatFamiliarityCheck(s);
+        assert.strictEqual(s.familiarity.retriesUsed, 1);
+        s = markAllKnown(s);
+        s = P.finalizeFamiliarityCheck(s); // -> PRACTICE
+        s = P.returnToFamiliarityFromPractice(s);
+        assert.strictEqual(s.familiarity.retriesUsed, 1, 'the earlier familiarity re-check is still remembered, not lost/reset to 0 or undefined');
+    });
+
     test(`[${assessmentId}] "Τερματισμός προετοιμασίας" ends the session — no further transitions allowed`, () => {
         const definition = RAN.getDefinition(assessmentId);
         let s = P.beginFamiliarity(P.createSession(assessmentId));

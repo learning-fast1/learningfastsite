@@ -78,6 +78,14 @@
         RAN_DIGITS_V1: { rows: [['2', '4', '1', '5', '3'], ['4', '1', '3', '2', '5']] },
         RAN_COLORS_V1: { rows: [['YELLOW', 'RED', 'BLACK', 'BLUE', 'GREEN'], ['BLACK', 'GREEN', 'RED', 'YELLOW', 'BLUE']] },
         RAN_OBJECTS_V1: { rows: [['apple', 'vase', 'ball', 'hen', 'gift'], ['vase', 'gift', 'apple', 'ball', 'hen']] },
+        // V2 reuses the exact same practice rows as V1 — Practice is an
+        // untimed, unscored procedural check independent of which timed
+        // Forms A/B are in play, and these rows were re-checked against
+        // RAN.validatePracticeMaterials's own invariants (no row shared
+        // with any V2 Form A/B row either) before being reused here.
+        RAN_DIGITS_V2: { rows: [['2', '4', '1', '5', '3'], ['4', '1', '3', '2', '5']] },
+        RAN_COLORS_V2: { rows: [['YELLOW', 'RED', 'BLACK', 'BLUE', 'GREEN'], ['BLACK', 'GREEN', 'RED', 'YELLOW', 'BLUE']] },
+        RAN_OBJECTS_V2: { rows: [['apple', 'vase', 'ball', 'hen', 'gift'], ['vase', 'gift', 'apple', 'ball', 'hen']] },
     });
 
     /** Validates RAN.practiceMaterials against the invariants locked
@@ -146,7 +154,15 @@
                 state: RAN.PREP_STATE.ASSESSMENT_SELECTED,
                 terminated: false,
                 failureReason: null,
-                familiarity: { marks, assistanceGiven },
+                // Item 16 (audit/context metadata): counts how many
+                // FAMILIARITY_NOT_ESTABLISHED re-checks this session has
+                // gone through (repeatFamiliarityCheck below is the only
+                // place that increments it — that's the only path
+                // reachable exclusively via a Δυσκολία mark). 0 here
+                // means "no re-check happened yet"; flows through to
+                // administration.familiarityRetriesUsed at build time
+                // (ran_ui.js), never derived/recomputed anywhere else.
+                familiarity: { marks, assistanceGiven, retriesUsed: 0 },
                 practice: {
                     attemptNumber: 0,
                     checklist: { startPosition: false, leftToRight: false, rowTransition: false },
@@ -240,7 +256,10 @@
             const next = cloneSession(session);
             next.state = RAN.PREP_STATE.FAMILIARITY;
             next.failureReason = null;
-            next.familiarity = { marks, assistanceGiven };
+            // Item 16: this IS the "a new familiarity re-check was
+            // needed because at least one stimulus was Δυσκολία" event
+            // — the only place this counter increments.
+            next.familiarity = { marks, assistanceGiven, retriesUsed: session.familiarity.retriesUsed + 1 };
             return next;
         },
 
@@ -308,7 +327,14 @@
 
             const next = cloneSession(session);
             next.state = RAN.PREP_STATE.FAMILIARITY;
-            next.familiarity = { marks, assistanceGiven };
+            // Item 16: this return path is triggered by naming errors
+            // observed live during Practice, never by a Δυσκολία mark
+            // (reaching Practice at all already required every stimulus
+            // to have been Known) — so it must NOT increment
+            // retriesUsed. It must also not silently drop the count
+            // down to undefined, hence carrying the existing value
+            // forward unchanged.
+            next.familiarity = { marks, assistanceGiven, retriesUsed: session.familiarity.retriesUsed };
             next.practice = { attemptNumber: 0, checklist: { startPosition: false, leftToRight: false, rowTransition: false } };
             return next;
         },
@@ -356,6 +382,7 @@
             familiarity: {
                 marks: Object.assign({}, session.familiarity.marks),
                 assistanceGiven: Object.assign({}, session.familiarity.assistanceGiven),
+                retriesUsed: session.familiarity.retriesUsed,
             },
             practice: {
                 attemptNumber: session.practice.attemptNumber,

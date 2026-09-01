@@ -29,7 +29,7 @@
    absent — so there is no chance of a stray decorative element
    leaking into the child-facing measurement surface.
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Nunito:wght@400;600;700;800&subset=greek&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Nunito:wght@400;600;700;800&family=Atkinson+Hyperlegible:wght@700&subset=greek&display=swap');
 
 :root {
     --ran-bg: #F5F8F9;
@@ -74,6 +74,17 @@
 
     --font-heading: 'Outfit', 'Segoe UI', sans-serif;
     --font-body: 'Nunito', 'Segoe UI', Arial, sans-serif;
+    /* Item 25 (approved): RAN digit STIMULI only — never the global/
+       interface font, which stays Outfit everywhere else (headings,
+       buttons, every other UI element, including this variable's own
+       fallback chain here). Chosen for clearer glyph differentiation
+       of the digits themselves (Outfit's "1" is a bare vertical stroke
+       with no flag/base serif) — not presented as a dyslexia/
+       diagnostic-accommodation font or as scientifically superior for
+       RAN, just a clearer digit rendering. Falls back to --font-heading
+       (Outfit) if the webfont fails to load, same fallback pattern as
+       every other font token here. */
+    --font-digit: 'Atkinson Hyperlegible', var(--font-heading);
 
     --transition-fast: 150ms ease;
 }
@@ -269,6 +280,15 @@ h2.ran-checklist-heading {
     font-family: var(--font-heading);
     color: var(--ran-text);
 }
+/* Item 25 (approved): digit stimuli only — same box, same font-size
+   (1.8rem) and font-weight (700), same 64px tile, only the glyph
+   shapes differ. Applied by renderStimulus() (js/ran_ui.js) only for
+   the digits type, so Colors (.ran-stimulus-circle, no text at all)
+   and Objects (.ran-stimulus-object, image-based) are structurally
+   unreachable by this rule regardless of specificity/ordering. */
+.ran-stimulus-digit {
+    font-family: var(--font-digit);
+}
 
 /* Colors: identical circle shape/size for every stimulus — only the
    fill color varies (spec §5.2). These 5 hex values ARE the scientific
@@ -282,6 +302,31 @@ h2.ran-checklist-heading {
 .ran-stimulus-circle[data-stimulus="GREEN"] { background: #16a34a; }
 .ran-stimulus-circle[data-stimulus="YELLOW"] { background: #eab308; }
 .ran-stimulus-circle[data-stimulus="BLACK"] { background: #111827; }
+
+/* Pre-exposure fix, hardened: a SINGLE undifferentiated placeholder box
+   for the whole pre-start matrix area — no per-tile sub-elements at
+   all, so no row/column count or individual stimulus position is ever
+   revealed before Start (a per-tile masked grid, tried in an earlier
+   pass, still leaked the grid shape/scan path even with identity
+   hidden). Sized to the EXACT pixel footprint the real 4x5
+   .ran-timed-matrix occupies, derived from the same constants used
+   there and in .ran-stimulus/.ran-stimulus-row (kept in sync by this
+   comment, not a shared CSS variable, matching this file's existing
+   convention of literal per-rule values):
+     width  = 5 tiles * 64px + 4 column-gaps * 16px = 384px
+     height = 4 tiles * 64px + 3 row-gaps    * 12px = 292px
+   No transition/animation — it never changes after mount, and
+   pre-start/timed-running are two separate screens (full DOM rebuild
+   via navigate()), never one screen morphing into another. */
+.ran-prestart-placeholder {
+    width: 384px;
+    height: 292px;
+    margin: 8px 0; /* mirrors .ran-timed-matrix's own external margin */
+    border-radius: var(--radius-lg);
+    background-image: repeating-linear-gradient(45deg, #E3E8EB, #E3E8EB 6px, #D3DBDF 6px, #D3DBDF 12px);
+    border: 2px solid #C7D1D6;
+    box-sizing: border-box;
+}
 
 /* Objects: the image fits WITHIN the existing fixed .ran-stimulus box
    (object-fit: contain) rather than resizing the box — box dimensions
@@ -715,26 +760,52 @@ select {
 .ran-radio-group {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
-    margin: var(--space-2) 0 var(--space-3);
+    gap: var(--space-1);
+    margin: var(--space-2) 0 var(--space-2);
 }
 .ran-radio-group-heading {
     font-family: var(--font-heading);
     font-weight: 700;
     font-size: 0.95rem;
-    margin-top: var(--space-3);
+    margin-top: var(--space-2);
     color: var(--ran-text);
+}
+/* Item 9 (abandonment screen compactness — layout only, no logic/
+   wording/reason-ID change): tighter row padding/gap so all 14
+   Ημιτελής/Άκυρη reasons need noticeably less vertical scroll on a
+   laptop screen, plus a clear divider + accent color between the two
+   categories so they read as visually distinct groups at a glance,
+   not just by their heading text. Font-size is untouched (still
+   0.95rem) and each row keeps a comfortable tap target — only the
+   padding/gap that separates rows shrank. */
+.ran-radio-group-heading-invalid {
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--ran-border);
+    color: var(--ran-danger);
 }
 .ran-radio-group label {
     display: flex;
     align-items: flex-start;
     gap: var(--space-2);
     font-size: 0.95rem;
-    padding: var(--space-2) var(--space-3);
+    padding: 6px var(--space-3);
     border-radius: var(--radius-sm);
 }
 .ran-radio-group label:hover { background: var(--ran-card); }
 .ran-radio-group input[type="radio"] { accent-color: var(--ran-blue-dark); width: 18px; height: 18px; margin-top: 1px; }
+
+/* Post-trial correction (item 15): compact Ναι/Όχι pair for the
+   sequenceLoss review control, sitting inline next to its label
+   inside a .ran-form-field-compact row — unlike the vertical
+   incomplete/invalid reason list above, a 2-option yes/no choice
+   reads better side by side than stacked. */
+.ran-radio-group.ran-radio-group-inline {
+    flex-direction: row;
+    gap: var(--space-4);
+    margin: 0;
+}
+.ran-radio-group.ran-radio-group-inline label { padding: 0; }
 
 .ran-validation-problems {
     background: var(--ran-invalid-bg);
@@ -746,6 +817,21 @@ select {
     color: var(--ran-invalid-text);
 }
 .ran-validation-problems ul { margin: 6px 0 0; padding-left: 20px; }
+
+/* Item 20: same visual treatment as .ran-validation-problems (still a
+   validation-error box), but its OWN class — this one is a LIVE,
+   pre-submit warning driven by the stepper controls themselves, never
+   the post-submit server-side problemsBox above, and the two must stay
+   distinguishable (by class, for tests/tooling as much as anything). */
+.ran-error-budget-message {
+    background: var(--ran-invalid-bg);
+    border: 1px solid var(--ran-invalid-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    margin: var(--space-3) 0;
+    font-size: 0.9rem;
+    color: var(--ran-invalid-text);
+}
 
 /* ============================================================
    POST-ADMINISTRATION SIMPLE MODE — UX refinement pass (compact
@@ -811,6 +897,12 @@ select {
     transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 .ran-count-stepper-btn:hover { background: var(--ran-blue-pale); border-color: var(--ran-blue); }
+/* Item 20: the "+" on Αντικαταστάσεις/Παραλείψεις/Δόθηκε απάντηση is
+   disabled once their combined sum reaches totalStimuli — needs its
+   own visible cue since this class doesn't carry .ran-btn (so the
+   shared .ran-btn:disabled rule never applied to it before now). */
+.ran-count-stepper-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.ran-count-stepper-btn:disabled:hover { background: var(--ran-card); border-color: var(--ran-border); }
 /* Compound selector (class + type attribute) so this reliably beats
    the shared ".ran-form-field input[type=number]" width:100% rule
    above regardless of source order — the same specificity pitfall
@@ -924,6 +1016,23 @@ body.ran-measurement-mode #ran-app {
 @media (max-width: 640px) {
     body.ran-measurement-mode #ran-app { padding: var(--space-2) var(--space-3) var(--space-3); }
 }
+
+/* ---- Pre-start layout-shift reduction: identical #ran-app sizing to
+   Measurement Mode above, so renderTimedMatrixPreStart()'s two-column
+   row centers with the exact same math renderTimedRunning()'s real
+   matrix+toolbar row will use next — deliberately a SEPARATE class
+   (not a reuse of ran-measurement-mode) since that one specifically
+   means "a timed run is in progress"; nothing about that meaning or
+   its own triggers changes here. Background stays the normal app
+   background (not Measurement Mode's near-white) — this screen is not
+   itself the measurement surface, only pre-start. ---- */
+body.ran-prestart-mode #ran-app {
+    max-width: 760px;
+    padding: var(--space-3) var(--space-4) var(--space-4);
+}
+@media (max-width: 640px) {
+    body.ran-prestart-mode #ran-app { padding: var(--space-2) var(--space-3) var(--space-3); }
+}
 /* Timed-screen side-by-side correction: matrix (child-facing) on the
    left, a fixed-width vertical examiner toolbar on the right. Neither
    column shrinks or wraps — isViewportSafeForMatrix()'s width
@@ -965,6 +1074,17 @@ body.ran-measurement-mode #ran-app {
     margin-top: var(--space-1);
     flex-direction: column;
     align-items: stretch;
+}
+/* Layout-shift reduction fix (visual QA finding): .ran-toolbar's flex
+   column has no explicit align-items, so it defaults to stretch —
+   fine for text/buttons (they already fill the width intentionally),
+   but it also stretched the pre-start logo <img> to the column's full
+   260px width, badly distorting its aspect ratio (rendered ~234px
+   wide instead of its correct ~35px at height:22px). The logo is the
+   only image .ran-toolbar has ever needed to hold; excluding it from
+   the stretch keeps its own height:22px/width:auto sizing intact. */
+.ran-prestart-toolbar .ran-brand-logo {
+    align-self: flex-start;
 }
 .ran-toolbar .ran-actions .ran-btn {
     width: 100%;
@@ -1032,6 +1152,36 @@ body.ran-measurement-mode #ran-app {
     text-align: center;
     color: var(--ran-text);
     margin-left: auto;
+}
+/* Examiner-facing click confirmation fix: deliberately small/quiet —
+   NOT a revival of the old large .ran-redirect-count/.ran-sequence-
+   loss-indicator counters above (both orphaned, unused since the
+   student-facing live-counter fix; left in place but never referenced
+   by markup). Reserves one line of height even while empty so its
+   first appearance never shifts the button below it. Lives inside
+   .ran-toolbar only — the already-established examiner-only column,
+   never anywhere near the child-facing matrix. */
+.ran-examiner-ack {
+    flex-basis: 100%;
+    font-size: 0.75rem;
+    color: var(--ran-text-muted);
+    min-height: 1.1em;
+}
+/* Item 3 (shared-screen hardening): visually hides only the live-value
+   elements (timer readout, ack counters) a child sharing the monitor
+   could read/react to — never the buttons themselves, so the examiner
+   never loses an accurate click target. visibility:hidden (not
+   display:none) keeps each element's layout space reserved, so
+   toggling never shifts/reflows anything else in the toolbar. See
+   ran_ui.js renderTimedRunning() for the full rationale. */
+.ran-toolbar.ran-examiner-elements-hidden .ran-timer-panel,
+.ran-toolbar.ran-examiner-elements-hidden .ran-examiner-ack {
+    visibility: hidden;
+}
+.ran-visibility-toggle-btn {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    align-self: flex-start;
 }
 /* Toolbar buttons stay muted/neutral — never compete visually with
    the matrix (explicit instruction: no sand/ochre here). */
@@ -1241,25 +1391,112 @@ body.ran-measurement-mode #ran-app {
    HISTORY TABLE — responsive card fallback on narrow screens
    ============================================================ */
 
+/* PASS 2 layout fix: the table can exceed #ran-app's available width
+   at a ~900px laptop viewport (9 columns incl. "Έκδοση εργαλείου" /
+   "Επανεξοικείωση" / "Ενέργειες") — body has overflow-x:hidden (for
+   the decorative-blob bleed effect elsewhere), so without its own
+   scroll container the excess columns would be silently clipped
+   rather than merely needing a scroll. Inert below 640px, where the
+   table itself switches to the stacked-card layout further down and
+   never needs horizontal scrolling. */
+.ran-history-table-wrap {
+    overflow-x: auto;
+}
+/* Round-2 layout fix (root cause found via real worst-case content —
+   INCOMPLETE's "(διακοπή)" suffix + a long grade label + plural
+   "επανέλεγχοι" simultaneously): table-layout:auto (the previous
+   fix's implicit default) lets the browser size EVERY column to fit
+   its content on one line, so the table's real rendered width can
+   still exceed the 100% target whenever content is long enough —
+   confirmed at ~895px needed vs ~868px available at a real 1366px
+   window, which is exactly what still triggered .ran-history-table-
+   wrap's own scrollbar. table-layout:fixed makes the 100% width a
+   hard constraint instead: columns get FIXED proportional widths
+   (below) and cell text wraps within them — never grows the table
+   past its container regardless of content length. */
 .ran-history-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     margin: var(--space-3) 0 var(--space-2);
     font-size: 0.9rem;
 }
+/* Column proportions tuned against the actual longest real content
+   per column (dates, "Ολοκληρώθηκε · με σημείωση", "Ναι (3
+   επανέλεγχοι)", "Μη διαθέσιμη τάξη", the Διαγραφή button/its
+   confirm state) — narrow columns (Μορφή, Έκδοση εργαλείου) get just
+   enough room never to wrap; wide-content columns (Κατάσταση,
+   Επανεξοικείωση, Τάξη) get more, wrapping to 2 lines is expected
+   and fine there, matching how the same values already wrap in the
+   sub-900px card layout further below. Sums to 100%. Scoped to
+   min-width:901px — the EXACT complement of the max-width:900px
+   card-layout breakpoint further down — because :nth-child raises
+   selector specificity above that breakpoint's own `td { width:
+   100% }` block-layout reset; without this scoping these percentages
+   would win there too and break the stacked-card width. */
+@media (min-width: 901px) {
+    /* Re-tuned after a real screenshot showed HEADER text (bold,
+       often the widest content in a short-data column) breaking
+       mid-word — e.g. "Ημερομηνία" splitting into "Ημερομηνί"/"α".
+       Each column now targets its own single longest UNBREAKABLE
+       word (the header, for columns with short data) rather than the
+       column's average content. */
+    .ran-history-table th:nth-child(1), .ran-history-table td:nth-child(1) { width: 11%; } /* Ημερομηνία */
+    .ran-history-table th:nth-child(2), .ran-history-table td:nth-child(2) { width: 11%; } /* Έκδοση εργαλείου */
+    .ran-history-table th:nth-child(3), .ran-history-table td:nth-child(3) { width: 7%; }  /* Μορφή */
+    .ran-history-table th:nth-child(4), .ran-history-table td:nth-child(4) { width: 9%; }  /* Χρόνος (δευτ.) */
+    .ran-history-table th:nth-child(5), .ran-history-table td:nth-child(5) { width: 12%; } /* Ανεξάρτητα σωστά */
+    .ran-history-table th:nth-child(6), .ran-history-table td:nth-child(6) { width: 12%; } /* Κατάσταση */
+    /* Wider than "Τάξη" alone needs — the common "Μη διαθέσιμη τάξη"
+       fallback value (shown whenever no grade was recorded) is a
+       3-word phrase and was wrapping to 4 cramped lines at 7%. */
+    .ran-history-table th:nth-child(7), .ran-history-table td:nth-child(7) { width: 9%; }  /* Τάξη */
+    .ran-history-table th:nth-child(8), .ran-history-table td:nth-child(8) { width: 16%; } /* Επανεξοικείωση */
+    .ran-history-table th:nth-child(9), .ran-history-table td:nth-child(9) { width: 13%; } /* Ενέργειες */
+}
 .ran-history-table th,
 .ran-history-table td {
     text-align: left;
-    padding: 7px 12px;
+    padding: 7px 8px;
     border-bottom: 1px solid var(--ran-border);
+    /* overflow-wrap (not the more aggressive word-break) — wraps at a
+       natural space first ("Έκδοση" / "εργαλείου"), and only breaks
+       mid-word as an absolute last resort for a single word wider
+       than its whole column, instead of doing that pre-emptively. */
+    overflow-wrap: break-word;
 }
 .ran-history-table th {
     color: var(--ran-text-muted);
     font-weight: 700;
     background: transparent;
 }
+/* Root cause of the residual overflow after table-layout:fixed: the
+   shared .ran-btn style (padding: 11px 20px, 1rem) is sized for
+   full-width standalone actions elsewhere in the app — a button
+   doesn't wrap/shrink its own text, so at that size "Διαγραφή" (and
+   the two-button "Ναι, διαγραφή"/"Άκυρο" confirm state) is wider
+   than any column budget 9 columns can share, and pushed the
+   table's actual scrollWidth past its fixed layout regardless of the
+   column percentages above. Scoped smaller only inside this table —
+   every other .ran-btn elsewhere keeps its normal full size. */
+@media (min-width: 901px) {
+    .ran-history-table .ran-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+}
 
-@media (max-width: 640px) {
+/* PASS 2 layout fix: raised from 640px. The table grew to 9 columns
+   (Έκδοση εργαλείου / Επανεξοικείωση / Ενέργειες among them) and now
+   needs ~877px of raw content width even after the tightened padding
+   above — comfortably fits once #ran-app reaches its own 900px
+   max-width (i.e. any viewport ~901px+), but a portrait-tablet-width
+   viewport (700-900px) no longer has room for 9 real table columns.
+   Switching to the same stacked-card layout already used below 640px
+   avoids relying on horizontal scroll (which the wrap above still
+   catches as a fallback, but a full-layout switch reads better than a
+   hidden-until-scrolled last column at these in-between widths). */
+@media (max-width: 900px) {
     .ran-history-table thead { display: none; }
     .ran-history-table, .ran-history-table tbody, .ran-history-table tr, .ran-history-table td {
         display: block; width: 100%;

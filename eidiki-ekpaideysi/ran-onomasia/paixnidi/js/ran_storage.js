@@ -146,9 +146,26 @@
             return 'Μαθητής ' + String(max + 1).padStart(2, '0');
         },
 
-        createProfile(displayLabel) {
+        /**
+         * `grade` is optional context metadata (RAN.GRADE value or
+         * null/undefined for "not set") — never required, never
+         * inferred. Validated with RAN.isValidGrade as a live-write
+         * guard (the UI only ever offers real RAN.GRADE options in its
+         * <select>, so this only catches direct API misuse, not normal
+         * examiner input) — throws rather than silently coercing a bad
+         * value, since this is the strict-write side of the grade
+         * data-flow (see RAN.storage.updateProfileGrade/
+         * saveAdministration for the same guard elsewhere, and
+         * RAN.wording.resolveGradeLabel for the separate tolerant-read
+         * side used for legacy/imported data).
+         */
+        createProfile(displayLabel, grade) {
             const label = (displayLabel && displayLabel.trim()) || this.suggestNextDisplayLabel();
-            const profile = { profileId: generateProfileId(), displayLabel: label, createdAt: new Date().toISOString() };
+            const gradeValue = grade !== undefined ? grade : null;
+            if (!RAN.isValidGrade(gradeValue)) {
+                throw new Error('RAN.storage.createProfile: invalid grade "' + gradeValue + '"');
+            }
+            const profile = { profileId: generateProfileId(), displayLabel: label, createdAt: new Date().toISOString(), grade: gradeValue };
             const profiles = readList(PROFILES_KEY);
             profiles.push(profile);
             writeList(PROFILES_KEY, profiles);
@@ -160,6 +177,28 @@
             const profile = profiles.find(p => p.profileId === profileId);
             if (!profile) throw new Error('RAN.storage.renameProfile: unknown profileId "' + profileId + '"');
             profile.displayLabel = displayLabel;
+            writeList(PROFILES_KEY, profiles);
+            return profile;
+        },
+
+        /**
+         * Updates a profile's CURRENT grade — pure standing metadata
+         * used only as future prefill (see ran_ui.js renderSaveSection).
+         * Never touches any already-saved administration's
+         * gradeAtAdministration snapshot: those live entirely on their
+         * own administration records, written once at save time and
+         * never re-derived from profile.grade afterwards (grade
+         * data-flow correction — no fallback/inference lives in this
+         * storage layer).
+         */
+        updateProfileGrade(profileId, grade) {
+            if (!RAN.isValidGrade(grade)) {
+                throw new Error('RAN.storage.updateProfileGrade: invalid grade "' + grade + '"');
+            }
+            const profiles = readList(PROFILES_KEY);
+            const profile = profiles.find(p => p.profileId === profileId);
+            if (!profile) throw new Error('RAN.storage.updateProfileGrade: unknown profileId "' + profileId + '"');
+            profile.grade = grade;
             writeList(PROFILES_KEY, profiles);
             return profile;
         },
@@ -176,6 +215,59 @@
         },
 
         /**
+         * Item 23: permanently removes exactly one administration by
+         * its administrationId — nothing else. History/graph/comparison
+         * never need a separate invalidation step: they're all derived
+         * live from listAdministrations()/listAllAdministrations() on
+         * every render, so the deleted record simply stops appearing
+         * the next time the examiner is navigated back to that screen
+         * (ran_ui.js does this immediately after a successful delete).
+         * Returns { deleted:false } (never throws) for an unknown id,
+         * mirroring saveAdministration's own "report a problem, don't
+         * throw" convention.
+         */
+        deleteAdministration(administrationId) {
+            const all = readList(ADMINISTRATIONS_KEY);
+            const next = all.filter(a => a.administrationId !== administrationId);
+            if (next.length === all.length) {
+                return { deleted: false, problems: ['Άγνωστη χορήγηση (δεν βρέθηκε administrationId "' + administrationId + '")'] };
+            }
+            writeList(ADMINISTRATIONS_KEY, next);
+            return { deleted: true };
+        },
+
+        /**
+         * Item 23: cascade-deletes a profile AND every administration
+         * that references it. Deliberately cascade (not orphan-and-
+         * leave, not block-while-non-empty): the storage layer already
+         * treats "an administration referencing a profileId not present
+         * locally" as invalid data (see importAll's own rejection of
+         * exactly that shape) — leaving orphaned administrations behind
+         * would create data this same storage layer could never import
+         * back cleanly. The examiner-facing confirmation (ran_ui.js) is
+         * responsible for stating the real administration count up
+         * front before this is ever called — this function does not
+         * ask for confirmation itself, matching every other storage
+         * function's "pure data operation" contract.
+         * Returns { deleted:false, problems } for an unknown profileId
+         * (never throws), or { deleted:true, deletedAdministrationsCount }.
+         */
+        deleteProfile(profileId) {
+            const profiles = readList(PROFILES_KEY);
+            const profileExists = profiles.some(p => p.profileId === profileId);
+            if (!profileExists) {
+                return { deleted: false, problems: ['Άγνωστο προφίλ (δεν βρέθηκε profileId "' + profileId + '")'] };
+            }
+            const remainingProfiles = profiles.filter(p => p.profileId !== profileId);
+            const allAdmins = readList(ADMINISTRATIONS_KEY);
+            const remainingAdmins = allAdmins.filter(a => a.studentId !== profileId);
+            const deletedAdministrationsCount = allAdmins.length - remainingAdmins.length;
+            writeList(PROFILES_KEY, remainingProfiles);
+            writeList(ADMINISTRATIONS_KEY, remainingAdmins);
+            return { deleted: true, deletedAdministrationsCount };
+        },
+
+        /**
          * Re-associates `administration` (as built by RAN.timed.
          * build*Administration, still carrying its ephemeral Phase 3
          * studentId) with `profileId`, validates the result with the
@@ -189,6 +281,22 @@
             const profile = this.getProfile(profileId);
             if (!profile) {
                 return { saved: false, problems: ['Άγνωστο προφίλ (δεν βρέθηκε profileId "' + profileId + '")'] };
+            }
+            // Grade data-flow correction: gradeAtAdministration is NEVER
+            // read from `profile.grade` here — whatever is already on
+            // `administration` (set explicitly by the UI/save-flow
+            // before this call, or left null/absent) is what gets
+            // persisted, verbatim. This is only a strict-write validity
+            // guard against a live-write API misuse (e.g. a hand-typed
+            // value) — the examiner-facing <select> in ran_ui.js only
+            // ever offers real RAN.GRADE options, so this should never
+            // actually trigger from normal use. RAN.validateAdministration
+            // itself (used by import too) deliberately does NOT check
+            // this field — that keeps legacy/imported records with an
+            // unknown grade importable (tolerant read), which this
+            // stricter, storage-local check must not interfere with.
+            if (administration.gradeAtAdministration !== undefined && !RAN.isValidGrade(administration.gradeAtAdministration)) {
+                return { saved: false, problems: ['Μη έγκυρη τιμή τάξης χορήγησης (gradeAtAdministration)'] };
             }
             const stored = Object.assign({}, administration, { studentId: profileId });
             const problems = RAN.validateAdministration(stored);
@@ -243,7 +351,22 @@
                     report.skippedProfiles.push({ profileId: p.profileId, reason: 'profileId already exists locally (no silent overwrite)' });
                     return;
                 }
-                profiles.push({ profileId: p.profileId, displayLabel: p.displayLabel, createdAt: p.createdAt || new Date().toISOString() });
+                // Tolerant read: `grade` is passed through as-is,
+                // whatever it is (a real RAN.GRADE value, an absent/
+                // undefined field from an older export, or an unknown/
+                // corrupt string) — never validated or rejected here.
+                // RAN.wording.resolveGradeLabel is solely responsible
+                // for turning anything not a recognized RAN.GRADE value
+                // into the neutral "Μη διαθέσιμη τάξη" at display time;
+                // this import step must never itself skip/reject a
+                // profile over its grade field, and must never coerce
+                // an unrecognized value into OTHER_UNSPECIFIED.
+                profiles.push({
+                    profileId: p.profileId,
+                    displayLabel: p.displayLabel,
+                    createdAt: p.createdAt || new Date().toISOString(),
+                    grade: p.grade !== undefined ? p.grade : null,
+                });
                 profileIds.add(p.profileId);
                 report.importedProfiles.push(p.profileId);
             });

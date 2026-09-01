@@ -25,7 +25,57 @@ window.RAN = window.RAN || {};
         RAN_DIGITS_V1: 'Αριθμοί',
         RAN_COLORS_V1: 'Χρώματα',
         RAN_OBJECTS_V1: 'Αντικείμενα',
+        RAN_DIGITS_V2: 'Αριθμοί',
+        RAN_COLORS_V2: 'Χρώματα',
+        RAN_OBJECTS_V2: 'Αντικείμενα',
     };
+
+    // Grade proposal — fixed display order for the grade <select>
+    // controls (Results save section, Profiles, Profile History).
+    // Deliberately its own ordered array, not Object.keys(RAN.GRADE)
+    // (property order isn't a locked contract) — Δημοτικού Α΄→ΣΤ΄,
+    // then Γυμνασίου Α΄→Β΄, with the explicit "Άλλο" choice last.
+    const GRADE_OPTION_ORDER = [
+        RAN.GRADE.NIPIAGOGEIO,
+        RAN.GRADE.A_DIMOTIKOU, RAN.GRADE.B_DIMOTIKOU, RAN.GRADE.G_DIMOTIKOU,
+        RAN.GRADE.D_DIMOTIKOU, RAN.GRADE.E_DIMOTIKOU, RAN.GRADE.ST_DIMOTIKOU,
+        RAN.GRADE.A_GYMNASIOU, RAN.GRADE.B_GYMNASIOU, RAN.GRADE.G_GYMNASIOU,
+        RAN.GRADE.OTHER_UNSPECIFIED,
+    ];
+    const GRADE_UNSET_VALUE = '__unset__';
+
+    /** Builds a grade <select> — blank/"not set" option plus every
+     * RAN.GRADE value in GRADE_OPTION_ORDER, real Greek labels via
+     * RAN.wording.gradeLabels. The <select> can therefore never
+     * produce anything other than a real RAN.GRADE value or "not set"
+     * — the strict-write side of the grade data-flow is enforced
+     * structurally here, at the UI layer, not just by
+     * RAN.isValidGrade's storage-layer guard. `selected` is a
+     * RAN.GRADE value or null/undefined (prefill). */
+    function buildGradeSelect(idAttr, selected) {
+        const options = [
+            el('option', { value: GRADE_UNSET_VALUE, textContent: '— Χωρίς επιλογή —' }),
+            ...GRADE_OPTION_ORDER.map(g => el('option', { value: g, textContent: RAN.wording.gradeLabels[g] })),
+        ];
+        const select = el('select', { id: idAttr }, options);
+        select.value = (selected && GRADE_OPTION_ORDER.includes(selected)) ? selected : GRADE_UNSET_VALUE;
+        return select;
+    }
+    /** Inverse of buildGradeSelect's value attribute: '__unset__' -> null. */
+    function readGradeSelect(select) {
+        return select.value === GRADE_UNSET_VALUE ? null : select.value;
+    }
+
+    // Item 24: shown next to every profile naming/renaming field (new
+    // profile in Profiles, new profile in the Results save section,
+    // rename in Profile History). Deliberately only a hint, never a
+    // technical restriction — displayLabel stays a plain free-text
+    // field, nothing here validates/blocks/rewrites what's typed, and
+    // no new personal-data field is introduced anywhere by this.
+    const DATA_MINIMIZATION_HINT = 'Για την προστασία προσωπικών δεδομένων, προτιμήστε κωδικό ή ψευδώνυμο αντί για ονοματεπώνυμο.';
+    function buildDataMinimizationHint() {
+        return el('p', { className: 'ran-field-hint', textContent: DATA_MINIMIZATION_HINT });
+    }
 
     // History status labels moved to RAN.wording.historyStatusLabels /
     // RAN.wording.resolveHistoryStatusLabel() — single source of truth,
@@ -73,6 +123,9 @@ window.RAN = window.RAN || {};
         RAN_DIGITS_V1: 'RAN Αριθμών',
         RAN_COLORS_V1: 'RAN Χρωμάτων',
         RAN_OBJECTS_V1: 'RAN Αντικειμένων',
+        RAN_DIGITS_V2: 'RAN Αριθμών',
+        RAN_COLORS_V2: 'RAN Χρωμάτων',
+        RAN_OBJECTS_V2: 'RAN Αντικειμένων',
     };
 
     // Non-interactive stepper — plain divs, never clickable navigation
@@ -143,6 +196,30 @@ window.RAN = window.RAN || {};
         return admin.status === RAN.STATUS.COMPLETED || admin.status === RAN.STATUS.COMPLETED_FLAGGED;
     }
 
+    // PASS 2 §2 — EXACT PAIR RULE. Classifies exactly the two
+    // administrations handed in (already chosen as the two
+    // chronologically LAST ones for one assessmentId by the caller) —
+    // never searches for a different/older/better pair itself. Returns
+    // one of:
+    //   { kind: 'valid', diff, form }              — numeric comparison shown
+    //   { kind: 'flagged' }                         — one or both COMPLETED_FLAGGED
+    //   { kind: 'form-mismatch', previousForm, currentForm }
+    //   { kind: 'ineligible' }                      — one or both not COMPLETED/COMPLETED_FLAGGED
+    function classifyComparisonPair(previous, current) {
+        if (!isGraphEligible(previous) || !isGraphEligible(current)) {
+            return { kind: 'ineligible' };
+        }
+        if (previous.status === RAN.STATUS.COMPLETED_FLAGGED || current.status === RAN.STATUS.COMPLETED_FLAGGED) {
+            return { kind: 'flagged' };
+        }
+        if (previous.form !== current.form) {
+            return { kind: 'form-mismatch', previousForm: previous.form, currentForm: current.form };
+        }
+        const diff = RAN.calcTimeDifference(previous.durationMs, current.durationMs);
+        if (!diff) return { kind: 'ineligible' };
+        return { kind: 'valid', diff, form: current.form };
+    }
+
     function formatDateDDMMYYYY(iso) {
         if (!iso) return '—';
         const [y, m, d] = iso.slice(0, 10).split('-');
@@ -153,21 +230,53 @@ window.RAN = window.RAN || {};
         const [, m, d] = iso.slice(0, 10).split('-');
         return `${d}/${m}`;
     }
+    // PASS 2 §7/§17: same calendar-day administrations get date+time
+    // instead of date-only, so adjacent points never render identical
+    // labels. Sliced directly out of the stored ISO string — same
+    // convention as formatDateShort/formatDateDDMMYYYY above (both
+    // already read the stored UTC-offset ISO string verbatim, never
+    // converted to the viewer's local timezone) — so this stays
+    // consistent with every other date label already on this screen,
+    // not a new/divergent time-handling approach. No stored precision
+    // is invented: dateISO already carries full time-of-day (confirmed
+    // in the PASS 1 export audit), this only chooses when to display it.
+    function formatDateTimeShort(iso) {
+        if (!iso) return '—';
+        const [, m, d] = iso.slice(0, 10).split('-');
+        const hhmm = iso.slice(11, 16);
+        return `${d}/${m} ${hhmm}`;
+    }
 
     /**
      * Builds one longitudinal graph section for an already-filtered,
-     * already-chronologically-sorted list of >=3 graph-eligible points
-     * `{dateISO, durationSec, form, status}` — all belonging to the
-     * SAME profile/assessmentId/assessmentVersion (callers never mix
-     * versions or assessment types into one call). No regression/
-     * trend/forecast/smoothing — the polyline connects the measured
-     * observations only. No normative bands/zones/targets. Y-axis
-     * starts at 0 and is never inverted. COMPLETED_FLAGGED points use
-     * a distinct shape (diamond, not just a color swap) — spec §5.
+     * already-chronologically-sorted list of >=2 graph-eligible points
+     * `{dateISO, durationSec, independentCorrect, totalStimuli, form,
+     * status}` — all belonging to the SAME profile/assessmentId/
+     * assessmentVersion (callers never mix versions or assessment
+     * types into one call). No regression/trend/forecast/smoothing.
+     * No normative bands/zones/targets. Y-axis starts at 0 and is
+     * never inverted (PASS 1 lock: this scaling is unchanged from
+     * before — only the layout/content around it changed in PASS 2).
+     * COMPLETED_FLAGGED points use a distinct shape (diamond, not just
+     * a color swap). PASS 2: COMPLETED_FLAGGED points are plotted like
+     * any other point, but never bridged by a connecting line segment
+     * and never one of the two points used for numeric comparison
+     * (that restriction is enforced by the CALLER for comparison, and
+     * by connectableSegment() below for line segments — this function
+     * itself has no concept of "eligible for comparison").
      */
+    function connectableSegment(a, b) {
+        return a.status === RAN.STATUS.COMPLETED && b.status === RAN.STATUS.COMPLETED && a.form === b.form;
+    }
+
     function buildLongitudinalGraph(points, headingText) {
-        const width = 640, height = 280;
-        const padLeft = 56, padRight = 24, padTop = 24, padBottom = 56;
+        // PASS 2 §14: layout-only fix for the clipped Y-axis title —
+        // more overall height/padding so the rotated axis title, the
+        // per-point time+accuracy labels, and the x-axis labels all
+        // have room, without touching yMin/yMax/tick math below (PASS 1
+        // lock: domain/scaling formula is byte-for-byte the same).
+        const width = 640, height = 320;
+        const padLeft = 60, padRight = 24, padTop = 28, padBottom = 96;
         const plotW = width - padLeft - padRight;
         const plotH = height - padTop - padBottom;
         const n = points.length;
@@ -175,37 +284,100 @@ window.RAN = window.RAN || {};
         const maxVal = Math.max.apply(null, points.map(p => p.durationSec));
         const yMax = Math.max(1, Math.ceil(maxVal * 1.15 * 10) / 10);
         const yMin = 0;
-        const xFor = (i) => padLeft + (n === 1 ? plotW / 2 : (i / (n - 1)) * plotW);
+        // PASS 2 §14/§17 layout fix (visual QA finding): the leftmost
+        // point used to sit exactly flush against the y-axis (xFor(0)
+        // === padLeft) — harmless before PASS 2, but now that each
+        // point carries its own text label (time + accuracy), a
+        // leftmost point whose value happens to land near a gridline
+        // visually collided with that gridline's tick label. Insetting
+        // the DATA points only (grid/axis lines still span the full
+        // plotW, unaffected) gives every point's own label breathing
+        // room from both edges — purely a pixel-layout change, the
+        // yFor()/domain math above is untouched.
+        const pointInsetX = 28;
+        const xFor = (i) => padLeft + pointInsetX + (n === 1 ? (plotW - pointInsetX * 2) / 2 : (i / (n - 1)) * (plotW - pointInsetX * 2));
         const yFor = (v) => padTop + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
 
         const gridAndYLabels = [];
-        const yTicks = 4;
-        for (let t = 0; t <= yTicks; t++) {
-            const val = yMin + (yMax - yMin) * (t / yTicks);
+        // Item 5 (nice-number Y-axis ticks): presentation-only — chosen
+        // independently from the yMin/yMax/point-position math above
+        // (all untouched, PASS 1 lock still holds). Previously ticks
+        // were 4 equal fractions of yMax (0%, 25%, 50%, 75%, 100%),
+        // which produced mathematically-correct but visually ugly
+        // values like 7,5/22,6 whenever yMax itself wasn't round.
+        // Standard 1/2/5 x 10^n "nice step" algorithm instead: pick the
+        // step from that family closest to yMax/targetTickCount, then
+        // emit every multiple of it from yMin (always 0) up to the
+        // largest one that still fits inside the existing domain — so
+        // the top tick can never land above yMax and clip against the
+        // padded plot area. fmtNum(val, 1) still does the actual label
+        // rounding/formatting, unchanged from before.
+        const targetTickCount = 4;
+        const rawStep = (yMax - yMin) / targetTickCount;
+        const stepMagnitude = Math.pow(10, Math.floor(Math.log10(rawStep)));
+        const stepNormalized = rawStep / stepMagnitude;
+        const niceStepNormalized = stepNormalized <= 1 ? 1 : stepNormalized <= 2 ? 2 : stepNormalized <= 5 ? 5 : 10;
+        const niceStep = niceStepNormalized * stepMagnitude;
+        for (let val = yMin; val <= yMax + niceStep * 1e-6; val += niceStep) {
             const y = yFor(val);
             gridAndYLabels.push(svgEl('line', { x1: padLeft, y1: y, x2: width - padRight, y2: y, stroke: '#DCE4E8', 'stroke-width': 1 }));
             gridAndYLabels.push(svgEl('text', { x: padLeft - 8, y: y + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#57707A', textContent: fmtNum(val, 1) }));
         }
 
+        // PASS 2 §7: same-calendar-day collision detection — if >=2
+        // points share a calendar day, ALL points sharing that day get
+        // a date+time x-axis label (not just those two), so no pair of
+        // labels on this graph is ever ambiguous/identical.
+        const dayCounts = {};
+        points.forEach(p => {
+            const day = (p.dateISO || '').slice(0, 10);
+            dayCounts[day] = (dayCounts[day] || 0) + 1;
+        });
+        const hasSameDayCollision = Object.keys(dayCounts).some(day => dayCounts[day] >= 2);
+
         // Thin X labels once there are more points than comfortably
         // fit — every point is still PLOTTED, only its text LABEL may
-        // be skipped (spec §13: never silently discard data points).
+        // be skipped (never silently discard a data point itself).
         const maxLabels = 7;
         const labelEvery = Math.max(1, Math.ceil(n / maxLabels));
         const xLabels = [];
         points.forEach((p, i) => {
             if (i % labelEvery !== 0 && i !== n - 1) return;
+            const day = (p.dateISO || '').slice(0, 10);
             const x = xFor(i);
-            const y = height - padBottom + 18;
+            const y = height - padBottom + 44;
             xLabels.push(svgEl('text', {
                 x, y, 'text-anchor': 'end', 'font-size': 10, fill: '#57707A',
                 transform: `rotate(-35 ${x} ${y})`,
-                textContent: formatDateShort(p.dateISO),
+                textContent: dayCounts[day] >= 2 ? formatDateTimeShort(p.dateISO) : formatDateShort(p.dateISO),
             }));
         });
 
-        const linePoints = points.map((p, i) => `${xFor(i)},${yFor(p.durationSec)}`).join(' ');
-        const line = svgEl('polyline', { points: linePoints, fill: 'none', stroke: '#3E6D8F', 'stroke-width': 2 });
+        // PASS 2 §5: line segments are no longer one continuous
+        // polyline across every point — a segment is drawn ONLY
+        // between two immediately-consecutive points that are both
+        // COMPLETED (unflagged) and share the same Form. A → B → A
+        // (or any flagged point in between) breaks the line on BOTH
+        // sides; there is no "bridge over" the excluded point.
+        const segments = [];
+        for (let i = 1; i < n; i++) {
+            if (connectableSegment(points[i - 1], points[i])) {
+                segments.push(svgEl('line', {
+                    x1: xFor(i - 1), y1: yFor(points[i - 1].durationSec),
+                    x2: xFor(i), y2: yFor(points[i].durationSec),
+                    stroke: '#3E6D8F', 'stroke-width': 2,
+                }));
+            }
+        }
+
+        // PASS 2 §6: on-chart per-point labels (time + accuracy) are
+        // only rendered up to the same point-count where x-axis labels
+        // stay unthinned (maxLabels) — beyond that, adjacent points are
+        // too close together for two extra stacked lines of text to
+        // stay legible, so they're omitted from the chart itself and
+        // remain fully available via the marker's tooltip/aria-label
+        // (accessible detail instead of overlapping text).
+        const showInlineLabels = n <= maxLabels;
 
         const markers = [];
         // A/B longitudinal policy (locked): form (A/B) text labels are
@@ -213,11 +385,21 @@ window.RAN = window.RAN || {};
         // NOT pick up the marker hover/focus/tooltip listeners wired up
         // below (they're pointer-events:none, purely visual annotation).
         const formLabels = [];
+        const pointLabels = [];
         points.forEach((p, i) => {
             const cx = xFor(i), cy = yFor(p.durationSec);
             const isFlagged = p.status === RAN.STATUS.COMPLETED_FLAGGED;
             const statusText = isFlagged ? 'Ολοκληρώθηκε με διαδικαστική επισήμανση' : 'Ολοκληρώθηκε';
-            const label = `${formatDateDDMMYYYY(p.dateISO)} · ${fmtNum(p.durationSec, 2)} sec · Μορφή ${p.form} · ${statusText}`;
+            const day = (p.dateISO || '').slice(0, 10);
+            const dateLabel = dayCounts[day] >= 2 ? formatDateTimeShort(p.dateISO) : formatDateDDMMYYYY(p.dateISO);
+            const accuracyText = (p.independentCorrect != null && p.totalStimuli != null)
+                ? `${p.independentCorrect}/${p.totalStimuli}` : '—';
+            // PASS 2 §6: full information (incl. accuracy, now added)
+            // always lives in this accessible label — the tooltip and
+            // aria-label/role="img" text, read by hover, focus, AND
+            // screen readers regardless of whether the on-chart inline
+            // labels are shown for this point count.
+            const label = `${dateLabel} · ${fmtNum(p.durationSec, 2)} sec · ${accuracyText} · Μορφή ${p.form} · ${statusText}`;
             let marker;
             if (isFlagged) {
                 const s = 7;
@@ -251,22 +433,40 @@ window.RAN = window.RAN || {};
                 fill: '#57707A', 'pointer-events': 'none',
                 textContent: p.form,
             }));
+
+            // PASS 2 §6: time + accuracy, NOT four metadata lines —
+            // exactly these two, stacked below the marker. Never marker
+            // size, never a second y-axis.
+            if (showInlineLabels) {
+                pointLabels.push(svgEl('text', {
+                    x: cx, y: cy + (isFlagged ? 20 : 18),
+                    'text-anchor': 'middle', 'font-size': 9, fill: '#2E3D46', 'pointer-events': 'none',
+                    textContent: `${fmtNum(p.durationSec, 2)} sec`,
+                }));
+                pointLabels.push(svgEl('text', {
+                    x: cx, y: cy + (isFlagged ? 31 : 29),
+                    'text-anchor': 'middle', 'font-size': 9, fill: '#57707A', 'pointer-events': 'none',
+                    textContent: accuracyText,
+                }));
+            }
         });
 
         const svg = svgEl('svg', {
             viewBox: `0 0 ${width} ${height}`,
             width: '100%',
             role: 'img',
-            'aria-label': `${headingText} — γράφημα εξέλιξης χρόνου ολοκλήρωσης, ${n} χορηγήσεις`,
+            'aria-label': `${headingText} — γράφημα καταγεγραμμένων χορηγήσεων, ${n} χορηγήσεις`,
         }, [
             svgEl('title', { textContent: headingText }),
+            svgEl('desc', { textContent: 'Κύκλος: χωρίς διαδικαστική επισήμανση. Ρόμβος: με διαδικαστική επισήμανση. Πλήρη στοιχεία κάθε σημείου μέσω εστίασης/hover.' }),
             ...gridAndYLabels,
             ...xLabels,
-            line,
+            ...segments,
             ...markers,
             ...formLabels,
+            ...pointLabels,
         ]);
-        svg.style.minWidth = Math.max(400, n * 50) + 'px';
+        svg.style.minWidth = Math.max(400, n * 70) + 'px';
 
         const tooltip = el('div', { className: 'ran-graph-tooltip' });
         const svgWrap = el('div', { className: 'ran-graph-svg-wrap' }, [svg, tooltip]);
@@ -290,12 +490,18 @@ window.RAN = window.RAN || {};
 
         return el('div', { className: 'ran-graph-section' }, [
             el('h3', { textContent: headingText }),
-            el('p', { className: 'ran-field-hint', textContent: 'Οπτικοποίηση της εξέλιξης του χρόνου ολοκλήρωσης στις έγκυρες, ολοκληρωμένες χορηγήσεις. Ο πίνακας παρακάτω παραμένει διαθέσιμος με όλα τα δεδομένα.' }),
+            el('p', { className: 'ran-field-hint', textContent: RAN.wording.graphIntro }),
+            // PASS 2 §7: shown once per graph, never attributing
+            // causality, never proposing a minimum retest interval.
+            hasSameDayCollision ? el('p', { className: 'ran-graph-same-day-warning', role: 'note', textContent: RAN.wording.sameDayWarning }) : null,
             el('div', { className: 'ran-graph-chart-row' }, [
                 el('div', { className: 'ran-graph-y-axis-label', textContent: 'Χρόνος ολοκλήρωσης (sec)' }),
                 svgWrap,
             ]),
-            el('div', { className: 'ran-graph-x-axis-label', textContent: 'Ημερομηνία χορήγησης' }),
+            // PASS 2 §8: x-axis relabeled — points are equally spaced by
+            // administration order, not by a continuous time scale; the
+            // real dates/times remain available as point labels/context.
+            el('div', { className: 'ran-graph-x-axis-label', textContent: 'Σειρά χορηγήσεων' }),
             el('p', { className: 'ran-graph-axis-helper', textContent: '↓ Μικρότερος χρόνος = ταχύτερη ολοκλήρωση' }),
             el('div', { className: 'ran-graph-legend' }, [
                 el('span', { className: 'ran-graph-legend-item' }, [el('span', { className: 'ran-legend-circle' }), document.createTextNode('Ολοκληρώθηκε')]),
@@ -463,6 +669,11 @@ window.RAN = window.RAN || {};
             // screen regardless of how timedRunning was left (Finish,
             // Abort, or a defensive guard redirect).
             document.body.classList.remove('ran-measurement-mode');
+            // Layout-shift reduction: armed only inside
+            // renderTimedMatrixPreStart() — same unconditional-clear
+            // rule as ran-measurement-mode directly above, so it can
+            // never leak onto any other screen either.
+            document.body.classList.remove('ran-prestart-mode');
             // Same reasoning for Practice's wider content column (final
             // compact-layout correction): armed only inside
             // renderPractice(), always cleared here first so no other
@@ -485,6 +696,17 @@ window.RAN = window.RAN || {};
             if (this._visibilityListener) {
                 document.removeEventListener('visibilitychange', this._visibilityListener);
                 this._visibilityListener = null;
+            }
+            // Item 17: same reasoning as the two guards above — the
+            // Enter-to-finish shortcut is armed only inside
+            // renderTimedRunning() and must never survive onto any
+            // other screen (pre-start, error capture, results, etc.),
+            // regardless of which path left timedRunning (Finish,
+            // Abort, the resize/visibility auto-abort gates, or any
+            // future/defensive navigation).
+            if (this._finishKeyListener) {
+                window.removeEventListener('keydown', this._finishKeyListener);
+                this._finishKeyListener = null;
             }
             // Phase 7 hardening: stopTimer() already clears this on every
             // real Finish/Abort path, but centralizing it here too (like
@@ -561,8 +783,15 @@ window.RAN = window.RAN || {};
                     }),
                 ]);
             }
+            // Item 25 (approved): digits get an additional class that
+            // switches ONLY the font-family (Atkinson Hyperlegible) —
+            // same tile size, font-size, font-weight, layout. Since
+            // renderStimulus() is the one shared render path for
+            // Familiarity, Practice, and the Timed matrix, this single
+            // branch covers all three stages automatically, so the same
+            // digit always looks the same everywhere it appears.
             return el('div', {
-                className: 'ran-stimulus',
+                className: 'ran-stimulus ran-stimulus-digit',
                 'data-stimulus': stimulus,
                 textContent: stimulus,
             });
@@ -582,7 +811,7 @@ window.RAN = window.RAN || {};
                 el('div', { className: 'ran-assessment-picker' }, [
                     el('button', {
                         className: 'ran-assessment-card',
-                        onClick: () => this.startPreparation('RAN_DIGITS_V1'),
+                        onClick: () => this.startPreparation(RAN.CURRENT_VERSIONS.digits),
                     }, [
                         el('div', { className: 'ran-assessment-motif' }, ['1', '2', '3'].map(d => el('span', { className: 'ran-assessment-motif-digit', textContent: d }))),
                         el('div', { className: 'ran-assessment-card-title', textContent: 'Αριθμοί' }),
@@ -591,7 +820,7 @@ window.RAN = window.RAN || {};
                     ]),
                     el('button', {
                         className: 'ran-assessment-card',
-                        onClick: () => this.startPreparation('RAN_COLORS_V1'),
+                        onClick: () => this.startPreparation(RAN.CURRENT_VERSIONS.colors),
                     }, [
                         el('div', { className: 'ran-assessment-motif' }, ['#dc2626', '#2563eb', '#16a34a', '#eab308', '#111827'].map(c => el('span', { className: 'ran-assessment-motif-dot', style: { background: c } }))),
                         el('div', { className: 'ran-assessment-card-title', textContent: 'Χρώματα' }),
@@ -600,9 +829,9 @@ window.RAN = window.RAN || {};
                     ]),
                     el('button', {
                         className: 'ran-assessment-card',
-                        onClick: () => this.startPreparation('RAN_OBJECTS_V1'),
+                        onClick: () => this.startPreparation(RAN.CURRENT_VERSIONS.objects),
                     }, [
-                        el('div', { className: 'ran-assessment-motif' }, RAN.getDefinition('RAN_OBJECTS_V1').stimuli.slice(0, 3).map(id => el('img', {
+                        el('div', { className: 'ran-assessment-motif' }, RAN.getDefinition(RAN.CURRENT_VERSIONS.objects).stimuli.slice(0, 3).map(id => el('img', {
                             className: 'ran-assessment-motif-object',
                             src: `assets/objects/${id}.png`,
                             alt: '',
@@ -617,7 +846,11 @@ window.RAN = window.RAN || {};
                     el('button', { className: 'ran-profile-entry-card', onClick: () => this.navigate('profiles') }, [
                         el('div', {}, [
                             el('div', { className: 'ran-assessment-card-title', textContent: 'Προφίλ & Ιστορικό' }),
-                            el('div', { className: 'ran-assessment-card-desc', textContent: 'Δείτε προηγούμενες χορηγήσεις και την εξέλιξη κάθε μαθητή.' }),
+                            // Item 18 wording correction: neutral, does
+                            // not presuppose or imply any interpretation
+                            // of change/progress — purely describes what
+                            // the screen shows (a history list).
+                            el('div', { className: 'ran-assessment-card-desc', textContent: 'Δείτε το ιστορικό χορηγήσεων κάθε μαθητή.' }),
                         ]),
                         el('div', { className: 'ran-assessment-card-cta', textContent: 'Προβολή προφίλ →' }),
                     ]),
@@ -762,6 +995,24 @@ window.RAN = window.RAN || {};
                 el('div', { className: 'ran-eyebrow', textContent: ASSESSMENT_LABELS[session.assessmentId] }),
                 el('h1', { textContent: 'Έλεγχος εξοικείωσης' }),
                 el('p', { className: 'ran-subtitle', textContent: 'Βεβαιωθείτε ότι το παιδί κατονομάζει όλα τα ερεθίσματα πριν από τη χρονομέτρηση.' }),
+                // Item 26: examiner-facing only (an "eyebrow" reminder,
+                // never a line the examiner says to the child, unlike
+                // the "Πείτε στο παιδί" block right below it), shown
+                // only for the Colors type — dispatches on the
+                // definition's own `type` field so it applies to
+                // RAN_COLORS_V1 and RAN_COLORS_V2 alike, matching the
+                // rest of this file's type-based (not hardcoded-ID)
+                // dispatch convention. Purely a reminder to confirm via
+                // the existing Familiarity gate — no new screening/
+                // diagnosis/risk-classification mechanism is added; the
+                // gate itself (Γνωστό/Δυσκολία -> pass/fail) is
+                // completely unchanged.
+                definition.type === 'colors'
+                    ? el('div', { className: 'ran-examiner-instruction ran-colorvision-reminder' }, [
+                        el('div', { className: 'ran-eyebrow', textContent: 'Σημείωση εξεταστή:' }),
+                        el('p', { textContent: RAN.wording.colorVisionReminder }),
+                    ])
+                    : null,
                 el('div', { className: 'ran-examiner-instruction' }, [
                     el('div', { className: 'ran-eyebrow', textContent: 'Πείτε στο παιδί:' }),
                     el('p', { textContent: wording.familiarityInstruction }),
@@ -795,9 +1046,16 @@ window.RAN = window.RAN || {};
 
             const actions = [];
             if (isFamiliarityFailure) {
+                // Item 16 wording correction: "Επανεξοικείωση και
+                // επανέλεγχος" — same underlying transition as before
+                // (repeatFamiliarityCheck: resets every mark, returns to
+                // a fresh untimed FAMILIARITY state; if the examiner
+                // re-presents the stimuli and the child now names them
+                // all correctly, this naturally re-passes and continues
+                // to Practice as normal).
                 actions.push(el('button', {
                     className: 'ran-btn ran-btn-primary',
-                    textContent: 'Επανάληψη ελέγχου',
+                    textContent: 'Επανεξοικείωση και επανέλεγχος',
                     onClick: () => {
                         this.session = P.repeatFamiliarityCheck(this.session);
                         this.familiarityIndex = 0;
@@ -807,7 +1065,12 @@ window.RAN = window.RAN || {};
             }
             actions.push(el('button', {
                 className: 'ran-btn ran-btn-danger',
-                textContent: 'Τερματισμός προετοιμασίας',
+                // Item 16 wording correction: "Διακοπή χορήγησης" — same
+                // endPreparation() transition as before (terminal, no
+                // timed RAN result). Shared by both failure reasons
+                // (Familiarity and serial-procedure), and accurate for
+                // both: neither case reaches a timed administration.
+                textContent: 'Διακοπή χορήγησης',
                 onClick: () => {
                     this.session = P.endPreparation(this.session);
                     this.navigate('preparationEnded');
@@ -1046,28 +1309,81 @@ window.RAN = window.RAN || {};
 
             const session = this.session;
             const draft = this.timedDraft;
-            const definition = RAN.getDefinition(session.assessmentId);
-            const formRows = definition.forms[draft.form];
 
-            const matrixRows = formRows.map(row => el('div', { className: 'ran-stimulus-row' },
-                row.map(stim => this.renderStimulus(session.assessmentId, stim))));
+            // Layout-shift reduction: this screen now shares the SAME
+            // #ran-app sizing (max-width/padding) that timedRunning's
+            // own Measurement Mode uses — see body.ran-prestart-mode in
+            // ran.css, a dedicated class deliberately kept separate
+            // from ran-measurement-mode (that one still means "a timed
+            // run is actually in progress"; nothing here changes what
+            // that flag means or when it's set). Cleared centrally in
+            // navigate() exactly like ran-measurement-mode already is.
+            document.body.classList.add('ran-prestart-mode');
 
+            // Pre-exposure fix, hardened: this screen must NEVER read
+            // definition.forms[draft.form] (the actual Form A/B stimulus
+            // sequence) — confirmed unchanged, still never touched here.
+            // A previous version of this screen rendered 20 neutral
+            // "masked" tiles in the real 4x5 row/column layout — that
+            // still revealed the grid shape, row/column count, and each
+            // individual stimulus position (and therefore the scan
+            // path) even though the stimulus IDENTITY was hidden. This
+            // version renders NO sub-structure at all: one single,
+            // undifferentiated placeholder box, sized to exactly the
+            // pixel footprint the real matrix will occupy (5 stimulus
+            // tiles + 4 column gaps wide, 4 stimulus tiles + 3 row gaps
+            // tall — the same constants .ran-stimulus/.ran-stimulus-row/
+            // .ran-timed-matrix already use, see .ran-prestart-placeholder
+            // in ran.css for the exact derivation), so the real array
+            // appears in exactly this reserved space at Start with zero
+            // resize/reflow — but reveals nothing about rows, columns,
+            // or individual positions before that.
+            const placeholder = el('div', { className: 'ran-prestart-placeholder', 'aria-hidden': 'true' });
+
+            // Layout-shift reduction (measured finding: the placeholder
+            // was landing 87px right / 185px above where the real
+            // matrix appears post-Start, because this screen used a
+            // single centered column while timedRunning uses a
+            // matrix+toolbar two-column row under Measurement Mode's
+            // narrower #ran-app). Reusing the EXACT same
+            // .ran-timed-layout/.ran-measurement-matrix-wrap/.ran-toolbar
+            // structure timedRunning itself uses means the placeholder
+            // column is centered by the identical flex math the real
+            // matrix will be, collapsing nearly all of that offset —
+            // confirmed by re-measuring after this change (see the
+            // round report). The examiner-facing stepper is dropped
+            // from ONLY this one screen to fit the narrower toolbar
+            // column (still shown on every other screen); nothing about
+            // WHAT is shown changes — no real stimulus, no preview
+            // sequence, still the same single neutral placeholder, same
+            // locked preStartReminder text, same "Έναρξη" button/
+            // onClick/onset-synchronization timing below.
             const screen = el('div', { className: 'ran-screen' }, [
-                renderStepper('timed'),
-                el('img', { className: 'ran-brand-logo ran-brand-logo-small', src: 'assets/brand/logo.png', alt: 'Learning Fast' }),
-                el('h1', { textContent: `${ASSESSMENT_LABELS[session.assessmentId]} — Μορφή ${draft.form}` }),
-                el('div', { className: 'ran-examiner-instruction' }, [
-                    el('p', { textContent: RAN.wording.preStartReminder }),
-                ]),
-                el('div', { className: 'ran-prestart-matrix-wrap' }, [
-                    el('div', { className: 'ran-timed-matrix' }, matrixRows),
-                ]),
-                el('div', { className: 'ran-actions' }, [
-                    el('button', {
-                        className: 'ran-btn ran-btn-primary',
-                        textContent: 'Έναρξη',
-                        onClick: () => this.navigate('timedRunning'),
-                    }),
+                el('div', { className: 'ran-timed-layout' }, [
+                    el('div', { className: 'ran-measurement-matrix-wrap' }, [
+                        placeholder,
+                    ]),
+                    el('div', { className: 'ran-toolbar ran-prestart-toolbar' }, [
+                        el('img', { className: 'ran-brand-logo ran-brand-logo-small', src: 'assets/brand/logo.png', alt: 'Learning Fast' }),
+                        el('h1', { textContent: `${ASSESSMENT_LABELS[session.assessmentId]} — Μορφή ${draft.form}` }),
+                        el('p', { className: 'ran-status-line', textContent: RAN.wording.preStartReminder }),
+                        el('div', { className: 'ran-actions' }, [
+                            el('button', {
+                                className: 'ran-btn ran-btn-primary',
+                                textContent: 'Έναρξη',
+                                // Onset synchronization (locked): navigate() is a
+                                // single synchronous call — renderTimedRunning()
+                                // captures performance.now() as the start
+                                // timestamp AND builds/appends the real stimulus
+                                // matrix within that same synchronous call, before
+                                // the browser gets a chance to paint anything in
+                                // between. There is no separate "reveal" step and
+                                // no intentional delay between the two — see the
+                                // Timer/Render Safety Audit in the round report.
+                                onClick: () => this.navigate('timedRunning'),
+                            }),
+                        ]),
+                    ]),
                 ]),
             ]);
             this.container.appendChild(screen);
@@ -1130,9 +1446,6 @@ window.RAN = window.RAN || {};
                 row.map(stim => this.renderStimulus(session.assessmentId, stim))));
 
             const timerDisplay = el('span', { className: 'ran-timer-display', textContent: '00:00.00' });
-            const redirectCount = el('span', { className: 'ran-redirect-count', textContent: '0' });
-            const sequenceLossIndicator = el('span', { className: 'ran-sequence-loss-indicator', textContent: 'Όχι' });
-            const answerGivenCount = el('span', { className: 'ran-redirect-count', textContent: '0' });
 
             const tick = () => {
                 timerDisplay.textContent = formatElapsedTime(performance.now() - run.startTime);
@@ -1199,27 +1512,53 @@ window.RAN = window.RAN || {};
             };
             document.addEventListener('visibilitychange', this._visibilityListener);
 
+            // Examiner-facing click confirmation fix: the earlier
+            // "Student-facing live-counter fix" removed EVERY visible
+            // acknowledgement for these three controls, leaving only a
+            // screen-reader-only aria-live region — which reads as "the
+            // button doesn't respond" to a sighted examiner, even though
+            // run.sequenceLoss/examinerRedirects/examinerProvidedAnswers
+            // were always updating correctly underneath. Each button now
+            // gets its own small `<span aria-live="polite">` right next
+            // to it — small/functional text only (never the old large
+            // live counters), living entirely inside .ran-toolbar (the
+            // already-established examiner-only column, side-by-side
+            // with the child-facing matrix — see the layout correction
+            // above) so it can never be mistaken for feedback shown to
+            // the child. The span itself carries aria-live, so it is
+            // simultaneously the sighted AND the screen-reader
+            // acknowledgement — no separate hidden region needed.
+            //
             // Deliberately two independent actions/variables (Phase 3
             // correction pass): sequenceLoss (boolean — was the serial
             // procedure lost at some point) and examinerRedirects
             // (integer — how many neutral redirects were given). They
             // often co-occur but one must never auto-set the other.
+            const redirectAck = el('span', { className: 'ran-examiner-ack', 'aria-live': 'polite' });
             const redirectBtn = el('button', {
                 className: 'ran-btn ran-btn-secondary',
                 textContent: `Επαναφορά «${RAN.wording.neutralRedirect}»`,
                 onClick: () => {
                     run.examinerRedirects += 1;
-                    redirectCount.textContent = String(run.examinerRedirects);
+                    redirectAck.textContent = `Σύνολο: ${run.examinerRedirects}`;
                 },
             });
 
+            // sequenceLoss stays a one-way boolean exactly as before —
+            // clicking more than once is harmless/idempotent (still just
+            // `true`), so unlike an even-older version this button is
+            // never disabled after use: a disabled/grayed-out button
+            // sitting in the child-facing view would itself be a visible
+            // success-state cue — but the small "Καταγράφηκε" ack text
+            // below it (examiner-only column) is exactly the confirmation
+            // an examiner needs without touching the button's own state.
+            const sequenceLossAck = el('span', { className: 'ran-examiner-ack', 'aria-live': 'polite' });
             const sequenceLossBtn = el('button', {
                 className: 'ran-btn ran-btn-secondary',
                 textContent: 'Απώλεια σειράς',
                 onClick: () => {
                     run.sequenceLoss = true;
-                    sequenceLossIndicator.textContent = 'Καταγράφηκε';
-                    sequenceLossBtn.disabled = true;
+                    sequenceLossAck.textContent = 'Καταγράφηκε';
                 },
             });
 
@@ -1231,23 +1570,59 @@ window.RAN = window.RAN || {};
             // the examiner alone judges the ~3s threshold and clicks
             // this button; the live timer above keeps running
             // uninterrupted regardless.
+            const answerAck = el('span', { className: 'ran-examiner-ack', 'aria-live': 'polite' });
             const answerGivenBtn = el('button', {
                 className: 'ran-btn ran-btn-secondary',
                 textContent: 'Δόθηκε απάντηση',
                 onClick: () => {
                     run.examinerProvidedAnswers += 1;
-                    answerGivenCount.textContent = String(run.examinerProvidedAnswers);
+                    answerAck.textContent = `Σύνολο: ${run.examinerProvidedAnswers}`;
                 },
             });
 
+            // Item 17: the button's onClick and the Enter-key shortcut
+            // below are two INPUT PATHS into this exact same function —
+            // never two separate finish implementations. finishTriggered
+            // is the single-activation guard shared by both: whichever
+            // path fires first (a real mouse click, or Enter) wins, and
+            // the other becomes a no-op. This is purely an alternative
+            // way to trigger the identical stopTimer()+navigate() call
+            // the button always made — it does not reduce or eliminate
+            // examiner reaction time, just offers a second input method.
+            let finishTriggered = false;
+            const finishTrial = () => {
+                if (finishTriggered) return;
+                finishTriggered = true;
+                run.durationMs = stopTimer();
+                this.navigate('timedErrorCapture');
+            };
             const finishBtn = el('button', {
                 className: 'ran-btn ran-btn-primary',
                 textContent: 'Τέλος',
-                onClick: () => {
-                    run.durationMs = stopTimer();
-                    this.navigate('timedErrorCapture');
-                },
+                onClick: finishTrial,
             });
+            // Enter only (not Space, to reduce accidental activation —
+            // Space is more likely to be hit incidentally, e.g. resting
+            // a hand near the keyboard). e.repeat is the OS/browser's
+            // own "this key is being held down" flag for auto-repeated
+            // keydown events — always preventDefault (so a held Enter
+            // never does anything ELSE by default either), but only
+            // call finishTrial() on the first, non-repeat press; the
+            // finishTriggered flag above is the second, independent
+            // guard against a genuine double-activation (e.g. a race
+            // with a mouse click). Attached only here, inside
+            // renderTimedRunning(), and torn down centrally by
+            // navigate() on every screen transition (see its own
+            // comment) — so it is only ever live while this screen is
+            // actually showing, never on pre-start/error-capture/
+            // results/or any other screen.
+            this._finishKeyListener = (e) => {
+                if (e.key !== 'Enter') return;
+                e.preventDefault();
+                if (e.repeat) return;
+                finishTrial();
+            };
+            window.addEventListener('keydown', this._finishKeyListener);
 
             // Timed-screen side-by-side correction: Abort is deliberately
             // styled as a muted/outlined secondary action here (never the
@@ -1264,6 +1639,41 @@ window.RAN = window.RAN || {};
                 },
             });
 
+            // Item 3 (shared-screen hardening): on a single shared
+            // monitor the child can see the live timer, the three
+            // procedural buttons' ack text, and (per the original
+            // request) the controls themselves. A toggle that visually
+            // hid the BUTTONS too would force the examiner to aim at a
+            // now-invisible click target mid-trial — a new interaction
+            // risk the round's own audit rejected; a keyboard-shortcut
+            // alternative for all three controls would be a much larger
+            // surface (new global listeners, discoverability, conflict
+            // checking) and was treated as a significant architectural
+            // change, so it is reported only, not built here. This
+            // toggle instead hides only the LIVE-VALUE elements a child
+            // could read/react to — the timer's numeric readout and the
+            // small ack counters — via `visibility:hidden` (keeps their
+            // layout space, so nothing reflows/shifts). The buttons stay
+            // fully visible and clickable at all times, and the toggle
+            // button itself is never hidden, so the examiner can restore
+            // visibility with one click. Purely a display-layer flag —
+            // never read by stopTimer/finishTrial/scoring, never touches
+            // run.startTime/rafId/examinerRedirects/sequenceLoss/
+            // examinerProvidedAnswers, and the rAF tick() loop keeps
+            // writing timerDisplay.textContent underneath regardless.
+            let examinerElementsHidden = false;
+            const visibilityToggleBtn = el('button', {
+                className: 'ran-btn ran-btn-secondary ran-visibility-toggle-btn',
+                textContent: 'Απόκρυψη στοιχείων εξεταστή',
+                'aria-pressed': 'false',
+                onClick: () => {
+                    examinerElementsHidden = !examinerElementsHidden;
+                    toolbarEl.classList.toggle('ran-examiner-elements-hidden', examinerElementsHidden);
+                    visibilityToggleBtn.textContent = examinerElementsHidden ? 'Εμφάνιση στοιχείων εξεταστή' : 'Απόκρυψη στοιχείων εξεταστή';
+                    visibilityToggleBtn.setAttribute('aria-pressed', String(examinerElementsHidden));
+                },
+            });
+
             // Timed-screen side-by-side correction: matrix (child-facing,
             // left) and a fixed-width vertical examiner toolbar (right)
             // sit side by side in .ran-timed-layout on any viewport wide
@@ -1276,42 +1686,42 @@ window.RAN = window.RAN || {};
             // see its doc comment) already blocks entry via the existing
             // renderScreenTooSmall() gate above, so this arrangement is
             // never reached in a squeezed state.
+            const toolbarEl = el('div', { className: 'ran-toolbar' }, [
+                visibilityToggleBtn,
+                el('div', { className: 'ran-timer-panel' }, [timerDisplay, el('span', { className: 'ran-timer-label', textContent: 'χρόνος' })]),
+                // Examiner-facing click confirmation fix: each
+                // panel now carries its own small ack span right
+                // next to the button (see the buttons' own
+                // definitions above for why) — still no large
+                // live counter, just enough for the examiner to
+                // see the click actually registered.
+                el('div', { className: 'ran-sequence-loss-panel' }, [sequenceLossBtn, sequenceLossAck]),
+                el('div', { className: 'ran-redirect-panel' }, [redirectBtn, redirectAck]),
+                el('div', { className: 'ran-answer-given-panel' }, [answerGivenBtn, answerAck]),
+                // UX refinement pass (locked 3-second protocol
+                // wording): rewritten to read as one consistent
+                // set of instructions covering both procedural
+                // cases — sequence loss vs. ~3s no-response — in
+                // place of the older two-part "neutral redirect /
+                // stuck-on-stimulus" framing. The locked
+                // neutralRedirect phrase (spec §36) is still
+                // embedded verbatim inside the sentence.
+                // moveOnPrompt itself is untouched and still used
+                // as its own locked wording constant elsewhere —
+                // only this status line's own prose changed.
+                el('p', { className: 'ran-status-line', textContent: `Αν χαθεί η σειρά: δείξτε το σωστό σημείο και πείτε «${RAN.wording.neutralRedirect}» Αν δεν απαντήσει σε περίπου 3″: δώστε την ονομασία του ερεθίσματος και ζητήστε να συνεχίσει.` }),
+                el('div', { className: 'ran-actions' }, [finishBtn, abortBtn]),
+                // Item 17: discreet examiner-facing indication of
+                // the alternative input path — never claims or
+                // implies this removes/reduces reaction time.
+                el('p', { className: 'ran-field-hint ran-finish-shortcut-hint', textContent: 'Enter: Τέλος' }),
+            ]);
             const screen = el('div', { className: 'ran-screen' }, [
                 el('div', { className: 'ran-timed-layout' }, [
                     el('div', { className: 'ran-measurement-matrix-wrap' }, [
                         el('div', { className: 'ran-timed-matrix' }, matrixRows),
                     ]),
-                    el('div', { className: 'ran-toolbar' }, [
-                        el('div', { className: 'ran-timer-panel' }, [timerDisplay, el('span', { className: 'ran-timer-label', textContent: 'χρόνος' })]),
-                        el('div', { className: 'ran-sequence-loss-panel' }, [
-                            el('span', { className: 'ran-toolbar-row-label', textContent: 'Απώλεια σειράς:' }),
-                            sequenceLossIndicator,
-                            sequenceLossBtn,
-                        ]),
-                        el('div', { className: 'ran-redirect-panel' }, [
-                            el('span', { className: 'ran-toolbar-row-label', textContent: 'Επαναφορές:' }),
-                            redirectCount,
-                            redirectBtn,
-                        ]),
-                        el('div', { className: 'ran-answer-given-panel' }, [
-                            el('span', { className: 'ran-toolbar-row-label', textContent: 'Δόθηκε απάντηση:' }),
-                            answerGivenCount,
-                            answerGivenBtn,
-                        ]),
-                        // UX refinement pass (locked 3-second protocol
-                        // wording): rewritten to read as one consistent
-                        // set of instructions covering both procedural
-                        // cases — sequence loss vs. ~3s no-response — in
-                        // place of the older two-part "neutral redirect /
-                        // stuck-on-stimulus" framing. The locked
-                        // neutralRedirect phrase (spec §36) is still
-                        // embedded verbatim inside the sentence.
-                        // moveOnPrompt itself is untouched and still used
-                        // as its own locked wording constant elsewhere —
-                        // only this status line's own prose changed.
-                        el('p', { className: 'ran-status-line', textContent: `Αν χαθεί η σειρά: δείξτε το σωστό σημείο και πείτε «${RAN.wording.neutralRedirect}» Αν δεν απαντήσει σε περίπου 3″: δώστε την ονομασία του ερεθίσματος και ζητήστε να συνεχίσει.` }),
-                        el('div', { className: 'ran-actions' }, [finishBtn, abortBtn]),
-                    ]),
+                    toolbarEl,
                 ]),
             ]);
             this.container.appendChild(screen);
@@ -1343,6 +1753,7 @@ window.RAN = window.RAN || {};
                         examinerRedirects: run.examinerRedirects,
                         examinerProvidedAnswers: run.examinerProvidedAnswers,
                         sequenceLoss: run.sequenceLoss,
+                        familiarityRetriesUsed: session.familiarity.retriesUsed,
                     });
                     this.navigate('results');
                 },
@@ -1380,9 +1791,15 @@ window.RAN = window.RAN || {};
                 autoAbortNotice,
                 el('p', { textContent: 'Επίλεξε την αιτία που ταιριάζει καλύτερα. Η κατηγορία (Ημιτελής / Άκυρη) καθορίζεται αυτόματα από την επιλογή.' }),
                 el('div', { className: 'ran-radio-group' }, [
-                    el('div', { className: 'ran-radio-group-heading', textContent: 'Ημιτελής δοκιμασία' }),
+                    el('div', { className: 'ran-radio-group-heading ran-radio-group-heading-incomplete', textContent: 'Ημιτελής δοκιμασία' }),
                     ...incompleteRows,
-                    el('div', { className: 'ran-radio-group-heading', textContent: 'Άκυρη δοκιμασία' }),
+                    // Item 9: a distinct modifier class only, so CSS can
+                    // give the two categories a clear visual divider +
+                    // separate accent color (never a new reason ID, never
+                    // a wording/mapping/validation change — the category
+                    // itself is still decided purely by radioRow's own
+                    // `category` argument above).
+                    el('div', { className: 'ran-radio-group-heading ran-radio-group-heading-invalid', textContent: 'Άκυρη δοκιμασία' }),
                     ...invalidRows,
                 ]),
                 el('div', { className: 'ran-actions' }, [confirmBtn]),
@@ -1398,6 +1815,7 @@ window.RAN = window.RAN || {};
             const session = this.session;
             const draft = this.timedDraft;
             const run = this.timedRun;
+            const definition = RAN.getDefinition(session.assessmentId);
 
             // UX refinement pass: compact −/value/+ stepper in place of a
             // bare numeric input, so 4 fields fit in far less vertical
@@ -1439,7 +1857,12 @@ window.RAN = window.RAN || {};
                     el('label', { for: id, textContent: labelText }),
                     stepper,
                 ]);
-                return { field, input };
+                // plusBtn/minusBtn additionally exposed (item 20) so the
+                // primary-error-budget wiring below can attach its own
+                // extra listeners without touching this shared helper's
+                // own behavior — existing callers (selfCorr/reps) simply
+                // never read these two extra properties.
+                return { field, input, plusBtn, minusBtn };
             };
 
             // Order locked by examiner review: Αντικαταστάσεις, Παραλείψεις,
@@ -1462,28 +1885,137 @@ window.RAN = window.RAN || {};
                 ])
                 : null;
 
-            // UX refinement pass: examinerProvidedAnswers/examinerRedirects/
-            // sequenceLoss were already captured live during timedRunning —
-            // they're shown here as a compact READ-ONLY summary, not
-            // editable inputs, and the submit handler below reads them
-            // straight from `run` (unchanged values/logic, just no longer
-            // exposed as a form control the examiner could accidentally
-            // edit after the fact).
-            const proceduralSummary = el('div', { className: 'ran-card ran-procedural-summary' }, [
-                el('h2', { textContent: 'Καταγράφηκαν κατά τη δοκιμασία' }),
-                el('dl', { className: 'ran-summary-list' }, [
-                    el('dt', { textContent: 'Δόθηκε απάντηση' }),
-                    el('dd', { textContent: String(run.examinerProvidedAnswers) }),
-                    el('dt', { textContent: 'Επαναφορές' }),
-                    el('dd', { textContent: String(run.examinerRedirects) }),
-                    el('dt', { textContent: 'Απώλεια σειράς' }),
-                    el('dd', { textContent: run.sequenceLoss ? 'Ναι' : 'Όχι' }),
+            // Post-trial review/correction (item 15, locked): these
+            // three were previously a READ-ONLY summary of whatever was
+            // clicked live during timedRunning, with no way to fix a
+            // mis-click after the fact. They are now editable HERE, at
+            // this existing post-timing review stage — deliberately NOT
+            // adding any +/- control to the live timedRunning screen
+            // itself, which stays exactly as before (no extra cognitive
+            // load during actual measurement). Pre-filled with the
+            // live-recorded values from `run`; the submit handler below
+            // compares the final (possibly edited) values against these
+            // same `run.*` values to set examinerReviewAdjusted — never
+            // free text, a single boolean audit marker. durationMs and
+            // stimulusSequence are untouched by this review step: this
+            // screen already reads run.durationMs read-only above (never
+            // fed into any of these fields), and stimulusSequence comes
+            // from the fixed definition/form, never from `run` at all.
+            const redirects = stepperField('Επαναφορές εξεταστή', run.examinerRedirects);
+            const answers = stepperField('Δόθηκε απάντηση', run.examinerProvidedAnswers);
+            const seqLossYes = el('input', { type: 'radio', name: 'ran-review-sequence-loss', checked: run.sequenceLoss === true });
+            const seqLossNo = el('input', { type: 'radio', name: 'ran-review-sequence-loss', checked: run.sequenceLoss !== true });
+            const seqLossField = el('div', { className: 'ran-form-field ran-form-field-compact' }, [
+                el('label', { textContent: 'Απώλεια σειράς' }),
+                el('div', { className: 'ran-radio-group ran-radio-group-inline' }, [
+                    el('label', {}, [seqLossYes, document.createTextNode(' Ναι')]),
+                    el('label', {}, [seqLossNo, document.createTextNode(' Όχι')]),
                 ]),
             ]);
+            const proceduralSummary = el('div', { className: 'ran-card ran-procedural-summary' }, [
+                el('h2', { textContent: 'Έλεγχος καταγεγραμμένων γεγονότων' }),
+                el('p', { className: 'ran-field-hint', textContent: 'Οι τιμές είναι αυτές που καταγράφηκαν κατά τη χρονομέτρηση. Διόρθωσέ τις μόνο αν έγινε λάθος πάτημα — δεν επηρεάζουν τον χρόνο ή τη σειρά ερεθισμάτων.' }),
+                answers.field, redirects.field, seqLossField,
+            ]);
+
+            const submitBtn = el('button', {
+                className: 'ran-btn ran-btn-primary',
+                textContent: 'Ολοκλήρωση Καταγραφής',
+                onClick: () => {
+                    const toInt = (input) => Math.max(0, parseInt(input.value, 10) || 0);
+                    // Post-trial correction (item 15): the FINAL
+                    // reviewed values (possibly edited here) are
+                    // what the administration actually stores —
+                    // never the raw `run.*` values directly.
+                    // examinerReviewAdjusted is set iff at least
+                    // one of these three differs from what was
+                    // live-recorded — durationMs above still
+                    // comes straight from `run.durationMs`,
+                    // completely untouched by this comparison.
+                    const finalRedirects = toInt(redirects.input);
+                    const finalAnswers = toInt(answers.input);
+                    const finalSequenceLoss = seqLossYes.checked;
+                    const examinerReviewAdjusted = finalRedirects !== run.examinerRedirects
+                        || finalAnswers !== run.examinerProvidedAnswers
+                        || finalSequenceLoss !== run.sequenceLoss;
+                    const result = RAN.timed.buildCompletedAdministration({
+                        studentId: draft.studentId,
+                        assessmentId: session.assessmentId,
+                        form: draft.form,
+                        durationMs: run.durationMs,
+                        substitutions: toInt(subs.input),
+                        omissions: toInt(omis.input),
+                        repetitions: toInt(reps.input),
+                        selfCorrections: toInt(selfCorr.input),
+                        examinerRedirects: finalRedirects,
+                        examinerProvidedAnswers: finalAnswers,
+                        sequenceLoss: finalSequenceLoss,
+                        examinerReviewAdjusted,
+                        familiarityRetriesUsed: session.familiarity.retriesUsed,
+                        notes: notesInput.value || '',
+                    });
+                    if (result.validationProblems.length) {
+                        draft.lastValidationProblems = result.validationProblems;
+                        this.navigate('timedErrorCapture');
+                        return;
+                    }
+                    draft.lastValidationProblems = null;
+                    this.timedRecord = result;
+                    this.navigate('results');
+                },
+            });
+
+            // Item 20: UI-level prevention mirroring the engine's own
+            // locked rule (RAN.validateAdministration: substitutions +
+            // omissions + examinerProvidedAnswers must not exceed
+            // totalStimuli) — NOT a second/different rule, just the same
+            // one enforced earlier, at the controls themselves, so an
+            // invalid combination is caught before submit rather than
+            // only after. Deliberately scoped to exactly these three
+            // mutually-exclusive primary-error fields — repetitions and
+            // selfCorrections are separate descriptive counts (per spec,
+            // never part of this sum) and are untouched by any of this.
+            const toIntLive = (input) => Math.max(0, parseInt(input.value, 10) || 0);
+            const errorBudgetMessage = el('p', { className: 'ran-error-budget-message', role: 'alert' });
+            errorBudgetMessage.hidden = true;
+            function recomputeErrorBudget() {
+                const sum = toIntLive(subs.input) + toIntLive(omis.input) + toIntLive(answers.input);
+                const overBudget = sum > definition.totalStimuli;
+                errorBudgetMessage.textContent = overBudget
+                    ? `Το άθροισμα Αντικαταστάσεων, Παραλείψεων και «Δόθηκε απάντηση» (${sum}) υπερβαίνει το σύνολο ερεθισμάτων (${definition.totalStimuli}). Διόρθωσε τις τιμές πριν συνεχίσεις.`
+                    : '';
+                errorBudgetMessage.hidden = !overBudget;
+                submitBtn.disabled = overBudget;
+                // Dynamic bound: once the three together already reach
+                // the total, incrementing ANY of them further would
+                // exceed it — so all three "+" buttons (not just the one
+                // just clicked) are disabled together, and re-enabled the
+                // moment any field is lowered enough to free up room.
+                // Never blocks decrementing, and never touches selfCorr/
+                // reps' own +/- buttons.
+                const atBudget = sum >= definition.totalStimuli;
+                [subs, omis, answers].forEach(f => { f.plusBtn.disabled = atBudget; });
+            }
+            [subs, omis, answers].forEach(f => {
+                // 'input' catches live typing; the plus/minus buttons
+                // mutate input.value programmatically (no native 'input'
+                // event fires for that), so they need their own listener
+                // — registered here, AFTER stepperField's own onClick
+                // already ran and updated the value, so this always reads
+                // the post-click value.
+                f.input.addEventListener('input', recomputeErrorBudget);
+                f.plusBtn.addEventListener('click', recomputeErrorBudget);
+                f.minusBtn.addEventListener('click', recomputeErrorBudget);
+            });
 
             const screen = el('div', { className: 'ran-screen ran-error-capture-screen' }, [
                 renderStepper('timed'),
-                el('h1', { textContent: 'Καταγραφή (Simple Mode)' }),
+                // Item 19 wording correction: user-facing text only —
+                // the screen key ('timedErrorCapture'), CSS class
+                // (.ran-error-capture-screen), and every internal
+                // identifier/comment referring to "Simple Mode" are
+                // deliberately left untouched.
+                el('h1', { textContent: 'Απλή καταγραφή' }),
                 el('p', { className: 'ran-status-line', textContent: `Μετρημένος χρόνος: ${formatElapsedTime(run.durationMs)} (${fmtNum(run.durationMs / 1000, 2)} sec)` }),
                 problemsBox,
                 el('div', { className: 'ran-error-capture-grid' }, [
@@ -1493,43 +2025,17 @@ window.RAN = window.RAN || {};
                     ]),
                     proceduralSummary,
                 ]),
+                errorBudgetMessage,
                 el('div', { className: 'ran-card' }, [
                     el('h2', { textContent: 'Σημειώσεις' }),
                     notesInput,
                 ]),
                 el('div', { className: 'ran-actions' }, [
-                    el('button', {
-                        className: 'ran-btn ran-btn-primary',
-                        textContent: 'Ολοκλήρωση Καταγραφής',
-                        onClick: () => {
-                            const toInt = (input) => Math.max(0, parseInt(input.value, 10) || 0);
-                            const result = RAN.timed.buildCompletedAdministration({
-                                studentId: draft.studentId,
-                                assessmentId: session.assessmentId,
-                                form: draft.form,
-                                durationMs: run.durationMs,
-                                substitutions: toInt(subs.input),
-                                omissions: toInt(omis.input),
-                                repetitions: toInt(reps.input),
-                                selfCorrections: toInt(selfCorr.input),
-                                examinerRedirects: run.examinerRedirects,
-                                examinerProvidedAnswers: run.examinerProvidedAnswers,
-                                sequenceLoss: run.sequenceLoss,
-                                notes: notesInput.value || '',
-                            });
-                            if (result.validationProblems.length) {
-                                draft.lastValidationProblems = result.validationProblems;
-                                this.navigate('timedErrorCapture');
-                                return;
-                            }
-                            draft.lastValidationProblems = null;
-                            this.timedRecord = result;
-                            this.navigate('results');
-                        },
-                    }),
+                    submitBtn,
                 ]),
             ]);
             this.container.appendChild(screen);
+            recomputeErrorBudget();
         },
 
         /**
@@ -1583,10 +2089,32 @@ window.RAN = window.RAN || {};
             const newProfileField = el('div', { className: 'ran-form-field' }, [
                 el('label', { for: 'ran-save-new-profile-name', textContent: 'Όνομα νέου προφίλ' }),
                 newProfileInput,
+                buildDataMinimizationHint(),
             ]);
             newProfileField.style.display = select.value === NEW_PROFILE_VALUE ? 'block' : 'none';
+
+            // Grade data-flow (A: prefill in UI). The grade select
+            // starts prefilled from the currently-selected EXISTING
+            // profile's profile.grade — purely a read, nothing is
+            // written anywhere yet. Re-prefilled every time the
+            // examiner switches which profile they're saving under; for
+            // "+ Νέο προφίλ" there is no profile.grade yet to read, so
+            // it resets to "not set" (the examiner can still pick one —
+            // it will only affect this one gradeAtAdministration
+            // snapshot, since a brand-new profile has no grade of its
+            // own to have prefilled from).
+            const initialProfile = (select.value && select.value !== NEW_PROFILE_VALUE) ? RAN.storage.getProfile(select.value) : null;
+            const gradeSelect = buildGradeSelect('ran-save-grade-select', initialProfile && initialProfile.grade);
+            const gradeField = el('div', { className: 'ran-form-field' }, [
+                el('label', { for: 'ran-save-grade-select', textContent: 'Τάξη κατά τη χορήγηση' }),
+                gradeSelect,
+            ]);
+
             select.addEventListener('change', () => {
                 newProfileField.style.display = select.value === NEW_PROFILE_VALUE ? 'block' : 'none';
+                const chosenProfile = select.value !== NEW_PROFILE_VALUE ? RAN.storage.getProfile(select.value) : null;
+                gradeSelect.value = (chosenProfile && chosenProfile.grade && GRADE_OPTION_ORDER.includes(chosenProfile.grade))
+                    ? chosenProfile.grade : GRADE_UNSET_VALUE;
             });
 
             return el('div', { className: 'ran-save-section' }, [
@@ -1601,6 +2129,7 @@ window.RAN = window.RAN || {};
                     select,
                 ]),
                 newProfileField,
+                gradeField,
                 el('div', { className: 'ran-actions' }, [
                     el('button', {
                         className: 'ran-btn ran-btn-primary',
@@ -1610,7 +2139,16 @@ window.RAN = window.RAN || {};
                             if (profileId === NEW_PROFILE_VALUE) {
                                 profileId = RAN.storage.createProfile(newProfileInput.value).profileId;
                             }
-                            this.lastSaveResult = RAN.storage.saveAdministration(profileId, admin);
+                            // Grade data-flow (B: explicit write). The
+                            // examiner's FINAL selected value is
+                            // assigned onto a new administration object
+                            // here, explicitly, by this UI/save-flow
+                            // code — BEFORE RAN.storage.saveAdministration
+                            // is called. Storage itself never reads
+                            // profile.grade or decides this value (see
+                            // that function's own note in ran_storage.js).
+                            const administrationToSave = Object.assign({}, admin, { gradeAtAdministration: readGradeSelect(gradeSelect) });
+                            this.lastSaveResult = RAN.storage.saveAdministration(profileId, administrationToSave);
                             this.navigate('results');
                         },
                     }),
@@ -1651,32 +2189,79 @@ window.RAN = window.RAN || {};
                     ? el('p', { className: 'ran-status-line', textContent: 'Αιτία διακοπής: ' + RAN.wording.invalidReasonLabels[admin.invalidReason] })
                     : null;
 
-            const primaryMetric = results.completionTimeSec != null
+            // INCOMPLETE/INVALID correctness fix: which time figure (if
+            // any) counts as a "primary performance result" depends on
+            // status — never the same tile/label for all three.
+            //   COMPLETED/COMPLETED_FLAGGED: unchanged — completionTimeSec,
+            //     labeled "Χρόνος ολοκλήρωσης" (a genuine completion time).
+            //   INCOMPLETE: the run was never completed, so its elapsed
+            //     time is NOT a completion time — shown as
+            //     interruptedAtTimeSec under "Χρόνος μέχρι τη διακοπή"
+            //     instead, never claiming the run finished.
+            //   INVALID: no elapsed-time figure is a valid performance
+            //     result at all — shows an explicit "—", never the raw
+            //     stored duration (which remains in admin.durationMs,
+            //     untouched, as raw audit data only).
+            const primaryMetric = admin.status === RAN.STATUS.INVALID
                 ? el('div', { className: 'ran-metric-primary' }, [
-                    el('div', { className: 'ran-metric-primary-value', textContent: `${fmtNum(results.completionTimeSec, 2)} sec` }),
+                    el('div', { className: 'ran-metric-primary-value', textContent: '—' }),
                     el('div', { className: 'ran-metric-primary-label', textContent: 'Χρόνος ολοκλήρωσης' }),
                 ])
-                : null;
+                : admin.status === RAN.STATUS.INCOMPLETE
+                    ? (results.interruptedAtTimeSec != null
+                        ? el('div', { className: 'ran-metric-primary' }, [
+                            el('div', { className: 'ran-metric-primary-value', textContent: `${fmtNum(results.interruptedAtTimeSec, 2)} sec` }),
+                            el('div', { className: 'ran-metric-primary-label', textContent: 'Χρόνος μέχρι τη διακοπή' }),
+                        ])
+                        : null)
+                    : (results.completionTimeSec != null
+                        ? el('div', { className: 'ran-metric-primary' }, [
+                            el('div', { className: 'ran-metric-primary-value', textContent: `${fmtNum(results.completionTimeSec, 2)} sec` }),
+                            el('div', { className: 'ran-metric-primary-label', textContent: 'Χρόνος ολοκλήρωσης' }),
+                        ])
+                        : null);
 
-            const secondaryMetrics = results.rateEligible
+            // INVALID gets an explicit "—" independent-correct tile
+            // (never a number — independentCorrect is null for INVALID
+            // per RAN.calcResults) instead of the generic non-eligible
+            // sentence, per the explicit "Ανεξάρτητα σωστές: —"
+            // requirement. INCOMPLETE keeps the existing generic
+            // sentence (no specific replacement wording was requested
+            // there, and it already fully suppresses any number).
+            const secondaryMetrics = admin.status === RAN.STATUS.INVALID
                 ? el('div', { className: 'ran-metrics-secondary' }, [
                     el('div', { className: 'ran-metric-card' }, [
-                        el('div', { className: 'ran-metric-card-value', textContent: `${results.independentCorrect} / ${results.totalStimuli}` }),
+                        el('div', { className: 'ran-metric-card-value', textContent: '—' }),
                         el('div', { className: 'ran-metric-card-label', textContent: 'Ανεξάρτητα σωστές κατονομασίες' }),
                     ]),
-                    el('div', { className: 'ran-metric-card', title: 'σωστές ανεξάρτητες κατονομασίες/sec' }, [
-                        el('div', { className: 'ran-metric-card-value', textContent: `${fmtNum(results.independentNamingRate, 2)}/sec` }),
-                        el('div', { className: 'ran-metric-card-label', textContent: 'Περιγραφικός ρυθμός ανεξάρτητης κατονομασίας' }),
-                    ]),
                 ])
-                : el('p', { className: 'ran-status-line', textContent: 'Δεν υπολογίζεται δείκτης ταχύτητας κατονομασίας για αυτή τη χορήγηση.' });
+                : results.rateEligible
+                    ? el('div', { className: 'ran-metrics-secondary' }, [
+                        el('div', { className: 'ran-metric-card' }, [
+                            el('div', { className: 'ran-metric-card-value', textContent: `${results.independentCorrect} / ${results.totalStimuli}` }),
+                            el('div', { className: 'ran-metric-card-label', textContent: 'Ανεξάρτητα σωστές κατονομασίες' }),
+                        ]),
+                        el('div', { className: 'ran-metric-card', title: 'σωστές ανεξάρτητες κατονομασίες/sec' }, [
+                            el('div', { className: 'ran-metric-card-value', textContent: `${fmtNum(results.independentNamingRate, 2)}/sec` }),
+                            el('div', { className: 'ran-metric-card-label', textContent: 'Περιγραφικός ρυθμός ανεξάρτητης κατονομασίας' }),
+                        ]),
+                    ])
+                    : el('p', { className: 'ran-status-line', textContent: 'Δεν υπολογίζεται δείκτης ταχύτητας κατονομασίας για αυτή τη χορήγηση.' });
 
             // Scientific Protocol Correction decision §7: short helper
             // descriptions for the item-error/procedural terms, shown as
             // native tooltips on the term (<dt title="...">) — descriptive
             // only, not a new visible UI element.
+            // Same status-driven time label/value as primaryMetric above
+            // — kept as one shared computation so the detailed-data list
+            // can never disagree with the primary tile about what the
+            // elapsed-time figure means for this status.
+            const timeRowLabel = admin.status === RAN.STATUS.INCOMPLETE ? 'Χρόνος μέχρι τη διακοπή (δευτ.)' : 'Χρόνος ολοκλήρωσης (δευτ.)';
+            const timeRowValue = admin.status === RAN.STATUS.INCOMPLETE
+                ? (results.interruptedAtTimeSec != null ? fmtNum(results.interruptedAtTimeSec, 2) : '—')
+                : (results.completionTimeSec != null ? fmtNum(results.completionTimeSec, 2) : '—');
             const dlEntries = [
-                ['Χρόνος ολοκλήρωσης (δευτ.)', results.completionTimeSec != null ? fmtNum(results.completionTimeSec, 2) : '—'],
+                [timeRowLabel, timeRowValue],
                 ['Ανεξάρτητα σωστές κατονομασίες', results.independentCorrect != null ? results.independentCorrect : '—'],
                 ['Σύνολο ερεθισμάτων', results.totalStimuli],
                 ['Αντικαταστάσεις', results.substitutions, 'Λανθασμένες κατονομασίες που δεν αυτοδιορθώθηκαν.'],
@@ -1686,6 +2271,8 @@ window.RAN = window.RAN || {};
                 ['Δόθηκε απάντηση', results.examinerProvidedAnswers, 'Περιπτώσεις στις οποίες, μετά από περίπου 3\'\' χωρίς απόκριση, ο εξεταστής έδωσε το όνομα του ερεθίσματος για να συνεχιστεί η διαδικασία.'],
                 ['Επαναφορές εξεταστή', results.examinerRedirects],
                 ['Απώλεια σειράς', results.sequenceLoss ? 'Ναι' : 'Όχι'],
+                ['Διόρθωση μετά τη χρονομέτρηση', results.examinerReviewAdjusted ? 'Ναι' : 'Όχι', 'Ο εξεταστής άλλαξε τουλάχιστον μία από τις παραπάνω τιμές (Δόθηκε απάντηση / Επαναφορές εξεταστή / Απώλεια σειράς) στο στάδιο ελέγχου μετά τη χρονομέτρηση, σε σχέση με ό,τι είχε καταγραφεί ζωντανά.'],
+                ['Επανεξοικείωση πριν τη χορήγηση', RAN.wording.resolveFamiliarityRetriesLabel(admin.familiarityRetriesUsed), 'Πόσες φορές χρειάστηκε νέος έλεγχος εξοικείωσης επειδή τουλάχιστον ένα ερέθισμα δεν κατονομάστηκε ως Γνωστό. Καθαρά περιγραφικό — δεν επηρεάζει τη βαθμολόγηση ή την κατάσταση της χορήγησης.'],
             ];
             const dl = el('dl', {}, dlEntries.flatMap(([term, value, helpText]) => [
                 el('dt', helpText ? { textContent: term, title: helpText } : { textContent: term }),
@@ -1764,7 +2351,7 @@ window.RAN = window.RAN || {};
                 body.push(el('div', { className: 'ran-profile-list' }, profiles.map(p => el('div', { className: 'ran-profile-row' }, [
                     el('div', {}, [
                         el('div', { className: 'ran-profile-label', textContent: p.displayLabel }),
-                        el('div', { className: 'ran-profile-meta', textContent: p.createdAt ? `Δημιουργήθηκε: ${p.createdAt.slice(0, 10)}` : '' }),
+                        el('div', { className: 'ran-profile-meta', textContent: p.createdAt ? `Δημιουργήθηκε: ${p.createdAt.slice(0, 10)} · ${RAN.wording.resolveGradeLabel(p.grade)}` : RAN.wording.resolveGradeLabel(p.grade) }),
                     ]),
                     el('button', {
                         className: 'ran-btn ran-btn-secondary',
@@ -1775,14 +2362,18 @@ window.RAN = window.RAN || {};
             }
 
             const newLabelInput = el('input', { id: 'ran-new-profile-name', type: 'text', value: RAN.storage.suggestNextDisplayLabel() });
+            const newProfileGradeSelect = buildGradeSelect('ran-new-profile-grade', null);
             body.push(el('div', { className: 'ran-form-field' }, [
                 el('label', { for: 'ran-new-profile-name', textContent: '+ Νέο προφίλ' }),
                 newLabelInput,
+                buildDataMinimizationHint(),
+                el('label', { for: 'ran-new-profile-grade', textContent: 'Τάξη (προαιρετικό)' }),
+                newProfileGradeSelect,
                 el('div', { className: 'ran-actions' }, [
                     el('button', {
                         className: 'ran-btn ran-btn-secondary',
                         textContent: 'Δημιουργία',
-                        onClick: () => { RAN.storage.createProfile(newLabelInput.value); this.navigate('profiles'); },
+                        onClick: () => { RAN.storage.createProfile(newLabelInput.value, readGradeSelect(newProfileGradeSelect)); this.navigate('profiles'); },
                     }),
                 ]),
             ]));
@@ -1861,13 +2452,69 @@ window.RAN = window.RAN || {};
             if (!profile) { this.navigate('profiles'); return; }
 
             const renameInput = el('input', { id: 'ran-rename-profile', type: 'text', value: profile.displayLabel });
+            // Grade proposal: editing profile.grade here only changes
+            // future prefill (renderSaveSection reads profile.grade at
+            // save time) — it can never alter any already-saved
+            // administration's own gradeAtAdministration snapshot, since
+            // that field lives independently on each administration
+            // record and nothing here touches it.
+            const profileGradeSelect = buildGradeSelect('ran-profile-grade', profile.grade);
+            // Moved above `body` (was previously declared further down)
+            // so the item 23 delete-profile confirmation below can state
+            // the REAL, current administration count — computed fresh on
+            // every render, never a stale/cached number.
+            const administrations = RAN.storage.listAdministrations(profile.profileId);
+
+            // Item 23: cascade delete, gated behind the same explicit
+            // two-step confirmation pattern as individual-administration
+            // delete (renderProfileHistory's own History table below) —
+            // never a single accidental click. The message is built
+            // dynamically from `administrations.length` so it always
+            // states the real, current number about to be deleted, not
+            // a guess or a stale count.
+            const deleteProfileMessage = administrations.length > 0
+                ? `Θα διαγραφεί το προφίλ και ${administrations.length} συνδεδεμένες χορηγήσεις. Η ενέργεια δεν αναιρείται.`
+                : 'Θα διαγραφεί το προφίλ. Η ενέργεια δεν αναιρείται.';
+            const deleteProfileSection = this.pendingDeleteProfile
+                ? el('div', { className: 'ran-form-field' }, [
+                    el('p', { className: 'ran-error-budget-message', role: 'alert', textContent: deleteProfileMessage }),
+                    el('div', { className: 'ran-actions' }, [
+                        el('button', {
+                            className: 'ran-btn ran-btn-danger',
+                            textContent: 'Ναι, οριστική διαγραφή προφίλ',
+                            onClick: () => {
+                                RAN.storage.deleteProfile(profile.profileId);
+                                this.pendingDeleteProfile = false;
+                                this.navigate('profiles');
+                            },
+                        }),
+                        el('button', {
+                            className: 'ran-btn ran-btn-secondary',
+                            textContent: 'Άκυρο',
+                            onClick: () => { this.pendingDeleteProfile = false; this.navigate('profileHistory'); },
+                        }),
+                    ]),
+                ])
+                : el('div', { className: 'ran-form-field' }, [
+                    el('div', { className: 'ran-actions' }, [
+                        el('button', {
+                            className: 'ran-btn ran-btn-danger',
+                            textContent: 'Διαγραφή προφίλ',
+                            onClick: () => { this.pendingDeleteProfile = true; this.navigate('profileHistory'); },
+                        }),
+                    ]),
+                ]);
 
             const body = [
                 el('h1', { textContent: profile.displayLabel }),
+                // PASS 2 §10: shown exactly once here, at the top —
+                // never repeated per assessment-type section below.
+                el('p', { className: 'ran-cross-type-warning', textContent: RAN.wording.crossTypeWarning }),
                 el('div', { className: 'ran-info-card', textContent: RAN.wording.storageWarning }),
                 el('div', { className: 'ran-form-field' }, [
                     el('label', { for: 'ran-rename-profile', textContent: 'Μετονομασία προφίλ' }),
                     renameInput,
+                    buildDataMinimizationHint(),
                     el('div', { className: 'ran-actions' }, [
                         el('button', {
                             className: 'ran-btn ran-btn-secondary',
@@ -1876,113 +2523,247 @@ window.RAN = window.RAN || {};
                         }),
                     ]),
                 ]),
+                el('div', { className: 'ran-form-field' }, [
+                    el('label', { for: 'ran-profile-grade', textContent: 'Τάξη μαθητή (τρέχουσα)' }),
+                    profileGradeSelect,
+                    el('div', { className: 'ran-actions' }, [
+                        el('button', {
+                            className: 'ran-btn ran-btn-secondary',
+                            textContent: 'Αποθήκευση Τάξης',
+                            onClick: () => { RAN.storage.updateProfileGrade(profile.profileId, readGradeSelect(profileGradeSelect)); this.navigate('profileHistory'); },
+                        }),
+                    ]),
+                ]),
+                deleteProfileSection,
             ];
 
-            const administrations = RAN.storage.listAdministrations(profile.profileId);
+            // Versioning (V2): grouped by TYPE, not by a single fixed
+            // assessmentId — RAN_DIGITS_V1 and RAN_DIGITS_V2 are
+            // distinct assessmentIds, so a naive per-assessmentId loop
+            // would render two separate, identically-labeled "RAN
+            // Αριθμοί" sections. Per type, only the assessmentIds that
+            // either (a) already have at least one saved administration
+            // for this profile, or (b) are the type's CURRENT_VERSIONS
+            // entry, are shown — so a brand-new profile with no history
+            // yet sees exactly one section per type (the current
+            // version), matching the pre-V2 single-version UI exactly,
+            // while a profile with old V1 data keeps seeing it
+            // alongside V2. The " — Έκδοση N" heading suffix is only
+            // added when more than one version is actually being shown
+            // for that type in THIS profile's history.
+            const assessmentIdsByType = {};
+            Object.keys(RAN.definitions).forEach(id => {
+                const type = RAN.definitions[id].type;
+                (assessmentIdsByType[type] = assessmentIdsByType[type] || []).push(id);
+            });
+            Object.keys(RAN.CURRENT_VERSIONS).forEach(type => {
+                const idsForType = (assessmentIdsByType[type] || []).slice()
+                    .sort((a, b) => RAN.definitions[a].version - RAN.definitions[b].version);
+                const currentId = RAN.CURRENT_VERSIONS[type];
+                const idsToShow = idsForType.filter(id => id === currentId || administrations.some(a => a.assessmentId === id));
+                const showVersionSuffix = idsToShow.length > 1;
+                const typeLabel = RAN.getDefinition(currentId).label;
 
-            Object.keys(ASSESSMENT_LABELS).forEach(assessmentId => {
+            idsToShow.forEach(assessmentId => {
                 const rows = administrations.filter(a => a.assessmentId === assessmentId);
-                body.push(el('h2', { textContent: `RAN ${ASSESSMENT_LABELS[assessmentId]}` }));
+                const version = RAN.definitions[assessmentId].version;
+                // PASS 2 §13: "Έκδοση" -> "Έκδοση εργαλείου" wherever the
+                // assessmentVersion is presented as a standalone label —
+                // internal field/enum names are completely untouched.
+                const versionSuffix = showVersionSuffix ? ` — Έκδοση εργαλείου ${version}` : '';
+                body.push(el('h2', { textContent: `RAN ${typeLabel}${versionSuffix}` }));
                 if (rows.length === 0) {
                     body.push(el('p', { className: 'ran-status-line', textContent: 'Καμία καταγεγραμμένη χορήγηση.' }));
                     return;
                 }
 
-                const sortedByDate = rows.slice().sort((a, b) => (a.dateISO || '').localeCompare(b.dateISO || ''));
-                const latest = sortedByDate[sortedByDate.length - 1];
-                if (latest.durationMs != null) {
-                    body.push(el('div', { className: 'ran-metric-latest' }, [
-                        el('div', { className: 'ran-metric-latest-value', textContent: `${fmtNum(latest.durationMs / 1000, 2)} sec` }),
-                        el('div', { className: 'ran-metric-latest-label', textContent: 'Τελευταία χορήγηση' }),
-                    ]));
-                }
+                // PASS 2 §11: the standalone "Τελευταία χορήγηση" card is
+                // removed entirely, for every assessment type, with 1 or
+                // many administrations. The time remains visible in the
+                // History table below, and in graph points when a graph
+                // is shown — never in a separate large metric widget.
 
-                // Phase 6 — Longitudinal Graph. Grouped by assessment
-                // VERSION so a future RAN_DIGITS_V2 is never connected
-                // into the same line as V1 (spec §8) — one graph
-                // section per version that has >=3 comparable (same
-                // profile+assessmentId+version), graph-eligible
-                // (COMPLETED/COMPLETED_FLAGGED only) administrations.
-                // Form A/B may share one graph (spec §9) — only the
-                // version is a hard split. Below the 3-point minimum,
-                // no graph is shown for that version at all (the table
-                // further below is unaffected and always complete).
-                const byVersion = new Map();
-                rows.forEach(a => {
-                    if (!byVersion.has(a.assessmentVersion)) byVersion.set(a.assessmentVersion, []);
-                    byVersion.get(a.assessmentVersion).push(a);
-                });
-                Array.from(byVersion.keys()).sort((a, b) => a - b).forEach(version => {
-                    const eligiblePoints = byVersion.get(version)
-                        .filter(isGraphEligible)
-                        .slice()
-                        .sort((a, b) => (a.dateISO || '').localeCompare(b.dateISO || ''))
-                        .map(a => ({ dateISO: a.dateISO, durationSec: a.durationMs / 1000, form: a.form, status: a.status }));
-                    if (eligiblePoints.length >= 3) {
-                        const versionCount = byVersion.size;
-                        const heading = `RAN ${ASSESSMENT_LABELS[assessmentId]}${versionCount > 1 ? ` — Έκδοση ${version}` : ''}`;
-                        body.push(buildLongitudinalGraph(eligiblePoints, heading));
-                    }
-                });
+                // PASS 2 §3/§4/§12: `rows` already belongs to exactly ONE
+                // assessmentId, and assessmentId<->assessmentVersion is
+                // 1:1 in RAN.definitions (confirmed in the PASS 1 audit)
+                // — so no separate per-version grouping is needed here
+                // any more; a byVersion Map would always have had exactly
+                // one entry. Threshold changed from >=3 to >=2 (PASS 2
+                // §3): COMPLETED and COMPLETED_FLAGGED both count toward
+                // it — isGraphEligible() already covers both. The
+                // COMPLETED_FLAGGED restriction is scoped to connecting
+                // line segments (buildLongitudinalGraph's own
+                // connectableSegment()) and numeric comparison
+                // (classifyComparisonPair() below), never to a flagged
+                // point's presence on the graph.
+                const eligiblePoints = rows
+                    .filter(isGraphEligible)
+                    .slice()
+                    .sort((a, b) => (a.dateISO || '').localeCompare(b.dateISO || ''))
+                    .map(a => ({
+                        dateISO: a.dateISO,
+                        durationSec: a.durationMs / 1000,
+                        independentCorrect: a.independentCorrect,
+                        totalStimuli: a.totalStimuli,
+                        form: a.form,
+                        status: a.status,
+                    }));
+                if (eligiblePoints.length >= 2) {
+                    const heading = `RAN ${typeLabel}${versionSuffix}`;
+                    body.push(buildLongitudinalGraph(eligiblePoints, heading));
+                } else if (eligiblePoints.length === 1) {
+                    // PASS 2 §12: no graph, no giant latest-time metric —
+                    // just the neutral threshold explanation. The History
+                    // table (pushed further below) still shows this and
+                    // every other row normally, regardless.
+                    body.push(el('p', { className: 'ran-field-hint ran-graph-insufficient-message', textContent: RAN.wording.insufficientGraphDataMessage }));
+                }
 
                 const table = el('table', { className: 'ran-history-table' }, [
                     el('thead', {}, [el('tr', {}, [
                         el('th', { textContent: 'Ημερομηνία' }),
-                        el('th', { textContent: 'Έκδοση' }),
+                        el('th', { textContent: 'Έκδοση εργαλείου' }),
                         el('th', { textContent: 'Μορφή' }),
                         el('th', { textContent: 'Χρόνος (δευτ.)' }),
                         el('th', { textContent: 'Ανεξάρτητα σωστά' }),
                         el('th', { textContent: 'Κατάσταση' }),
+                        el('th', { textContent: 'Τάξη' }),
+                        el('th', { textContent: 'Επανεξοικείωση' }),
+                        el('th', { textContent: 'Ενέργειες' }),
                     ])]),
-                    el('tbody', {}, rows.map(a => el('tr', {}, [
-                        el('td', { 'data-label': 'Ημερομηνία', textContent: formatDateDDMMYYYY(a.dateISO) }),
-                        el('td', { 'data-label': 'Έκδοση', textContent: String(a.assessmentVersion) }),
-                        el('td', { 'data-label': 'Μορφή', textContent: a.form }),
-                        el('td', { 'data-label': 'Χρόνος (δευτ.)', textContent: a.durationMs != null ? fmtNum(a.durationMs / 1000, 2) : '—' }),
-                        el('td', { 'data-label': 'Ανεξάρτητα σωστά', textContent: a.independentCorrect != null ? String(a.independentCorrect) : '—' }),
-                        el('td', { 'data-label': 'Κατάσταση', textContent: RAN.wording.resolveHistoryStatusLabel(a.status) }),
-                    ]))),
+                    el('tbody', {}, rows.map(a => {
+                        // INCOMPLETE/INVALID correctness fix: reuse
+                        // RAN.calcResults() as the single source of truth
+                        // instead of reading a.durationMs/a.independentCorrect
+                        // directly — a raw INCOMPLETE independentCorrect would
+                        // otherwise silently treat never-reached stimuli as
+                        // correct, and INVALID's raw elapsed time would
+                        // otherwise look like a comparable completion time in
+                        // the same column as COMPLETED rows.
+                        const rowResults = RAN.calcResults(a);
+                        const timeCell = a.status === RAN.STATUS.INVALID
+                            ? '—'
+                            : a.status === RAN.STATUS.INCOMPLETE
+                                ? (rowResults.interruptedAtTimeSec != null ? `${fmtNum(rowResults.interruptedAtTimeSec, 2)} (διακοπή)` : '—')
+                                : (rowResults.completionTimeSec != null ? fmtNum(rowResults.completionTimeSec, 2) : '—');
+                        return el('tr', {}, [
+                            el('td', { 'data-label': 'Ημερομηνία', textContent: formatDateDDMMYYYY(a.dateISO) }),
+                            el('td', { 'data-label': 'Έκδοση εργαλείου', textContent: String(a.assessmentVersion) }),
+                            el('td', { 'data-label': 'Μορφή', textContent: a.form }),
+                            el('td', { 'data-label': 'Χρόνος (δευτ.)', textContent: timeCell }),
+                            el('td', { 'data-label': 'Ανεξάρτητα σωστά', textContent: rowResults.independentCorrect != null ? String(rowResults.independentCorrect) : '—' }),
+                            el('td', { 'data-label': 'Κατάσταση', textContent: RAN.wording.resolveHistoryStatusLabel(a.status) }),
+                            // Grade proposal: this specific
+                            // administration's immutable snapshot, never
+                            // the profile's current grade — reads
+                            // a.gradeAtAdministration only, through the
+                            // tolerant resolver (legacy rows without the
+                            // field, or any unrecognized value, show the
+                            // neutral fallback, never "Άλλο").
+                            el('td', { 'data-label': 'Τάξη', textContent: RAN.wording.resolveGradeLabel(a.gradeAtAdministration) }),
+                            // Item 16: same immutable-snapshot pattern as
+                            // Τάξη above — reads a.familiarityRetriesUsed
+                            // only, through the tolerant resolver (a
+                            // legacy row predating this field, or any
+                            // non-integer/negative value, shows "Δεν
+                            // καταγράφηκε", never a silent 0).
+                            el('td', { 'data-label': 'Επανεξοικείωση', textContent: RAN.wording.resolveFamiliarityRetriesLabel(a.familiarityRetriesUsed) }),
+                            // Item 23: explicit per-administration
+                            // delete, gated behind an inline two-step
+                            // confirmation (click "Διαγραφή" once to
+                            // arm it, a second explicit click actually
+                            // deletes) — never a single accidental
+                            // click away from permanent data loss.
+                            // History/graph/comparison need no separate
+                            // refresh call: they're all derived fresh
+                            // from RAN.storage.listAdministrations() on
+                            // every render, and the delete handler
+                            // re-navigates to this same screen, so the
+                            // deleted row (and any graph/comparison
+                            // point it fed) is simply gone from the very
+                            // next render.
+                            el('td', { 'data-label': 'Ενέργειες' },
+                                this.pendingDeleteAdministrationId === a.administrationId
+                                    ? [
+                                        el('span', { className: 'ran-status-line', textContent: 'Οριστική διαγραφή;' }),
+                                        el('button', {
+                                            className: 'ran-btn ran-btn-danger',
+                                            textContent: 'Ναι, διαγραφή',
+                                            onClick: () => {
+                                                RAN.storage.deleteAdministration(a.administrationId);
+                                                this.pendingDeleteAdministrationId = null;
+                                                this.navigate('profileHistory');
+                                            },
+                                        }),
+                                        el('button', {
+                                            className: 'ran-btn ran-btn-secondary',
+                                            textContent: 'Άκυρο',
+                                            onClick: () => { this.pendingDeleteAdministrationId = null; this.navigate('profileHistory'); },
+                                        }),
+                                    ]
+                                    : [
+                                        el('button', {
+                                            className: 'ran-btn ran-btn-secondary',
+                                            textContent: 'Διαγραφή',
+                                            onClick: () => { this.pendingDeleteAdministrationId = a.administrationId; this.navigate('profileHistory'); },
+                                        }),
+                                    ]),
+                        ]);
+                    })),
                 ]);
-                body.push(table);
+                // PASS 2 §13/§17 layout fix (visual QA finding): the
+                // table gained enough columns/label length ("Έκδοση
+                // εργαλείου", "Επανεξοικείωση", "Ενέργειες") that at a
+                // ~900px laptop width it can exceed the available
+                // width. #ran-app/body clip horizontal overflow (no
+                // page scrollbar, by design, for the decorative-blob
+                // bleed effect) — without its own scroll container, the
+                // excess columns would be silently invisible, not just
+                // scrollable. Wrapping in a horizontally-scrollable
+                // container (same established pattern as the graph's
+                // own .ran-graph-svg-wrap) guarantees every column
+                // always stays reachable, never clipped away.
+                body.push(el('div', { className: 'ran-history-table-wrap' }, [table]));
 
-                const eligible = rows.filter(a => RAN.calcResults(a).rateEligible && a.assessmentVersion === rows[rows.length - 1].assessmentVersion);
-                if (eligible.length >= 2) {
-                    const sorted = eligible.slice().sort((a, b) => (a.dateISO || '').localeCompare(b.dateISO || ''));
-                    const previous = sorted[sorted.length - 2];
-                    const current = sorted[sorted.length - 1];
-                    // A/B longitudinal policy (locked): a numerical time
-                    // comparison is only ever shown between the two most
-                    // recent rate-eligible same-version administrations
-                    // WHEN THEY ALSO SHARE THE SAME FORM — Form A and
-                    // Form B have no documented psychometric equivalence,
-                    // so a cross-form delta would misleadingly read as a
-                    // direct measurement of change. Deliberately no
-                    // fallback to an older same-form pair if the two most
-                    // recent differ — that would silently substitute a
-                    // non-adjacent comparison without saying so.
-                    if (previous.form === current.form) {
-                        const diff = RAN.calcTimeDifference(previous.durationMs, current.durationMs);
-                        if (diff) {
-                            // Deliberately no color-coding for faster/slower —
-                            // a descriptive difference, not a normative
-                            // judgement (Phase 5.5 §24, reaffirmed in the
-                            // Results/History presentation pass). The wording
-                            // itself (comparisonLine/comparisonNote) is
-                            // RAN.wording.formatTimeComparison's own locked/
-                            // tested output, rendered verbatim — the note is
-                            // always shown alongside the line, never omitted.
-                            const labels = RAN.wording.formatTimeComparison(diff.deltaSec, diff.percentChange);
-                            body.push(el('p', { className: 'ran-comparison-line', textContent: labels.comparisonLine }));
-                            body.push(el('p', { className: 'ran-comparison-note', textContent: labels.comparisonNote }));
-                        }
+                // PASS 2 §2 — EXACT PAIR RULE (replaces the old "filter
+                // eligible, then take the two most recent eligible ones"
+                // behavior, which could silently search backward past an
+                // ineligible most-recent administration). Take ONLY the
+                // two chronologically LAST administrations of this
+                // assessmentId — any status — and classify exactly that
+                // pair; never search further back for a better pair.
+                const sortedAll = rows.slice().sort((a, b) => (a.dateISO || '').localeCompare(b.dateISO || ''));
+                if (sortedAll.length >= 2) {
+                    const previous = sortedAll[sortedAll.length - 2];
+                    const current = sortedAll[sortedAll.length - 1];
+                    const classification = classifyComparisonPair(previous, current);
+                    if (classification.kind === 'valid') {
+                        // Deliberately no color-coding for faster/slower —
+                        // a descriptive difference, not a normative
+                        // judgement. Percentage change is never rendered
+                        // (PASS 2 §1) — only the signed absolute
+                        // difference, via formatTimeComparison.
+                        body.push(el('p', { className: 'ran-comparison-header', textContent: RAN.wording.comparisonHeader(classification.form) }));
+                        const labels = RAN.wording.formatTimeComparison(classification.diff.deltaSec);
+                        body.push(el('p', { className: 'ran-comparison-line', textContent: labels.comparisonLine }));
+                        body.push(el('p', { className: 'ran-comparison-note', textContent: labels.comparisonNote }));
+                    } else if (classification.kind === 'flagged') {
+                        body.push(el('p', { className: 'ran-comparison-line ran-comparison-unavailable', textContent: RAN.wording.comparisonBlockedFlagged }));
+                    } else if (classification.kind === 'form-mismatch') {
+                        body.push(el('p', { className: 'ran-comparison-line ran-comparison-unavailable', textContent: RAN.wording.comparisonFormMismatch(classification.previousForm, classification.currentForm) }));
                     } else {
-                        body.push(el('p', { className: 'ran-comparison-line ran-comparison-unavailable', textContent: RAN.wording.timeComparisonFormMismatch }));
+                        // 'ineligible': one or both of the last two are
+                        // INCOMPLETE/INVALID (or otherwise not graph-
+                        // eligible) — no backward search for an older
+                        // eligible pair, per the exact-pair rule.
+                        body.push(el('p', { className: 'ran-comparison-line ran-comparison-unavailable', textContent: RAN.wording.comparisonBlockedIneligibleStatus }));
                     }
                 }
-            });
+            }); // end idsToShow.forEach
+            }); // end Object.keys(RAN.CURRENT_VERSIONS).forEach
 
             body.push(el('div', { className: 'ran-actions' }, [
-                el('button', { className: 'ran-btn ran-btn-secondary', textContent: '← Πίσω στα Προφίλ', onClick: () => this.navigate('profiles') }),
+                el('button', { className: 'ran-btn ran-btn-secondary', textContent: '← Πίσω στα Προφίλ', onClick: () => { this.pendingDeleteAdministrationId = null; this.pendingDeleteProfile = false; this.navigate('profiles'); } }),
             ]));
 
             this.container.appendChild(el('div', { className: 'ran-screen' }, body));
