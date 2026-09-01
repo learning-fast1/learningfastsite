@@ -1364,7 +1364,6 @@ window.RAN = window.RAN || {};
                         placeholder,
                     ]),
                     el('div', { className: 'ran-toolbar ran-prestart-toolbar' }, [
-                        el('img', { className: 'ran-brand-logo ran-brand-logo-small', src: 'assets/brand/logo.png', alt: 'Learning Fast' }),
                         el('h1', { textContent: `${ASSESSMENT_LABELS[session.assessmentId]} — Μορφή ${draft.form}` }),
                         el('p', { className: 'ran-status-line', textContent: RAN.wording.preStartReminder }),
                         el('div', { className: 'ran-actions' }, [
@@ -2332,7 +2331,6 @@ window.RAN = window.RAN || {};
             ]));
             body.push(el('div', { className: 'ran-hero' }, [
                 renderBlob('dot', { top: '-6px', right: '8px' }),
-                el('img', { className: 'ran-brand-logo ran-brand-logo-small', src: 'assets/brand/logo.png', alt: 'Learning Fast' }),
                 el('h1', { textContent: 'Προφίλ & Ιστορικό' }),
             ]));
             body.push(el('div', { className: 'ran-info-card', textContent: RAN.wording.storageWarning }));
