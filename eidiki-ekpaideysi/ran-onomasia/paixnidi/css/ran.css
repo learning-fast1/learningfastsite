@@ -91,23 +91,23 @@
 
 * { box-sizing: border-box; }
 
-/* Mobile touch fix: every real click target in this app is a <button>
-   (even card-styled ones, e.g. .ran-assessment-card) plus native
-   checkbox/radio inputs — none of them need the browser's default
-   double-tap-to-zoom gesture, which otherwise fires when an examiner
-   taps two buttons in quick succession on a touch device. This only
-   suppresses that double-tap/delay gesture on these elements; pinch-
-   zoom on the page itself is untouched (no user-scalable=no), so the
-   page remains zoomable for accessibility. */
-button, input[type="checkbox"], input[type="radio"] {
-    touch-action: manipulation;
-}
-
 body {
     margin: 0;
     font-family: var(--font-body);
     background: var(--ran-bg);
     color: var(--ran-text);
+    /* Mobile touch fix, page-wide: an earlier narrower version of this
+       rule only targeted button/checkbox/radio, which missed the
+       .ran-stimulus tiles (plain <div>s, tapped rapidly during
+       timedRunning) and any other non-<button> interactive element —
+       any two taps landing close together anywhere on the page could
+       still trigger the browser's default double-tap-to-zoom gesture.
+       Applying touch-action: manipulation at the body level removes
+       that gesture everywhere in one place; pinch-zoom is explicitly
+       still permitted by "manipulation" (unlike "none"), and the
+       viewport meta has no user-scalable=no, so accessibility zoom is
+       untouched. */
+    touch-action: manipulation;
     /* Decorative blobs are deliberately positioned partially outside
        their .ran-hero container (a soft "bleed" effect) — without this,
        narrow viewports get a horizontal scrollbar from that overflow. */
