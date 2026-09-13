@@ -208,6 +208,10 @@ button {
 .btn-back { position: fixed; top: var(--space-md); left: var(--space-md); z-index: 10; }
 .btn-mute { position: fixed; top: var(--space-md); right: var(--space-md); z-index: 10; }
 .btn-settings { position: fixed; top: var(--space-md); right: var(--space-md); z-index: 10; }
+.site-back-link {
+    position: fixed; top: var(--space-md); left: var(--space-md); z-index: 10;
+    text-decoration: none;
+}
 
 /* ===========================================
    7. HOME SCREEN
