@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Τα Ζωάκια — Παιχνίδι πληκτρολόγησης για παιδιά. Γράψε το όνομα ενός ζώου και δες το!">
+    <meta name="theme-color" content="#B8A9E8">
+    <title>Τα Ζωάκια — Learning Fast</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css?v=5">
+</head>
+<body>
+    <div id="app">
+
+        <!-- HOME SCREEN -->
+        <section id="home-screen" class="home-screen">
+            <button id="settings-btn" class="btn btn-icon btn-settings" aria-label="Ρυθμίσεις για εκπαιδευτικούς">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+            </button>
+
+            <div class="home-logo-emoji" aria-hidden="true">🐾</div>
+            <h1 class="home-title">Τα Ζωάκια</h1>
+            <p class="home-subtitle">Γράψε το όνομα ενός ζώου στο πληκτρολόγιο και θα το δεις να εμφανίζεται!</p>
+            <button id="start-btn" class="btn btn-primary btn-large">Ας ξεκινήσουμε</button>
+        </section>
+
+        <!-- SETTINGS MODAL (για τον εκπαιδευτικό) -->
+        <div id="settings-overlay" class="settings-overlay" hidden>
+            <div class="settings-modal">
+                <h2 class="settings-title">Ρυθμίσεις</h2>
+                <p class="settings-desc">Ποιες απαντήσεις να δέχεται το παιχνίδι ως σωστές;</p>
+
+                <div class="settings-options">
+                    <button class="settings-option" data-mode="exact">
+                        <span class="settings-option-title">Ορθές λέξεις</span>
+                        <span class="settings-option-desc">Χωρίς ορθογραφικά λάθη (μόνο η σωστή γραφή)</span>
+                    </button>
+                    <button class="settings-option" data-mode="typos">
+                        <span class="settings-option-title">Με ορθογραφικά λάθη</span>
+                        <span class="settings-option-desc">Δέχεται μικρά λάθη γραφής</span>
+                    </button>
+                    <button class="settings-option" data-mode="omissions">
+                        <span class="settings-option-title">Με παράλειψη γραμμάτων</span>
+                        <span class="settings-option-desc">Ορθογραφικά λάθη + μεγαλύτερη ανοχή σε γράμματα που λείπουν</span>
+                    </button>
+                </div>
+
+                <button id="settings-close-btn" class="btn btn-primary">Κλείσιμο</button>
+            </div>
+        </div>
+
+        <!-- LEVEL SELECT SCREEN -->
+        <section id="levels-screen" class="levels-screen" hidden>
+            <button id="levels-back-btn" class="btn btn-back-pill btn-back" aria-label="Πίσω">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+                Πίσω
+            </button>
+
+            <h2 class="levels-title">Διάλεξε επίπεδο</h2>
+
+            <div class="level-list">
+                <button class="level-card level-card-1" data-level="1">
+                    <span class="level-num">1</span>
+                    <span class="level-info">
+                        <span class="level-title">Επίπεδο 1</span>
+                        <span class="level-desc">Γράψε το όνομα ενός ζώου</span>
+                    </span>
+                </button>
+                <button class="level-card level-card-2" data-level="2">
+                    <span class="level-num">2</span>
+                    <span class="level-info">
+                        <span class="level-title">Επίπεδο 2</span>
+                        <span class="level-desc">Πάτα «Θέλω» και γράψε το ζώο</span>
+                    </span>
+                </button>
+                <button class="level-card level-card-3" data-level="3">
+                    <span class="level-num">3</span>
+                    <span class="level-info">
+                        <span class="level-title">Επίπεδο 3</span>
+                        <span class="level-desc">Γράψε ολόκληρη την πρόταση</span>
+                    </span>
+                </button>
+            </div>
+        </section>
+
+        <!-- GAME SCREEN -->
+        <section id="game-screen" class="game-screen" hidden>
+            <button id="back-btn" class="btn btn-back-pill btn-back" aria-label="Πίσω">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="M11 18l-6-6 6-6"/></svg>
+                Πίσω
+            </button>
+            <button id="mute-btn" class="btn btn-icon btn-mute" aria-label="Ήχος">🔊</button>
+
+            <p id="game-instructions" class="game-instructions">Ποιο ζώο θέλεις να δεις; Γράψε το όνομά του!</p>
+
+            <div id="reveal-card" class="reveal-card">
+                <p id="reveal-hint" class="reveal-hint">🐾</p>
+                <img id="reveal-img" alt="" hidden>
+                <span id="reveal-emoji" class="reveal-emoji" hidden></span>
+                <p id="reveal-label" class="reveal-label"></p>
+            </div>
+
+            <div class="text-input-area">
+                <button id="want-btn" class="btn btn-secondary btn-want" type="button" hidden>Θέλω</button>
+                <input id="animal-input" class="game-text-input" type="text"
+                       autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            </div>
+
+            <div class="collection-wrap">
+                <p class="collection-title">Ζωάκια που βρήκες: <span id="collection-count">0</span></p>
+                <div id="collection-strip" class="collection-strip"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <div id="bg-shapes" aria-hidden="true">
+        <div class="bg-shape shape-circle shape-1"></div>
+        <div class="bg-shape shape-circle shape-2"></div>
+        <div class="bg-shape shape-circle shape-3"></div>
+        <div class="bg-shape shape-square shape-4"></div>
+        <div class="bg-shape shape-circle shape-5"></div>
+        <div class="bg-shape shape-square shape-6"></div>
+    </div>
+
+    <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+    <script src="js/animals.js?v=8"></script>
+    <script src="js/app.js?v=10"></script>
+</body>
+</html>
