@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Learning Fast Workspace – Πρόσβαση</title>
+  <link rel="stylesheet" href="../styles/main.css" />
+  <style>
+    .ws-gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--primary-tint, #EAE7FA); }
+    .ws-gate__card { width: 100%; max-width: 400px; background: var(--surface, #fff); border-radius: var(--radius, 20px); padding: 2rem 1.75rem; box-shadow: 0 12px 40px rgba(95, 82, 184, .22); text-align: center; display: flex; flex-direction: column; gap: 1rem; }
+    .ws-gate__card img { height: 34px; width: auto; margin: 0 auto; display: block; }
+    .ws-gate__card h1 { font-size: 1.35rem; color: var(--text, #3B3358); }
+    .ws-gate__card p { color: var(--muted, #8A80A8); font-size: .95rem; line-height: 1.5; }
+    .ws-gate__input { font: inherit; font-size: 1.05rem; padding: .8rem 1rem; border-radius: 12px; border: 2px solid #ddd8f3; text-align: center; }
+    .ws-gate__input:focus-visible { outline: 3px solid var(--primary-tint, #EAE7FA); border-color: var(--primary, #7C6FD9); }
+    .ws-gate__btn { font: inherit; font-weight: 800; color: #fff; border: none; cursor: pointer; padding: .85rem 1rem; border-radius: 12px; background: linear-gradient(180deg, #9a8ff0 0%, var(--primary, #7C6FD9) 55%, var(--primary-dark, #5F52B8) 100%); box-shadow: 0 4px 0 #4a3f9c, 0 9px 16px rgba(95, 82, 184, .35), inset 0 1px 0 rgba(255,255,255,.4); }
+    .ws-gate__btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #4a3f9c; }
+    .ws-gate__card .ws-gate__error { color: #b3402f; font-weight: 700; font-size: .95rem; min-height: 1.2em; }
+    .ws-gate__back { font-size: .9rem; font-weight: 600; color: var(--primary, #7C6FD9); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <main class="ws-gate">
+    <form class="ws-gate__card" id="wsForm" autocomplete="off">
+      <img src="../assets/images/logo-wordmark.png" alt="Learning Fast" />
+      <h1>Learning Fast Workspace</h1>
+      <p>Η πρόσβαση γίνεται μόνο με κωδικό.</p>
+      <input class="ws-gate__input" id="wsCode" type="password" placeholder="Κωδικός πρόσβασης" aria-label="Κωδικός πρόσβασης" autofocus />
+      <p class="ws-gate__error" id="wsError" role="alert"></p>
+      <button class="ws-gate__btn" type="submit">Είσοδος</button>
+      <a class="ws-gate__back" href="../index.html">← Επιστροφή στην Αρχική</a>
+    </form>
+  </main>
+  <script>
+    // Απλό φίλτρο πρόσβασης (όχι πραγματική ασφάλεια): ο κωδικός δεν γράφεται σε απλό κείμενο,
+    // μόνο το SHA-256 του. Αν αλλάξει ο κωδικός, αλλάζει το HASH και όλα τα «θυμημένα» ξεκλειδώματα ακυρώνονται.
+    var HASH = '69c38d36707cdd094f06fb36fc43b91e799c87a8931fb852bfe8e19fdf4a4293';
+    var KEY = 'lfWorkspaceAccess';
+    var TARGET = 'https://learning-fast1.github.io/workspace/';
+    function sha256(text) {
+      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (buf) {
+        return Array.prototype.map.call(new Uint8Array(buf), function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+      });
+    }
+    try { if (localStorage.getItem(KEY) === HASH) location.replace(TARGET); } catch (e) {}
+    document.getElementById('wsForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var err = document.getElementById('wsError');
+      sha256(document.getElementById('wsCode').value.trim()).then(function (h) {
+        if (h === HASH) {
+          try { localStorage.setItem(KEY, HASH); } catch (e2) {}
+          location.replace(TARGET);
+        } else {
+          err.textContent = 'Λάθος κωδικός. Δοκίμασε ξανά.';
+        }
+      });
+    });
+    document.getElementById('wsCode').addEventListener('input', function () { document.getElementById('wsError').textContent = ''; });
+  </script>
+</body>
+</html>
