@@ -9,5 +9,74 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Ελαφρύ update-check, χωρίς service worker: η εφαρμογή μένει συχνά
+      // ανοιχτή όλη μέρα σε tablet/πίνακα, οπότε ένα deploy ενώ είναι ήδη
+      // φορτωμένη περνάει απαρατήρητο -- ο browser κρατά το παλιό JS στη
+      // μνήμη ασχέτως cache headers. Κάθε λίγα λεπτά ξαναφέρνει το δικό του
+      // index.html (cache: 'no-store', ώστε να μην ξαναδιαβάσει cache) και
+      // συγκρίνει το hashed όνομα του κύριου JS bundle με αυτό που έχει
+      // φορτωμένο -- αν διαφέρει, δείχνει μια μικρή, μη παρεμβατική
+      // ειδοποίηση αντί να κάνει silent/αυτόματο reload (θα έκοβε μια
+      // δραστηριότητα σε εξέλιξη).
+      (function () {
+        var CHECK_INTERVAL_MS = 3 * 60 * 1000;
+        var currentScript = document.querySelector('script[type="module"][src*="/assets/"]');
+        if (!currentScript) return;
+        var currentSrc = currentScript.getAttribute('src');
+
+        function extractMainScriptSrc(html) {
+          var match = html.match(/<script[^>]*type="module"[^>]*src="([^"]*\/assets\/[^"]+\.js)"/);
+          return match ? match[1] : null;
+        }
+
+        function showUpdateBanner() {
+          if (document.getElementById('app-update-banner')) return;
+          var banner = document.createElement('div');
+          banner.id = 'app-update-banner';
+          banner.setAttribute('role', 'status');
+          banner.style.cssText =
+            'position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99999;' +
+            'background:#3c6f7c;color:#fff;padding:12px 18px;border-radius:14px;' +
+            'font-family:system-ui,sans-serif;font-size:15px;font-weight:600;' +
+            'box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;align-items:center;gap:12px;';
+          var text = document.createElement('span');
+          text.textContent = 'Υπάρχει νέα έκδοση της εφαρμογής.';
+          var button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = 'Ανανέωση';
+          button.style.cssText =
+            'background:#fff;color:#3c6f7c;border:none;border-radius:10px;' +
+            'padding:8px 14px;font-weight:800;cursor:pointer;font-size:14px;';
+          button.onclick = function () {
+            location.reload();
+          };
+          banner.appendChild(text);
+          banner.appendChild(button);
+          document.body.appendChild(banner);
+        }
+
+        function checkForUpdate() {
+          var url = new URL('index.html', location.href);
+          url.searchParams.set('_check', Date.now());
+          fetch(url.toString(), { cache: 'no-store' })
+            .then(function (res) {
+              return res.ok ? res.text() : null;
+            })
+            .then(function (html) {
+              if (!html) return;
+              var latestSrc = extractMainScriptSrc(html);
+              if (latestSrc && latestSrc !== currentSrc) showUpdateBanner();
+            })
+            .catch(function () {
+              // Δίχως σύνδεση ή άλλο πρόβλημα δικτύου -- σιωπηλή αποτυχία,
+              // ξαναδοκιμάζει στον επόμενο κύκλο.
+            });
+        }
+
+        setTimeout(checkForUpdate, 30 * 1000);
+        setInterval(checkForUpdate, CHECK_INTERVAL_MS);
+      })();
+    </script>
   </body>
 </html>
