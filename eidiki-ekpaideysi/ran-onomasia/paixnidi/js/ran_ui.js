@@ -858,6 +858,14 @@ window.RAN = window.RAN || {};
                 el('div', { className: 'ran-disclaimer', textContent: RAN.wording.intendedAudienceNote }),
             ]);
             this.container.appendChild(screen);
+
+            // Copyright μόνο στην αρχική οθόνη -- το navigate() αδειάζει το
+            // container, οπότε φεύγει μόνο του στις υπόλοιπες οθόνες.
+            const copyright = document.createElement('p');
+            copyright.className = 'lf-copyright';
+            copyright.style.cssText = 'position:fixed;left:50%;bottom:10px;transform:translateX(-50%);max-width:calc(100% - 24px);margin:0;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.85);color:#444;font:13px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;text-align:center;z-index:9999;pointer-events:none;';
+            copyright.textContent = '© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.';
+            this.container.appendChild(copyright);
         },
 
         startPreparation(assessmentId) {
