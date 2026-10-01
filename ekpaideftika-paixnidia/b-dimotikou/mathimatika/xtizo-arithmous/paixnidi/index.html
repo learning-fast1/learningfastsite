@@ -52,6 +52,8 @@ button:focus-visible,[tabindex]:focus-visible,input:focus-visible{outline:3px so
 .modes button[aria-selected="true"]{background:var(--nav);color:var(--nav-ink)}
 .stars{font-family:var(--f-display);font-weight:700;display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
 .stars svg{width:18px;height:18px;fill:#F2B32E}
+.home{color:inherit;text-decoration:none}
+.home:hover{background:var(--nav);color:var(--nav-ink);border-color:var(--nav)}
 .icon-btn{border:1px solid var(--line);background:var(--panel);border-radius:999px;width:38px;height:38px;display:grid;place-items:center}
 .icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
 .lvl{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 4px 4px 12px;font-size:.85rem;color:var(--muted)}
@@ -256,6 +258,7 @@ label.small{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
       </div>
       <div class="stars" title="Αστέρια"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z"/></svg><span id="stars">0</span></div>
       <button class="icon-btn" id="snd" aria-label="Ήχος ανοιχτός" title="Ήχος"></button>
+      <a class="icon-btn home" href="/" aria-label="Learning Fast – Αρχική" title="Learning Fast – Αρχική"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 9.5V20h5v-6h4v6h5V9.5"/></svg></a>
     </div>
   </header>
 
