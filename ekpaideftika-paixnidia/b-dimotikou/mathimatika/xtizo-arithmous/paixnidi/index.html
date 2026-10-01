@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Χτίζω Αριθμούς: δωρεάν διαδραστικό παιχνίδι αξίας θέσης ψηφίου με κύβους Dienes. Πρόσθεση με κρατούμενο και αφαίρεση με δανεικό.">
+<title>Χτίζω Αριθμούς</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Didact+Gothic&display=swap">
+<style>
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+
+/* Layout: graph-paper desk; place-value mat on the left, task + vertical operation on the right; block tray under the mat */
+:root{
+  --paper:#EAF0F3; --grid:#D8E1E8; --panel:#FFFFFF; --ink:#1C2733; --muted:#5A6878; --line:#CBD5DF; --nav:#233C58; --nav-ink:#FFFFFF;
+  --c0:#7B4CBF; --c1:#2D83D8; --c2:#EC8629; --c3:#35A064;
+  --ok:#2C9A58; --warn:#C9741E; --bad:#C24848;
+  --f-display:'Comfortaa','Trebuchet MS',sans-serif;
+  --f-body:'Didact Gothic','Segoe UI',Arial,sans-serif;
+  --ub:clamp(6px, 0.55vw + 3.2px, 11px);
+  --u:var(--ub);
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#12181F; --grid:#1A222B; --panel:#1C242E; --ink:#E6EDF3; --muted:#9AA8B7; --line:#2E3A47; --nav:#DDE7F1; --nav-ink:#14202C;
+  --c0:#9B72DD; --c1:#4B9BEA; --c2:#F29A45; --c3:#4CB87D; --ok:#4CC27E; --warn:#F0A254; --bad:#EE7474; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#12181F; --grid:#1A222B; --panel:#1C242E; --ink:#E6EDF3; --muted:#9AA8B7; --line:#2E3A47; --nav:#DDE7F1; --nav-ink:#14202C;
+  --c0:#9B72DD; --c1:#4B9BEA; --c2:#F29A45; --c3:#4CB87D; --ok:#4CC27E; --warn:#F0A254; --bad:#EE7474; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px}
+.app{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:10px 12px;display:flex;flex-direction:column;gap:10px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible,input:focus-visible{outline:3px solid var(--c1);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{width:84px;height:44px;flex:none;overflow:visible}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:clamp(1.35rem,2.4vw,1.8rem);margin:0;letter-spacing:-.01em}
+.brand p{margin:0;color:var(--muted);font-size:.9rem}
+.right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.modes{display:flex;flex-wrap:wrap;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px}
+.modes button{border:0;background:transparent;padding:8px 14px;border-radius:999px;font-family:var(--f-display);font-weight:700;font-size:.88rem}
+.modes button[aria-selected="true"]{background:var(--nav);color:var(--nav-ink)}
+.stars{font-family:var(--f-display);font-weight:700;display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+.stars svg{width:18px;height:18px;fill:#F2B32E}
+.icon-btn{border:1px solid var(--line);background:var(--panel);border-radius:999px;width:38px;height:38px;display:grid;place-items:center}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+.lvl{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 4px 4px 12px;font-size:.85rem;color:var(--muted)}
+.lvl .seg{display:flex;gap:2px}
+.lvl .seg button{border:0;background:transparent;border-radius:999px;padding:5px 10px;font-family:var(--f-display);font-weight:700;font-size:.85rem}
+.lvl .seg button[aria-pressed="true"]{background:var(--nav);color:var(--nav-ink)}
+
+/* stage */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) clamp(260px,27vw,340px);gap:14px;align-items:start}
+@media (max-width:699px){.stage{grid-template-columns:minmax(0,1fr)}}
+.board{display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+
+/* readout + tools bar */
+.ro-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:8px 10px 8px 14px}
+.ro{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;min-width:0}
+.digits{display:flex;gap:6px}
+.dg{--c:var(--c3);min-width:48px;border-radius:10px;border:2px solid var(--c);background:color-mix(in oklab,var(--c) 12%,var(--panel));text-align:center;padding:4px 6px 3px}
+.dg b{display:block;font-family:var(--f-display);font-size:1.35rem;line-height:1.15;font-variant-numeric:tabular-nums}
+.dg small{display:block;font-size:.72rem;color:var(--muted);letter-spacing:.06em}
+.dg.over{border-style:dashed;background:color-mix(in oklab,var(--warn) 16%,var(--panel))}
+.dg.over b{color:var(--warn)}
+.eq{display:flex;flex-direction:column;min-width:0}
+.eq .val{font-family:var(--f-display);font-weight:700;font-size:1.5rem;line-height:1.1}
+.eq .words{color:var(--muted);font-size:.95rem}
+
+/* mat */
+.mat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:hidden}
+.col{--c:var(--c3);display:flex;flex-direction:column;min-width:0;border-left:1px solid var(--line);transition:background .15s}
+.col:first-child{border-left:0}
+.col.hot{background:color-mix(in oklab,var(--c) 10%,var(--panel))}
+.col.nohot{background:color-mix(in oklab,var(--bad) 8%,var(--panel))}
+.col-h{background:color-mix(in oklab,var(--c) 16%,var(--panel));border-bottom:3px solid var(--c);padding:5px 6px;text-align:center}
+.col-h .ab{font-family:var(--f-display);font-weight:700;font-size:1.1rem;color:var(--c);line-height:1;margin-right:5px}
+.col-h .nm{font-size:.82rem;font-weight:600;overflow-wrap:anywhere}
+.col-h .eqv{font-size:.72rem;color:var(--muted);display:block}
+.col-b{--u:calc(var(--ub)*var(--k,1));position:relative;flex:1;min-height:calc(var(--ub)*25);padding:8px 4px;display:flex;justify-content:center;align-content:flex-start;align-items:flex-start}
+.col-b.k0,.col-b.k1{flex-wrap:wrap;gap:5px}
+.col-b.k2{flex-wrap:wrap;gap:3px}
+.col-b.k3{display:grid;grid-template-columns:repeat(5,var(--u));gap:2px;grid-auto-rows:var(--u)}
+.col-f{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 8px;padding:5px 4px;border-top:1px dashed var(--line);min-height:42px}
+.col-f .n{font-family:var(--f-display);font-weight:700;font-size:1.25rem;font-variant-numeric:tabular-nums}
+.col-f .n.over{color:var(--warn)}
+.grp{border:0;border-radius:999px;background:var(--c);color:#fff;font-weight:700;font-size:.8rem;padding:6px 10px;animation:nudge 1.4s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(-3px)}}
+
+/* blocks */
+.blk{position:relative;flex:none;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.blk.k3{width:var(--u);height:var(--u);border-radius:2px;background:var(--c3)}
+.blk.k2{width:var(--u);height:calc(var(--u)*10);border-radius:2px;background-color:var(--c2);
+  background-image:linear-gradient(to bottom,rgb(0 0 0/.22) 1px,transparent 1px);background-size:100% var(--u)}
+.blk.k1{width:calc(var(--u)*6);height:calc(var(--u)*6);border-radius:2px;background-color:var(--c1);
+  background-image:linear-gradient(to bottom,rgb(0 0 0/.2) 1px,transparent 1px),linear-gradient(to right,rgb(0 0 0/.2) 1px,transparent 1px);
+  background-size:10% 10%}
+/* in the mat, 3 flats / cubes always fit side by side, whatever the column width */
+.col-b.k0,.col-b.k1{container-type:inline-size}
+.col-b .blk.k0,.col-b .blk.k1{width:min(calc(var(--u)*6),30cqi);height:min(calc(var(--u)*6),30cqi)}
+.blk.k3,.blk.k2,.blk.k1{box-shadow:inset -1px -1px 0 rgb(0 0 0/.28),inset 1px 1px 0 rgb(255 255 255/.4),0 1px 2px rgb(0 0 0/.15)}
+.blk.k0{width:calc(var(--u)*6);height:calc(var(--u)*6)}
+.blk.k0 svg{display:block;width:100%;height:100%}
+.blk.is-b{filter:saturate(.5) brightness(1.2)}
+.blk.dragging{opacity:.25}
+.blk.pop{animation:pop .38s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes pop{from{transform:scale(.2);opacity:0}}
+.blk.gather{animation:gather .4s ease-in forwards}
+@keyframes gather{to{transform:translateX(-70px) scale(.4);opacity:0}}
+.blk.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.ghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;opacity:.92;filter:drop-shadow(0 6px 10px rgb(0 0 0/.3));margin:0!important}
+body.tool-break .col-b .blk{cursor:crosshair}
+body.tool-erase .col-b .blk{cursor:not-allowed}
+
+/* tray */
+.tray{--u:calc(var(--ub)*.55);padding:6px 10px;display:flex;flex-direction:column;gap:5px;transition:background .15s}
+.tray.hot{background:color-mix(in oklab,var(--bad) 8%,var(--panel))}
+.tray-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 8px}
+.tray-h h3{margin:0;font-family:var(--f-display);font-size:.95rem}
+.tray-h p{margin:0;color:var(--muted);font-size:.82rem;flex:1;min-width:12em}
+.tray-h .btn{padding:5px 12px}
+.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.slot{--c:var(--c3);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 10px;padding:4px;border-radius:10px;background:color-mix(in oklab,var(--c) 8%,var(--panel));border:1px solid color-mix(in oklab,var(--c) 30%,var(--line));min-height:calc(var(--u)*10 + 8px)}
+.slot .txt{display:flex;flex-direction:column;align-items:center}
+.slot .lbl{font-size:.8rem;text-align:center}
+.slot .cnt{font-family:var(--f-display);font-weight:700;font-size:.95rem;color:var(--c)}
+.slot .blk.k3{width:calc(var(--u)*1.8);height:calc(var(--u)*1.8)}
+.slot{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.slot.empty,.slot.empty .blk{cursor:default}
+.slot.empty .blk{opacity:.2}
+.bin{display:flex;align-items:center;justify-content:center;gap:10px;min-height:50px;border:2px dashed var(--line);border-radius:12px;color:var(--muted);font-size:.95rem;text-align:center;padding:8px}
+.bin svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+
+/* side */
+.side{display:flex;flex-direction:column;gap:10px;min-width:0}
+.card{padding:12px 14px}
+.card h2{font-family:var(--f-display);font-size:1.05rem;margin:0 0 4px}
+.card p{margin:0 0 8px;font-size:.93rem}
+.card .muted{color:var(--muted);font-size:.88rem}
+.big{font-family:var(--f-display);font-weight:700;font-size:clamp(1.45rem,2.3vw,1.9rem);line-height:1.15;margin:2px 0 6px;text-wrap:balance}
+.th{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.th .btn{padding:6px 12px;font-size:.88rem;flex:none}
+.big.w{font-size:1.45rem}
+/* the number to build, in any form, stands out clearly in bold */
+.task-build .big{font-weight:700;-webkit-text-stroke:.8px currentColor;paint-order:stroke fill}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px 14px;font-weight:600}
+.btn.pri{background:var(--nav);color:var(--nav-ink);border-color:var(--nav)}
+.btn:disabled{opacity:.45;cursor:default}
+input[type=number]{font:inherit;font-family:var(--f-display);font-weight:700;font-size:1.1rem;width:7.5ch;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+label.small{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
+.steps{margin:4px 0 8px;padding-left:1.2em;font-size:.88rem;line-height:1.35}
+.steps li{margin-bottom:3px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.chip{--c:var(--c3);border:2px solid var(--c);border-radius:999px;padding:2px 9px;font-size:.84rem;font-weight:600;background:color-mix(in oklab,var(--c) 10%,var(--panel))}
+.chip.done{background:var(--c);color:#fff}
+.chip.need{border-style:dashed}
+.hint{border-radius:10px;padding:6px 10px;font-size:.88rem;background:color-mix(in oklab,var(--warn) 14%,var(--panel));margin-bottom:8px}
+.hint:empty{display:none}
+.win{border-radius:12px;padding:8px 12px;background:color-mix(in oklab,var(--ok) 15%,var(--panel));border:1px solid color-mix(in oklab,var(--ok) 45%,var(--line));margin-bottom:8px;animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.win b{font-family:var(--f-display);font-size:1.1rem;display:block}
+
+.tools{display:flex;gap:6px}
+.tools button{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:6px 10px;display:flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600}
+.tools svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;flex:none}
+.tools button[aria-pressed="true"]{background:var(--nav);color:var(--nav-ink);border-color:var(--nav)}
+.tools button:disabled{opacity:.35;cursor:default}
+
+.op{padding:10px 14px}
+.op h3{margin:0 0 4px;font-family:var(--f-display);font-size:.92rem}
+.opg{display:grid;grid-template-columns:28px repeat(var(--w),40px);justify-content:center;font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums}
+.opg > div{height:34px;display:flex;align-items:center;justify-content:center;font-size:1.45rem;position:relative}
+.opg .hd{height:20px;font-size:.82rem}
+.opg .mk{height:20px;font-size:.9rem;color:var(--bad)}
+.opg .mk.carry{color:var(--ok)}
+.opg .rule{height:0;border-top:3px solid var(--ink);grid-column:1/-1;margin:2px 0}
+.opg s{text-decoration-thickness:3px;text-decoration-color:var(--bad);color:var(--muted)}
+.opg .res.q{color:var(--line)}
+.opg .res.show{animation:pop .4s cubic-bezier(.3,1.6,.5,1) both;color:var(--ok)}
+.expd{font-family:var(--f-display);font-size:.98rem;line-height:1.8}
+.expd span{font-weight:700}
+
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;transition:.25s;z-index:70;
+  background:var(--nav);color:var(--nav-ink);padding:10px 16px;border-radius:12px;max-width:min(92vw,520px);text-align:center;font-weight:600;pointer-events:none}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.foot{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:.78rem;margin:0}
+.foot img{height:32px;width:auto;display:block}
+
+/* Fit everything on one screen (computer / tablet): the page height is the window height,
+   the mat takes the space that is left and the block size follows the window height. */
+@media (min-width:700px) and (min-height:500px){
+  :root{--ub:min(clamp(6px, 1.4vw, 16px), max(5px, calc((100dvh - 270px) / 34)))}
+  html,body{height:100%}
+  .app{height:100dvh}
+  .stage{flex:1;min-height:0;align-items:stretch}
+  .board{min-height:0}
+  .mat{flex:1;min-height:0;grid-template-rows:minmax(0,1fr)}
+  .col{min-height:0}
+  .col-b{min-height:0;overflow-y:auto}
+  .side{min-height:0;overflow-y:auto}
+}
+/* touch screens (tablet): units big enough for a child's finger */
+@media (pointer:coarse){
+  .col-b.k3{--uu:max(var(--u),16px);grid-template-columns:repeat(5,var(--uu));grid-auto-rows:var(--uu);gap:3px}
+  .col-b .blk.k3{width:var(--uu);height:var(--uu)}
+}
+@media (max-width:1180px){ .brand > div{display:none} }
+@media (max-width:900px){ .tools button{flex-direction:column;gap:2px;padding:4px 8px;font-size:.78rem} }
+@media (max-width:520px){ .col-h .eqv{display:none} .dg{min-width:40px} .dg b{font-size:1.3rem} .modes button{padding:7px 10px;font-size:.8rem} }
+@media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 13 58 30" aria-hidden="true">
+        <path d="M1 22L6 17H24L19 22Z" style="fill:color-mix(in oklab,var(--c0) 70%,white)"/>
+        <path d="M19 22L24 17V35L19 40Z" style="fill:color-mix(in oklab,var(--c0) 70%,black)"/>
+        <rect x="1" y="22" width="18" height="18" style="fill:var(--c0)"/>
+        <rect x="27" y="24" width="16" height="16" rx=".8" style="fill:var(--c1)"/>
+        <rect x="46" y="24" width="4" height="16" rx=".6" style="fill:var(--c2)"/>
+        <rect x="53" y="36" width="4" height="4" rx=".6" style="fill:var(--c3)"/>
+        <g stroke="rgb(0 0 0/.22)" stroke-width=".5" fill="none">
+          <path d="M1 28H19M1 34H19M7 22V40M13 22V40M3 20H21M5 18H23M21 20V38M23 18V36M7 22L12 17M13 22L18 17M19 28L24 23M19 34L24 29"/>
+          <path d="M27 28H43M27 32H43M27 36H43M31 24V40M35 24V40M39 24V40"/>
+          <path d="M46 28H50M46 32H50M46 36H50"/>
+        </g>
+        <path d="M1 22L6 17H24V35L19 40H1Z M1 22H19L24 17 M19 22V40" fill="none" stroke="rgb(0 0 0/.35)" stroke-width=".6" stroke-linejoin="round"/>
+      </svg>
+      <div><h1>Χτίζω Αριθμούς</h1><p>Αξία θέσης ψηφίου με κύβους Dienes</p></div>
+    </div>
+    <div class="right">
+      <nav class="modes" role="tablist" aria-label="Δραστηριότητα">
+        <button role="tab" data-mode="explore">Εξερεύνηση</button>
+        <button role="tab" data-mode="build">Φτιάξε τον αριθμό</button>
+        <button role="tab" data-mode="add">Πρόσθεση</button>
+        <button role="tab" data-mode="sub">Αφαίρεση</button>
+      </nav>
+      <div class="lvl">Έως
+        <div class="seg" id="lv">
+          <button data-lv="2">99</button><button data-lv="3">999</button><button data-lv="4">9999</button>
+        </div>
+      </div>
+      <div class="stars" title="Αστέρια"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z"/></svg><span id="stars">0</span></div>
+      <button class="icon-btn" id="snd" aria-label="Ήχος ανοιχτός" title="Ήχος"></button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="board">
+      <div class="panel ro-bar">
+      <div class="ro" id="ro"></div>
+      <div class="tools" id="tools">
+        <button data-tool="hand" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M8 13V5.5a1.5 1.5 0 013 0V12M11 11V4a1.5 1.5 0 013 0v7M14 11V5.5a1.5 1.5 0 013 0V14c0 4-2.5 7-6.5 7-3 0-4.5-1.5-6-4l-2-3.5a1.5 1.5 0 012.5-1.6L8 14"/></svg>Μετακίνησε</button>
+        <button data-tool="break" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M14 4l6 6-3 3-6-6zM12.5 8.5L4 17l3 3 8.5-8.5"/></svg>Σπάσε</button>
+        <button data-tool="erase" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Βγάλε</button>
+      </div>
+      </div>
+      <div class="panel mat" id="mat"></div>
+      <div class="panel tray" id="tray" data-drop="tray"></div>
+    </section>
+    <aside class="side">
+      <div class="panel card" id="task"></div>
+      <div class="panel op" id="op"></div>
+    </aside>
+  </main>
+  <p class="foot"><img src="logo-game.png" alt="Learning Fast">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+const COLS=[
+  {name:'Χιλιάδες',one:'χιλιάδα',pl:'χιλιάδες',ab:'Χ',val:1000,eqv:'1 = 10 Ε'},
+  {name:'Εκατοντάδες',one:'εκατοντάδα',pl:'εκατοντάδες',ab:'Ε',val:100,eqv:'1 = 10 Δ'},
+  {name:'Δεκάδες',one:'δεκάδα',pl:'δεκάδες',ab:'Δ',val:10,eqv:'1 = 10 Μ'},
+  {name:'Μονάδες',one:'μονάδα',pl:'μονάδες',ab:'Μ',val:1,eqv:'ο μικρότερος'}];
+const MAXC=30;
+let uid=1, busy=false;
+const S={mode:'explore',tool:'hand',level:3,stars:0,muted:false,mat:[[],[],[],[]],tray:[0,0,0,0],t:null};
+const fresh=new Map();
+const $=s=>document.querySelector(s);
+
+/* ---------- helpers ---------- */
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const digits=n=>[Math.floor(n/1000)%10,Math.floor(n/100)%10,Math.floor(n/10)%10,n%10];
+const value=()=>S.mat.reduce((s,c,i)=>s+c.length*COLS[i].val,0);
+const cnt=(n,i)=>n+' '+(n===1?COLS[i].one:COLS[i].pl);
+
+const W1=['','ένα','δύο','τρία','τέσσερα','πέντε','έξι','επτά','οκτώ','εννέα'];
+const WT=['δέκα','έντεκα','δώδεκα','δεκατρία','δεκατέσσερα','δεκαπέντε','δεκαέξι','δεκαεπτά','δεκαοκτώ','δεκαεννέα'];
+const W10=['','','είκοσι','τριάντα','σαράντα','πενήντα','εξήντα','εβδομήντα','ογδόντα','ενενήντα'];
+const W100=['','εκατό','διακόσια','τριακόσια','τετρακόσια','πεντακόσια','εξακόσια','επτακόσια','οκτακόσια','εννιακόσια'];
+const WK=['','χίλια','δύο','τρεις','τέσσερις','πέντε','έξι','επτά','οκτώ','εννέα'];
+function u100(n){if(n<10)return W1[n];if(n<20)return WT[n-10];return (W10[Math.floor(n/10)]+' '+W1[n%10]).trim();}
+function u1000(n){const h=Math.floor(n/100),r=n%100;let s='';if(h)s=(h===1&&r)?'εκατόν':W100[h];if(r)s+=(s?' ':'')+u100(r);return s;}
+function words(n){if(n===0)return 'μηδέν';if(n>9999)return '';const k=Math.floor(n/1000),r=n%1000;let s='';if(k===1)s='χίλια';else if(k)s=WK[k]+' χιλιάδες';if(r)s+=(s?' ':'')+u1000(r);return s;}
+
+function cubeSVG(){
+  let g='';
+  for(let k=1;k<10;k++){
+    g+=`<line x1="${k}" y1="4" x2="${k}" y2="14"/><line x1="0" y1="${4+k}" x2="10" y2="${4+k}"/>`;
+    const o=k*0.4;
+    g+=`<line x1="${k}" y1="4" x2="${k+4}" y2="0"/><line x1="${o}" y1="${4-o}" x2="${10+o}" y2="${4-o}"/>`;
+    g+=`<line x1="${10+o}" y1="${4-o}" x2="${10+o}" y2="${14-o}"/><line x1="10" y1="${4+k}" x2="14" y2="${k}"/>`;
+  }
+  return `<svg viewBox="-.1 -.1 14.2 14.2" aria-hidden="true">
+  <path d="M0 4L4 0H14L10 4Z" fill="color-mix(in oklab,var(--c0) 72%,white)"/>
+  <path d="M10 4L14 0V10L10 14Z" fill="color-mix(in oklab,var(--c0) 72%,black)"/>
+  <rect x="0" y="4" width="10" height="10" fill="var(--c0)"/>
+  <g stroke="rgb(0 0 0/.22)" stroke-width=".07">${g}</g>
+  <path d="M0 4L4 0H14V10L10 14H0Z M0 4H10L14 0 M10 4V14" fill="none" stroke="rgb(0 0 0/.35)" stroke-width=".12"/></svg>`;
+}
+const CUBE=cubeSVG();
+
+/* ---------- sound ---------- */
+let AC=null;
+function tone(f,d=.09,type='sine',v=.07,delay=0){
+  if(S.muted)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const t=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.02);}catch(e){}
+}
+const sPop=()=>tone(660,.07,'triangle');
+const sBreak=()=>{tone(180,.12,'square',.05);for(let k=0;k<5;k++)tone(700+k*60,.05,'triangle',.04,.05+k*.03)};
+const sGroup=()=>{tone(520,.08,'triangle');tone(780,.12,'triangle',.07,.08)};
+const sWin=()=>[523,659,784,1047].forEach((f,k)=>tone(f,.18,'triangle',.08,k*.1));
+const sNo=()=>tone(150,.15,'sine',.08);
+
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800);}
+
+/* ---------- state ops ---------- */
+function mk(kind){return {id:uid++,kind};}
+function setMat(n,kind='a'){
+  S.mat=digits(n).map(d=>Array.from({length:d},()=>mk(kind)));
+  S.mat.flat().forEach((b,k)=>fresh.set(b.id,Math.min(k*25,500)));
+}
+function push(i,n,kind,stagger=30){
+  for(let k=0;k<n;k++){const b=mk(kind);S.mat[i].push(b);fresh.set(b.id,k*stagger);}
+}
+function canTake(i){return S.mode!=='sub';}
+
+function fromTray(i,j){
+  if(S.t&&S.t.done)return;
+  if(!canTake(i)){sNo();toast('Εδώ δεν προσθέτουμε κύβους.');return;}
+  const kind=S.mode==='add'?'b':'a';
+  if(j===i){
+    if(S.mat[i].length>=MAXC){sNo();toast('Πάρα πολλοί κύβοι σε αυτή τη στήλη. Ένωσε πρώτα 10.');return;}
+    push(i,1,kind);sPop();
+  }else if(j===i+1){
+    if(i===3)return;
+    if(S.mat[j].length+10>MAXC){sNo();toast('Πάρα πολλοί κύβοι σε αυτή τη στήλη. Ένωσε πρώτα 10.');return;}
+    push(j,10,kind);sBreak();toast(`1 ${COLS[i].one} έγινε 10 ${COLS[j].pl}!`);
+  }else if(j<i){sNo();toast(`Εδώ μπαίνουν ${COLS[j].pl}. Για 1 ${COLS[j].one} χρειάζεσαι 10 ${COLS[j+1].pl}.`);return;}
+  else{sNo();toast('Σπάσε τον κύβο βήμα-βήμα, στη διπλανή στήλη.');return;}
+  after();
+}
+
+function doBreak(i,id){
+  if(S.t&&S.t.done)return;
+  if(i===3){sNo();toast('Η μονάδα είναι ο πιο μικρός κύβος. Δεν σπάει άλλο!');return;}
+  if(S.mat[i+1].length+10>MAXC){sNo();toast(`Πάρα πολλές ${COLS[i+1].pl}. Ένωσε πρώτα 10.`);return;}
+  const k=S.mat[i].findIndex(b=>b.id===id);
+  const b=S.mat[i].splice(k<0?S.mat[i].length-1:k,1)[0];
+  push(i+1,10,b.kind);
+  if(S.t&&S.t.reg){S.t.reg[i]--;S.t.reg[i+1]+=10;}
+  sBreak();toast(`1 ${COLS[i].one} έγινε 10 ${COLS[i+1].pl}!`);
+  after();
+}
+
+function doGroup(i){
+  if(busy||i===0||S.mat[i].length<10||(S.t&&S.t.done))return;
+  busy=true;
+  const els=[...document.querySelectorAll(`.col-b.k${i} .blk`)].slice(-10);
+  els.forEach((el,k)=>{el.style.animationDelay=(k*20)+'ms';el.classList.add('gather');});
+  setTimeout(()=>{
+    const gone=S.mat[i].splice(S.mat[i].length-10,10);
+    const kind=gone.every(b=>b.kind==='b')?'b':'a';
+    push(i-1,1,kind);
+    if(S.t&&S.t.type==='add')S.t.carries[i-1]++;
+    if(S.t&&S.t.reg){S.t.reg[i]-=10;S.t.reg[i-1]++;}
+    sGroup();toast(`10 ${COLS[i].pl} έγιναν 1 ${COLS[i-1].one}!`);
+    busy=false;after();
+  },420+180);
+}
+
+function doRemove(i,id){
+  if(S.t&&S.t.done)return;
+  const k=S.mat[i].findIndex(b=>b.id===id);
+  S.mat[i].splice(k<0?S.mat[i].length-1:k,1);
+  tone(420,.08,'triangle');
+  after();
+}
+
+function moveMat(i,j,id){
+  if(j===i)return;
+  if(j===i+1)return doBreak(i,id);
+  sNo();
+  if(j<i)toast(`Για να φτιάξεις 1 ${COLS[j].one} χρειάζεσαι 10 ${COLS[j+1].pl}. Μάζεψε 10 και πάτα «Ένωσε».`);
+  else toast('Σπάσε τον κύβο βήμα-βήμα, στη διπλανή στήλη.');
+}
+
+/* ---------- tasks ---------- */
+function genAdd(L){const lo=10**(L-1),hi=10**L-1;
+  for(let k=0;k<2000;k++){const a=rnd(lo,hi),b=rnd(Math.max(2,Math.random()<.4?lo/10:lo),hi);
+    if(a+b>9999)continue;const da=digits(a),db=digits(b);if(da.some((d,i)=>d+db[i]>=10))return [a,b];}
+  return [47,38];}
+function genSub(L){const lo=10**(L-1),hi=10**L-1;
+  for(let k=0;k<2000;k++){const a=rnd(lo,hi),bl=Math.max(2,Math.random()<.4?lo/10:lo);if(bl>=a)continue;
+    const b=rnd(bl,a-1),da=digits(a),db=digits(b);if(da.some((d,i)=>d<db[i]))return [a,b];}
+  return [52,27];}
+function genBuild(L){const lo=10**(L-1),hi=10**L-1,n=rnd(lo,hi),d=digits(n);
+  const nc=[0,1,2].filter(i=>d[i]>0&&d[i]*10+d[i+1]<=25);
+  if(nc.length&&Math.random()<.3)return {type:'build',n,form:'nocol',forbid:nc[rnd(0,nc.length-1)]};
+  return {type:'build',n,form:['digits','words','expanded'][rnd(0,2)],forbid:null};}
+
+function newTask(){
+  S.tray=[0,0,0,0];
+  if(S.mode==='explore'){S.t=null;S.mat=[[],[],[],[]];}
+  else if(S.mode==='build'){S.t=genBuild(S.level);S.mat=[[],[],[],[]];}
+  else if(S.mode==='add'){const [a,b]=genAdd(S.level);S.t={type:'add',a,b,carries:[0,0,0,0],done:false};setMat(a);}
+  else{const [a,b]=genSub(S.level);S.t={type:'sub',a,b,reg:digits(a),done:false};setMat(a);}
+  renderTask();render();
+}
+
+function win(){
+  S.t.done=true;S.stars++;sWin();
+  renderTask();render();
+}
+function after(){
+  const h=$('#hint');if(h&&S.t&&S.t.type!=='build')h.textContent='';
+  render();
+}
+// add / sub: the child works freely and checks at the end; the answer must be in the
+// simplest form (at most 9 blocks per column), as it is written in the vertical operation
+function checkOp(){
+  const t=S.t;
+  if(t.done)return;
+  const res=t.type==='add'?t.a+t.b:t.a-t.b;
+  if(value()===res&&S.mat.every(c=>c.length<=9))return win();
+  sNo();
+  $('#hint').textContent=value()===res?'Προσπάθησε πάλι! Θυμήσου: κάθε στήλη μπορεί να έχει μέχρι 9 κύβους.':'Προσπάθησε πάλι!';}
+function checkBuild(){
+  const t=S.t,v=value();
+  if(t.done)return;
+  if(v!==t.n){sNo();$('#hint').textContent=`Προσπάθησε πάλι. Ο αριθμός που δημιούργησες είναι το ${v}.`;return;}
+  if(t.forbid!==null&&S.mat[t.forbid].length){sNo();$('#hint').textContent=`Ο αριθμός είναι σωστός, αλλά χρησιμοποίησες ${COLS[t.forbid].pl}. Σπάσε τις!`;return;}
+  t.note=S.mat.some(c=>c.length>9)&&t.forbid===null?'Σωστό! Μπορείς όμως να ενώσεις 10 κύβους για να τον γράψεις πιο απλά.':'';
+  win();
+}
+
+/* ---------- rendering ---------- */
+function blockEl(i,b,src){
+  const el=document.createElement('div');
+  el.className=`blk k${i}`+(b&&b.kind==='b'?' is-b':'');
+  el.dataset.col=i;el.dataset.src=src;
+  if(b){el.dataset.id=b.id;if(fresh.has(b.id)){el.classList.add('pop');el.style.animationDelay=fresh.get(b.id)+'ms';}}
+  if(i===0)el.innerHTML=CUBE;
+  return el;
+}
+
+function renderMat(){
+  const m=$('#mat');m.innerHTML='';
+  COLS.forEach((c,i)=>{
+    const col=document.createElement('div');col.className='col';col.dataset.drop=i;col.style.setProperty('--c',`var(--c${i})`);
+    col.innerHTML=`<div class="col-h"><span class="ab">${c.ab}</span><span class="nm">${c.name}</span><span class="eqv">${c.eqv}</span></div>`;
+    const body=document.createElement('div');body.className=`col-b k${i}`;
+    S.mat[i].forEach(b=>body.appendChild(blockEl(i,b,'mat')));
+    col.appendChild(body);
+    const n=S.mat[i].length;
+    const f=document.createElement('div');f.className='col-f';
+    f.innerHTML=`<span class="n${n>9?' over':''}">${n}</span>`+
+      (i>0&&n>=10&&!(S.t&&S.t.done)?`<button class="grp" data-act="group" data-col="${i}" aria-label="Ένωσε 10 ${c.pl} σε 1 ${COLS[i-1].one}">← Ένωσε 10</button>`:'');
+    col.appendChild(f);
+    m.appendChild(col);
+  });
+  fresh.clear();
+}
+
+/* shrink the blocks of a column until they all fit, so the column never needs scrolling */
+function fitMat(){
+  document.querySelectorAll('.col-b').forEach(b=>{
+    // measured with offsets, not scrollHeight: the "pop" animation scales blocks down while they appear
+    const over=()=>{const l=b.lastElementChild;return l&&l.offsetTop+l.offsetHeight+8>b.clientHeight;};
+    let k=1;b.style.setProperty('--k',k);
+    while(over()&&k>.2){k*=.9;b.style.setProperty('--k',k);}
+  });
+}
+let fitT;
+window.addEventListener('resize',()=>{clearTimeout(fitT);fitT=setTimeout(fitMat,100);});
+
+function renderTray(){
+  const t=$('#tray');
+  if(S.mode==='sub'){
+    t.innerHTML=`<div class="bin"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Σύρε εδώ έναν κύβο ή πάτα «Βγάλε» και μετά τον κύβο.</div>`;return;
+  }
+  const add=S.mode==='add';
+  t.innerHTML=`<div class="tray-h"><h3>${add?`Οι κύβοι του ${S.t.b}`:'Κουτί με κύβους'}</h3>
+    <p>Πάτα ή σύρε έναν κύβο στον πίνακα. Σύρε κύβο εδώ για να τον βγάλεις.</p></div>`;
+  const slots=document.createElement('div');slots.className='slots';
+  COLS.forEach((c,i)=>{
+    const s=document.createElement('div');s.className='slot';s.style.setProperty('--c',`var(--c${i})`);
+    const b=blockEl(i,add?{kind:'b'}:null,'tray');b.tabIndex=0;b.setAttribute('role','button');
+    b.setAttribute('aria-label',`Πρόσθεσε 1 ${c.one}`);
+    s.appendChild(b);
+    s.insertAdjacentHTML('beforeend',`<span class="txt"><span class="lbl">${c.one[0].toUpperCase()+c.one.slice(1)}</span></span>`);
+    slots.appendChild(s);
+  });
+  t.appendChild(slots);
+}
+
+function renderReadout(){
+  const r=$('#ro'),v=value(),hideTotal=S.mode!=='explore'&&!S.t.done;
+  const dg=COLS.map((c,i)=>{const n=S.mat[i].length;return `<div class="dg${n>9?' over':''}" style="--c:var(--c${i})" title="${cnt(n,i)}"><b>${n}</b><small>${c.ab}</small></div>`}).join('');
+  const w=v<=9999?words(v):'';
+  r.innerHTML=`<div class="digits" aria-label="Κύβοι ανά στήλη">${dg}</div>`+
+   (hideTotal?`<div class="eq"><span class="words">Μέτρησε τους κύβους σε κάθε στήλη.</span></div>`:
+   `<div class="eq"><span class="val">= ${v}</span><span class="words">${w}</span></div>`);
+}
+
+function renderOp(){
+  const o=$('#op'),t=S.t;
+  if(S.mode==='build'){o.hidden=true;return;}
+  o.hidden=false;
+  if(S.mode==='explore'){
+    const parts=S.mat.map((c,i)=>c.length?`<span style="color:var(--c${i})">${c.length}</span> × ${COLS[i].val}`:null).filter(Boolean);
+    o.innerHTML=`<h3>Ανάπτυγμα</h3><div class="expd">${parts.length?parts.join(' + ')+' = <span>'+value()+'</span>':'Ο πίνακας είναι άδειος.'}</div>`;
+    return;
+  }
+  const add=t.type==='add',res=add?t.a+t.b:t.a-t.b;
+  const w=add?String(Math.max(t.a,t.b,res)).length:String(t.a).length,st=4-w;
+  const da=digits(t.a),db=digits(t.b),dr=digits(res);
+  const la=String(t.a).length,lb=String(t.b).length,lr=String(res).length;
+  let h='<div></div>',mkr='<div class="mk"></div>',ra='<div></div>',rb=`<div>${add?'+':'−'}</div>`,rr='<div></div>';
+  for(let i=st;i<4;i++){
+    const p=4-i; // position from right (1..4)
+    h+=`<div class="hd" style="color:var(--c${i})">${COLS[i].ab}</div>`;
+    if(add){mkr+=`<div class="mk carry">${t.carries[i]?'+'+t.carries[i]:''}</div>`;ra+=`<div>${p<=la?da[i]:''}</div>`;}
+    else{const ch=t.reg[i]!==da[i]&&p<=la;mkr+=`<div class="mk">${ch?t.reg[i]:''}</div>`;ra+=`<div>${p<=la?(ch?`<s>${da[i]}</s>`:da[i]):''}</div>`;}
+    rb+=`<div>${p<=lb?db[i]:''}</div>`;
+    rr+=t.done?`<div class="res show" style="animation-delay:${(i-st)*90}ms">${p<=lr?dr[i]:''}</div>`:`<div class="res q">?</div>`;
+  }
+  o.innerHTML=`<div class="opg" style="--w:${w}">${h}${mkr}${ra}${rb}<div class="rule"></div>${rr}</div>`;
+}
+
+function renderTask(){
+  const c=$('#task'),t=S.t;
+  if(S.mode==='explore'){
+    c.innerHTML=`<h2>Εξερεύνηση</h2>
+    <p style="margin-bottom:2px">Σύρε κύβους από το κουτί στον πίνακα.</p>
+    <ul class="steps"><li>Σύρε έναν κύβο στη στήλη δεξιά του και θα σπάσει σε 10 μικρότερους.</li><li>Όταν μια στήλη έχει 10 κύβους, ένωσέ τους.</li></ul>
+    <form id="mkf"><label class="small" for="mkn">Φτιάξε τον αριθμό</label>
+      <div class="row"><input id="mkn" type="number" min="0" max="9999" inputmode="numeric"><button class="btn pri">Φτιάξε</button></div></form>
+    <div class="row" style="margin-top:10px"><button class="btn" data-act="tidy">Τακτοποίησε</button><button class="btn" data-act="clear">Άδειασε</button></div>`;
+    $('#mkf').addEventListener('submit',e=>{e.preventDefault();if($('#mkn').value==='')return;const n=Math.max(0,Math.min(9999,parseInt($('#mkn').value,10)||0));setMat(n);sGroup();render();});
+    return;
+  }
+  const next=`<button class="btn pri" data-act="next">${t.type!=='build'?'Επόμενη πράξη':t.done?'Επόμενη άσκηση':'Άλλη άσκηση'}</button>`;
+  const winBox=t.done?`<div class="win"><b>Μπράβο!</b>${
+     t.type==='build'?`Έφτιαξες το ${t.n}. ${t.note||''}`:`${t.a} ${t.type==='add'?'+':'−'} ${t.b} = ${t.type==='add'?t.a+t.b:t.a-t.b}`}</div>`:'';
+  const opBtns=t.done?'':'<div class="row"><button class="btn pri" data-act="check">Έλεγχος</button><button class="btn" data-act="restart">Από την αρχή</button></div>';
+  c.classList.toggle('task-build',t.type==='build');
+  if(t.type==='build'){
+    const d=digits(t.n);
+    let prompt='';
+    if(t.form==='words')prompt=`<div class="big w">${words(t.n)}</div>`;
+    else if(t.form==='expanded')prompt=`<div class="big">${d.map((x,i)=>x?x*COLS[i].val:null).filter(Boolean).join(' + ')}</div>`;
+    else prompt=`<div class="big">${t.n}</div>`;
+    c.innerHTML=`<h2>Φτιάξε τον αριθμό</h2>${prompt}
+      ${t.form==='nocol'?`<p><b>Χωρίς ${COLS[t.forbid].pl}!</b> Βρες άλλο τρόπο να τον φτιάξεις.</p>`:''}
+      <p class="muted">Βάλε τους κύβους στον πίνακα για να δημιουργήσεις τον πιο πάνω αριθμό και πάτα το κουμπί «Έλεγχος» για να ελέγξεις την απάντησή σου.</p>
+      <div class="hint" id="hint"></div>${winBox}
+      <div class="row">${t.done?'':'<button class="btn pri" data-act="check">Έλεγχος</button><button class="btn" data-act="clear">Άδειασε</button>'}${t.done?next:'<button class="btn" data-act="next">Άλλος αριθμός</button>'}</div>`;
+    return;
+  }
+  if(t.type==='add'){
+    c.innerHTML=`<div class="th"><h2>Πρόσθεση με κρατούμενο</h2>${next}</div><div class="big">${t.a} + ${t.b}</div>
+      <ol class="steps"><li>Στον πίνακα είναι το <b>${t.a}</b>. Φέρε τους ανοιχτόχρωμους κύβους του <b>${t.b}</b>.</li>
+      <li>Ξεκίνα από τις μονάδες. Αν μια στήλη έχει 10 ή περισσότερους κύβους, ένωσε 10 και ο νέος κύβος πάει αριστερά. Αυτό είναι το κρατούμενο.</li>
+      <li>Όταν τελειώσεις, πάτα «Έλεγχος».</li></ol>
+      <div class="hint" id="hint"></div>${winBox}${opBtns}`;
+  }else{
+    c.innerHTML=`<div class="th"><h2>Αφαίρεση με δανεικό</h2>${next}</div><div class="big">${t.a} − ${t.b}</div>
+      <ol class="steps"><li>Στον πίνακα είναι το <b>${t.a}</b>. Βγάλε από τον πίνακα τους κύβους του <b>${t.b}</b>.</li>
+      <li>Ξεκίνα από τις μονάδες. Αν δεν φτάνουν οι κύβοι, σπάσε έναν κύβο από τη στήλη αριστερά.</li>
+      <li>Όταν τελειώσεις, πάτα «Έλεγχος».</li></ol>
+      <div class="hint" id="hint"></div>${winBox}${opBtns}`;
+  }
+}
+
+function renderChrome(){
+  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-selected',b.dataset.mode===S.mode));
+  document.querySelectorAll('[data-lv]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.lv===S.level));
+  document.querySelectorAll('[data-tool]').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.tool===S.tool);
+  });
+  document.body.className='tool-'+S.tool;
+  $('#stars').textContent=S.stars;
+  $('#snd').innerHTML=S.muted?'<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4zM17 9l4 6M21 9l-4 6"/></svg>':'<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4zM16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>';
+  $('#snd').setAttribute('aria-label',S.muted?'Ήχος κλειστός':'Ήχος ανοιχτός');
+}
+function render(){renderChrome();renderReadout();renderMat();renderTray();renderOp();fitMat();}
+
+/* ---------- input ---------- */
+document.addEventListener('click',e=>{
+  const m=e.target.closest('[data-mode]');if(m){S.mode=m.dataset.mode;S.tool=S.mode==='sub'?'erase':'hand';if(S.mode==='explore')S.t=null;newTask();return;}
+  const lv=e.target.closest('[data-lv]');if(lv){S.level=+lv.dataset.lv;if(S.mode!=='explore')newTask();else render();return;}
+  const tl=e.target.closest('[data-tool]');if(tl&&!tl.disabled){S.tool=tl.dataset.tool;renderChrome();return;}
+  const a=e.target.closest('[data-act]');if(!a)return;
+  const act=a.dataset.act;
+  if(act==='group')doGroup(+a.dataset.col);
+  else if(act==='next')newTask();
+  else if(act==='check'){if(S.t.type==='build')checkBuild();else checkOp();}
+  else if(act==='restart'){const t=S.t;setMat(t.a);if(t.carries)t.carries=[0,0,0,0];if(t.reg)t.reg=digits(t.a);after();}
+  else if(act==='clear'){S.mat=[[],[],[],[]];render();}
+  else if(act==='tidy'){const v=value();if(v>9999){toast('Ο αριθμός είναι μεγαλύτερος από 9999.');return;}setMat(v);sGroup();render();}
+});
+$('#snd').addEventListener('click',()=>{S.muted=!S.muted;renderChrome();});
+document.addEventListener('keydown',e=>{
+  const el=e.target.closest&&e.target.closest('[data-src="tray"]');
+  if(el&&(e.key==='Enter'||e.key===' ')){e.preventDefault();const i=+el.dataset.col;fromTray(i,i);}
+});
+
+let drag=null,hintShown=false;
+function dropTarget(x,y){const el=document.elementFromPoint(x,y);const d=el&&el.closest('[data-drop]');return d?d.dataset.drop:null;}
+function clearHot(){document.querySelectorAll('.hot,.nohot').forEach(n=>n.classList.remove('hot','nohot'));}
+document.addEventListener('pointerdown',e=>{
+  const slot=e.target.closest('.slot');
+  const el=e.target.closest('[data-src]')||(slot&&slot.querySelector('[data-src]'));
+  if(!el||busy||(e.pointerType==='mouse'&&e.button!==0))return;
+  e.preventDefault();
+  drag={el,src:el.dataset.src,col:+el.dataset.col,id:el.dataset.id?+el.dataset.id:null,x0:e.clientX,y0:e.clientY,moving:false,pid:e.pointerId};
+});
+document.addEventListener('pointermove',e=>{
+  if(!drag||e.pointerId!==drag.pid)return;
+  if(!drag.moving){
+    if(Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)<7)return;
+    if(drag.src==='tray'&&!canTake(drag.col)){drag=null;return;}
+    if(drag.src==='mat'&&S.t&&S.t.done){drag=null;return;}
+    const r=drag.el.getBoundingClientRect(),g=drag.el.cloneNode(true);
+    g.classList.remove('pop');g.classList.add('ghost');g.style.width=r.width+'px';g.style.height=r.height+'px';
+    g.style.setProperty('--u',getComputedStyle(drag.el).getPropertyValue('--u'));
+    drag.ox=drag.x0-r.left;drag.oy=drag.y0-r.top;document.body.appendChild(g);drag.g=g;drag.moving=true;
+    if(drag.src==='mat')drag.el.classList.add('dragging');
+  }
+  drag.g.style.transform=`translate(${e.clientX-drag.ox}px,${e.clientY-drag.oy}px)`;
+  clearHot();const d=dropTarget(e.clientX,e.clientY);
+  if(d!==null){const n=d==='tray'?$('#tray'):document.querySelector(`.col[data-drop="${d}"]`);
+    if(d==='tray'){if(drag.src==='mat')n.classList.add('hot');}
+    else{const j=+d,ok=j===drag.col||j===drag.col+1;n.classList.add(ok?'hot':'nohot');}}
+});
+function endDrag(e,cancel){
+  if(!drag||e.pointerId!==drag.pid)return;
+  const d=drag;drag=null;clearHot();
+  if(d.g)d.g.remove();d.el.classList.remove('dragging');
+  if(cancel)return;
+  if(!d.moving){ // tap
+    if(d.src==='tray')return fromTray(d.col,d.col);
+    if(S.tool==='break')return doBreak(d.col,d.id);
+    if(S.tool==='erase')return doRemove(d.col,d.id);
+    d.el.classList.add('shake');setTimeout(()=>d.el.classList.remove('shake'),400);
+    if(!hintShown){hintShown=true;toast('Σύρε τον κύβο σε άλλη στήλη ή διάλεξε «Σπάσε» ή «Βγάλε».');}
+    return;
+  }
+  const t=dropTarget(e.clientX,e.clientY);
+  if(d.src==='tray'){if(t!==null&&t!=='tray')fromTray(d.col,+t);return;}
+  if(t===null||t==='tray')return doRemove(d.col,d.id);
+  moveMat(d.col,+t,d.id);
+}
+document.addEventListener('pointerup',e=>endDrag(e,false));
+document.addEventListener('pointercancel',e=>endDrag(e,true));
+
+/* ---------- start ---------- */
+renderTask();render();
+})();
+</script>
+</body>
+</html>

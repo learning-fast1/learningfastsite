@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S07M3VNB5N');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Χτίζω Αριθμούς: δωρεάν διαδραστικό παιχνίδι αξίας θέσης ψηφίου με ψηφιακούς κύβους Dienes για Β΄–ΣΤ΄ Δημοτικού. Αριθμοί έως το 9999, πρόσθεση με κρατούμενο και αφαίρεση με δανεικό." />
+  <title>Χτίζω Αριθμούς – Learning Fast</title>
+  <link rel="canonical" href="https://learning-fast.com/ekpaideftika-paixnidia/b-dimotikou/mathimatika/xtizo-arithmous/" />
+  <link rel="stylesheet" href="../../../../styles/main.css" />
+  <style>
+    /* Κείμενο αριστερά, παιχνίδι δεξιά· στο κινητό το παιχνίδι πάνω και το κείμενο από κάτω. */
+    .game-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 2.5rem;
+      max-width: 1100px;
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+
+    .game-detail__text {
+      flex: 1 1 420px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .game-detail__frame {
+      flex: 1 1 460px;
+      position: sticky;
+      top: 90px;
+      display: block;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .game-detail__frame:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(108,99,255,.3);
+    }
+
+    .game-detail__frame img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .game-detail__play-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(26,26,46,.45);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .game-detail__frame:hover .game-detail__play-hint,
+    .game-detail__frame:focus-visible .game-detail__play-hint { opacity: 1; }
+
+    .game-detail__play-hint span {
+      padding: .9rem 2rem;
+      border-radius: 999px;
+      background: #fff;
+      color: #6C63FF;
+      font-weight: 800;
+      font-size: 1.1rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,.25);
+    }
+
+    .game-detail__text h2 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .game-detail__text p,
+    .game-detail__text li {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .game-detail__text p { margin-bottom: 1.1rem; }
+
+    .game-detail__text ul {
+      margin: -.4rem 0 1.1rem;
+      padding-left: 1.4rem;
+    }
+
+    .game-detail__play-btn {
+      align-self: flex-start;
+      margin-top: .4rem;
+      padding: .8rem 1.8rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg,#4f6ef7,#7c9aff);
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 760px) {
+      .game-detail { flex-direction: column; align-items: stretch; }
+      .game-detail__frame { position: relative; top: auto; order: -1; flex-basis: auto; }
+      .game-detail__text { flex-basis: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <a href="../../../../index.html" class="navbar__logo"><img src="../../../../assets/images/logo-wordmark.png" alt="Learning Fast" /></a>
+      <button class="navbar__hamburger" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <ul class="navbar__links">
+        <li><a href="../../../../index.html">Αρχική</a></li>        <li class="has-dropdown"><a href="../../../../eidiki-ekpaideysi/index.html">Ειδική Εκπαίδευση</a>
+          <ul class="dropdown">
+            <li><a href="../../../../eidiki-ekpaideysi/kategories-taxinomisi/index.html">Κατηγορίες - Ταξινόμηση</a></li>
+            <li><a href="../../../../eidiki-ekpaideysi/leitourgikos-logos/index.html">Λειτουργικός λόγος</a></li>
+            <li><a href="../../../../eidiki-ekpaideysi/fonologiki-epignosi/index.html">Φωνολογική Επίγνωση</a></li>
+            <li><a href="../../../../eidiki-ekpaideysi/ran-onomasia/index.html">Ταχεία Κατονομασία (RAN)</a></li>
+            <li><a href="../../../../eidiki-ekpaideysi/proini-routina/index.html">Πρωινή Ρουτίνα</a></li>
+          </ul>
+        </li>        <li class="has-dropdown"><a href="../../../index.html">Εκπαιδευτικά Παιχνίδια</a>
+          <ul class="dropdown">
+            <li><a href="../../../../ekpaideftika-paixnidia/a-dimotikou/index.html">Α΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/b-dimotikou/index.html">Β΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/g-dimotikou/index.html">Γ΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/d-dimotikou/index.html">Δ΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/e-dimotikou/index.html">Ε΄ Δημοτικού</a></li>
+            <li><a href="../../../../ekpaideftika-paixnidia/st-dimotikou/index.html">ΣΤ΄ Δημοτικού</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown"><a href="../../../../ekpaideftika-vivlia/index.html">Εκπαιδευτικά Βιβλία</a>
+          <ul class="dropdown">
+            <li><a href="../../../../ekpaideftika-vivlia/atzenta/index.html">Ατζέντα</a></li>
+            <li><a href="../../../../ekpaideftika-vivlia/tetradio-epikoinonias/index.html">Τετράδιο Επικοινωνίας</a></li>
+          </ul>
+        </li>
+        <li><a href="../../../../epikoinonia/index.html">Επικοινωνία</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <div class="section__header">
+        <p class="breadcrumb">
+          <a href="../../../index.html">Εκπαιδευτικά Παιχνίδια</a> →
+          <a href="../index.html">Μαθηματικά</a>
+        </p>
+        <span class="section__label">Μαθηματικά – Β΄–ΣΤ΄ Δημοτικού</span>
+        <h1 class="section__title">Χτίζω Αριθμούς</h1>
+      </div>
+
+      <div class="game-detail">
+        <div class="game-detail__text">
+          <h2>Χτίζω Αριθμούς</h2>
+          <p>Ένα διαδραστικό παιχνίδι με ψηφιακούς κύβους Dienes, για να κατανοήσουν τα παιδιά την αξία θέσης ψηφίου. Τα παιδιά σχηματίζουν αριθμούς έως το 9999 με χιλιάδες, εκατοντάδες, δεκάδες και μονάδες. Μπορούν να σπάσουν έναν κύβο σε 10 μικρότερους ή να ενώσουν 10 κύβους σε έναν μεγαλύτερο, και έτσι βλέπουν πώς χτίζεται και πώς αναλύεται ένας αριθμός.</p>
+          <p>Το παιχνίδι περιλαμβάνει ελεύθερη εξερεύνηση, ασκήσεις σχηματισμού αριθμών, καθώς και πρόσθεση και αφαίρεση. Οι κινήσεις των κύβων εμφανίζονται ταυτόχρονα στην κάθετη πράξη. Είναι κατάλληλο για εξάσκηση στο σπίτι, για χρήση στον διαδραστικό πίνακα της τάξης και για εξατομικευμένη διδασκαλία στην ειδική εκπαίδευση.</p>
+          <a href="paixnidi/index.html" class="game-detail__play-btn" onclick="gtag('event','play_game',{event_category:'Game',event_label:'XtizoArithmous'})">▶ Παίξε</a>
+        </div>
+        <a href="paixnidi/index.html" class="game-detail__frame" onclick="gtag('event','play_game',{event_category:'Game',event_label:'XtizoArithmous'})">
+          <img src="../../../../assets/images/xtizo-arithmous.png" alt="Χτίζω Αριθμούς – η οθόνη του παιχνιδιού" />
+          <span class="game-detail__play-hint"><span>▶ Παίξε</span></span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__logo"><img src="../../../../assets/images/logo.png" alt="Learning Fast Logo" /></div>
+    <ul class="footer__links">
+      <li><a href="../../../../epikoinonia/index.html">Επικοινωνία</a></li>
+      <li><a href="../../../../steile-mia-idea/index.html">Στείλε μια ιδέα!</a></li>
+      <li><a href="../../../../enimeroseis/index.html">Ενημερώσεις</a></li>
+      <li><a href="../../../../oroi-xrisis/index.html">Όροι και προϋποθέσεις</a></li>
+      <li><a href="../../../../workspace-access/index.html" target="_blank" rel="noopener">Learning Fast Workspace</a></li>
+    </ul>
+    <p class="footer__copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
+
+<script>
+  var btn = document.getElementById('navToggle');
+  var links = document.querySelector('.navbar__links');
+  if(btn && links){
+    btn.addEventListener('click', function(){
+      links.classList.toggle('nav-open');
+      btn.classList.toggle('nav-open');
+    });
+    document.querySelectorAll('.has-dropdown > a').forEach(function(a){
+      a.addEventListener('click', function(e){
+        if(window.innerWidth <= 768){
+          e.preventDefault();
+          var li = this.parentElement;
+          document.querySelectorAll('.has-dropdown.open').forEach(function(el){
+            if(el !== li) el.classList.remove('open');
+          });
+          li.classList.toggle('open');
+        }
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!e.target.closest('.navbar') && links.classList.contains('nav-open')){
+        links.classList.remove('nav-open');
+        btn.classList.remove('nav-open');
+      }
+    });
+  }
+</script>
+</body>
+</html>
