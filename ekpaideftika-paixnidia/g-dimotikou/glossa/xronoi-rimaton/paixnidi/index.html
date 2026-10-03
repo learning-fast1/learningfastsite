@@ -356,7 +356,7 @@ function beep(ok){
 
 /* ---------- Κατάσταση ---------- */
 const ACTS=[
- {id:"learn",name:"Γνωριμία",desc:"Πότε λέμε κάθε χρόνο, λέξεις-κλειδιά και πώς κλίνεται."},
+ {id:"learn",name:"Γνωριμία",desc:"Πότε λέμε κάθε χρόνο, λέξεις-κλειδιά και πως κλίνεται."},
  {id:"which",name:"Ποιος χρόνος;",desc:"Διάβασε την πρόταση και βρες σε ποιον χρόνο είναι το ρήμα."},
  {id:"fill",name:"Συμπλήρωσε",desc:"Διάλεξε τον σωστό τύπο του ρήματος για το κενό."},
  {id:"transform",name:"Άλλαξε χρόνο",desc:"Βάλε το ρήμα σε άλλο χρόνο, στο ίδιο πρόσωπο."},
@@ -499,7 +499,7 @@ function renderLearn(){
    <div class="timeline">
     <div class="tl">${zone("Παρελθόν",["plu","aor","impf"])}${zone("Παρόν",["perf","pres"])}${zone("Μέλλον",["futS","futC","futP"])}</div>
    </div>
-   <div><p class="prompt" style="margin-bottom:8px">Διάλεξε ρήμα για να δεις πώς κλίνεται:</p>
+   <div><p class="prompt" style="margin-bottom:8px">Διάλεξε ρήμα για να δεις πως κλίνεται:</p>
     ${[["reg","Ομαλά ρήματα"],["con","Ρήματα σε -άω"],["irr","Ανώμαλα ρήματα"],["mid","Ρήματα σε -ομαι"]].map(([k,label])=>`
     <p class="vgroup">${label}</p>
     <div class="verbpick">${V.map((v,i)=>v.kind!==k?"":`<button data-v="${i}" aria-pressed="${i===vi}">${v.v}</button>`).join("")}</div>`).join("")}</div>
