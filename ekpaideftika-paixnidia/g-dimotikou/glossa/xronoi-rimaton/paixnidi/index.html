@@ -90,7 +90,6 @@ button:focus-visible,.chip:focus-visible{outline:3px solid var(--accent);outline
 .acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 .act{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .act:hover{border-color:var(--accent)}
-.act .ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--sunk);font-family:var(--f-display);font-weight:700;color:var(--accent);font-size:1.1rem}
 .act .st{color:var(--star);letter-spacing:2px;font-size:1.05rem}
 .act .st .off{color:var(--line)}
 
@@ -357,11 +356,11 @@ function beep(ok){
 
 /* ---------- Κατάσταση ---------- */
 const ACTS=[
- {id:"learn",ico:"Αα",name:"Γνωριμία",desc:"Πότε λέμε κάθε χρόνο, λέξεις-κλειδιά και πώς κλίνεται."},
- {id:"which",ico:"?",name:"Ποιος χρόνος;",desc:"Διάβασε την πρόταση και βρες σε ποιον χρόνο είναι το ρήμα."},
- {id:"fill",ico:"_",name:"Συμπλήρωσε",desc:"Διάλεξε τον σωστό τύπο του ρήματος για το κενό."},
- {id:"transform",ico:"⇄",name:"Άλλαξε χρόνο",desc:"Βάλε το ρήμα σε άλλο χρόνο, στο ίδιο πρόσωπο."},
- {id:"sort",ico:"▦",name:"Τα καλάθια",desc:"Βάλε κάθε ρήμα στο καλάθι του χρόνου του."}
+ {id:"learn",name:"Γνωριμία",desc:"Πότε λέμε κάθε χρόνο, λέξεις-κλειδιά και πώς κλίνεται."},
+ {id:"which",name:"Ποιος χρόνος;",desc:"Διάβασε την πρόταση και βρες σε ποιον χρόνο είναι το ρήμα."},
+ {id:"fill",name:"Συμπλήρωσε",desc:"Διάλεξε τον σωστό τύπο του ρήματος για το κενό."},
+ {id:"transform",name:"Άλλαξε χρόνο",desc:"Βάλε το ρήμα σε άλλο χρόνο, στο ίδιο πρόσωπο."},
+ {id:"sort",name:"Τα καλάθια",desc:"Βάλε κάθε ρήμα στο καλάθι του χρόνου του."}
 ];
 const QN=10;
 let S={level:1,screen:"home",act:null,qs:[],i:0,score:0,answered:false,learnVerb:0,helpOn:null};
@@ -483,7 +482,7 @@ function renderStation(){
     <span class="kw">${LEVELS[l].map(t=>`<span class="tchip" style="${tc(t)}">${T[t].name}</span>`).join(" ")}</span></div>
   <div class="acts">
    ${ACTS.map(a=>`<button class="act" data-act="${a.id}">
-     <span class="ico" aria-hidden="true">${a.ico}</span><h3>${a.name}</h3><span class="muted">${a.desc}</span>
+     <h3>${a.name}</h3><span class="muted">${a.desc}</span>
      ${a.id==="learn"?"":`<span class="st" aria-label="${stars(l,a.id)} αστέρια">${starStr(stars(l,a.id))}</span>`}</button>`).join("")}
   </div>
   `;
