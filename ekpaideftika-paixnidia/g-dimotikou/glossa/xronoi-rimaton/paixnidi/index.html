@@ -162,6 +162,9 @@ table.conj td:last-child{font-weight:600}
 .basket{text-align:left;background:var(--sunk);border:2px solid transparent;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;min-height:96px;align-items:flex-start}
 .basket .bt{font-family:var(--f-display);font-weight:700;color:var(--tc);font-size:.92rem}
 .basket.armed{border-color:color-mix(in srgb,var(--tc) 50%,transparent)}
+.basket.wrongb{border-color:var(--bad);background:var(--bad-bg)}
+.basket.wrongb .bt{color:var(--bad)}
+.basket:disabled{cursor:default}
 .shake{animation:shake .35s}
 @keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 
@@ -522,6 +525,8 @@ function start(id){
   S.act=id;S.i=0;S.score=0;S.answered=false;S.helpOn=null;
   const g={which:genWhich,fill:genFill,transform:genTransform,sort:genSort}[id];
   S.qs=id==="sort"?[g(S.level)]:tenseSequence(S.level,QN).map(t=>g(S.level,t));
+  // Λάθος απάντηση: μένει κόκκινη, εξηγούμε από κάτω και το παιδί ξαναπροσπαθεί όσες φορές χρειαστεί.
+  S.qs.forEach(q=>{q.wrongs=[];q.tries=0;q.msg="";q.failK=-1;q.failT=[];});
   S.screen="play";render();window.scrollTo(0,0);
 }
 function sentenceHTML(q,mid){return `${esc(q.cue)} ${esc(q.subj)} ${mid} ${esc(q.obj)}.`.replace(esc(q.cue),`<span class="cue">${esc(q.cue.replace(/,$/,""))}</span>,`);}
@@ -533,51 +538,82 @@ function renderPlay(){
   if(q.type==="which"){
     body=`<p class="prompt">Σε ποιον χρόνο είναι το ρήμα;</p>
     <p class="sentence">${sentenceHTML(q,`<span class="verb">${esc(q.ans)}</span>`)}</p>
-    <div class="opts">${q.opts.map(t=>`<button class="opt tense" style="${tc(t)}" data-a="${t}">${T[t].name}</button>`).join("")}</div>`;
+    <div class="opts">${q.opts.map(t=>`<button class="opt tense${q.wrongs.includes(t)?" wrong":""}" style="${tc(t)}" data-a="${t}"${q.wrongs.includes(t)?" disabled":""}>${T[t].name}</button>`).join("")}</div>`;
   }else if(q.type==="fill"){
     body=`<p class="prompt">Συμπλήρωσε το κενό με τον σωστό τύπο.</p>
     <p class="sentence">${sentenceHTML(q,`<span class="blank" id="blank">;</span>`)}</p>
     <p class="hint">Ρήμα: <b>${V[q.vi].v}</b> · ${help?"Πρόσεξε τη λέξη-κλειδί που είναι υπογραμμισμένη.":"Βρες τη λέξη που δείχνει πότε γίνεται."}</p>
-    <div class="opts">${q.opts.map(o=>`<button class="opt" data-a="${esc(o)}">${esc(o)}</button>`).join("")}</div>`;
+    <div class="opts">${q.opts.map(o=>`<button class="opt${q.wrongs.includes(o)?" wrong":""}" data-a="${esc(o)}"${q.wrongs.includes(o)?" disabled":""}>${esc(o)}</button>`).join("")}</div>`;
   }else if(q.type==="transform"){
     body=`<p class="prompt">Άλλαξε τον χρόνο του ρήματος. Το πρόσωπο μένει ίδιο.</p>
     <p class="sentence">${esc(cap(q.subj))} <span class="verb">${esc(q.from)}</span> ${esc(q.obj)}.</p>
     <div class="transform"><span class="tchip" style="${tc(q.src)}">${T[q.src].name}</span><span class="arrow" aria-hidden="true">→</span><span class="tchip" style="${tc(q.t)}">${T[q.t].name}</span></div>
     ${help?`<p class="helpbox">${followsRule(q.vi,q.t)?`<b>${T[q.t].name}:</b> ${T[q.t].how}`:verbNote(q.vi)}</p>`:""}
-    <div class="opts">${q.opts.map(o=>`<button class="opt" data-a="${esc(o)}">${esc(o)}</button>`).join("")}</div>`;
+    <div class="opts">${q.opts.map(o=>`<button class="opt${q.wrongs.includes(o)?" wrong":""}" data-a="${esc(o)}"${q.wrongs.includes(o)?" disabled":""}>${esc(o)}</button>`).join("")}</div>`;
   }else{
     const lv=LEVELS[S.level];
+    const bad=t=>q.sel>=0&&q.failK===q.sel&&q.failT.includes(t);
     body=`<p class="prompt">Πάτησε ένα ρήμα και μετά το καλάθι του χρόνου του.</p>
     <div class="pool" id="pool">${q.items.map((it,k)=>it.placed?"":`<button class="chip" data-k="${k}" aria-pressed="${q.sel===k}">${esc(it.f)}</button>`).join("")||'<span class="muted">Μπράβο, τα έβαλες όλα!</span>'}</div>
-    <div class="baskets">${lv.map(t=>`<button class="basket ${q.sel>=0?"armed":""}" style="${tc(t)}" data-b="${t}"><span class="bt">${T[t].name}</span>${help?`<span class="bex">π.χ. ${form(0,t,persons()[0])}</span>`:""}${q.items.filter(it=>it.placed&&it.t===t).map(it=>`<span class="chip placed" style="${tc(t)}">${esc(it.f)}</span>`).join("")}</button>`).join("")}</div>
+    <div class="baskets">${lv.map(t=>`<button class="basket ${q.sel>=0?"armed":""}${bad(t)?" wrongb":""}" style="${tc(t)}" data-b="${t}"${bad(t)?" disabled":""}><span class="bt">${T[t].name}</span>${help?`<span class="bex">π.χ. ${form(0,t,persons()[0])}</span>`:""}${q.items.filter(it=>it.placed&&it.t===t).map(it=>`<span class="chip placed" style="${tc(t)}">${esc(it.f)}</span>`).join("")}</button>`).join("")}</div>
     <p class="hint">Λάθη: <span style="font-variant-numeric:tabular-nums">${q.mistakes}</span></p>`;
   }
   app.innerHTML=`<div class="play">
     <div class="bar"><button class="back" id="back">← Έξοδος</button><div class="prog"><i style="width:${done/total*100}%"></i></div><span class="count">${done} / ${total}</span></div>
-    <div class="qcard${help?" help":""}" id="qcard"><div class="qhead"><h2>${a.name}</h2><button class="helpbtn${help?" on":""}" id="helpbtn" aria-pressed="${help}">${help?"Χωρίς βοήθεια":"Βοήθεια"}</button></div>${body}<div id="fbx"></div></div></div>`;
+    <div class="qcard${help?" help":""}" id="qcard"><div class="qhead"><h2>${a.name}</h2><button class="helpbtn${help?" on":""}" id="helpbtn" aria-pressed="${help}">${help?"Χωρίς βοήθεια":"Βοήθεια"}</button></div>${body}<div id="fbx">${q.msg&&(q.type!=="sort"||(q.sel>=0&&q.failK===q.sel))?`<div class="fb no" role="status">${q.msg}</div>`:""}</div></div></div>`;
   document.getElementById("back").onclick=()=>{S.screen="station";render();};
   const hb=document.getElementById("helpbtn");if(hb)hb.onclick=()=>{S.helpOn=!help;render();};
   if(q.type==="sort")bindSort(q);else app.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>answer(q,b));
 }
+/* Όλοι οι (χρόνος, πρόσωπο) που δίνουν αυτόν τον τύπο ρήματος. */
+function tensesOf(vi,f){const out=[];Object.keys(T).forEach(t=>[0,1,2,3,4,5].forEach(p=>{if(form(vi,t,p)===f)out.push([t,p]);}));return out;}
+function verbHint(vi){
+  const v=V[vi];
+  // Δεν γράφουμε το ίδιο το ρήμα: ο τύπος του μπορεί να είναι ακριβώς η σωστή απάντηση.
+  if(v.kind==="irr")return `Αυτό είναι <b>ανώμαλο ρήμα</b>: σε κάποιους χρόνους αλλάζει όλη η λέξη.`;
+  if(v.kind==="con")return `Αυτό είναι <b>ρήμα σε -άω</b>: έχει άλλες καταλήξεις.`;
+  if(v.kind==="mid")return `Αυτό είναι <b>ρήμα σε -ομαι</b>: έχει άλλες καταλήξεις.`;
+  return "";
+}
+/* Επεξήγηση για ΛΑΘΟΣ απάντηση: εξηγεί τι σημαίνει αυτό που διάλεξε το παιδί, ΧΩΡΙΣ να δείχνει τη σωστή απάντηση. */
+function wrongMsg(q,val){
+  const no="<b>Όχι ακόμα.</b> ";
+  if(q.type==="which")return `${no}Ο <b>${T[val].name}</b> δείχνει ότι: ${T[val].when} Ταιριάζει αυτό με την πρόταση; Βρες τη λέξη που δείχνει πότε γίνεται και δοκίμασε ξανά.`;
+  const hits=tensesOf(q.vi,val);
+  if(hits.some(([t])=>t===q.t))return q.type==="fill"
+    ?`${no}Ο χρόνος είναι σωστός, αλλά το πρόσωπο δεν ταιριάζει με το «${esc(q.subj)}». Δοκίμασε ξανά.`
+    :`${no}Ο χρόνος είναι σωστός, αλλά άλλαξες το πρόσωπο. Το πρόσωπο μένει ίδιο («${esc(q.subj)}»). Δοκίμασε ξανά.`;
+  const same=hits.filter(([,p])=>p===q.p),use=same.length?same:hits;
+  const names=[...new Set(use.map(([t])=>T[t].name))].map(n=>`<b>${n}</b>`).join(" ή ");
+  const t0=use.length?use[0][0]:null;
+  if(q.type==="fill")return `${no}Το «${esc(val)}» ${names?`είναι ${names}. ${T[t0].when} Ταιριάζει αυτό με την πρόταση;`:"δεν ταιριάζει εδώ."} Βρες τη λέξη που δείχνει πότε γίνεται και δοκίμασε ξανά.`;
+  return `${no}Το «${esc(val)}» ${names?`είναι ${names}`:"δεν είναι ο χρόνος που ζητάμε"}, όχι ${T[q.t].name}. ${followsRule(q.vi,q.t)?`Θυμήσου πώς φτιάχνεται ο ${T[q.t].name}: ${T[q.t].how}.`:`${verbHint(q.vi)} Δες τον πίνακα στη «Γνωριμία».`} Δοκίμασε ξανά.`;
+}
 function answer(q,btn){
-  if(S.answered)return;S.answered=true;
+  if(S.answered)return;
   const val=btn.dataset.a,isTense=q.type==="which",right=isTense?val===q.t:val===q.ans;
-  if(right)S.score++;
   beep(right);
+  if(!right){
+    q.tries++;q.wrongs.push(val);q.msg=wrongMsg(q,val);
+    render();
+    const fb=document.querySelector("#fbx .fb");if(fb&&fb.scrollIntoView)fb.scrollIntoView({block:"nearest"});
+    return;
+  }
+  S.answered=true;
+  const first=q.tries===0;
+  if(first)S.score++;
   app.querySelectorAll("[data-a]").forEach(b=>{b.disabled=true;const v=b.dataset.a;if(isTense?v===q.t:v===q.ans)b.classList.add("right");});
-  if(!right)btn.classList.add("wrong");
   const bl=document.getElementById("blank");if(bl)bl.textContent=q.ans;
   document.getElementById("qcard").classList.add("help");
   const hb=document.getElementById("helpbtn");if(hb)hb.remove();
   const tn=T[q.t].name,why=T[q.t].when;
   let msg;
-  if(q.type==="which")msg=right?`<b>Σωστά!</b> ${tn}: ${why}`:`<b>Όχι ακόμα.</b> Είναι <b>${tn}</b>. ${why} Λέξη-κλειδί: «${esc(q.cue.replace(/,$/,""))}».`;
-  else if(q.type==="fill"){
-    const wrongPerson=!right&&V.length&&[0,1,2,3,4,5].some(p=>form(q.vi,q.t,p)===val);
-    msg=right?`<b>Σωστά!</b> «${esc(q.ans)}»: ${tn}.`:`<b>Όχι ακόμα.</b> Το σωστό είναι «${esc(q.ans)}» (${tn}). ${wrongPerson?`Ο χρόνος ήταν σωστός, αλλά το πρόσωπο πρέπει να ταιριάζει με το «${esc(q.subj)}».`:why}`;
-  }else msg=right?`<b>Σωστά!</b> «${esc(q.ans)}»: ${tn}.`:`<b>Όχι ακόμα.</b> Το σωστό είναι «${esc(q.ans)}» (${tn}). ${followsRule(q.vi,q.t)?`Θυμήσου: ${T[q.t].how}.`:verbNote(q.vi)}`;
+  const ok=first?"Σωστά!":"Μπράβο, το βρήκες!";
+  if(q.type==="which")msg=`<b>${ok}</b> ${tn}: ${why}`;
+  else if(q.type==="fill")msg=`<b>${ok}</b> «${esc(q.ans)}»: ${tn}.`;
+  else msg=`<b>${ok}</b> «${esc(q.ans)}»: ${tn}.`;
   const last=S.i===QN-1;
-  document.getElementById("fbx").outerHTML=`<div class="fb ${right?"ok":"no"}" role="status">${msg}</div><button class="next" id="next">${last?"Τέλος":"Επόμενο →"}</button>`;
+  document.getElementById("fbx").outerHTML=`<div class="fb ok" role="status">${msg}</div><button class="next" id="next">${last?"Τέλος":"Επόμενο →"}</button>`;
   const nx=document.getElementById("next");nx.focus();
   nx.onclick=()=>{S.answered=false;S.helpOn=null;if(last)finish(S.score/QN);else{S.i++;render();}};
 }
@@ -585,11 +621,19 @@ function bindSort(q){
   app.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{q.sel=q.sel===+b.dataset.k?-1:+b.dataset.k;render();});
   app.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>{
     if(q.sel<0)return;const it=q.items[q.sel];
-    if(it.t===b.dataset.b){it.placed=true;q.sel=-1;beep(true);
+    if(it.t===b.dataset.b){it.placed=true;q.sel=-1;q.msg="";q.failK=-1;q.failT=[];beep(true);
       if(q.items.every(x=>x.placed)){render();setTimeout(()=>{if(S.screen==="play"&&S.qs[0]===q)finish(q.items.length/(q.items.length+q.mistakes));},700);return;}
       render();}
-    else{q.mistakes++;beep(false);b.classList.remove("shake");void b.offsetWidth;b.classList.add("shake");
-      const h=app.querySelector(".hint span");if(h)h.textContent=q.mistakes;}
+    else{
+      // Λάθος καλάθι: μένει κόκκινο, εξηγούμε από κάτω χωρίς να δείξουμε το σωστό, και το ρήμα μένει επιλεγμένο για νέα προσπάθεια.
+      const bt=b.dataset.b;q.mistakes++;beep(false);
+      if(q.failK!==q.sel){q.failK=q.sel;q.failT=[];}
+      q.failT.push(bt);
+      q.msg=`<b>Όχι ακόμα.</b> Το «${esc(it.f)}» δεν είναι <b>${T[bt].name}</b>. ${T[bt].name}: ${T[bt].when} Δοκίμασε άλλο καλάθι.`;
+      render();
+      const nb=app.querySelector(`[data-b="${bt}"]`);if(nb)nb.classList.add("shake");
+      const fb=document.querySelector("#fbx .fb");if(fb&&fb.scrollIntoView)fb.scrollIntoView({block:"nearest"});
+    }
   });
 }
 function finish(ratio){
@@ -608,7 +652,7 @@ function renderResult(){
   app.innerHTML=`<div class="play"><div class="qcard result">
     <h2>${a.name}</h2>
     <div class="bigstars" aria-label="${st} αστέρια">${starStr(st)}</div>
-    <p style="font-size:1.2rem">${S.act==="sort"?`Ακρίβεια ${pct}%`:`${S.score} από ${QN} σωστά`}</p>
+    <p style="font-size:1.2rem">${S.act==="sort"?`Ακρίβεια ${pct}%`:`${S.score} από ${QN} σωστά με την πρώτη`}</p>
     <p class="muted">${msg}</p>
     ${S.last.justUnlocked?`<p class="unlocked" role="status">Μπράβο! Άνοιξε ο <b>Σταθμός ${S.level+1}</b>: ${LTITLE(S.level+1)}.</p>`:""}
     <div class="row"><button class="next" id="again">Ξανά</button><button class="btn2" id="home">Στον σταθμό</button>
