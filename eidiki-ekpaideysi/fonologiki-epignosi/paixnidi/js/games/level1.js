@@ -685,8 +685,7 @@ Phono.games.wordPosition = {
 
         // No emoji on these cards — the choice IS the word, unlike a
         // picture-choice game, and a 72px decorative "🔊" on every card
-        // was pure wasted vertical space (the word is already read aloud
-        // on tap).
+        // was pure wasted vertical space (the word is not read aloud on tap).
         const choicesGrid = el('div', { className: 'choices-grid' });
         choices.forEach(choice => {
             const card = el('div', { className: 'choice-card', onClick: () => this.checkAnswer(card) }, [
@@ -755,7 +754,10 @@ Phono.games.wordPosition = {
     checkAnswer(cardEl) {
         if (this.answered || cardEl.classList.contains('disabled')) return;
 
-        Phono.audio.speak(cardEl._word);
+        // The chosen card is never read aloud: the child already knows
+        // what they picked, and a single-word card such as «Η» was
+        // spoken as «Ηττα κεφαλαίο» by the voice. Only the sentence
+        // (read when the round starts) is spoken in this game.
 
         if (cardEl._correct) {
             this.answered = true;
