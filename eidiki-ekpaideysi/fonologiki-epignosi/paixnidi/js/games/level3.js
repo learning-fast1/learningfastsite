@@ -144,7 +144,7 @@ Phono.games.findRhyme = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.nextOrComplete(), 1500);
+            Phono.helpers.later(() => this.nextOrComplete(), 1500);
             return;
         }
 
@@ -249,7 +249,7 @@ Phono.games.rhymeMemory = {
         if (this.flippedCards.length === 2) {
             this.isChecking = true;
             this.totalAttempts++;
-            setTimeout(() => this.checkMatch(), 800);
+            Phono.helpers.later(() => this.checkMatch(), 800);
         }
     },
 
@@ -270,13 +270,13 @@ Phono.games.rhymeMemory = {
             Phono.engine.recordCorrect();
 
             if (this.matchedPairs >= this.totalPairs) {
-                setTimeout(() => {
+                Phono.helpers.later(() => {
                     Phono.app.onGameComplete('rhymeMemory', this.levelInfo.id);
                 }, 1000);
             }
         } else {
             // No match — flip back
-            setTimeout(() => {
+            Phono.helpers.later(() => {
                 el1.classList.remove('flipped');
                 el2.classList.remove('flipped');
             }, 600);
@@ -367,7 +367,7 @@ Phono.games.produceRhyme = {
 
         Phono.feedback.showCorrect();
         Phono.engine.recordCorrect();
-        setTimeout(() => this.nextOrComplete(), 1200);
+        Phono.helpers.later(() => this.nextOrComplete(), 1200);
     },
 
     /** Shown as a fixed overlay, not inline content — appending the hint
@@ -450,7 +450,7 @@ Phono.games.produceRhyme = {
             document.querySelectorAll('#produce-rhyme-help-choices .choice-card').forEach(c => c.classList.add('disabled'));
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
-            setTimeout(() => { closeOverlay(); this.markSuccess(); }, 900);
+            Phono.helpers.later(() => { closeOverlay(); this.markSuccess(); }, 900);
             return;
         }
 
@@ -540,7 +540,7 @@ Phono.games.rhymeOddOneOut = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.nextOrComplete(), 1500);
+            Phono.helpers.later(() => this.nextOrComplete(), 1500);
             return;
         }
 

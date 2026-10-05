@@ -689,7 +689,8 @@ Phono.app = {
         Phono.audio.playSfx('fanfare');
         Phono.confetti.launch(4000);
         
-        setTimeout(() => {
+        // Skipped if the child leaves the stage during these 0.8 s.
+        Phono.helpers.later(() => {
             this.navigate('gameComplete', {
                 gameId,
                 levelId,

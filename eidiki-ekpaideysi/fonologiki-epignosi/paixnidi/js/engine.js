@@ -182,8 +182,11 @@ Phono.audio = {
             setTimeout(() => {
                 // The app navigated to a different screen while this was
                 // waiting — don't let a stale call start talking now.
-                if (gen !== this.navGeneration) { resolve(); return; }
-                this._queueUtterance(text, rate, resolve);
+                // The promise is deliberately NEVER resolved: whatever was
+                // waiting for this speech (e.g. "then go to the next word")
+                // belongs to the stage that was left and must stop too.
+                if (gen !== this.navGeneration) return;
+                this._queueUtterance(text, rate, resolve, gen);
             }, 60);
         });
     },
@@ -194,7 +197,7 @@ Phono.audio = {
      * clipping the tail of the item that just finished playing (onend can
      * fire slightly before the system audio actually finishes draining
      * it). */
-    _queueUtterance(text, rate, resolve) {
+    _queueUtterance(text, rate, resolve, gen = this.navGeneration) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'el-GR';
         utterance.rate = rate;
@@ -204,8 +207,11 @@ Phono.audio = {
         const voice = this.getBestGreekVoice();
         if (voice) utterance.voice = voice;
 
-        utterance.onend = resolve;
-        utterance.onerror = resolve;
+        // Cancelling the speech on navigation fires onend/onerror. Don't
+        // resolve in that case, so the stage that was left can't carry on.
+        const done = () => { if (gen !== this.navGeneration) return; resolve(); };
+        utterance.onend = done;
+        utterance.onerror = done;
         window.speechSynthesis.speak(utterance);
     },
 
@@ -226,8 +232,9 @@ Phono.audio = {
 
         for (let i = 0; i < syllables.length; i++) {
             // The app navigated away mid-sequence — stop here instead of
-            // continuing to speak syllables over whatever screen is up now.
-            if (gen !== this.navGeneration) return;
+            // continuing to speak syllables over whatever screen is up now
+            // (and never resolve, so the stage that was left stops too).
+            if (gen !== this.navGeneration) return new Promise(() => {});
             // Trailing period: some Greek voices otherwise treat a bare
             // 2-letter syllable (e.g. "δι") as an abbreviation and spell
             // out the letter names ("δέλτα γιώτα") instead of reading it
@@ -250,7 +257,7 @@ Phono.audio = {
         await this._wait(80);
 
         for (let i = 0; i < phonemes.length; i++) {
-            if (gen !== this.navGeneration) return;
+            if (gen !== this.navGeneration) return new Promise(() => {});
             await new Promise(resolve => this._queueUtterance(phonemes[i], 0.6, resolve));
             if (i < phonemes.length - 1) {
                 await this._wait(delay);
@@ -862,9 +869,19 @@ Phono.helpers = {
         return elem;
     },
 
-    /** Wait ms then resolve */
+    /** Wait ms then resolve. If the child leaves the stage meanwhile it never
+     * resolves, so the code that was waiting stops instead of carrying on. */
     wait(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        const gen = Phono.audio.navGeneration;
+        return new Promise(resolve => setTimeout(() => { if (gen === Phono.audio.navGeneration) resolve(); }, ms));
+    },
+
+    /** setTimeout for stage code ("after 1.2 s go to the next word"). Skipped
+     * if the child left the stage in the meantime, so nothing keeps running
+     * (or talking) in the background after leaving. */
+    later(fn, ms) {
+        const gen = Phono.audio.navGeneration;
+        return setTimeout(() => { if (gen !== Phono.audio.navGeneration) return; fn(); }, ms);
     },
 
     /** Greek vowels check */

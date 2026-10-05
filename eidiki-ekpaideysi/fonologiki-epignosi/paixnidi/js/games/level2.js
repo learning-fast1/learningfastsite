@@ -142,7 +142,7 @@ Phono.games.syllableCounting = {
                         Phono.feedback.showCorrect();
                         Phono.engine.recordCorrect();
                         document.querySelectorAll('.number-choice-btn').forEach(b => b.classList.add('btn-disabled'));
-                        setTimeout(() => this.nextOrComplete(), 1200);
+                        Phono.helpers.later(() => this.nextOrComplete(), 1200);
                     } else {
                         e.target.classList.add('wrong');
                         Phono.feedback.showWrong();
@@ -210,7 +210,7 @@ Phono.games.syllableCounting = {
 
         const btn = document.getElementById('tap-btn');
         btn.classList.add('tapped');
-        setTimeout(() => btn.classList.remove('tapped'), 300);
+        Phono.helpers.later(() => btn.classList.remove('tapped'), 300);
 
         // "Δύσκολο" mode: the dot is still added (undo/reset rely on it
         // being a real DOM node to remove), but stays invisible — the
@@ -433,12 +433,12 @@ Phono.games.syllableSynthesis = {
                 style: { width: 'auto', padding: '0 16px', minWidth: '50px' },
             });
             syllableDisplay.appendChild(bubble);
-            setTimeout(() => bubble.classList.add('visible'), 200 + i * 300);
+            Phono.helpers.later(() => bubble.classList.add('visible'), 200 + i * 300);
         });
         footer.appendChild(syllableDisplay);
 
         const nextDelay = 900 + this.currentWord.syllables.length * 300;
-        setTimeout(() => this.showNextButton(), nextDelay);
+        Phono.helpers.later(() => this.showNextButton(), nextDelay);
     },
 
     showNextButton() {
@@ -548,7 +548,7 @@ Phono.games.syllableSplit = {
         ]));
         Phono.audio.speak(this.currentWord.word);
 
-        setTimeout(() => {
+        Phono.helpers.later(() => {
             Phono.dragDrop.init('#syl-drag-items', '.draggable-item', '.drop-zone', (dragEl, dropZoneEl) => {
                 this.handleDrop(dragEl, dropZoneEl);
             });
@@ -615,7 +615,7 @@ Phono.games.syllableSplit = {
                 Phono.sessionLog.record('syllableSplit', this.currentWord.word, this.currentWord.syllables.join('-'), true);
                 Phono.feedback.showCorrect();
                 Phono.engine.recordCorrect();
-                setTimeout(() => this.nextOrComplete(), 1200);
+                Phono.helpers.later(() => this.nextOrComplete(), 1200);
             }
         } else {
             // Wrong syllable for this position — includes the trap tile
@@ -729,18 +729,18 @@ Phono.games.syllableRemoval = {
         // Animate removal after 1.5s, then hide the rest of the word too
         // (those boxes would otherwise spell out the exact answer) —
         // same two-stage reveal/hide used by wordDeletion in level1.js.
-        setTimeout(() => {
+        Phono.helpers.later(() => {
             const boxesEl = document.getElementById('syl-boxes');
             const removeBox = boxesEl ? boxesEl.querySelector(`.syllable-box[data-index="${this.currentItem.removeIndex}"]`) : null;
             if (removeBox) {
                 removeBox.classList.add('removing');
                 Phono.audio.playSfx('pop');
-                setTimeout(() => {
+                Phono.helpers.later(() => {
                     removeBox.style.visibility = 'hidden';
                     const choices = document.getElementById('removal-choices');
                     if (choices) choices.style.display = '';
 
-                    setTimeout(() => {
+                    Phono.helpers.later(() => {
                         if (boxesEl) { boxesEl.style.opacity = '0'; boxesEl.style.visibility = 'hidden'; }
                         const instructionEl = document.getElementById('sylremoval-instruction');
                         if (instructionEl) instructionEl.classList.add('shake-attention');
@@ -808,7 +808,7 @@ Phono.games.syllableRemoval = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.nextOrComplete(), 1500);
+            Phono.helpers.later(() => this.nextOrComplete(), 1500);
             return;
         }
 

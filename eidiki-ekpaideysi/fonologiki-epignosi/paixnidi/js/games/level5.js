@@ -60,7 +60,7 @@ Phono.games.phonemeSynthesis = {
             if (i > 0) {
                 const sep = el('span', { className: 'phoneme-separator', textContent: '+' });
                 phonemeDisplay.appendChild(sep);
-                setTimeout(() => sep.classList.add('visible'), 400 + i * 500);
+                Phono.helpers.later(() => sep.classList.add('visible'), 400 + i * 500);
             }
             const isVowel = Phono.helpers.isVowelSound(ph);
             const bubble = el('div', {
@@ -68,7 +68,7 @@ Phono.games.phonemeSynthesis = {
                 textContent: ph,
             });
             phonemeDisplay.appendChild(bubble);
-            setTimeout(() => bubble.classList.add('visible'), 300 + i * 500);
+            Phono.helpers.later(() => bubble.classList.add('visible'), 300 + i * 500);
         });
 
         const distractors = Phono.data.getDistractors(this.currentWord.word, 3);
@@ -97,7 +97,7 @@ Phono.games.phonemeSynthesis = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.nextOrComplete(), 1500);
+            Phono.helpers.later(() => this.nextOrComplete(), 1500);
             return;
         }
 
@@ -215,7 +215,7 @@ Phono.games.phonemeAnalysis = {
                         Phono.feedback.showCorrect();
                         Phono.engine.recordCorrect();
                         document.querySelectorAll('.number-choice-btn').forEach(b => b.classList.add('btn-disabled'));
-                        setTimeout(() => this.nextOrComplete(), 1200);
+                        Phono.helpers.later(() => this.nextOrComplete(), 1200);
                     } else {
                         e.target.classList.add('wrong');
                         Phono.feedback.showWrong();
@@ -240,7 +240,7 @@ Phono.games.phonemeAnalysis = {
 
         const btn = document.getElementById('tap-btn');
         btn.classList.add('tapped');
-        setTimeout(() => btn.classList.remove('tapped'), 300);
+        Phono.helpers.later(() => btn.classList.remove('tapped'), 300);
 
         const counter = document.getElementById('tap-counter');
         const dot = el('div', { className: 'tap-dot' });
@@ -393,7 +393,7 @@ Phono.games.elkoninBoxes = {
 
         this.container.appendChild(el('div', { className: 'elkonin-container' }, [instruction, emojiDiv, wordDiv, boxesDiv, tokensDiv, legend]));
 
-        setTimeout(() => {
+        Phono.helpers.later(() => {
             Phono.dragDrop.init('#phoneme-tokens', '.phoneme-draggable', '.elkonin-box', (dragEl, dropZone) => {
                 this.handleDrop(dragEl, dropZone);
             });
@@ -423,7 +423,7 @@ Phono.games.elkoninBoxes = {
 
             if (this.placed.every(p => p !== null)) {
                 Phono.feedback.showCorrect();
-                setTimeout(() => this.nextOrComplete(), 1200);
+                Phono.helpers.later(() => this.nextOrComplete(), 1200);
             }
         } else {
             Phono.feedback.highlightElement(dropZone, false);
@@ -540,18 +540,18 @@ Phono.games.phonemeDeletion = {
 
         Phono.audio.speak(word);
 
-        setTimeout(() => {
+        Phono.helpers.later(() => {
             const letterDisplayEl = document.getElementById('pd-letters');
             const targetBox = letterDisplayEl ? letterDisplayEl.querySelector(`.letter-box[data-index="${targetIndex}"]`) : null;
             if (targetBox) {
                 targetBox.classList.add('removing');
                 Phono.audio.playSfx('pop');
-                setTimeout(() => {
+                Phono.helpers.later(() => {
                     targetBox.style.visibility = 'hidden';
                     const choices = document.getElementById('pd-choices');
                     if (choices) choices.style.display = '';
 
-                    setTimeout(() => {
+                    Phono.helpers.later(() => {
                         if (letterDisplayEl) { letterDisplayEl.style.opacity = '0'; letterDisplayEl.style.visibility = 'hidden'; }
                         const instructionEl = document.getElementById('phonemedeletion-instruction');
                         if (instructionEl) instructionEl.classList.add('shake-attention');
@@ -625,7 +625,7 @@ Phono.games.phonemeDeletion = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.nextOrComplete(), 1500);
+            Phono.helpers.later(() => this.nextOrComplete(), 1500);
             return;
         }
 

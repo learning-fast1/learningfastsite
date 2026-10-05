@@ -141,7 +141,7 @@ Phono.games.wordSizeCompare = {
             otherCardEl.classList.add('disabled');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.startClapping(), 1200);
+            Phono.helpers.later(() => this.startClapping(), 1200);
             return;
         }
 
@@ -150,7 +150,7 @@ Phono.games.wordSizeCompare = {
         // away the correct one by elimination — so it un-disables itself.
         cardEl.classList.add('wrong');
         Phono.feedback.showWrong();
-        setTimeout(() => cardEl.classList.remove('wrong'), 1500);
+        Phono.helpers.later(() => cardEl.classList.remove('wrong'), 1500);
 
         // Diagnostic: in stage C, the only wrong choice is also the
         // physically bigger object — log that separately from a plain
@@ -227,7 +227,7 @@ Phono.games.wordSizeCompare = {
             clapBtn.classList.add('btn-disabled');
             this.clapWordIndex++;
             this.clapSylIndex = 0;
-            setTimeout(() => this.renderClapStep(), 500);
+            Phono.helpers.later(() => this.renderClapStep(), 500);
         }
     },
 
@@ -462,7 +462,7 @@ Phono.games.wordCounting = {
         // Animate clap button
         const btn = document.getElementById('clap-btn');
         btn.classList.add('clapped');
-        setTimeout(() => btn.classList.remove('clapped'), 300);
+        Phono.helpers.later(() => btn.classList.remove('clapped'), 300);
 
         // Add counter dot
         const counter = document.getElementById('clap-counter');
@@ -567,7 +567,7 @@ Phono.games.wordCounting = {
             Phono.engine.recordCorrect();
             // Disable all buttons
             document.querySelectorAll('.number-choice-btn').forEach(b => b.classList.add('btn-disabled'));
-            setTimeout(() => this.nextOrComplete(), 1200);
+            Phono.helpers.later(() => this.nextOrComplete(), 1200);
         } else {
             this.missedThisRound = true;
             btnEl.classList.add('wrong');
@@ -768,7 +768,7 @@ Phono.games.wordPosition = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.showNextButton(), 1200);
+            Phono.helpers.later(() => this.showNextButton(), 1200);
             return;
         }
 
@@ -895,7 +895,7 @@ Phono.games.sentenceBuilder = {
         Phono.audio.speak(this.currentSentence.text, 0.5);
 
         // Init drag & drop
-        setTimeout(() => {
+        Phono.helpers.later(() => {
             Phono.dragDrop.init('#drag-items', '.draggable-item', '.drop-zone', (dragEl, dropZone) => {
                 this.handleDrop(dragEl, dropZone);
             });
@@ -960,7 +960,7 @@ Phono.games.sentenceBuilder = {
             if (this.placedWords.every(w => w !== null)) {
                 Phono.feedback.showCorrect();
                 Phono.engine.recordCorrect();
-                setTimeout(() => this.nextOrComplete(), 1200);
+                Phono.helpers.later(() => this.nextOrComplete(), 1200);
             }
         } else {
             // Wrong placement
@@ -1144,10 +1144,10 @@ Phono.games.wordDeletion = {
             if (box) {
                 box.classList.add('removing');
                 Phono.audio.playSfx('pop');
-                setTimeout(() => {
+                Phono.helpers.later(() => {
                     box.style.visibility = 'hidden';
 
-                    setTimeout(() => {
+                    Phono.helpers.later(() => {
                         // visibility (not just opacity) — some mobile
                         // browsers don't reliably run the opacity
                         // transition here, leaving the rest of the
@@ -1219,7 +1219,7 @@ Phono.games.wordDeletion = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.showNextButton(), 1200);
+            Phono.helpers.later(() => this.showNextButton(), 1200);
             return;
         }
 

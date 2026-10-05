@@ -226,7 +226,7 @@ Phono.games.findInitialPhoneme = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.nextOrComplete(), 1500);
+            Phono.helpers.later(() => this.nextOrComplete(), 1500);
             return;
         }
 
@@ -329,7 +329,7 @@ Phono.games.initialSoundMC = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.nextOrComplete(), 1500);
+            Phono.helpers.later(() => this.nextOrComplete(), 1500);
             return;
         }
 
@@ -430,7 +430,7 @@ Phono.games.groupBySound = {
 
         this.container.appendChild(el('div', { className: 'sorting-area' }, [instruction, categoriesDiv, itemsDiv]));
 
-        setTimeout(() => {
+        Phono.helpers.later(() => {
             Phono.dragDrop.init('#sort-items', '.sort-draggable', '.sort-category', (dragEl, dropZone) => {
                 this.handleDrop(dragEl, dropZone);
             });
@@ -453,7 +453,7 @@ Phono.games.groupBySound = {
 
             if (this.correctCount >= this.totalItems) {
                 Phono.feedback.showCorrect();
-                setTimeout(() => {
+                Phono.helpers.later(() => {
                     Phono.app.onGameComplete('groupBySound', this.levelInfo.id);
                 }, 1200);
             }
@@ -522,7 +522,7 @@ Phono.games.soundOddOneOut = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.nextOrComplete(), 1500);
+            Phono.helpers.later(() => this.nextOrComplete(), 1500);
             return;
         }
 
@@ -653,7 +653,7 @@ Phono.games.findFinalPhoneme = {
             cardEl.classList.add('correct');
             Phono.feedback.showCorrect();
             Phono.engine.recordCorrect();
-            setTimeout(() => this.nextOrComplete(), 1500);
+            Phono.helpers.later(() => this.nextOrComplete(), 1500);
             return;
         }
 
