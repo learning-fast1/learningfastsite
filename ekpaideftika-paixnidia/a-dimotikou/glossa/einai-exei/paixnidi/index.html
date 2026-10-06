@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Η Περιπέτεια του Είναι και του Έχει: δωρεάν διαδραστικό παιχνίδι για να μάθουν τα παιδιά να διαβάζουν, να γράφουν και να χρησιμοποιούν σωστά τις λέξεις «είναι» και «έχει».">
+<title>Η Περιπέτεια του Είναι και του Έχει</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Didact+Gothic&display=swap" rel="stylesheet">
+<style>
+/* Layout: a sea chart you sail down — three islands as bands, stages as stepping stones; each game screen is a paper card floating on the sea */
+:root{
+  --sea:#27b2c2; --sea-deep:#137a96; --foam:#dff7f8;
+  --paper:#fffaf0; --sand:#ffeec9; --line:#ecdcb8; --ink:#1f2d45; --ink-soft:#56627a;
+  --einai:#5a4bd6; --einai-soft:#e8e5ff; --einai-ink:#2e2494;
+  --exei:#ee7420; --exei-soft:#ffe7d3; --exei-ink:#8d3d05;
+  --leaf:#2a9d61; --leaf-soft:#d8f2e3; --leaf-ink:#145b37;
+  --gold:#f6b915; --gold-deep:#c98a00; --good:#23a35a; --bad:#e2475a;
+  --f-display:'Comfortaa','Trebuchet MS',Verdana,sans-serif;
+  --f-body:'Didact Gothic','Comfortaa',Verdana,sans-serif;
+  --r:22px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  margin:0; color:var(--ink); font:18px/1.5 var(--f-body);
+  background:var(--sea);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='90'%3E%3Cg stroke='white' stroke-opacity='.28' stroke-width='2.5' fill='none' stroke-linecap='round'%3E%3Cpath d='M12 30 q9 -6 18 0 t18 0'/%3E%3Cpath d='M96 70 q8 -5 16 0 t16 0'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(ellipse 60px 8px at 20% 30%, rgba(255,255,255,.22), transparent 70%),
+    radial-gradient(ellipse 80px 9px at 75% 60%, rgba(255,255,255,.18), transparent 70%),
+    radial-gradient(ellipse 50px 7px at 40% 85%, rgba(255,255,255,.18), transparent 70%),
+    linear-gradient(180deg,var(--sea),var(--sea-deep));
+  background-size:160px 90px,420px 420px,520px 520px,380px 380px,100% 100%;
+  background-attachment:fixed;
+}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+#app{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:12px 40px}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.brand{background:none;border:0;padding:6px 4px;display:flex;align-items:center;gap:8px;font:700 1.05rem var(--f-display);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.15)}
+.brand b{color:var(--sand)}
+.top .spacer{flex:1}
+.pill{background:rgba(255,255,255,.92);border-radius:999px;padding:6px 14px;font:700 1rem var(--f-display);display:flex;align-items:center;gap:6px;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.pill .st{color:var(--gold-deep)}
+.icon-btn{width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.92);font-size:1.4rem;display:grid;place-items:center;box-shadow:0 3px 0 rgba(0,0,0,.12);flex:none}
+.icon-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.12)}
+
+/* home */
+.home{background:var(--paper);border-radius:32px;overflow:hidden;text-align:center;box-shadow:0 10px 0 rgba(0,0,0,.12)}
+.home-scene{display:block;width:100%;height:auto}
+.home-body{padding:16px 22px 28px}
+.home h1{font:700 clamp(1.6rem,6vw,2.5rem)/1.2 var(--f-display);margin:4px 0 6px;text-wrap:balance}
+.home h1 .e{color:var(--einai)} .home h1 .x{color:var(--exei)}
+.home .story{max-width:30em;margin:0 auto 18px;color:var(--ink-soft);font-size:1.15rem}
+.word-bubbles{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:10px 0 16px}
+.wb{font:400 2.4rem var(--f-body);padding:6px 26px;border-radius:999px;color:#fff;box-shadow:0 5px 0 rgba(0,0,0,.15)}
+.wb.e{background:var(--einai)} .wb.x{background:var(--exei)}
+.big-btn{border:0;border-radius:999px;padding:16px 34px;font:700 1.3rem var(--f-display);background:var(--gold);color:var(--ink);box-shadow:0 6px 0 var(--gold-deep)}
+.big-btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--gold-deep)}
+.big-btn.ghost{background:#fff;box-shadow:0 6px 0 var(--line)}
+.scene-boat{animation:rock 3.5s ease-in-out infinite;transform-origin:105px 200px}
+.scene-cloud{animation:drift 14s ease-in-out infinite alternate}
+.brand-pico{width:34px;height:37px;display:inline-block}
+.brand-pico svg,.pico svg,.mini-pico svg{width:100%;height:100%;display:block}
+.parrot-img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none}
+
+/* map: islands drawn as sand + grass blobs on the sea, stages are stepping stones */
+.island{position:relative;padding:74px 13% 92px;isolation:isolate}
+.isl-bg{position:absolute;inset:0;z-index:-2}
+.isl-bg svg{width:100%;height:100%;display:block;overflow:visible}
+.deco{position:absolute;z-index:-1;pointer-events:none}
+.deco.big{filter:drop-shadow(0 5px 3px rgba(0,60,40,.22))}
+.deco svg{display:block;width:100%;height:auto}
+.isl-head{display:flex;align-items:center;gap:12px;margin:0 auto 38px;width:fit-content;max-width:100%;position:relative;
+  padding:10px 16px;border-radius:12px;color:#fff;
+  background:repeating-linear-gradient(180deg,#c48a4e 0 21px,#ad743b 21px 23px);
+  box-shadow:0 5px 0 #7d5129,0 9px 10px rgba(0,0,0,.18)}
+.isl-head::before,.isl-head::after{content:"";position:absolute;top:8px;width:7px;height:7px;border-radius:50%;background:#6e4520;box-shadow:0 1px 0 rgba(255,255,255,.3)}
+.isl-head::before{left:7px}.isl-head::after{right:7px}
+.isl-word{font:400 1.7rem var(--f-body);color:#fff;background:var(--c);padding:2px 14px;border-radius:12px;box-shadow:0 3px 0 rgba(0,0,0,.2);white-space:nowrap}
+.isl-head h2{font:700 1.1rem/1.2 var(--f-display);margin:0;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.isl-head p{margin:2px 0 0;color:#fff2dc;font-size:.98rem}
+.isl-head .key{font-size:1.6rem}
+.path{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:26px 10px;position:relative}
+.node{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;position:relative}
+.path .node:nth-child(even){transform:translateY(18px)}
+.node .disc{width:76px;height:64px;display:grid;place-items:center;font:700 1.6rem var(--f-display);color:var(--c-ink);
+  border-radius:50% 50% 46% 46%/58% 58% 42% 42%;
+  background:radial-gradient(circle at 68% 66%,rgba(90,80,60,.22) 0 2px,transparent 3px),radial-gradient(circle at 30% 62%,rgba(90,80,60,.18) 0 1.5px,transparent 2.5px),radial-gradient(circle at 56% 40%,rgba(90,80,60,.14) 0 1.5px,transparent 2.5px),radial-gradient(ellipse at 34% 26%,#fdfcf7 0,#e0d9c9 40%,#b7ad97 80%,#9c927c 100%);
+  box-shadow:0 7px 0 #8d846f,0 12px 10px rgba(0,50,30,.25);transition:transform .15s}
+.node:hover .disc{transform:translateY(-3px)}
+.node.done .disc{color:#fff;background:radial-gradient(ellipse at 34% 28%,rgba(255,255,255,.55) 0,rgba(255,255,255,0) 45%),var(--c);box-shadow:0 7px 0 var(--c-ink),0 12px 10px rgba(0,50,30,.25)}
+.node.locked{cursor:not-allowed}
+.node.locked .disc{color:#7d7666;font-size:1.3rem;background:radial-gradient(ellipse at 34% 28%,#cfcabd 0,#aaa392 55%,#8b8473 100%);box-shadow:0 6px 0 #6f6959,0 10px 8px rgba(0,50,30,.2)}
+.node .flag{position:absolute;top:-26px;right:16px;width:30px}
+.node .flag svg{display:block;width:100%;height:auto}
+.node .nt{font:700 .86rem/1.2 var(--f-display);color:var(--ink);max-width:118px;background:rgba(255,255,255,.88);border-radius:10px;padding:3px 8px}
+.node.locked .nt{color:#7d7666;background:rgba(255,255,255,.6)}
+.node .ns{color:var(--gold);letter-spacing:2px;font-size:1.1rem;min-height:1.2em;text-shadow:0 1px 0 var(--gold-deep)}
+.node .ns i{color:rgba(255,255,255,.75);font-style:normal;text-shadow:none}
+.node .mini-pico{position:absolute;top:-48px;left:50%;margin-left:-26px;width:52px;height:52px;animation:bob 2s ease-in-out infinite}
+.treasure-row{margin-top:34px;text-align:center}
+.route{position:relative;height:96px}
+.route svg.line{position:absolute;inset:0;width:100%;height:100%}
+.route .boat{position:absolute;left:50%;top:14px;width:76px;margin-left:-38px;animation:rock 3.5s ease-in-out infinite}
+.route .boat svg,.route .fish svg{display:block;width:100%;height:auto}
+.route .fish{position:absolute;width:34px;left:18%;top:52px;animation:swim 6s ease-in-out infinite}
+.tone-e{--c:var(--einai);--c-soft:var(--einai-soft);--c-ink:var(--einai-ink)}
+.tone-x{--c:var(--exei);--c-soft:var(--exei-soft);--c-ink:var(--exei-ink)}
+.tone-m{--c:var(--leaf);--c-soft:var(--leaf-soft);--c-ink:var(--leaf-ink)}
+
+.foam{animation:foam 7s linear infinite}
+@keyframes foam{to{stroke-dashoffset:-72}}
+#seaTex{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+.sky-layer{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.cloud-shadow{position:absolute;left:0;width:380px;height:170px;border-radius:50%;background:#0b3550;opacity:.11;filter:blur(32px);animation:cloudmove 70s linear infinite}
+@keyframes cloudmove{from{transform:translateX(-480px)}to{transform:translateX(calc(100vw + 480px))}}
+.gull{position:absolute;left:0;width:30px;animation:fly 24s linear infinite;filter:drop-shadow(0 8px 2px rgba(0,40,60,.25))}
+.gull svg{display:block;width:100%;height:auto;animation:flap .5s ease-in-out infinite alternate;transform-origin:50% 60%}
+@keyframes fly{from{transform:translate(-60px,0)}to{transform:translate(calc(100vw + 60px),-60px)}}
+@keyframes flap{to{transform:scaleY(.45)}}
+.route .wv{position:absolute;width:30px;opacity:0;animation:wave 4s ease-in-out infinite}
+.route .wv svg{display:block;width:100%;height:auto}
+@keyframes wave{0%,100%{opacity:0;transform:translateX(-6px)}50%{opacity:.75;transform:translateX(6px)}}
+@keyframes rock{50%{transform:translateY(-4px) rotate(3deg)}}
+@keyframes drift{to{transform:translateX(30px)}}
+@keyframes swim{50%{transform:translate(30px,-6px) scaleX(1)}}
+@media (max-width:520px){
+  .island{padding:70px 11% 88px}
+  .path{grid-template-columns:repeat(2,1fr)}
+  .isl-head{flex-direction:column;gap:6px;text-align:center;padding:12px 18px}
+}
+
+/* stage */
+.stage{background:var(--paper);border-radius:32px;padding:16px 16px 26px;box-shadow:0 10px 0 rgba(0,0,0,.12);border-top:10px solid var(--c)}
+.stagebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.stagebar .icon-btn{background:var(--c-soft);box-shadow:none}
+.stagebar .back-btn{width:auto;border-radius:999px;padding:0 16px 0 12px;display:flex;align-items:center;gap:6px}
+.back-arrow{font:700 1.15rem/1 var(--f-display);color:var(--c-ink)}
+@media (max-width:520px){.stagebar .back-btn{padding:0 12px 0 9px}.stagebar .dots{flex:1 0 100%;order:3}}
+.st-title{flex:1;min-width:0}
+.st-title small{display:block;font:700 .8rem var(--f-display);color:var(--c-ink);letter-spacing:.06em;text-transform:uppercase}
+.st-title strong{font:700 1.2rem/1.2 var(--f-display)}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dots span{width:14px;height:14px;border-radius:50%;background:var(--c-soft);border:2px solid var(--c)}
+.dots span.on{background:var(--c)}
+.dots span.now{background:var(--gold);border-color:var(--gold-deep);transform:scale(1.25)}
+.guide{display:flex;align-items:center;gap:10px;margin:16px 0 10px}
+.pico{width:66px;height:64px;flex:none;display:block;animation:bob 2.6s ease-in-out infinite}
+.pico.happy{animation:hop .5s ease 2}
+.bubble{flex:1;min-width:0;background:#fff;border:3px solid var(--c-soft);border-radius:20px;padding:10px 14px;font-size:1.15rem;position:relative}
+.bubble::before{content:"";position:absolute;left:-12px;top:50%;margin-top:-8px;border:8px solid transparent;border-right:10px solid var(--c-soft)}
+.rule-strip{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:0 0 12px}
+.rule-strip span{border-radius:999px;padding:4px 14px;font-size:1rem}
+.rule-strip .e{background:var(--einai-soft);color:var(--einai-ink)}
+.rule-strip .x{background:var(--exei-soft);color:var(--exei-ink)}
+.play{display:flex;flex-direction:column;align-items:center;gap:18px;padding-top:6px}
+
+/* letters & tiles */
+.big-word{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ltile{min-width:68px;height:82px;padding:0 10px;border-radius:18px;border:0;background:#fff;font:400 3rem/1 var(--f-body);color:var(--ink);box-shadow:0 6px 0 var(--line),inset 0 0 0 3px var(--line);display:grid;place-items:center}
+.ltile.next{box-shadow:0 6px 0 var(--gold-deep),inset 0 0 0 4px var(--gold);animation:pulse 1.2s ease-in-out infinite}
+.ltile.lit{background:var(--c);color:#fff;box-shadow:0 6px 0 var(--c-ink)}
+.ltile.blank{background:var(--c-soft);color:var(--c);box-shadow:inset 0 0 0 3px var(--c);animation:pulse 1.4s ease-in-out infinite}
+.big-word.whole .ltile{animation:jump .5s ease both}
+.big-word.whole .ltile:nth-child(2){animation-delay:.07s}.big-word.whole .ltile:nth-child(3){animation-delay:.14s}.big-word.whole .ltile:nth-child(4){animation-delay:.21s}.big-word.whole .ltile:nth-child(5){animation-delay:.28s}
+.meaning{width:100%;display:flex;flex-direction:column;gap:12px;align-items:center}
+.rule{font:700 1.15rem/1.4 var(--f-display);background:var(--c-soft);color:var(--c-ink);padding:12px 18px;border-radius:18px;text-align:center;max-width:32em;margin:0}
+.ex-list{display:grid;gap:10px;width:100%;max-width:560px}
+.ex{display:flex;align-items:center;gap:12px;background:#fff;border-radius:18px;padding:10px 12px;box-shadow:0 4px 0 var(--line)}
+.ex .pic{font-size:2.3rem;flex:none}
+.ex p{margin:0;flex:1;min-width:0;font-size:1.35rem}
+.hl{color:#fff;border-radius:10px;padding:0 8px;white-space:nowrap}
+.hl.e{background:var(--einai)} .hl.x{background:var(--exei)}
+
+.target{display:flex;align-items:center;gap:12px;background:var(--c-soft);border-radius:999px;padding:6px 18px 6px 8px}
+.tletter{width:70px;height:70px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font:400 3rem/1 var(--f-body)}
+.tlabel{font:700 1rem var(--f-display);color:var(--c-ink)}
+.tcount{font:700 1.3rem var(--f-display);color:var(--c-ink);font-variant-numeric:tabular-nums}
+.bubbles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:440px}
+.bub{aspect-ratio:1;max-width:100%;border-radius:50%;border:0;font:400 clamp(2rem,9vw,2.7rem)/1 var(--f-body);display:grid;place-items:center;box-shadow:inset -6px -8px 0 rgba(0,0,0,.08),0 5px 0 rgba(0,0,0,.1);animation:float 3s ease-in-out infinite;animation-delay:var(--d)}
+.c0{background:#ffe1ea}.c1{background:#dff1ff}.c2{background:#fff1c2}.c3{background:#e2f7df}.c4{background:#efe3ff}
+.bub.got,.wcard.got,.chip.got{background:var(--gold)!important;color:var(--ink);animation:popin .35s ease both}
+.wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:520px}
+.wcard{border:0;border-radius:18px;background:#fff;padding:16px 6px;font:400 clamp(1.3rem,5.5vw,1.8rem)/1.1 var(--f-body);box-shadow:0 5px 0 var(--line),inset 0 0 0 3px var(--line);min-width:0;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:620px}
+.chip{border:0;border-radius:14px;background:#fff;padding:10px 14px;font:400 1.7rem/1.1 var(--f-body);box-shadow:0 5px 0 var(--line),inset 0 0 0 3px var(--line)}
+.small-btn{border:0;border-radius:999px;padding:8px 16px;background:var(--c-soft);color:var(--c-ink);font:700 .95rem var(--f-display)}
+
+.model{font:400 2.6rem var(--f-body);color:var(--c);background:var(--c-soft);padding:4px 26px;border-radius:18px;min-height:64px;display:grid;place-items:center}
+.model.hidden-model{background:repeating-linear-gradient(45deg,var(--c-soft) 0 10px,#fff 10px 20px)}
+.slots{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.slot{min-width:68px;height:82px;border-radius:18px;border:3px dashed var(--c);background:var(--c-soft);display:grid;place-items:center;font:400 3rem/1 var(--f-body);padding:0 8px}
+.slot.filled{border-style:solid;background:var(--c);color:#fff;animation:popin .3s ease both}
+.slots.words .slot{min-width:84px;height:62px;font-size:1.7rem;border-radius:14px}
+.slots.done .slot{animation:jump .5s ease both}
+.tray{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:14px;border-radius:22px;background:var(--sand);min-height:100px;width:100%;max-width:620px}
+.tray .ltile.used,.tray .chip.used{visibility:hidden}
+.scard{display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border-radius:24px;padding:16px 18px;box-shadow:0 6px 0 var(--line);width:100%;max-width:600px;position:relative}
+.scard .pic{font-size:4rem;line-height:1.1}
+.sent{font-size:clamp(1.5rem,6vw,2rem);text-align:center;margin:0;line-height:1.5}
+.blank-w{display:inline-block;min-width:3.4em;border-bottom:4px dashed var(--c);color:transparent}
+.blank-w.filled{color:#fff;border:0;border-radius:10px;padding:0 10px;animation:popin .3s ease both}
+.blank-w.filled.e{background:var(--einai)} .blank-w.filled.x{background:var(--exei)} .blank-w.filled.o{background:var(--c)}
+.opts{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.opt{border:0;border-radius:18px;background:#fff;min-width:96px;padding:14px 22px;font:400 2rem/1 var(--f-body);box-shadow:0 6px 0 var(--line),inset 0 0 0 3px var(--line)}
+.opt:active,.wcard:active,.chip:active,.ltile:active{transform:translateY(3px)}
+.opt.right{background:var(--good);color:#fff;box-shadow:0 6px 0 #167a41}
+.chest{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;width:150px}
+.chest .lid{width:130px;height:34px;border-radius:40px 40px 6px 6px;transform-origin:10% 100%;transition:transform .35s}
+.chest .box{width:130px;height:70px;border-radius:6px 6px 16px 16px;display:grid;place-items:center;font:400 1.9rem var(--f-body);color:#fff;position:relative}
+.chest .box::after{content:"";position:absolute;top:-6px;left:50%;margin-left:-12px;width:24px;height:22px;border-radius:6px;background:var(--gold);box-shadow:0 2px 0 var(--gold-deep)}
+.chest.e .lid,.chest.e .box{background:var(--einai)} .chest.x .lid,.chest.x .box{background:var(--exei)}
+.chest .box{box-shadow:inset 0 -10px 0 rgba(0,0,0,.15),0 6px 0 rgba(0,0,0,.15)}
+.chest small{font:700 .85rem var(--f-display);color:var(--ink-soft)}
+.chest:hover .lid,.chest.right .lid{transform:rotate(-24deg)}
+.tf-btn{border:0;border-radius:20px;padding:14px 26px;font:700 1.3rem var(--f-display);color:#fff;display:flex;gap:8px;align-items:center}
+.tf-btn.yes{background:var(--good);box-shadow:0 6px 0 #167a41}
+.tf-btn.no{background:var(--bad);box-shadow:0 6px 0 #a42536}
+.struck{text-decoration:line-through;text-decoration-thickness:4px;opacity:.55}
+.fix{margin-left:6px}
+
+.hint{animation:hintglow 1s ease-in-out infinite!important;box-shadow:0 0 0 5px var(--gold),0 0 22px 6px rgba(246,185,21,.8)!important}
+.shake{animation:shake .45s ease!important}
+
+/* overlay */
+#overlay{position:fixed;inset:0;background:rgba(19,60,80,.55);display:grid;place-items:center;padding:16px;z-index:20}
+.modal{background:var(--paper);border-radius:30px;padding:24px 22px;max-width:440px;width:100%;text-align:center;box-shadow:0 12px 0 rgba(0,0,0,.18);max-height:90vh;overflow:auto}
+.modal h2{font:700 1.7rem var(--f-display);margin:6px 0}
+.modal p{color:var(--ink-soft);margin:6px 0 16px}
+.stars{display:flex;justify-content:center;gap:6px}
+.star{font-size:3.6rem;color:#e6dbc3;line-height:1}
+.star.on{color:var(--gold);text-shadow:0 4px 0 var(--gold-deep);animation:starin .5s ease both;animation-delay:calc(var(--i)*.25s)}
+.btn-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.modal.wide{max-width:540px}
+.btn-row.three{gap:10px}.btn-row.three .big-btn{padding:14px 20px;font-size:1.15rem}
+.settings{text-align:left;display:grid;gap:12px;margin:12px 0 18px}
+.toggle{display:flex;align-items:center;gap:12px;font-size:1.05rem;background:#fff;border-radius:16px;padding:10px 14px;box-shadow:0 3px 0 var(--line)}
+.toggle input{width:24px;height:24px;accent-color:var(--leaf)}
+.note{font-size:.9rem;color:var(--ink-soft)}
+.danger{border:0;border-radius:999px;padding:10px 18px;background:#ffe2e6;color:#a42536;font:700 1rem var(--f-display)}
+
+/* final */
+.final{background:var(--paper);border-radius:32px;padding:26px 20px;text-align:center;box-shadow:0 10px 0 rgba(0,0,0,.12)}
+.bigchest{width:200px;margin:10px auto 0;position:relative}
+.bigchest .lid{height:56px;border-radius:70px 70px 8px 8px;background:#a0612b;box-shadow:inset 0 -8px 0 rgba(0,0,0,.18);transform-origin:8% 100%;animation:openlid 1s .4s ease forwards}
+.bigchest .box{height:110px;border-radius:8px 8px 22px 22px;background:#b8743a;box-shadow:inset 0 -14px 0 rgba(0,0,0,.18),0 8px 0 rgba(0,0,0,.15);position:relative}
+.bigchest .glow{position:absolute;left:50%;top:40px;width:160px;height:90px;margin-left:-80px;border-radius:50%;background:radial-gradient(var(--gold),transparent 70%);opacity:0;animation:glow 1s 1s ease forwards}
+.cert{margin:22px auto 0;max-width:460px;border:5px double var(--gold-deep);border-radius:20px;padding:18px;background:#fff}
+.cert h2{font:700 1.4rem var(--f-display);margin:0 0 6px}
+.cert .who{font:400 2rem var(--f-body);color:var(--leaf-ink);min-height:1.4em;border-bottom:2px dotted var(--line);margin:6px 0 10px}
+.name-in{font:inherit;font-size:1.1rem;padding:10px 14px;border-radius:14px;border:3px solid var(--line);width:100%;max-width:300px;margin-top:14px}
+
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30}
+
+@keyframes bob{50%{transform:translateY(-6px)}}
+@keyframes hop{50%{transform:translateY(-14px) rotate(-8deg)}}
+@keyframes float{50%{transform:translateY(-5px)}}
+@keyframes pulse{50%{transform:scale(1.06)}}
+@keyframes jump{40%{transform:translateY(-16px)}}
+@keyframes popin{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes hintglow{50%{transform:scale(1.08)}}
+@keyframes starin{0%{transform:scale(0) rotate(-40deg)}100%{transform:scale(1)}}
+@keyframes openlid{to{transform:rotate(-38deg)}}
+@keyframes glow{to{opacity:1}}
+.lf-home{color:var(--ink);text-decoration:none;white-space:nowrap;flex:none}
+.reset-btn{border:0;color:#a42536;white-space:nowrap;flex:none}
+.reset-btn[hidden]{display:none}
+.reset-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.12)}
+.big-btn.red{background:var(--bad);color:#fff;box-shadow:0 6px 0 #a42536}
+.big-btn.red:active{box-shadow:0 2px 0 #a42536}
+@media (max-width:480px){.reset-btn{order:9;margin-left:auto;font-size:.85rem;padding:5px 12px}.top{flex-wrap:wrap}}
+/* wide screens: the button sits in the top-left corner of the screen, outside the game column */
+@media (min-width:1200px){.lf-home{position:absolute;left:16px;top:20px;z-index:6}}
+.brand-logo{display:block;height:52px;width:auto}
+#brand{flex:none}
+@media (max-width:480px){.lf-home{font-size:.85rem;padding:6px 10px}.brand-logo{height:40px}.top{gap:8px}}
+@media (max-width:350px){.brand-logo{height:32px}.lf-home{font-size:.75rem;padding:4px 7px}.top .icon-btn{width:38px;height:38px}}
+@media (max-width:400px){.spacer{display:none}#starPill{margin-left:auto}.lf-home{font-size:.8rem;padding:5px 9px}.top{gap:5px}.top .icon-btn{width:42px;height:42px;font-size:1.2rem}#brand{padding:6px 0}}
+.lf-home svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.copy{margin:16px 0 0;font-size:.85rem;color:var(--ink-soft)}
+.scard .pico-pic{width:76px;height:72px;display:block}
+.ex .ex-parrot{width:2.6rem;height:2.6rem;flex:none}
+/* the diploma screen fits a short laptop screen without scrolling */
+@media (min-width:700px) and (max-height:820px){.final{padding:14px 20px 18px}.bigchest{width:140px;margin-top:26px}.bigchest .lid{height:38px}.bigchest .box{height:74px}.bigchest .glow{top:26px;width:110px;height:60px;margin-left:-55px}.cert{margin-top:10px;padding:10px 16px}.cert h2{font-size:1.2rem;margin-bottom:2px}.cert .who{font-size:1.6rem;margin:2px 0 6px}.cert p{margin:4px 0}.name-in{margin-top:8px;padding:8px 12px}.final .btn-row{margin-top:10px!important}}
+body.wide-stage #app{max-width:1180px}
+body.wide-stage .lf-home{position:static}
+body.wide-stage .scard{max-width:960px;padding:18px 28px;gap:10px}
+body.wide-stage .scard .pic.has-img{height:clamp(110px,24vh,270px)}
+body.wide-stage .scard .pic:not(.has-img){font-size:clamp(4.5rem,13vh,9rem)}
+body.wide-stage .sent{font-size:clamp(2.1rem,6.6vh,3.9rem)}
+body.wide-stage .opts{gap:20px}
+/* building a sentence (Φτιάχνω πρόταση / Πρόταση-παγίδα): big picture, big slots, big word tiles */
+body.wide-stage[data-wide="build"] .scard .pic.has-img,body.wide-stage[data-wide="build2"] .scard .pic.has-img{height:clamp(96px,17vh,230px)}
+body.wide-stage[data-wide="build"] .scard .pic:not(.has-img),body.wide-stage[data-wide="build2"] .scard .pic:not(.has-img){font-size:clamp(3.5rem,11vh,7rem)}
+body.wide-stage .slots{gap:12px}
+body.wide-stage .slots.words .slot{min-width:clamp(96px,13vh,150px);height:clamp(64px,9.5vh,104px);font-size:clamp(1.8rem,5vh,3rem);border-radius:18px}
+body.wide-stage .tray{max-width:1000px;gap:14px;padding:18px;min-height:clamp(96px,16vh,170px)}
+body.wide-stage .tray .chip{font-size:clamp(1.8rem,5vh,3rem);padding:12px 24px;border-radius:18px}
+/* letter tiles (Γνωρίζω, Γράμματα στη σειρά, Το χαμένο γράμμα) */
+body.wide-stage[data-wide="meet"] .ltile,body.wide-stage[data-wide="order"] .ltile,body.wide-stage[data-wide="missing"] .ltile,body.wide-stage[data-wide="order"] .slots:not(.words) .slot{height:clamp(68px,10.5vh,140px);min-width:clamp(68px,9vh,116px);font-size:clamp(3rem,7vh,5.6rem);padding:0 14px;border-radius:22px}
+body.wide-stage[data-wide="meet"] .big-word,body.wide-stage[data-wide="order"] .big-word,body.wide-stage[data-wide="missing"] .big-word,body.wide-stage[data-wide="order"] .slots{gap:clamp(8px,1.6vh,16px)}
+body.wide-stage[data-wide="meet"] .meaning{gap:clamp(8px,1.8vh,18px)}
+body.wide-stage[data-wide="meet"] .rule{font-size:clamp(1.2rem,3vh,2rem);padding:clamp(8px,1.6vh,16px) 24px;max-width:36em}
+body.wide-stage[data-wide="meet"] .ex-list{max-width:820px;gap:clamp(6px,1.2vh,12px)}
+body.wide-stage[data-wide="meet"] .ex{padding:clamp(4px,.9vh,10px) 18px;gap:18px}
+body.wide-stage[data-wide="meet"] .ex p{font-size:clamp(1.4rem,3.6vh,2.4rem)}
+body.wide-stage[data-wide="meet"] .ex .pic{width:clamp(64px,9vh,120px);font-size:clamp(2rem,5.4vh,3.6rem)}
+body.wide-stage[data-wide="meet"] .ex .pic.has-img{height:clamp(46px,6.8vh,92px)}
+body.wide-stage[data-wide="meet"] .big-btn{font-size:clamp(1.3rem,3.2vh,2.1rem);padding:clamp(12px,2vh,22px) clamp(32px,5vh,56px)}
+body.wide-stage[data-wide="order"] .model,body.wide-stage[data-wide="order"] .model.hidden-model{font-size:clamp(2.6rem,7.4vh,5.6rem);min-height:clamp(64px,10.5vh,140px);padding:4px 40px;border-radius:22px}
+body.wide-stage[data-wide="order"] .tray{max-width:900px;padding:clamp(12px,2.2vh,22px);gap:clamp(10px,1.8vh,18px);min-height:clamp(100px,16vh,190px)}
+/* fewer things on screen -> bigger tiles (positive width only, phones keep their own sizes) */
+@media (min-width:701px){
+body.wide-stage[data-wide="missing"] .ltile{height:clamp(76px,16vh,200px);min-width:clamp(76px,13vh,170px);font-size:clamp(3.4rem,9.4vh,7.4rem)}
+body.wide-stage[data-wide="missing"] .big-word{gap:clamp(10px,2vh,22px)}
+body.wide-stage[data-wide="missing"] .opt{font-size:clamp(2.6rem,8.4vh,4.8rem);padding:clamp(14px,2.6vh,30px) clamp(40px,7vh,80px);min-width:clamp(160px,24vh,260px)}
+body.wide-stage[data-wide="missing"] .opts{gap:clamp(16px,3vh,32px)}
+body.wide-stage[data-wide="order"] .ltile,body.wide-stage[data-wide="order"] .slots:not(.words) .slot{height:clamp(72px,12.5vh,170px);min-width:clamp(72px,10.5vh,140px);font-size:clamp(3.2rem,8.4vh,6.4rem)}
+body.wide-stage[data-wide="order"] .model,body.wide-stage[data-wide="order"] .model.hidden-model{font-size:clamp(2.8rem,8.6vh,6.4rem);min-height:clamp(70px,12vh,160px)}
+}
+/* find the word */
+body.wide-stage[data-wide="spot"] .target{padding:8px clamp(18px,3vh,32px) 8px 10px;gap:16px}
+body.wide-stage[data-wide="spot"] .tletter{height:clamp(70px,10vh,116px);font-size:clamp(2.2rem,6.2vh,4rem)!important}
+body.wide-stage[data-wide="spot"] .tletter:not([style]){width:clamp(70px,10vh,116px)}
+body.wide-stage[data-wide="spot"] .tlabel{font-size:clamp(1rem,2.6vh,1.6rem)}
+body.wide-stage[data-wide="spot"] .tcount{font-size:clamp(1.3rem,3.4vh,2.2rem)}
+body.wide-stage[data-wide="spot"] .wgrid{max-width:900px;gap:clamp(10px,1.8vh,18px)}
+body.wide-stage[data-wide="spot"] .wcard{font-size:clamp(1.9rem,5.6vh,3.4rem);padding:clamp(14px,3vh,30px) 8px;border-radius:22px}
+body.wide-stage[data-wide="spot"] .chips{max-width:980px;gap:clamp(10px,1.8vh,18px)}
+body.wide-stage[data-wide="spot"] .chip{font-size:clamp(1.8rem,5vh,3.2rem);padding:clamp(10px,1.8vh,18px) clamp(16px,2.6vh,28px);border-radius:20px}
+/* right or wrong */
+body.wide-stage[data-wide="tf"] .scard .pic.has-img{height:clamp(100px,20vh,250px)}
+body.wide-stage[data-wide="tf"] .scard .pic:not(.has-img){font-size:clamp(4rem,12vh,8rem)}
+body.wide-stage .tf-btn{font-size:clamp(1.7rem,4.8vh,2.9rem);padding:14px 44px;border-radius:26px;gap:12px}
+body.wide-stage .opt{font-size:clamp(2.2rem,6.4vh,3.4rem);min-width:160px;padding:14px 36px;border-radius:22px}
+@media (max-width:700px){
+  body.wide-stage .scard{padding:14px 14px}
+  body.wide-stage .scard .pic.has-img{height:clamp(100px,17vh,170px)}
+  body.wide-stage .sent{font-size:clamp(1.9rem,8vw,2.6rem)}
+  body.wide-stage .opt{font-size:2.1rem;min-width:110px;padding:12px 24px}
+  body.wide-stage[data-wide="build"] .scard .pic.has-img,body.wide-stage[data-wide="build2"] .scard .pic.has-img,body.wide-stage[data-wide="tf"] .scard .pic.has-img{height:clamp(80px,12vh,120px)}
+  body.wide-stage .slots.words .slot{min-width:58px;height:60px;font-size:1.7rem;padding:0 6px}
+  body.wide-stage .tray{padding:12px;gap:10px}
+  body.wide-stage .tray .chip{font-size:1.7rem;padding:10px 16px}
+  body.wide-stage .tf-btn{font-size:1.8rem;padding:12px 28px}
+  body.wide-stage[data-wide="meet"] .ltile,body.wide-stage[data-wide="order"] .ltile,body.wide-stage[data-wide="missing"] .ltile,body.wide-stage[data-wide="order"] .slots:not(.words) .slot{height:64px;min-width:52px;font-size:2.4rem;padding:0 8px}
+  body.wide-stage[data-wide="order"] .model{font-size:2.2rem;padding:4px 22px;min-height:60px}
+  body.wide-stage[data-wide="meet"] .ex p{font-size:1.2rem}
+  body.wide-stage[data-wide="meet"] .ex{padding:6px 10px;gap:10px}
+  body.wide-stage[data-wide="meet"] .ex .pic{width:48px}
+  body.wide-stage[data-wide="meet"] .rule{font-size:1.1rem}
+  body.wide-stage[data-wide="spot"] .wcard{font-size:1.6rem;padding:14px 4px}
+  body.wide-stage[data-wide="spot"] .chip{font-size:1.5rem;padding:10px 14px}
+  body.wide-stage[data-wide="spot"] .tletter{font-size:2rem!important}
+}
+.pic-img{display:block;height:100%;width:auto;max-width:100%;object-fit:contain;margin:0 auto;pointer-events:none;-webkit-user-drag:none}
+.scard .pic.has-img{height:92px;line-height:0;display:flex;align-items:center;justify-content:center}
+.ex .pic{width:64px;text-align:center;flex:none}
+.ex .pic.has-img{height:48px;line-height:0;display:flex;align-items:center;justify-content:center}
+@media (min-width:700px) and (max-height:820px){.ex .ex-parrot{width:2.1rem;height:2.1rem}.scard .pic.has-img{height:80px}.ex .pic.has-img{height:42px}}
+.scard .pico-pic svg{width:100%;height:100%;display:block}
+/* short screens (laptop, interactive whiteboard): everything fits without scrolling */
+@media (min-width:700px) and (max-height:820px){
+  #app{padding-block:8px 6px}
+  .top{margin-bottom:8px}
+  .home-scene{height:clamp(140px,calc(100dvh - 420px),330px)}
+  .home-body{padding:10px 22px 14px}
+  .home h1{font-size:2.1rem;margin:0 0 2px}
+  .word-bubbles{margin:6px 0 10px}
+  .wb{font-size:2rem;padding:2px 22px}
+  .home .story{margin-bottom:12px;font-size:1.05rem}
+  .copy{margin-top:10px}
+  .stage{padding-top:10px}
+  .guide{margin:10px 0 6px}
+  .play{gap:12px}
+  .bubbles{max-width:min(440px,calc((100dvh - 385px)*4/3))}
+  .big-word .ltile{height:68px}
+  .meaning{gap:8px}
+  .rule{padding:8px 16px}
+  .ex-list{gap:6px}
+  .ex{padding:4px 12px}
+  .ex p{font-size:1.2rem}
+  .ex .pic{font-size:1.8rem}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+@media (max-width:480px){
+  .ltile,.slot{min-width:54px;height:68px;font-size:2.4rem}
+  .bubbles{gap:9px}
+  .opt{font-size:1.7rem;min-width:84px;padding:12px 16px}
+  .chest{width:128px}.chest .lid,.chest .box{width:118px}
+}
+</style>
+<style>[hidden]{display:none!important} img{max-width:100%} body{margin:0}</style>
+</head>
+<body>
+<svg id="seaTex" aria-hidden="true"><defs><filter id="caust" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.035" numOctaves="2" seed="11" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -3 0 0 0 1.45"/></filter></defs><rect width="100%" height="100%" filter="url(#caust)" opacity=".22"/></svg>
+<div id="app">
+  <header class="top">
+    <a class="pill lf-home" href="/">← Learning Fast</a>
+    <button class="brand" id="brand" aria-label="Αρχική του παιχνιδιού"><img class="brand-logo" src="logo-game.png" alt="Learning Fast"></button>
+    <span class="spacer"></span>
+    <span class="pill" id="starPill" aria-label="Αστέρια"><span class="st">★</span><span id="starTotal">0</span></span>
+    <button class="pill reset-btn" id="resetBtn" hidden>Μηδενισμός προόδου</button>
+    <button class="icon-btn" id="gear" aria-label="Ρυθμίσεις για εκπαιδευτικούς">⚙️</button>
+  </header>
+  <main id="screen"></main>
+</div>
+<div id="overlay" hidden></div>
+<canvas id="fx"></canvas>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+function h(tag,attrs={},...kids){const e=document.createElement(tag);for(const[k,v] of Object.entries(attrs)){if(v===false||v==null)continue;if(k==='class')e.className=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v===true?'':v);}for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(c));}return e;}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const one=a=>a[Math.floor(Math.random()*a.length)];
+const clean=w=>w.replace(/[.,!;·]/g,'');
+
+/* ---------- save ---------- */
+const KEY='einai-exei-v1';
+let save={stars:{},unlockAll:false,sound:true,name:''};
+try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s)save={...save,...s};delete save.voice;}catch(e){}
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}};
+
+/* ---------- sound ---------- */
+let actx=null;
+function tone(freqs,dur=.14,type='triangle',gap=.09){if(!save.sound)return;try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();const t0=actx.currentTime;freqs.forEach((f,i)=>{const o=actx.createOscillator(),g=actx.createGain();o.type=type;o.frequency.value=f;const s=t0+i*gap;g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.16,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+dur);o.connect(g);g.connect(actx.destination);o.start(s);o.stop(s+dur+.03);});}catch(e){}}
+const sfx={good:()=>tone([660,880]),bad:()=>tone([240,190],.18,'sine',.12),pop:()=>tone([560],.08),win:()=>tone([523,659,784,1046],.24,'triangle',.13)};
+
+/* ---------- content ---------- */
+const W={
+  e:{word:"είναι",letters:["ε","ί","ν","α","ι"],
+    meaning:"Με το «είναι» λέμε πως είναι κάτι ή τι είναι.",
+    examples:[["☀️","Ο ήλιος είναι κίτρινος."],["🐱","Η γάτα είναι μικρή."],["🐢","Η χελώνα είναι αργή."]],
+    hunt:[["ε",["ξ","ζ","σ","ο","ς","θ"]],["ί",["ι","ι","τ","λ","κ","ή"]],["ν",["υ","μ","η","ρ","π","γ"]],["α",["ο","σ","δ","ρ","φ","θ"]],["ι",["τ","λ","κ","ρ","υ","ν"]]],
+    spot:["ένα","ήταν","έλα","ένας","νέο","ώρα","όλα","εδώ","μία","ήρθε"],
+    spotSent:["Ο Πίκο είναι ένας πράσινος παπαγάλος.","Ο Θάνος είναι ψηλός.","Η γάτα είναι άσπρη.","Το νερό είναι γαλάζιο.","Η Μαρία είναι καλή.","Το λεμόνι είναι ξινό.","Ο λύκος είναι γρήγορος.","Ο πάγος είναι κρύος.","Το παπί είναι μικρό.","Ο Άρης είναι μαθητής.","Η Μαρίνα είναι ήρεμη.","Το πεπόνι είναι μεγάλο.","Το ποτάμι είναι καθαρό.","Το κεράσι είναι κόκκινο.","Ο Πάνος είναι μαθητής.","Ο Πάρης είναι παπάς.","Η μαμά είναι κουρασμένη.","Το πιρούνι είναι λερωμένο.","Τα μάτια είναι καφέ.","Το καρότο είναι μεγάλο.","Το κερί είναι αναμμένο."],
+    missing:[[0,["ε","η","ο"]],[1,["ί","ι","ή"]],[2,["ν","μ","υ"]],[3,["α","ο","ε"]],[4,["ι","η","υ"]]],
+    sent:[["☀️","Ο ήλιος","κίτρινος."],["🍦","Το παγωτό","κρύο."],["🐢","Η χελώνα","αργή."],["🍋","Το λεμόνι","ξινό."],["🦒","Η καμηλοπάρδαλη","ψηλή."],["🍏","Το μήλο","πράσινο."],["🐑","Το πρόβατο","άσπρο."],["🔥","Η φωτιά","ζεστή."],["🥛","Το γάλα","φρέσκο."],["🦆","Η πάπια","μικρή."],["🍯","Το μέλι","γλυκό."],["🐴","Το άλογο","γρήγορο."],["🦆","Το παπί","μικρό."],["👦","Ο Άρης","μαθητής."],["😌","Η Μαρίνα","ήρεμη."],["🍈","Το πεπόνι","μεγάλο."],["🏞️","Το ποτάμι","καθαρό."],["🍒","Το κεράσι","κόκκινο."],["🧒","Ο Πάνος","μαθητής."],["⛪","Ο Πάρης","παπάς."],["😴","Η μαμά","κουρασμένη."],["🍴","Το πιρούνι","λερωμένο."],["👀","Τα μάτια","καφέ."],["🥕","Το καρότο","μεγάλο."],["🕯️","Το κερί","αναμμένο."]],
+    build:[["☀️",["Ο","ήλιος","είναι","ζεστός."]],["🐱",["Η","γάτα","είναι","μικρή."]],["🍏",["Το","μήλο","είναι","πράσινο."]],["🐺",["Ο","λύκος","είναι","γρήγορος."]],["💧",["Το","νερό","είναι","γαλάζιο."]],["🏠",["Το","σπίτι","είναι","μεγάλο."]],["🐸",["Ο","βάτραχος","είναι","πράσινος."]],["👵",["Η","γιαγιά","είναι","καλή."]],["🍋",["Το","λεμόνι","είναι","ξινό."]],["🧊",["Ο","πάγος","είναι","κρύος."]],["🦆",["Το","παπί","είναι","μικρό."]],["👦",["Ο","Άρης","είναι","μαθητής."]],["😌",["Η","Μαρίνα","είναι","ήρεμη."]],["🍈",["Το","πεπόνι","είναι","μεγάλο."]],["🏞️",["Το","ποτάμι","είναι","καθαρό."]],["🍒",["Το","κεράσι","είναι","κόκκινο."]],["🧒",["Ο","Πάνος","είναι","μαθητής."]],["⛪",["Ο","Πάρης","είναι","παπάς."]],["😴",["Η","μαμά","είναι","κουρασμένη."]],["🍴",["Το","πιρούνι","είναι","λερωμένο."]],["👀",["Τα","μάτια","είναι","καφέ."]],["🥕",["Το","καρότο","είναι","μεγάλο."]],["🕯️",["Το","κερί","είναι","αναμμένο."]]]
+  },
+  x:{word:"έχει",letters:["έ","χ","ε","ι"],
+    meaning:"Με το «έχει» λέμε τι έχει ένα ζώο ή ο φίλος μας.",
+    examples:[["🐱","Η γάτα έχει μάτια."],["🦆","Η πάπια έχει φτερά."],["👧","Η Μαρία έχει ένα ποδήλατο."]],
+    hunt:[["έ",["ε","ε","ξ","ζ","ό","σ"]],["χ",["κ","λ","ψ","ζ","ξ","γ"]],["ε",["ξ","ζ","σ","ο","ς","θ"]],["ι",["τ","λ","κ","ρ","υ","ν"]]],
+    spot:["έχω","χέρι","ήχος","έλα","ένα","εδώ","μέλι","έξι","όχι","νύχι"],
+    spotSent:["Η Ελένη έχει ένα ποδήλατο.","Ο Πίκο έχει δύο φτερά.","Ο Νίκος έχει μια μικρή γάτα.","Η μαμά έχει ένα φόρεμα.","Η κότα έχει φωλιά.","Η Μαρία έχει ένα μολύβι.","Ο Πέτρος έχει ένα βιβλίο.","Ο Κώστας έχει ένα καπέλο.","Η Ιωάννα έχει πανί.","Ο Μάριος έχει τυρί.","Ο λαγός έχει καρότο.","Η Κική έχει παπί.","Ο Κυριάκος έχει μέλι.","Η Βίκυ έχει τουλίπα.","Ο Θάνος έχει ένα τρένο.","Η Ρένα έχει ένα γατάκι.","Ο Τάσος έχει ένα ψωμί.","Η Λίνα έχει ένα τετράδιο.","Ο Μάρκος έχει ένα σκυλάκι.","Η Νίκη έχει ένα παγωτό.","Ο Σάκης έχει ένα καράβι.","Η Μαρίνα έχει ένα κεράσι.","Ο Άρης έχει ένα αχλάδι.","Ο Πάνος έχει ένα δώρο."],
+    missing:[[0,["έ","ε","ά"]],[1,["χ","κ","ψ"]],[2,["ε","α","η"]],[3,["ι","η","υ"]]],
+    sent:[["🐶","Ο σκύλος","μάτια."],["🦆","Η πάπια","φτερά."],["🏠","Το σπίτι","πόρτα."],["🐮","Η αγελάδα","κέρατα."],["🐟","Το ψάρι","πτερύγια."],["🐔","Η κότα","ράμφος."],["🍎","Η μηλιά","μήλα."],["🦏","Ο ρινόκερος","ένα κέρατο."],["🦓","Η ζέβρα","ρίγες."],["🐒","Ο πίθηκος","χέρια."],["🚲","Το ποδήλατο","ρόδες."],["🐙","Το χταπόδι","πόδια."],["👧","Η Ιωάννα","πανί."],["🧀","Ο Μάριος","τυρί."],["🐰","Ο λαγός","καρότο."],["🦆","Η Κική","παπί."],["🍯","Ο Κυριάκος","μέλι."],["🌷","Η Βίκυ","τουλίπα."],["🐢","Η χελώνα","πόδια."],["🦜","Ο παπαγάλος","ράμφος."],["🐸","Ο βάτραχος","μάτια."],["✈️","Το αεροπλάνο","φτερά."],["⛵","Το καράβι","πανί."],["🐯","Η τίγρη","ρίγες."],["🐬","Το δελφίνι","πτερύγια."],["⛄","Ο χιονάνθρωπος","καρότο."]],
+    build:[["🐶",["Ο","σκύλος","έχει","μύτη."]],["🎁",["Η","Μαρία","έχει","ένα","δώρο."]],["🦜",["Ο","Πίκο","έχει","φτερά."]],["🍎",["Η","μηλιά","έχει","μήλα."]],["👓",["Ο","φίλος","έχει","γυαλιά."]],["🐠",["Το","ψάρι","έχει","φολίδες."]],["🚂",["Το","τρένο","έχει","ρόδες."]],["📚",["Ο","Νίκος","έχει","βιβλία."]],["🐱",["Η","γάτα","έχει","νύχια."]],["🐮",["Η","αγελάδα","έχει","κέρατα."]],["👧",["Η","Ιωάννα","έχει","πανί."]],["🧀",["Ο","Μάριος","έχει","τυρί."]],["🐰",["Ο","λαγός","έχει","καρότο."]],["🦆",["Η","Κική","έχει","παπί."]],["🍯",["Ο","Κυριάκος","έχει","μέλι."]],["🌷",["Η","Βίκυ","έχει","τουλίπα."]],["🐸",["Ο","βάτραχος","έχει","πόδια."]],["🦆",["Η","πάπια","έχει","ράμφος."]],["🐯",["Η","τίγρη","έχει","μάτια."]],["👧",["Η","Νίκη","έχει","ένα","παγωτό."]],["👦",["Ο","Θάνος","έχει","ένα","τρένο."]],["🧒",["Ο","Τάσος","έχει","ένα","ψωμί."]],["🐱",["Η","γάτα","έχει","μύτη."]],["🐶",["Ο","σκύλος","έχει","κολάρο."]],["🐑",["Το","πρόβατο","έχει","κεφάλι."]]]
+  }
+};
+const FILL=["να","με","στο","το","σε"];
+const M={
+  sort:[["πράσινος.","είναι"],["φτερά.","έχει"],["καλός.","είναι"],["ένα ράμφος.","έχει"],["μικρός.","είναι"],["μια φωλιά.","έχει"],["γρήγορος.","είναι"],["δύο πόδια.","έχει"],["πολύχρωμος.","είναι"],["μια φίλη.","έχει"],["έξυπνος.","είναι"],["δύο μάτια.","έχει"],["ήρεμος.","είναι"],["ένα καπέλο.","έχει"],["δυνατός.","είναι"],["ένα βιβλίο.","έχει"],["όμορφος.","είναι"],["ένα δώρο.","έχει"],["ζωηρός.","είναι"],["νύχια.","έχει"],["καθαρός.","είναι"],["ένα κεφάλι.","έχει"],["φίλος μας.","είναι"],["ένα ποδήλατο.","έχει"]],
+  choose:[["🦒","Η καμηλοπάρδαλη","ψηλή.","είναι"],["🐮","Η αγελάδα","κέρατα.","έχει"],["❄️","Το χιόνι","άσπρο.","είναι"],["🦆","Η πάπια","ράμφος.","έχει"],["🍋","Το λεμόνι","ξινό.","είναι"],["🐱","Η γάτα","νύχια.","έχει"],["⭐","Το αστέρι","κίτρινο.","είναι"],["🚲","Το ποδήλατο","δύο ρόδες.","έχει"],["🐸","Ο βάτραχος","πράσινος.","είναι"],["🎁","Το δώρο","μεγάλο.","είναι"],["🍐","Το αχλάδι","μαλακό.","είναι"],["🐕","Ο σκύλος","κολάρο.","έχει"],["🧊","Ο πάγος","κρύος.","είναι"],["🐒","Ο πίθηκος","μακριά χέρια.","έχει"],["🍯","Το μέλι","γλυκό.","είναι"],["🦓","Η ζέβρα","ρίγες.","έχει"],["🦆","Το παπί","μικρό.","είναι"],["👦","Ο Άρης","μαθητής.","είναι"],["😌","Η Μαρίνα","ήρεμη.","είναι"],["🍈","Το πεπόνι","μεγάλο.","είναι"],["🏞️","Το ποτάμι","καθαρό.","είναι"],["🍒","Το κεράσι","κόκκινο.","είναι"],["🧒","Ο Πάνος","μαθητής.","είναι"],["⛪","Ο Πάρης","παπάς.","είναι"],["😴","Η μαμά","κουρασμένη.","είναι"],["🍴","Το πιρούνι","λερωμένο.","είναι"],["👀","Τα μάτια","καφέ.","είναι"],["🥕","Το καρότο","μεγάλο.","είναι"],["🕯️","Το κερί","αναμμένο.","είναι"],["👧","Η Ιωάννα","πανί.","έχει"],["🧀","Ο Μάριος","τυρί.","έχει"],["🐰","Ο λαγός","καρότο.","έχει"],["🦆","Η Κική","παπί.","έχει"],["🍯","Ο Κυριάκος","μέλι.","έχει"],["🌷","Η Βίκυ","τουλίπα.","έχει"]],
+  tf:[{pic:"🐱",s:["Η γάτα","έχει","νύχια."],ok:true},{pic:"🍏",s:["Το μήλο","έχει","πράσινο."],ok:false,fix:"είναι"},{pic:"☀️",s:["Ο ήλιος","είναι","ζεστός."],ok:true},{pic:"🐟",s:["Το ψάρι","είναι","πτερύγια."],ok:false,fix:"έχει"},{pic:"🦆",s:["Η πάπια","έχει","φτερά."],ok:true},{pic:"🐶",s:["Ο σκύλος","έχει","γρήγορος."],ok:false,fix:"είναι"},{pic:"🍦",s:["Το παγωτό","είναι","κρύο."],ok:true},{pic:"🏠",s:["Το σπίτι","είναι","παράθυρα."],ok:false,fix:"έχει"},{pic:"🚲",s:["Το ποδήλατο","έχει","ρόδες."],ok:true},{pic:"🍯",s:["Το μέλι","έχει","γλυκό."],ok:false,fix:"είναι"},{pic:"🐢",s:["Η χελώνα","είναι","αργή."],ok:true},{pic:"🐮",s:["Η αγελάδα","είναι","κέρατα."],ok:false,fix:"έχει"},{pic:"🐴",s:["Το άλογο","είναι","ψηλό."],ok:true},{pic:"🍎",s:["Το μήλο","έχει","γλυκό."],ok:false,fix:"είναι"},{pic:"🦏",s:["Ο ρινόκερος","έχει","κέρατο."],ok:true},{pic:"🐟",s:["Το ψάρι","είναι","φολίδες."],ok:false,fix:"έχει"},{pic:"🍋",s:["Το λεμόνι","είναι","κίτρινο."],ok:true},{pic:"🏠",s:["Το σπίτι","έχει","μεγάλο."],ok:false,fix:"είναι"},{pic:"🧀",s:["Το τυρί","είναι","νόστιμο."],ok:true},{pic:"🐮",s:["Η αγελάδα","έχει","μεγάλη."],ok:false,fix:"είναι"},{pic:"🐸",s:["Ο βάτραχος","έχει","πόδια."],ok:true},{pic:"🧊",s:["Ο πάγος","έχει","κρύος."],ok:false,fix:"είναι"},{pic:"🐙",s:["Το χταπόδι","έχει","μάτια."],ok:true},{pic:"🚲",s:["Το ποδήλατο","είναι","ρόδες."],ok:false,fix:"έχει"}],
+  build2:[["🐔",["Η","κότα","έχει","φτερά."]],["💧",["Το","νερό","είναι","κρύο."]],["🚲",["Ο","Πέτρος","έχει","ποδήλατο."]],["🍋",["Το","λεμόνι","είναι","κίτρινο."]],["🐴",["Το","άλογο","έχει","πόδια."]],["🧊",["Ο","πάγος","είναι","κρύος."]],["👧",["Η","Ελένη","έχει","ένα","δώρο."]],["🍯",["Το","μέλι","είναι","γλυκό."]],["🦆",["Το","παπί","είναι","μικρό."]],["👦",["Ο","Άρης","είναι","μαθητής."]],["😌",["Η","Μαρίνα","είναι","ήρεμη."]],["🍈",["Το","πεπόνι","είναι","μεγάλο."]],["🏞️",["Το","ποτάμι","είναι","καθαρό."]],["🍒",["Το","κεράσι","είναι","κόκκινο."]],["🧒",["Ο","Πάνος","είναι","μαθητής."]],["⛪",["Ο","Πάρης","είναι","παπάς."]],["😴",["Η","μαμά","είναι","κουρασμένη."]],["🍴",["Το","πιρούνι","είναι","λερωμένο."]],["👀",["Τα","μάτια","είναι","καφέ."]],["🥕",["Το","καρότο","είναι","μεγάλο."]],["🕯️",["Το","κερί","είναι","αναμμένο."]],["👧",["Η","Ιωάννα","έχει","πανί."]],["🧀",["Ο","Μάριος","έχει","τυρί."]],["🐰",["Ο","λαγός","έχει","καρότο."]],["🦆",["Η","Κική","έχει","παπί."]],["🍯",["Ο","Κυριάκος","έχει","μέλι."]],["🌷",["Η","Βίκυ","έχει","τουλίπα."]]],
+  bossSent:["Ο Πίκο είναι πράσινος, έχει μεγάλα φτερά.","Η γάτα είναι μικρή, έχει νύχια.","Η Μαρία είναι καλή, έχει ένα ποδήλατο.","Ο ρινόκερος είναι μεγάλος, έχει ένα κέρατο.","Η ζέβρα είναι γρήγορη, έχει ρίγες."]
+};
+const ISLANDS=[
+  {id:'e',big:'είναι',name:'Το Νησί του ΕΙΝΑΙ',blurb:'Πώς είναι; Τι είναι;'},
+  {id:'x',big:'έχει',name:'Το Νησί του ΕΧΕΙ',blurb:'Τι έχει;'},
+  {id:'m',big:'είναι + έχει',name:'Το Νησί του Θησαυρού',blurb:'Και οι δύο λέξεις μαζί!'}
+];
+const STAGES=[];
+for(const isl of ['e','x']){const n=W[isl].word;[['meet',`Γνωρίζω το «${n}»`],['letters','Κυνήγι γραμμάτων'],['spot','Βρες τη λέξη'],['order','Γράμματα στη σειρά'],['missing','Το χαμένο γράμμα'],['sentence','Η λέξη στην πρόταση'],['build','Φτιάχνω πρόταση']].forEach(([type,title],i)=>STAGES.push({id:isl+(i+1),isl,type,title}));}
+[['sort','Τα δύο σεντούκια'],['choose','Είναι ή έχει;'],['tf','Σωστό ή λάθος;'],['build2','Πρόταση-παγίδα'],['boss','Ο μεγάλος θησαυρός']].forEach(([type,title],i)=>STAGES.push({id:'m'+(i+1),isl:'m',type,title}));
+
+const PRAISE=['Μπράβο!','Τέλεια!','Σούπερ!','Υπέροχα!','Είσαι αστέρι!','Πολύ ωραία!','Τα κατάφερες!'];
+const TRY=['Ξαναδοκίμασε!','Σχεδόν! Δοκίμασε ξανά.','Δεν πειράζει, προσπάθησε πάλι!'];
+
+function roundsFor(st){
+  const w=W[st.isl];
+  const ch=([pic,pre,post,ans])=>({k:'choose',pic,pre,post,ans,opts:['είναι','έχει']});
+  const ms=(wd)=>{const[i,opts]=one(wd.missing);return{k:'missing',letters:wd.letters,i,opts};};
+  switch(st.type){
+    case 'meet':return[{k:'meet',w}];
+    case 'letters':return w.hunt.map(([t,d])=>({k:'hunt',t,d}));
+    case 'spot':return[{k:'spotGrid',w},{k:'spotGrid',w},{k:'spotGrid',w},...pick(w.spotSent,3).map(s=>({k:'spotSent',s,target:w.word}))];
+    case 'order':return[true,true,false,false].map(model=>({k:'order',word:w.word,letters:w.letters,model}));
+    case 'missing':return shuffle(w.missing).map(([i,opts])=>({k:'missing',letters:w.letters,i,opts}));
+    /* «με» would make a correct phrase with «έχει» sentences (Το σπίτι με πόρτα), so it is not offered there */
+    case 'sentence':return pick(w.sent,6).map(([pic,pre,post])=>({k:'choose',pic,pre,post,ans:w.word,opts:shuffle([w.word,...pick(st.isl==='x'?FILL.filter(f=>f!=='με'):FILL,2)])}));
+    case 'build':return pick(w.build,5).map(([pic,words])=>({k:'build',pic,words,extra:null}));
+    case 'sort':return pick(M.sort,8).map(([post,ans])=>({k:'choose',chest:true,pic:'pico',pre:'Ο Πίκο',post,ans,opts:['είναι','έχει']}));
+    case 'choose':return pick(M.choose,8).map(ch);
+    case 'tf':return pick(M.tf,8).map(r=>({k:'tf',...r}));
+    case 'build2':return pick(M.build2,6).map(([pic,words])=>({k:'build',pic,words,extra:words.includes('είναι')?'έχει':'είναι'}));
+    case 'boss':return shuffle([...pick(M.choose,3).map(ch),ms(W.e),ms(W.x),
+      {k:'spotSent',s:one(M.bossSent),target:one(['είναι','έχει'])},
+      {k:'order',word:'είναι',letters:W.e.letters,model:false},{k:'order',word:'έχει',letters:W.x.letters,model:false},
+      {k:'tf',...one(M.tf)}]);
+  }
+}
+
+/* ---------- helpers ---------- */
+const screen=$('#screen');
+const islandOf=id=>ISLANDS.find(i=>i.id===id);
+const tone_=isl=>'tone-'+isl;
+const starTotal=()=>Object.values(save.stars).reduce((a,b)=>a+b,0);
+const isDone=st=>(save.stars[st.id]||0)>0;
+const isOpen=(st,i)=>save.unlockAll||i===0||isDone(STAGES[i-1]);
+const islandDone=id=>STAGES.filter(s=>s.isl===id).every(isDone);
+function refreshStars(){$('#starTotal').textContent=starTotal();}
+function hlSentence(s){const parts=s.split(/(είναι|έχει)/);return parts.map(p=>p==='είναι'?h('span',{class:'hl e'},p):p==='έχει'?h('span',{class:'hl x'},p):p);}
+
+/* ---------- art ---------- */
+const ART={
+  pico:(a='')=>`<img class="parrot-img" src="parrot-small.png" alt="" draggable="false">`,
+  picoOld:(a='')=>`<svg viewBox="0 0 100 110" ${a} aria-hidden="true"><path d="M42 86 L28 108 L38 107 L47 90Z" fill="#e2475a"/><path d="M51 88 L49 110 L58 105 L58 90Z" fill="#2b7bd6"/><ellipse cx="50" cy="62" rx="25" ry="31" fill="#34b158"/><ellipse cx="55" cy="70" rx="14" ry="19" fill="#a5e27f"/><path d="M27 52 C18 72 25 92 43 96 C34 83 33 68 39 55Z" fill="#1f8547"/><path d="M30 64 C28 74 31 84 38 90" stroke="#16693a" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M45 9 C46 1 53 -1 55 7 C58 -1 66 1 64 10 C60 7 50 7 45 9Z" fill="#e2475a"/><circle cx="54" cy="30" r="22" fill="#3cc463"/><circle cx="62" cy="26" r="8.5" fill="#fff"/><circle cx="64" cy="26.5" r="5" fill="#1f2d45"/><circle cx="65.8" cy="24.6" r="1.7" fill="#fff"/><circle cx="49" cy="38" r="5" fill="#ff8fa0" opacity=".55"/><path d="M71 28 C86 25 92 38 83 51 C81 43 77 39 70 38Z" fill="#f6b915"/><path d="M70 38 C75 40 79 44 81 49 C74 49 70 45 68 40Z" fill="#c98a00"/><g stroke="#c98a00" stroke-width="4" stroke-linecap="round"><path d="M44 91 v7 m-4 0 h8"/><path d="M57 91 v7 m-4 0 h8"/></g></svg>`,
+  palm:(a='')=>`<svg viewBox="0 0 100 150" ${a} aria-hidden="true"><ellipse cx="49" cy="146" rx="27" ry="4.5" fill="#103a20" opacity=".22"/><path d="M48 146 C45 118 43 88 55 52" stroke="#7d4f25" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M46 144 C43 118 41 90 52 56" stroke="#b98a52" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/><path d="M48 146 C45 118 43 88 55 52" stroke="#5e3a19" stroke-width="11" stroke-dasharray="2 9" fill="none" opacity=".45"/><g fill="#1f7a3c"><path d="M55 52 C46 36 30 20 13 20 C31 28 44 38 55 52Z"/><path d="M55 52 C66 44 87 52 93 72 C80 58 68 54 55 52Z"/><path d="M55 52 C42 50 21 60 14 78 C30 64 42 58 55 52Z"/></g><g fill="#32a352"><path d="M55 52 C42 34 20 34 3 48 C22 42 38 44 55 52Z"/><path d="M55 52 C68 32 88 32 99 46 C82 41 68 44 55 52Z"/><path d="M55 52 C50 30 58 12 75 5 C64 20 60 34 55 52Z"/></g><g stroke="#1d6b35" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".8"><path d="M55 52 C40 40 22 40 6 47"/><path d="M55 52 C70 40 86 39 97 46"/><path d="M55 52 C55 34 62 18 73 8"/></g><g fill="#5cc874" opacity=".6"><path d="M30 39 C38 37 46 40 52 46 C44 42 38 40 30 39Z"/><path d="M70 37 C78 37 86 39 92 43 C84 41 78 40 70 37Z"/></g><circle cx="51" cy="57" r="5.5" fill="#5c3415"/><circle cx="60" cy="58" r="5.5" fill="#6b3f1d"/><circle cx="56" cy="63" r="5" fill="#5c3415"/><circle cx="49.5" cy="55.5" r="1.6" fill="#a26b3a"/></svg>`,
+  orange:(a='')=>`<svg viewBox="0 0 100 120" ${a} aria-hidden="true"><ellipse cx="50" cy="116" rx="34" ry="5" fill="#103a20" opacity=".22"/><path d="M46 70 C45 90 44 104 42 116 L58 116 C56 104 55 90 55 70Z" fill="#7d4f25"/><path d="M49 74 C48 92 47 104 46 114" stroke="#b98a52" stroke-width="2.5" fill="none" opacity=".8"/><path d="M52 82 C60 76 64 70 66 64" stroke="#7d4f25" stroke-width="5" fill="none" stroke-linecap="round"/><g fill="#257f3f"><circle cx="50" cy="50" r="36"/><circle cx="24" cy="54" r="16"/><circle cx="78" cy="54" r="16"/></g><g fill="#33a352"><circle cx="34" cy="38" r="21"/><circle cx="66" cy="42" r="22"/><circle cx="52" cy="24" r="17"/><circle cx="50" cy="58" r="18"/></g><g fill="#5cc874" opacity=".75"><circle cx="30" cy="30" r="9"/><circle cx="50" cy="16" r="7"/><circle cx="62" cy="34" r="7"/></g><g fill="#f28a1e"><circle cx="34" cy="58" r="6.5"/><circle cx="64" cy="30" r="6"/><circle cx="72" cy="60" r="6.5"/><circle cx="46" cy="40" r="5.5"/><circle cx="23" cy="40" r="5.5"/><circle cx="55" cy="66" r="5.5"/><circle cx="82" cy="46" r="5"/></g><g fill="#ffd8a3"><circle cx="32" cy="56" r="2"/><circle cx="62" cy="28" r="1.8"/><circle cx="70" cy="58" r="2"/><circle cx="44" cy="38" r="1.6"/><circle cx="53" cy="64" r="1.6"/></g></svg>`,
+  rock:(a='')=>`<svg viewBox="0 0 100 60" ${a} aria-hidden="true"><path d="M6 57 C2 36 18 18 40 20 C52 5 79 9 87 27 C99 33 99 52 93 57Z" fill="#98a1ab"/><path d="M40 20 C52 5 79 9 87 27 C70 23 54 26 40 20Z" fill="#c4cbd2"/><path d="M14 44 C22 40 30 42 34 48" stroke="#7d8692" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+  flowers:(c,a='')=>`<svg viewBox="0 0 100 50" ${a} aria-hidden="true"><circle cx="20" cy="34" r="16" fill="#2e9b4c"/><circle cx="46" cy="27" r="21" fill="#38a956"/><circle cx="76" cy="34" r="17" fill="#2e9b4c"/>${[[16,26],[38,15],[54,30],[70,21],[84,33],[30,37]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5.5" fill="${c}"/><circle cx="${x}" cy="${y}" r="2.2" fill="#ffe27a"/>`).join('')}</svg>`,
+  star:(a='')=>`<svg viewBox="0 0 100 100" ${a} aria-hidden="true"><path d="M50 6 L61 38 L95 38 L67 58 L78 92 L50 72 L22 92 L33 58 L5 38 L39 38Z" fill="#ff8c6b" stroke="#e8694a" stroke-width="5" stroke-linejoin="round"/><g fill="#ffd0bf"><circle cx="50" cy="30" r="3"/><circle cx="68" cy="47" r="3"/><circle cx="32" cy="47" r="3"/><circle cx="50" cy="56" r="3"/></g></svg>`,
+  shell:(a='')=>`<svg viewBox="0 0 100 80" ${a} aria-hidden="true"><path d="M10 70 C6 30 30 6 50 6 C70 6 94 30 90 70Z" fill="#ffe3ec" stroke="#f4a6bd" stroke-width="4"/><g stroke="#f4a6bd" stroke-width="4" stroke-linecap="round"><path d="M50 10 V70"/><path d="M30 18 L36 70"/><path d="M70 18 L64 70"/></g><rect x="38" y="66" width="24" height="10" rx="4" fill="#f4a6bd"/></svg>`,
+  tuft:(c='#4fae55')=>`<svg viewBox="0 0 30 20" aria-hidden="true"><path d="M4 20 C6 12 8 8 10 3 C10 10 12 14 13 20Z M12 20 C14 10 16 6 21 1 C18 10 18 14 19 20Z M18 20 C20 14 24 10 29 9 C24 13 23 17 24 20Z" fill="${c}"/></svg>`,
+  chest:(a='')=>`<svg viewBox="0 0 100 82" ${a} aria-hidden="true"><path d="M10 40 C10 12 90 12 90 40Z" fill="#b8743a"/><rect x="10" y="38" width="80" height="40" rx="6" fill="#a0612b"/><rect x="10" y="38" width="80" height="7" fill="#f6b915"/><rect x="24" y="16" width="8" height="62" fill="#f6b915"/><rect x="68" y="16" width="8" height="62" fill="#f6b915"/><rect x="43" y="34" width="14" height="18" rx="3" fill="#ffd34d" stroke="#c98a00" stroke-width="2"/><circle cx="50" cy="42" r="2.5" fill="#6b3f1d"/></svg>`,
+  xmark:(a='')=>`<svg viewBox="0 0 60 60" ${a} aria-hidden="true"><g stroke="#d6394c" stroke-width="10" stroke-linecap="round"><path d="M10 10 L50 50"/><path d="M50 10 L10 50"/></g></svg>`,
+  boat:(a='')=>`<svg viewBox="0 0 120 92" ${a} aria-hidden="true"><path d="M58 6 L58 62" stroke="#6b4a2b" stroke-width="4"/><path d="M61 9 L102 58 L61 58Z" fill="#fffaf0"/><path d="M55 16 L22 58 L55 58Z" fill="#ffe7d3"/><path d="M61 6 L80 11 L61 16Z" fill="#e2475a"/><path d="M12 64 L108 64 L95 86 L25 86Z" fill="#b8743a"/><path d="M12 64 L108 64 L105 70 L15 70Z" fill="#8b5a2b"/><circle cx="44" cy="76" r="3.5" fill="#ffeec9"/><circle cx="60" cy="76" r="3.5" fill="#ffeec9"/><circle cx="76" cy="76" r="3.5" fill="#ffeec9"/></svg>`,
+  fish:(a='')=>`<svg viewBox="0 0 60 34" ${a} aria-hidden="true"><path d="M8 17 C18 2 40 2 48 17 C40 32 18 32 8 17Z" fill="#ffb347"/><path d="M48 17 L60 6 L60 28Z" fill="#ff9a2e"/><circle cx="18" cy="14" r="3" fill="#1f2d45"/><path d="M28 9 C32 14 32 20 28 25" stroke="#ff9a2e" stroke-width="2.5" fill="none"/></svg>`,
+  flag:(c)=>`<svg viewBox="0 0 40 50" aria-hidden="true"><path d="M6 4 V48" stroke="#6b4a2b" stroke-width="4" stroke-linecap="round"/><path d="M8 5 C18 1 26 11 38 6 V26 C26 31 18 21 8 25Z" fill="${c}"/><path d="M14 13 l3 3 l6 -7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+};
+/* The parrot (the 🦜 picture, or "pico") is always drawn with the game's own parrot image, never the emoji. */
+/* Pictures: the teacher's own images (img/*.png) replace the emoji one by one. Whatever has no image yet keeps its emoji.
+   IMG_SENT picks an image for one particular sentence, IMG for every sentence that uses that emoji. */
+const IMG={'☀':'ilios','🐱':'gata','🐢':'xelona','🦒':'kamilopardali','🐑':'provato','🐴':'alogo','🐺':'lykos','🐶':'skylos','🐕':'skylos','🐔':'kota','🦏':'rinokeros','🦓':'zevra','🐒':'pithikos','🐙':'xtapodi','🐰':'lagos','🐯':'tigri','🐬':'delfini','🔥':'fotia','💧':'nero','⭐':'asteri','🏞':'potami','🦆':'papia','🐮':'agelada','🧊':'pagos','❄':'xioni','⛵':'karavi','🐸':'vatraxos','🐟':'psari','🐠':'psari',
+  '🍦':'pagoto','🍋':'lemoni','🍏':'milo-prasino','🍎':'milo-kokkino','🥛':'gala','🍯':'meli','🍈':'peponi','🍒':'kerasi','🥕':'karoto','🍐':'axladi','🧀':'tyri','🏠':'spiti','🕯':'keri','🍴':'piroyni','🚲':'podilato','✈':'aeroplano','🚂':'treno','🎁':'doro','👓':'gyalia','📚':'vivlia','👵':'giagia','👀':'matia','🌷':'toulipa','⛄':'xionanthropos'};
+const IMG_SENT={'Ο Άρης είναι μαθητής.':'mathitis','Ο Πάνος είναι μαθητής.':'mathitis','Η μαμά είναι κουρασμένη.':'mama-kourasmeni','Ο Πάρης είναι παπάς.':'papas','Το παπί είναι μικρό.':'papaki','Η Κική έχει παπί.':'papaki','Η Μαρίνα είναι ήρεμη.':'marina','Ο Θάνος έχει ένα τρένο.':'agori-trenaki','Ο Τάσος έχει ένα ψωμί.':'agori-psomi','Η Μαρία έχει ένα ποδήλατο.':'podilato','Η Ιωάννα έχει πανί.':'pani','Η Νίκη έχει ένα παγωτό.':'pagoto','Η Ελένη έχει ένα δώρο.':'doro'};
+const imgOf=(pic,text)=>IMG_SENT[text]||IMG[String(pic).replace(/️/g,'')]||null;
+/* Warm the cache a little after start, one picture at a time, so it never competes with the first screen. */
+try{const all=[...new Set([...Object.values(IMG),...Object.values(IMG_SENT)])];let k=0;const tick=()=>{if(k>=all.length)return;const i=new Image();i.src='img/'+all[k++]+'.png';setTimeout(tick,150);};setTimeout(tick,2500);}catch(e){}
+/* The parrot (the 🦜 picture, or "pico") is always the game's own parrot image. */
+function picNode(pic,text='',tag='div',cls='pic'){
+  if(pic==='🦜'||pic==='pico')return art(ART.pico(),'pico-pic'+(tag==='span'?' ex-parrot':''),{'aria-hidden':'true'});
+  const n=imgOf(pic,text);
+  if(n)return h(tag,{class:cls+' has-img','aria-hidden':'true'},h('img',{class:'pic-img',src:'img/'+n+'.png',alt:'',draggable:'false'}));
+  return h(tag,{class:cls,'aria-hidden':'true'},pic);
+}
+function art(svg,cls,attrs={}){const e=h('span',{class:cls,...attrs});e.innerHTML=svg;return e;}
+/* ---------- terrain ---------- */
+const GRASS={e:['#8fd673','#56ad52'],x:['#9ad46c','#5daf50'],m:['#a9da70','#69b855']};
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function smoothPath(pts,closed=true){
+  const n=pts.length,f=v=>v.toFixed(1);
+  const g=i=>closed?pts[(i+n)%n]:pts[Math.max(0,Math.min(n-1,i))];
+  let d=`M${f(pts[0][0])},${f(pts[0][1])}`;
+  for(let i=0;i<(closed?n:n-1);i++){const p0=g(i-1),p1=g(i),p2=g(i+1),p3=g(i+2);
+    d+=`C${f(p1[0]+(p2[0]-p0[0])/6)},${f(p1[1]+(p2[1]-p0[1])/6)} ${f(p2[0]-(p3[0]-p1[0])/6)},${f(p2[1]-(p3[1]-p1[1])/6)} ${f(p2[0])},${f(p2[1])}`;}
+  return closed?d+'Z':d;
+}
+function makeShape(W,H,seed){
+  const r=rng(seed),P=[0,0,0,0].map(()=>r()*6.283),Q=[0,0,0,0].map(()=>r()*6.283);
+  const noise=(t,p)=>Math.sin(t+p[0]*1.7)*.45+Math.sin(2*t+p[0])*.5+Math.sin(3*t+p[1])*.3+Math.sin(5*t+p[2])*.2+Math.sin(8*t+p[3])*.1;
+  const pt=(t,inset,amp,p)=>{const a=t*6.2832,c=Math.cos(a),s=Math.sin(a),e=2.35;
+    const sx=Math.sign(c)*Math.pow(Math.abs(c),2/e),sy=Math.sign(s)*Math.pow(Math.abs(s),2/e),d=amp*noise(a,p)-inset;
+    return[W/2+(W/2+d)*sx,H/2+(H/2+d)*sy];};
+  const ring=(inset,amp,p,n=110)=>smoothPath([...Array(n)].map((_,i)=>pt(i/n,inset,amp,p)));
+  return{pt,ring,P,Q,r};
+}
+function texDefs(id,seed,k=1){
+  return `<filter id="blur-${id}" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="${9*k}"/></filter>
+  <filter id="gtex-${id}" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="${seed}" result="n1"/>
+    <feColorMatrix in="n1" type="matrix" values="0 0 0 0 0.17  0 0 0 0 0.43  0 0 0 0 0.18  1.5 0 0 0 -0.66" result="dark"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="${seed+9}" result="n2"/>
+    <feColorMatrix in="n2" type="matrix" values="0 0 0 0 0.80  0 0 0 0 0.94  0 0 0 0 0.55  1.3 0 0 0 -0.68" result="light"/>
+    <feMerge result="m"><feMergeNode in="SourceGraphic"/><feMergeNode in="dark"/><feMergeNode in="light"/></feMerge>
+    <feComposite in="m" in2="SourceGraphic" operator="in"/></filter>
+  <filter id="stex-${id}" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="${seed+3}" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.72  0 0 0 0 0.56  0 0 0 0 0.3  0.9 0 0 0 -0.42" result="g"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="${seed+5}" result="n3"/>
+    <feColorMatrix in="n3" type="matrix" values="0 0 0 0 1  0 0 0 0 0.97  0 0 0 0 0.85  1.2 0 0 0 -0.6" result="hl"/>
+    <feMerge result="m"><feMergeNode in="SourceGraphic"/><feMergeNode in="hl"/><feMergeNode in="g"/></feMerge>
+    <feComposite in="m" in2="SourceGraphic" operator="in"/></filter>
+  <linearGradient id="sd-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe8b6"/><stop offset="1" stop-color="#f1d595"/></linearGradient>`;
+}
+const DECO={
+  e:[['palm',96,.63,'sand'],['palm',86,.86,'sand'],['palm',70,.33,'sand'],['rock',70,.12,'shore'],['flowers:#a78bfa',96,.42,'edge'],['flowers:#ffffff',80,.97,'edge'],['star',28,.2,'sand'],['shell',24,.73,'sand']],
+  x:[['orange',96,.6,'edge'],['orange',84,.04,'edge'],['palm',78,.86,'sand'],['palm',68,.3,'sand'],['flowers:#ff9f43',96,.4,'edge'],['shell',24,.5,'sand'],['star',28,.17,'sand'],['rock',60,.7,'shore']],
+  m:[['palm',96,.62,'sand'],['palm',90,.9,'sand'],['chest',70,.15,'sand'],['xmark',34,.24,'sand'],['rock',72,.4,'shore'],['flowers:#ff6b81',86,.76,'edge'],['star',28,.97,'sand'],['palm',66,.33,'sand']]
+};
+const ASPECT={palm:1.5,orange:1.2,rock:.6,flowers:.5,star:1,shell:.8,chest:.82,xmark:1};
+const FLOWERCOL={e:['#fff','#c9b8ff','#ffe27a'],x:['#fff','#ffc27a','#ffe27a'],m:['#fff','#ff9fb0','#ffe27a']};
+
+function layoutSnake(sec){
+  const nodes=[...sec.querySelectorAll('.node')];
+  nodes.forEach(n=>{n.style.gridRow='';n.style.gridColumn='';});
+  if(!nodes.length)return;
+  const top=nodes[0].offsetTop,cols=Math.max(1,nodes.filter(n=>n.offsetTop===top).length);
+  nodes.forEach((n,i)=>{const row=Math.floor(i/cols),col=i%cols;n.style.gridRow=row+1;n.style.gridColumn=(row%2?cols-col:col+1);});
+}
+function bushSVG(x,y,s,R,tint){
+  const f=v=>v.toFixed(1),c=tint||['#246f39','#2f8c47','#4fb862'];
+  const parts=[[-10,2,11],[0,-4,13],[11,1,10]].map(([dx,dy,r])=>[x+dx*s,y+dy*s,r*s*(.85+R()*.3)]);
+  return `<ellipse cx="${f(x+2*s)}" cy="${f(y+11*s)}" rx="${f(24*s)}" ry="${f(5*s)}" fill="#163f22" opacity=".28"/>`+
+    parts.map(([a,b,r])=>`<circle cx="${f(a)}" cy="${f(b)}" r="${f(r)}" fill="${c[0]}"/>`).join('')+
+    parts.map(([a,b,r])=>`<circle cx="${f(a-r*.15)}" cy="${f(b-r*.2)}" r="${f(r*.78)}" fill="${c[1]}"/>`).join('')+
+    parts.map(([a,b,r])=>`<circle cx="${f(a-r*.35)}" cy="${f(b-r*.4)}" r="${f(r*.32)}" fill="${c[2]}" opacity=".85"/>`).join('');
+}
+function treeSVG(x,y,s,R){
+  const f=v=>v.toFixed(1);
+  return `<ellipse cx="${f(x+4*s)}" cy="${f(y+2*s)}" rx="${f(20*s)}" ry="${f(5*s)}" fill="#163f22" opacity=".3"/><rect x="${f(x-3*s)}" y="${f(y-16*s)}" width="${f(6*s)}" height="${f(18*s)}" rx="${f(2*s)}" fill="#7d4f25"/>`+
+    `<circle cx="${f(x)}" cy="${f(y-26*s)}" r="${f(17*s)}" fill="#1f6b36"/><circle cx="${f(x-7*s)}" cy="${f(y-30*s)}" r="${f(11*s)}" fill="#2c8a46"/><circle cx="${f(x+7*s)}" cy="${f(y-25*s)}" r="${f(11*s)}" fill="#2a8443"/><circle cx="${f(x-9*s)}" cy="${f(y-34*s)}" r="${f(5*s)}" fill="#5cc874" opacity=".8"/>`;
+}
+function drawIsland(sec){
+  const id=sec.dataset.isl,idx=+sec.dataset.idx;
+  layoutSnake(sec);
+  const W=sec.clientWidth,H=sec.clientHeight;if(!W||!H)return;
+  const k=W<520?.72:1,S=makeShape(W,H,idx*97+13),[g1,g2]=GRASS[id],f=v=>v.toFixed(1);
+  const SAND=32*k,GR=62*k;
+  const sr=sec.getBoundingClientRect();
+  const pts=[...sec.querySelectorAll('.node .disc')].map(d=>{const r=d.getBoundingClientRect();return[r.left-sr.left+r.width/2,r.top-sr.top+r.height/2+8];});
+  const keep=[...sec.querySelectorAll('.node,.isl-head,.treasure-row')].map(n=>{const r=n.getBoundingClientRect();return[r.left-sr.left-14,r.top-sr.top-40,r.right-sr.left+14,r.bottom-sr.top+16];});
+  const free=(x,y)=>!keep.some(([a,b,c,d])=>x>a&&x<c&&y>b&&y<d);
+  const trail=pts.length>1?smoothPath(pts,false):'';
+  const R=rng(idx*31+5);
+  /* hills: soft light and shade patches give the meadow relief */
+  let hills='';
+  for(let i=0;i<5;i++){const x=W*(.2+R()*.6),y=H*(.2+R()*.6),rx=(70+R()*90)*k,ry=rx*(.45+R()*.3);
+    hills+=`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(ry)}" fill="url(#hill-${id})"/><ellipse cx="${f(x+rx*.1)}" cy="${f(y+ry*.55)}" rx="${f(rx*.9)}" ry="${f(ry*.35)}" fill="#2c6f33" opacity=".12"/>`;}
+  /* grass tufts and little flowers */
+  let bits='';
+  for(let i=0;i<70;i++){const t=R(),fr=.12+R()*.8,[ex,ey]=S.pt(t,GR+14*k,16*k,S.Q),x=W/2+(ex-W/2)*fr,y=H/2+(ey-H/2)*fr;
+    if(i%3===0){const c=FLOWERCOL[id][Math.floor(R()*3)];bits+=`<g transform="translate(${f(x)},${f(y)})"><circle r="${f(2.6*k)}" fill="${c}"/><circle r="${f(1*k)}" fill="#f6b915"/></g>`;}
+    else bits+=`<path transform="translate(${f(x)},${f(y)}) scale(${f((.7+R()*.5)*k)})" d="M-6 0 C-5 -5 -4 -8 -3 -12 C-2 -7 -1 -4 0 0Z M-1 0 C0 -7 2 -11 5 -14 C3 -8 3 -4 3 0Z M3 0 C4 -4 7 -7 10 -8 C7 -5 6 -2 6 0Z" fill="${R()<.5?'#3a8f45':'#4fae55'}"/>`;}
+  /* tufts that spill onto the path edges */
+  let edge='';
+  for(let i=0;i+1<pts.length;i++)for(let j=0;j<4;j++){const u=R(),x=pts[i][0]+(pts[i+1][0]-pts[i][0])*u,y=pts[i][1]+(pts[i+1][1]-pts[i][1])*u+(R()<.5?-1:1)*12*k;
+    edge+=`<path transform="translate(${f(x)},${f(y)}) scale(${f(.8*k)})" d="M-6 0 C-5 -5 -4 -8 -3 -12 C-2 -7 -1 -4 0 0Z M-1 0 C0 -7 2 -11 5 -14 C3 -8 3 -4 3 0Z" fill="#3f9a49"/>`;}
+  /* bushes and small trees ringing the meadow, kept off the stones and signs */
+  let veg=[];
+  for(let i=0;i<60;i++){const t=i/60+R()*.01,[x,y]=S.pt(t,GR+(4+R()*14)*k,16*k,S.Q);if(!free(x,y))continue;
+    if(R()<.22)veg.push([y,treeSVG(x,y,(.8+R()*.4)*k,R)]);else if(R()<.75)veg.push([y,bushSVG(x,y,(.7+R()*.5)*k,R)]);}
+  veg.sort((a,b)=>a[0]-b[0]);
+  sec.querySelector('.isl-bg').innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true"><defs>${texDefs(id,idx*7+3,k)}
+    <linearGradient id="gr-${id}" x1="0" y1="0" x2=".25" y2="1"><stop offset="0" stop-color="${g1}"/><stop offset="1" stop-color="${g2}"/></linearGradient>
+    <radialGradient id="hill-${id}"><stop offset="0" stop-color="#d9f59a" stop-opacity=".38"/><stop offset="1" stop-color="#d9f59a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="sun-${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbe0" stop-opacity=".28"/><stop offset=".55" stop-color="#fffbe0" stop-opacity="0"/><stop offset="1" stop-color="#0b3d1f" stop-opacity=".16"/></linearGradient>
+    <clipPath id="clip-${id}"><path d="${S.ring(GR,16*k,S.Q)}"/></clipPath></defs>
+    <path d="${S.ring(-6*k,16*k,S.P)}" fill="#1f9fb3" opacity=".55" filter="url(#blur-${id})"/>
+    <path d="${S.ring(2*k,14*k,S.P)}" fill="#86e1e6" opacity=".7" filter="url(#blur-${id})"/>
+    <path d="${S.ring(12*k,14*k,S.P)}" fill="#aef1ee" opacity=".9"/>
+    <path d="${S.ring(15*k,14*k,S.P)}" fill="none" stroke="#e8fbf9" stroke-width="${6*k}" opacity=".5"/>
+    <path class="foam" d="${S.ring(19*k,14*k,S.P)}" fill="none" stroke="#fff" stroke-width="${3.5*k}" stroke-dasharray="22 14" stroke-linecap="round" opacity=".9"/>
+    <path d="${S.ring(24*k,14*k,S.P)}" fill="#d8b46e"/>
+    <path d="${S.ring(SAND,14*k,S.P)}" fill="url(#sd-${id})" filter="url(#stex-${id})"/>
+    <path d="${S.ring(GR,16*k,S.Q)}" fill="#8a6a3a" opacity=".55" transform="translate(0,${f(6*k)})"/>
+    <path d="${S.ring(GR,16*k,S.Q)}" fill="url(#gr-${id})" filter="url(#gtex-${id})"/>
+    <g clip-path="url(#clip-${id})">${hills}<rect width="${W}" height="${H}" fill="url(#sun-${id})"/></g>
+    <path d="${S.ring(GR,16*k,S.Q)}" fill="none" stroke="#3d8d3e" stroke-width="2" stroke-opacity=".4"/>
+    ${bits}
+    ${trail?`<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${trail}" stroke="#5c4a24" stroke-opacity=".25" stroke-width="${33*k}" transform="translate(0,3)"/><path d="${trail}" stroke="#cfa868" stroke-width="${28*k}"/><path d="${trail}" stroke="#e6c98f" stroke-width="${18*k}"/><path d="${trail}" stroke="#f3e0b4" stroke-width="${5*k}" opacity=".5" transform="translate(-2,-3)"/><path d="${trail}" stroke="#a87c42" stroke-width="${3*k}" stroke-dasharray="1 15" opacity=".6"/></g>`:''}
+    ${edge}
+    ${veg.map(v=>v[1]).join('')}
+  </svg>`;
+  /* trees, rocks and shells stand on the beach */
+  sec.querySelectorAll('.deco').forEach(d=>d.remove());
+  const host=sec.querySelector('.isl-bg');
+  DECO[id].forEach(([n,w,t,ring])=>{const[kd,c]=n.split(':');const ww=w*k,hh=ww*ASPECT[kd];
+    const inset=ring==='sand'?(SAND+GR)/2:ring==='shore'?SAND-2*k:GR+18*k,[x,y]=S.pt(t,inset,ring==='edge'?16*k:14*k,ring==='edge'?S.Q:S.P);
+    const el=art(c?ART[kd](c):ART[kd](),'deco'+(kd==='palm'||kd==='orange'?' big':''),{style:`left:${(x-ww/2).toFixed(1)}px;top:${(y-hh*(kd==='palm'||kd==='orange'?.97:.75)).toFixed(1)}px;width:${ww.toFixed(1)}px`});
+    host.after(el);});
+}
+const islandRO='ResizeObserver' in window?new ResizeObserver(es=>es.forEach(e=>{const s=e.target;cancelAnimationFrame(s._raf);s._raf=requestAnimationFrame(()=>drawIsland(s));})):null;
+function sceneHome(){
+  const strip=s=>s.replace(/^<svg[^>]*>|<\/svg>$/g,'');
+  return `<svg class="home-scene" viewBox="0 0 600 250" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ο Πίκο ο παπαγάλος στο νησί του"><defs><linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#86d8ef"/><stop offset="1" stop-color="#dcf6f7"/></linearGradient><linearGradient id="hsea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2fbccb"/><stop offset="1" stop-color="#147f98"/></linearGradient><linearGradient id="gr-h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd673"/><stop offset="1" stop-color="#56ad52"/></linearGradient>${texDefs('h',4,.5)}
+  <filter id="water-h" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.01 0.08" numOctaves="2" seed="8" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.6 0 0 0 1.25"/><feComposite in2="SourceGraphic" operator="in"/></filter></defs>
+  <rect width="600" height="250" fill="url(#hsky)"/>
+  <circle cx="515" cy="56" r="46" fill="#ffd34d" opacity=".22"/><circle cx="515" cy="56" r="30" fill="#ffd34d"/>
+  <g fill="#fff" class="scene-cloud"><ellipse cx="100" cy="52" rx="42" ry="14"/><ellipse cx="126" cy="41" rx="25" ry="17"/><ellipse cx="320" cy="34" rx="34" ry="11"/><ellipse cx="341" cy="26" rx="20" ry="12"/></g>
+  <path d="M0 160 C60 150 110 156 170 152 C230 148 260 156 300 150 L300 160Z" fill="#7fb9a8" opacity=".55"/>
+  <rect y="158" width="600" height="92" fill="url(#hsea)"/>
+  <rect y="158" width="600" height="92" fill="#fff" opacity=".35" filter="url(#water-h)"/>
+  <ellipse cx="350" cy="171" rx="182" ry="30" fill="#86e1e6" opacity=".6" filter="url(#blur-h)"/>
+  <ellipse cx="350" cy="168" rx="160" ry="23" fill="#aef1ee"/>
+  <ellipse class="foam" cx="350" cy="167" rx="151" ry="20" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="16 10"/>
+  <ellipse cx="350" cy="165" rx="146" ry="19" fill="#dcb873"/>
+  <ellipse cx="350" cy="163" rx="141" ry="17" fill="url(#sd-h)" filter="url(#stex-h)"/>
+  <path d="M232 160 C250 118 312 104 358 108 C402 112 438 128 452 158 C440 164 420 162 404 165 C360 168 300 166 268 165 C252 164 240 163 232 160Z" fill="url(#gr-h)" filter="url(#gtex-h)"/>
+  <svg x="258" y="14" width="96" height="144" viewBox="0 0 100 150">${strip(ART.palm())}</svg>
+  <svg x="380" y="62" width="82" height="98" viewBox="0 0 100 120">${strip(ART.orange())}</svg>
+  <image href="parrot-small.png" x="408" y="78" width="86" height="86" preserveAspectRatio="xMidYMax meet"/>
+  <g class="scene-boat"><svg x="60" y="128" width="96" height="74" viewBox="0 0 120 92">${strip(ART.boat())}</svg></g>
+  <svg x="300" y="155" width="18" height="18" viewBox="0 0 100 100">${strip(ART.star())}</svg>
+  </svg>`;
+}
+function skyLayer(){
+  const l=h('div',{class:'sky-layer','aria-hidden':'true'});
+  [[8,0,70],[42,-25,90],[74,-50,80]].forEach(([top,delay,dur])=>l.append(h('span',{class:'cloud-shadow',style:`top:${top}%;animation-duration:${dur}s;animation-delay:${delay}s`})));
+  [[14,0,24],[18,-3,24],[11,-6,24],[56,-14,30],[60,-17,30]].forEach(([top,delay,dur])=>{const g=art(`<svg viewBox="0 0 40 16"><path d="M2 11 C8 3 14 3 20 10 C26 3 32 3 38 11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,'gull',{style:`top:${top}%;animation-duration:${dur}s;animation-delay:${delay}s`});l.append(g);});
+  return l;
+}
+function seaRoute(i){
+  const r=h('div',{class:'route','aria-hidden':'true'});
+  r.innerHTML=`<svg class="line" viewBox="0 0 400 96" preserveAspectRatio="none"><path d="${i%2?'M120 0 C160 60 240 30 280 96':'M280 0 C240 60 160 30 120 96'}" stroke="#fff" stroke-opacity=".8" stroke-width="4" stroke-dasharray="2 12" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke"/></svg>`;
+  r.append(art(ART.boat(),'boat'),art(ART.fish(),'fish'));
+  [[8,30,0],[78,20,-2],[30,70,-4],[66,64,-1.2]].forEach(([x,y,d])=>r.append(art('<svg viewBox="0 0 40 12"><path d="M2 9 C10 2 18 2 24 8 C28 5 33 5 38 9" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>','wv',{style:`left:${x}%;top:${y}%;animation-delay:${d}s`})));
+  return r;
+}
+
+/* ---------- home ---------- */
+function showReset(on){const b=$('#resetBtn');if(b)b.hidden=!on;document.body.classList.remove('wide-stage');}
+function renderHome(){
+  showReset(false);screen.innerHTML='';
+  const sec=h('section',{class:'home'});
+  sec.innerHTML=sceneHome();
+  sec.append(h('div',{class:'home-body'},
+    h('h1',{},'Η Περιπέτεια του ',h('span',{class:'e'},'Είναι'),' και του ',h('span',{class:'x'},'Έχει')),
+    h('div',{class:'word-bubbles'},h('span',{class:'wb e'},'είναι'),h('span',{class:'wb x'},'έχει')),
+    h('p',{class:'story'},'Ο Πίκο ο παπαγάλος έχασε τον θησαυρό του! Ταξίδεψε μαζί του σε τρία νησιά, μάθε τις δύο μαγικές λέξεις και βρες το χρυσό σεντούκι.'),
+    h('div',{class:'btn-row'},h('button',{class:'big-btn',onclick:renderMap},starTotal()?'Συνέχεια':'Ξεκινάμε!')),
+    h('p',{class:'copy'},'© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.')));
+  screen.append(sec);scrollTo(0,0);
+}
+
+/* ---------- map ---------- */
+function renderMap(){
+  showReset(true);islandRO&&islandRO.disconnect();screen.innerHTML='';refreshStars();
+  screen.append(skyLayer());
+  const cur=STAGES.findIndex((s,i)=>isOpen(s,i)&&!isDone(s));
+  const secs=[];
+  ISLANDS.forEach((isl,ii)=>{
+    if(ii>0)screen.append(seaRoute(ii));
+    const path=h('div',{class:'path'});
+    const col=getComputedStyle(document.documentElement).getPropertyValue('--'+(isl.id==='e'?'einai':isl.id==='x'?'exei':'leaf')).trim();
+    STAGES.forEach((st,i)=>{if(st.isl!==isl.id)return;
+      const open=isOpen(st,i),done=isDone(st),s=save.stars[st.id]||0;
+      const local=STAGES.filter(x=>x.isl===isl.id).indexOf(st)+1;
+      path.append(h('button',{class:'node'+(done?' done':'')+(open?'':' locked'),disabled:!open,'aria-label':st.title+(open?'':' (κλειδωμένο)'),onclick:()=>startStage(st)},
+        i===cur?art(ART.pico(),'mini-pico'):done?art(ART.flag(col),'flag'):null,
+        h('span',{class:'disc'},open?(st.type==='boss'?'👑':String(local)):'🔒'),
+        h('span',{class:'nt'},st.title),
+        h('span',{class:'ns'},done?['★'.repeat(s),h('i',{},'★'.repeat(3-s))]:'')));
+    });
+    const sec=h('section',{class:'island '+tone_(isl.id),'data-isl':isl.id,'data-idx':ii},h('div',{class:'isl-bg'}),
+      h('div',{class:'isl-head'},h('span',{class:'isl-word'},isl.big),h('div',{},h('h2',{},isl.name),h('p',{},isl.blurb)),islandDone(isl.id)?h('span',{class:'key',title:'Κέρδισες το κλειδί!'},'🗝️'):null),
+      path,
+      isl.id==='m'&&islandDone('m')?h('div',{class:'treasure-row'},h('button',{class:'big-btn',onclick:renderFinal},'Άνοιξε τον θησαυρό! 💰')):null);
+    screen.append(sec);secs.push(sec);
+  });
+  secs.forEach(s=>{drawIsland(s);islandRO&&islandRO.observe(s);});
+  /* show the stone where Pico is waiting (the next stage to play) */
+  const here=$('.mini-pico');
+  if(here)here.closest('.node').scrollIntoView({block:'center'});else scrollTo(0,0);
+  try{document.fonts&&document.fonts.ready.then(()=>secs.forEach(s=>s.isConnected&&drawIsland(s)));}catch(e){}
+}
+
+/* ---------- stage engine ---------- */
+let run=null,roundWrong=0,locked=false;
+function startStage(st){run={st,rounds:roundsFor(st),i:0,mistakes:0};renderStage();}
+function renderStage(){
+  showReset(false);
+  const st=run.st,isl=islandOf(st.isl);
+  /* «Η λέξη στην πρόταση»: a wider, bigger stage, so the picture and the sentence fill the screen instead of the sea */
+  const wideKinds=['sentence','build','build2','tf','meet','spot','order','missing'];
+  document.body.classList.toggle('wide-stage',wideKinds.includes(st.type));
+  document.body.dataset.wide=st.type;
+  screen.innerHTML='';
+  screen.append(h('section',{class:'stage '+tone_(st.isl)},
+    h('div',{class:'stagebar'},
+      h('button',{class:'icon-btn back-btn','aria-label':'Πίσω στον χάρτη',title:'Πίσω στον χάρτη',onclick:renderMap},h('span',{class:'back-arrow','aria-hidden':'true'},'←'),'🗺️'),
+      h('div',{class:'st-title'},h('small',{},isl.name),h('strong',{},st.title)),
+      h('div',{class:'dots',id:'dots'})),
+    h('div',{class:'guide'},art(ART.pico(),'pico',{id:'pico'}),h('div',{class:'bubble',id:'bubble','aria-live':'polite'})),
+    st.isl==='m'?h('div',{class:'rule-strip'},h('span',{class:'e'},'είναι → Πώς είναι; Τι είναι;'),h('span',{class:'x'},'έχει → Τι έχει;')):null,
+    h('div',{class:'play',id:'play'})));
+  scrollTo(0,0);
+  renderRound();
+}
+function setInstr(text){$('#bubble').textContent=text;}
+function updateDots(){const d=$('#dots');d.innerHTML='';run.rounds.forEach((_,i)=>d.append(h('span',{class:i<run.i?'on':i===run.i?'now':''})));}
+function renderRound(){roundWrong=0;locked=false;updateDots();const r=run.rounds[run.i],p=$('#play');p.innerHTML='';R[r.k](r,p);}
+function wrong(el){
+  run.mistakes++;roundWrong++;sfx.bad();
+  if(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+  $('#bubble').textContent=one(TRY);
+}
+function roundDone(spoken){
+  if(locked)return;locked=true;sfx.good();
+  const pr=one(PRAISE);$('#bubble').textContent=pr;
+  const pico=$('#pico');pico.classList.remove('happy');void pico.offsetWidth;pico.classList.add('happy');
+  const r0=run;
+  setTimeout(()=>{
+    if(run!==r0)return;
+    run.i++;const last=run.i>=run.rounds.length;
+    /* the child left the stage (map / home) while Pico was cheering: no pop-up, but a finished stage still counts */
+    if(!$('#play')){if(last){recordStage();if($('.island'))renderMap();}return;}
+    if(last)finishStage();else renderRound();},spoken?2300:1300);
+}
+function recordStage(){
+  const st=run.st,m=run.mistakes;
+  const stars=st.type==='meet'?3:m<=1?3:m<=4?2:1;
+  save.stars[st.id]=Math.max(save.stars[st.id]||0,stars);persist();refreshStars();
+  return stars;
+}
+function finishStage(){
+  const st=run.st;
+  const wasIslandDone=islandDone(st.isl);
+  const stars=recordStage();
+  sfx.win();confetti();
+  const title=stars===3?'Φανταστικά!':stars===2?'Πολύ καλά!':'Τα κατάφερες!';
+  const idx=STAGES.indexOf(st),next=STAGES[idx+1];
+  const gotKey=!wasIslandDone&&islandDone(st.isl);
+  let msg=stars===3?'Πήρες και τα τρία αστέρια!':'Μπορείς να ξαναπαίξεις για περισσότερα αστέρια.';
+  if(gotKey)msg=st.isl==='m'?'Βρήκες όλα τα κομμάτια του χάρτη! Ο θησαυρός σε περιμένει!':'Κέρδισες το κλειδί του νησιού! 🗝️';
+  showModal(h('div',{class:'modal'+(stars<3?' wide':'')},
+    h('div',{class:'stars'},[1,2,3].map(i=>h('span',{class:'star'+(i<=stars?' on':''),style:`--i:${i}`},'★'))),
+    h('h2',{},title),h('p',{},msg),
+    h('div',{class:'btn-row'+(stars<3?' three':'')},
+      h('button',{class:'big-btn ghost',onclick:()=>{closeModal();renderMap();}},'🗺️ Χάρτης'),
+      stars<3?h('button',{class:'big-btn ghost',id:'again',onclick:()=>{closeModal();startStage(st);}},'Ξανά'):null,
+      st.type==='boss'?h('button',{class:'big-btn',onclick:()=>{closeModal();renderFinal();}},'Θησαυρός 💰')
+        :next?h('button',{class:'big-btn',onclick:()=>{closeModal();startStage(next);}},'Επόμενο ▶'):null)));
+}
+
+/* sequence builder used by letter-order and sentence-build */
+function seqBuild(p,target,tiles,isWords,onDone){
+  const slots=h('div',{class:'slots'+(isWords?' words':'')},target.map(()=>h('span',{class:'slot'})));
+  const tray=h('div',{class:'tray'},tiles.map(t=>h('button',{class:isWords?'chip':'ltile'},t)));
+  let next=0;
+  const setHint=()=>{tray.querySelectorAll('button').forEach(b=>{b.removeAttribute('data-hint');b.classList.remove('hint');});const nb=[...tray.querySelectorAll('button:not(.used)')].find(b=>b.textContent===target[next]);if(nb)nb.setAttribute('data-hint','');};
+  tray.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.classList.contains('used')||locked)return;
+    if(b.textContent===target[next]){b.classList.add('used');const s=slots.children[next];s.textContent=b.textContent;s.classList.add('filled');sfx.pop();next++;
+      if(next===target.length){slots.classList.add('done');onDone();}else setHint();}
+    else wrong(b);});
+  setHint();p.append(slots,tray);
+}
+/* tap-all-targets used by letter hunt and word spotting */
+function tapAll(container,cells,isT,cls,n,onFound){
+  let found=0;
+  cells.forEach((v,i)=>{const b=h('button',{class:cls(i),'data-hint':isT(v)?'':null,style:`--d:${(i%4)*.4}s`},v);
+    b.onclick=()=>{if(locked||b.classList.contains('got'))return;
+      if(isT(v)){b.classList.add('got');b.removeAttribute('data-hint');b.classList.remove('hint');sfx.pop();found++;onFound(found);}
+      else wrong(b);};
+    container.append(b);});
+}
+
+const R={
+  meet(r,p){
+    const w=r.w,st0=run.st;let next=0;
+    setInstr(`Αυτή είναι η λέξη «${w.word}». Πάτα τα γράμματα ένα-ένα.`);
+    const row=h('div',{class:'big-word'});
+    w.letters.forEach((L,i)=>{const b=h('button',{class:'ltile'+(i===0?' next':'')},L);
+      b.onclick=()=>{if(i!==next){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');return;}
+        b.classList.add('lit');b.classList.remove('next');sfx.pop();next++;
+        if(next<w.letters.length)row.children[next].classList.add('next');
+        else setTimeout(()=>{row.classList.add('whole');sfx.good();showEx();},800);};
+      row.append(b);});
+    p.append(row);
+    function showEx(){
+      setInstr(w.meaning+' Διάβασε τις προτάσεις.');
+      p.append(h('div',{class:'meaning'},h('p',{class:'rule'},w.meaning),
+        h('div',{class:'ex-list'},w.examples.map(([pic,s])=>h('div',{class:'ex'},picNode(pic,s,'span','pic ex-pic'),h('p',{},hlSentence(s))))),
+        h('button',{class:'big-btn',onclick:()=>{
+          /* straight on to the next stage: no pop-up, the stage counts as done */
+          if(locked||run.st!==st0)return;locked=true;sfx.good();recordStage();
+          const next=STAGES[STAGES.indexOf(run.st)+1];
+          if(next)startStage(next);else renderMap();}},'Επόμενο ▶')));
+    }
+  },
+  hunt(r,p){
+    const n=3;
+    setInstr(`Βρες όλα τα γράμματα «${r.t}».`);
+    const cnt=h('span',{class:'tcount'},`0 / ${n}`);
+    p.append(h('div',{class:'target'},h('span',{class:'tletter'},r.t),h('span',{class:'tlabel'},'Ψάχνω:'),cnt));
+    const cells=shuffle([...Array(n).fill(r.t),...shuffle(r.d.concat(r.d)).slice(0,9)]);
+    const g=h('div',{class:'bubbles'});
+    tapAll(g,cells,v=>v===r.t,i=>'bub c'+(i%5),n,f=>{cnt.textContent=`${f} / ${n}`;if(f===n)roundDone();});
+    p.append(g);
+  },
+  spotGrid(r,p){
+    const w=r.w.word,n=3;
+    setInstr(`Βρες όλες τις λέξεις «${w}».`);
+    const cnt=h('span',{class:'tcount'},`0 / ${n}`);
+    p.append(h('div',{class:'target'},h('span',{class:'tletter',style:'width:auto;border-radius:999px;padding:0 18px;font-size:2rem'},w),cnt));
+    const g=h('div',{class:'wgrid'});
+    tapAll(g,shuffle([...Array(n).fill(w),...pick(r.w.spot,6)]),v=>v===w,()=>'wcard',n,f=>{cnt.textContent=`${f} / ${n}`;if(f===n)roundDone();});
+    p.append(g);
+  },
+  spotSent(r,p){
+    const words=r.s.split(' '),n=words.filter(x=>clean(x)===r.target).length;
+    setInstr(n>1?`Η λέξη «${r.target}» κρύβεται ${n} φορές! Βρες την.`:`Διάβασε την πρόταση. Πάτα τη λέξη «${r.target}».`);
+    p.append(h('div',{class:'target'},h('span',{class:'tletter',style:'width:auto;border-radius:999px;padding:0 18px;font-size:2rem'},r.target)));
+    const c=h('div',{class:'chips'});let found=0;
+    words.forEach(wd=>{const b=h('button',{class:'chip','data-hint':clean(wd)===r.target?'':null},wd);
+      b.onclick=()=>{if(locked||b.classList.contains('got'))return;
+        if(clean(wd)===r.target){b.classList.add('got');b.removeAttribute('data-hint');b.classList.remove('hint');sfx.pop();found++;if(found===n)roundDone(r.s);}
+        else wrong(b);};c.append(b);});
+    p.append(c);
+  },
+  order(r,p){
+    if(r.model){setInstr(`Φτιάξε τη λέξη «${r.word}». Βάλε τα γράμματα στη σειρά.`);p.append(h('div',{class:'model'},r.word));}
+    else{setInstr(`Φτιάξε τη λέξη «${r.word}» χωρίς να τη βλέπεις!`);
+      const m=h('div',{class:'model hidden-model'});
+      const peek=h('button',{class:'small-btn',onclick:()=>{m.textContent=r.word;m.classList.remove('hidden-model');setTimeout(()=>{m.textContent='';m.classList.add('hidden-model');m.append(peek);},1600);}},'👀 Κρυφοκοίτα');
+      m.append(peek);p.append(m);}
+    let tiles=shuffle(r.letters);while(tiles.join('')===r.letters.join(''))tiles=shuffle(r.letters);
+    seqBuild(p,r.letters,tiles,false,()=>roundDone(r.word));
+  },
+  missing(r,p){
+    setInstr('Ποιο γράμμα λείπει;');
+    const word=h('div',{class:'big-word'},r.letters.map((L,i)=>h('span',{class:'ltile'+(i===r.i?' blank':'')},i===r.i?'?':L)));
+    const ok=r.opts[0];
+    const opts=h('div',{class:'opts'},shuffle(r.opts).map(o=>{const b=h('button',{class:'opt','data-hint':o===ok?'':null},o);
+      b.onclick=()=>{if(locked)return;if(o===ok){const bl=word.children[r.i];bl.textContent=o;bl.classList.remove('blank');bl.classList.add('lit');b.classList.add('right');roundDone(r.letters.join(''));}else wrong(b);};return b;}));
+    p.append(word,opts);
+  },
+  choose(r,p){
+    const full=`${r.pre} ${r.ans} ${r.post}`;
+    setInstr(r.chest?'Σε ποιο σεντούκι πάει; Είναι ή έχει;':r.opts.length===2?'Είναι ή έχει; Διάλεξε τη σωστή λέξη.':'Ποια λέξη λείπει από την πρόταση;');
+    const blank=h('span',{class:'blank-w'},'_____');
+    p.append(h('div',{class:'scard'},picNode(r.pic,`${r.pre} ${r.ans} ${r.post}`),h('p',{class:'sent'},r.pre+' ',blank,' '+r.post)));
+    const opts=h('div',{class:'opts'},r.opts.map(o=>{
+      const b=r.chest?h('button',{class:'chest '+(o==='είναι'?'e':'x'),'data-hint':o===r.ans?'':null},h('span',{class:'lid'}),h('span',{class:'box'},o),h('small',{},o==='είναι'?'πώς είναι;':'τι έχει;'))
+        :h('button',{class:'opt','data-hint':o===r.ans?'':null},o);
+      b.onclick=()=>{if(locked)return;if(o===r.ans){blank.textContent=o;blank.classList.add('filled',o==='είναι'?'e':o==='έχει'?'x':'o');b.classList.add('right');roundDone(full);}else wrong(b);};return b;}));
+    p.append(opts);
+  },
+  tf(r,p){
+    const[a,b,c]=r.s;
+    setInstr('Διάβασε. Είναι σωστή αυτή η πρόταση;');
+    const mid=h('span',{class:'hl '+(b==='είναι'?'e':'x')},b);const sent=h('p',{class:'sent'},a+' ',mid,' '+c);
+    p.append(h('div',{class:'scard'},picNode(r.pic,r.s.join(' ')),sent));
+    const ans=v=>{if(locked)return;if(v===r.ok){
+        if(!r.ok){mid.classList.add('struck');mid.after(h('span',{class:'hl fix '+(r.fix==='είναι'?'e':'x')},r.fix));roundDone(`Σωστά! Λέμε: ${a} ${r.fix} ${c}`);}
+        else roundDone(r.s.join(' '));}
+      else wrong(v?yes:no);};
+    const yes=h('button',{class:'tf-btn yes','data-hint':r.ok?'':null,onclick:()=>ans(true)},'✔ Σωστό');
+    const no=h('button',{class:'tf-btn no','data-hint':r.ok?null:'',onclick:()=>ans(false)},'✘ Λάθος');
+    p.append(h('div',{class:'opts'},yes,no));
+  },
+  build(r,p){
+    setInstr(r.extra?'Φτιάξε την πρόταση. Πρόσεξε: μία λέξη περισσεύει!':'Βάλε τις λέξεις στη σειρά και φτιάξε την πρόταση.');
+    p.append(h('div',{class:'scard'},picNode(r.pic,r.words.join(' '))));
+    let tiles=shuffle(r.extra?[...r.words,r.extra]:r.words);while(tiles.join(' ')===r.words.join(' '))tiles=shuffle(tiles);
+    seqBuild(p,r.words,tiles,true,()=>roundDone(r.words.join(' ')));
+  }
+};
+
+/* ---------- final ---------- */
+function renderFinal(){
+  showReset(false);screen.innerHTML='';scrollTo(0,0);sfx.win();confetti();
+  const who=h('div',{class:'who'},save.name||'');
+  screen.append(h('section',{class:'final'},
+    h('div',{class:'bigchest','aria-hidden':'true'},h('div',{class:'glow'}),h('div',{class:'lid'}),h('div',{class:'box'})),
+    h('div',{class:'cert'},h('h2',{},'Δίπλωμα Εξερευνητή'),who,
+      h('p',{},'Ξέρω να διαβάζω, να γράφω και να χρησιμοποιώ τις λέξεις ',h('span',{class:'hl e'},'είναι'),' και ',h('span',{class:'hl x'},'έχει'),'.'),
+      h('p',{style:'font:700 1.3rem var(--f-display);color:var(--gold-deep)'},`★ ${starTotal()} / ${STAGES.length*3}`)),
+    h('input',{class:'name-in',id:'kidname',placeholder:'Γράψε το όνομά σου',value:save.name||'',oninput:e=>{save.name=e.target.value;who.textContent=save.name;persist();}}),
+    h('div',{class:'btn-row',style:'margin-top:18px'},h('button',{class:'big-btn',onclick:renderMap},'🗺️ Πίσω στα νησιά'))));
+}
+
+/* ---------- modal & settings ---------- */
+const ov=$('#overlay');
+function showModal(node){ov.innerHTML='';ov.append(node);ov.hidden=false;}
+function closeModal(){ov.hidden=true;ov.innerHTML='';}
+function resetProgress(){save.stars={};save.name='';persist();refreshStars();renderMap();}
+function askReset(){
+  showModal(h('div',{class:'modal'},h('h2',{},'Μηδενισμός προόδου'),
+    h('p',{},'Θα σβηστούν όλα τα αστέρια και το όνομα στο δίπλωμα. Να ξεκινήσουμε από την αρχή;'),
+    h('div',{class:'btn-row'},
+      h('button',{class:'big-btn ghost',onclick:closeModal},'Όχι'),
+      h('button',{class:'big-btn red',id:'resetYes',onclick:()=>{closeModal();resetProgress();}},'Ναι, μηδένισε'))));
+}
+function openSettings(){
+  let armed=false;
+  const tg=(id,label,keyName,after)=>h('label',{class:'toggle',for:id},h('input',{type:'checkbox',id,checked:!!save[keyName],onchange:e=>{save[keyName]=e.target.checked;persist();after&&after();}}),label);
+  const reset=h('button',{class:'danger',onclick:()=>{if(!armed){armed=true;reset.textContent='Πάτα ξανά για επιβεβαίωση';return;}closeModal();resetProgress();}},'Μηδένισε την πρόοδο');
+  showModal(h('div',{class:'modal'},h('h2',{},'Για τον εκπαιδευτικό'),
+    h('div',{class:'settings'},tg('opt-sound','🔔 Ηχητικά εφέ','sound'),tg('opt-unlock','🔓 Άνοιξε όλα τα στάδια','unlockAll',()=>{if($('.island'))renderMap();}),
+      h('span',{class:'note'},'Αστέρια: 3 με έως 1 λάθος, 2 με έως 4 λάθη. Όταν το παιδί κάνει λάθος, ο Πίκο το ενθαρρύνει να ξαναδοκιμάσει, χωρίς να δείχνει τη σωστή απάντηση.'),reset),
+    h('div',{class:'btn-row'},h('button',{class:'big-btn',onclick:closeModal},'Κλείσιμο'))));
+}
+$('#gear').onclick=openSettings;
+$('#resetBtn').onclick=askReset;
+$('#brand').onclick=renderHome;
+ov.addEventListener('click',e=>{if(e.target===ov&&!$('.stars',ov))closeModal();});
+
+/* ---------- confetti ---------- */
+const cv=$('#fx'),cx=cv.getContext('2d');let parts=[],raf=0;
+function confetti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  const cols=['#5a4bd6','#ee7420','#2a9d61','#f6b915','#e2475a','#27b2c2'];
+  for(let i=0;i<130;i++)parts.push({x:innerWidth/2,y:innerHeight*.35,vx:(Math.random()-.5)*14,vy:-Math.random()*13-3,r:Math.random()*6+4,c:one(cols),a:Math.random()*6,life:0});
+  if(!raf)raf=requestAnimationFrame(tick);
+}
+function tick(){cx.clearRect(0,0,innerWidth,innerHeight);
+  parts.forEach(q=>{q.vy+=.35;q.vx*=.99;q.x+=q.vx;q.y+=q.vy;q.a+=.2;q.life++;cx.save();cx.translate(q.x,q.y);cx.rotate(q.a);cx.fillStyle=q.c;cx.fillRect(-q.r/2,-q.r/4,q.r,q.r/2);cx.restore();});
+  parts=parts.filter(q=>q.y<innerHeight+30&&q.life<220);
+  raf=parts.length?requestAnimationFrame(tick):0;if(!raf)cx.clearRect(0,0,innerWidth,innerHeight);}
+
+refreshStars();renderHome();
+</script>
+</body>
+</html>
