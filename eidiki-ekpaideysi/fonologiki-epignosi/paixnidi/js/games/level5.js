@@ -77,7 +77,9 @@ Phono.games.phonemeSynthesis = {
             ...distractors.map(d => ({ word: d.word, emoji: d.emoji, correct: false })),
         ]);
 
-        const choicesGrid = el('div', { className: 'choices-grid' });
+        // The words under the pictures are hidden: the child should find the
+        // picture by sound, not by reading. The "Βοήθεια" button shows them.
+        const choicesGrid = el('div', { className: 'choices-grid words-hidden' });
         allChoices.forEach(choice => {
             const card = el('div', { className: 'choice-card', onClick: () => this.checkAnswer(choice.correct, card) }, [
                 el('span', { className: 'choice-emoji', textContent: choice.emoji }),
@@ -85,8 +87,16 @@ Phono.games.phonemeSynthesis = {
             ]);
             choicesGrid.appendChild(card);
         });
+        const helpBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: 'Βοήθεια',
+            onClick: () => {
+                const hidden = choicesGrid.classList.toggle('words-hidden');
+                helpBtn.textContent = hidden ? 'Βοήθεια' : 'Κρύψε τις λέξεις';
+            },
+        });
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, phonemeDisplay, choicesGrid]));
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, phonemeDisplay, choicesGrid, helpBtn]));
     },
 
     checkAnswer(isCorrect, cardEl) {

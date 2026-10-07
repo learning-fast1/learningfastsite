@@ -14,7 +14,7 @@
 .big-game[data-game="findRhyme"] { --main: 10.5; --cardonly: 11; }
 .big-game[data-game="produceRhyme"] { --main: 19; }
 .big-game[data-game="findInitialPhoneme"], .big-game[data-game="findFinalPhoneme"] { --main: 17; }
-.big-game[data-game="initialSoundMC"], .big-game[data-game="phonemeSynthesis"], .big-game[data-game="soundOddOneOut"] { --card: 11; }
+.big-game[data-game="initialSoundMC"], .big-game[data-game="soundOddOneOut"] { --card: 11; }
 .big-game[data-game="syllableRemoval"], .big-game[data-game="phonemeDeletion"] { --main: 13; }
 
 /* ---------- σελίδα ---------- */
@@ -102,3 +102,6 @@
     .big-game .choices-grid { gap: 10px; }
     .big-game .choice-card { padding: 8px; }
 }
+
+.choices-grid.words-hidden .choice-word { display: none; }
+.big-game[data-game="phonemeSynthesis"] { --card: 14; }
