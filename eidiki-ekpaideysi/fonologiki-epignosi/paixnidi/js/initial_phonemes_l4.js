@@ -74,6 +74,7 @@ Phono.data.initialPhonemesL4 = [
 
     // (ΟΧΙ χτ!)
     { word: "χέρι", initial: "χ", type: "cont", onsetVowel: true, imageable: true, emoji: "✋" },
+    { word: "χέλι", initial: "χ", type: "cont", onsetVowel: true, imageable: true, emoji: "🐟" },
     { word: "χαρτί", initial: "χ", type: "cont", onsetVowel: true, imageable: true, emoji: "📃" },
     { word: "χελώνα", initial: "χ", type: "cont", onsetVowel: true, imageable: true, emoji: "🐢" },
     { word: "χορός", initial: "χ", type: "cont", onsetVowel: true, imageable: true, emoji: "💃" },

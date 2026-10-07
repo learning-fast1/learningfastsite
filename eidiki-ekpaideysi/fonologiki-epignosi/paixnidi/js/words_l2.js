@@ -42,6 +42,8 @@ Phono.data.wordsL2 = [
     { word: "ψωμί", syllables: ["ψω", "μί"], stage: "A", imageable: true, emoji: "🍞" },
     { word: "πόδι", syllables: ["πό", "δι"], stage: "A", imageable: true, emoji: "🦶" },
     { word: "χέρι", syllables: ["χέ", "ρι"], stage: "A", imageable: true, emoji: "✋" },
+    { word: "χέλι", syllables: ["χέ", "λι"], stage: "A", imageable: true, emoji: "🐟" },
+    { word: "ταψί", syllables: ["τα", "ψί"], stage: "A", imageable: true, emoji: "🥘" },
     { word: "μέλι", syllables: ["μέ", "λι"], stage: "A", imageable: true, emoji: "🍯" },
     { word: "πίτα", syllables: ["πί", "τα"], stage: "A", imageable: true, emoji: "🥧" , splitTrap: "νε" },
     { word: "γάλα", syllables: ["γά", "λα"], stage: "A", imageable: true, emoji: "🥛" },

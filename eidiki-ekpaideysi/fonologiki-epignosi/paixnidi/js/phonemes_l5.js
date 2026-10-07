@@ -34,6 +34,7 @@ Phono.data.phonemesL5 = [
     { word: "γόμα", phonemes: ["γ", "ό", "μ", "α"], count: 4, imageable: true, emoji: "🧽" },
     { word: "νότα", phonemes: ["ν", "ό", "τ", "α"], count: 4, imageable: true, emoji: "🎵" },
     { word: "χέρι", phonemes: ["χ", "έ", "ρ", "ι"], count: 4, imageable: true, emoji: "🤚" },
+    { word: "χέλι", phonemes: ["χ", "έ", "λ", "ι"], count: 4, imageable: true, emoji: "🐟" },
     { word: "μάτι", phonemes: ["μ", "ά", "τ", "ι"], count: 4, imageable: true, emoji: "👁️" },
     { word: "πάνα", phonemes: ["π", "ά", "ν", "α"], count: 4, imageable: true, emoji: "🧷" },
     { word: "βίδα", phonemes: ["β", "ί", "δ", "α"], count: 4, imageable: true, emoji: "🔩" },

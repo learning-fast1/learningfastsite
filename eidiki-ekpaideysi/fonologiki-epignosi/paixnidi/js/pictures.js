@@ -42,7 +42,7 @@
         'πεπονι': 'peponi', 'πεταλουδα': 'petalouda', 'πιατο': 'piato', 'πιτα': 'pita', 'πλοιο': 'ploio', 'ποδηλατο': 'podilato', 'ποδι': 'podi',
         'ποντικοσ': 'podikos', 'πορτα': 'porta', 'πορτοκαλαδα': 'portokalada', 'πορτοκαλι': 'portokali', 'ποταμι': 'potami', 'ποτηρι': 'potiri',
         'πουλι': 'pouli', 'προβατο': 'provato', 'ραδιοφωνο': 'radiofono', 'ρακετα': 'raketa', 'ριζα': 'riza', 'ροδα': 'roda', 'ρολοι': 'roloi',
-        'ρομπα': 'roba', 'ρυζι': 'ryzi', 'σαλατα': 'salata', 'σαλαχι': 'cheli', 'σαλιγκαρι': 'saligkari', 'σαμπουαν': 'sabouan',
+        'ρομπα': 'roba', 'ρυζι': 'ryzi', 'σαλατα': 'salata', 'σαλαχι': 'salachi', 'σαλιγκαρι': 'saligkari', 'σαμπουαν': 'sabouan',
         'σανδαλι': 'sandali', 'σαπουνι': 'sapouni', 'σελιδα': 'selida', 'σεντονι': 'sedoni', 'σκαθαρι': 'skathari', 'σκαλα': 'skala',
         'σκουληκι': 'skouliki', 'σκυλακι': 'skylaki', 'σκυλοσ': 'skylos', 'σοκολατα': 'sokolata', 'σπιτι': 'spiti', 'σταφυλι': 'stafyli',
         'στομα': 'stoma', 'συννεφο': 'synnefo', 'σωμα': 'soma', 'ταπα': 'tapa', 'ταυροσ': 'tayros', 'ταψι': 'tapsi', 'τετραδιο': 'tetradio',
@@ -50,16 +50,16 @@
         'τοπι': 'topi', 'τουρτα': 'tourta', 'τρακτερ': 'trakter', 'τραπεζι': 'trapezi', 'τρενο': 'treno', 'τσαντα': 'tsada', 'τυρι': 'tyri',
         'φακοσ': 'fakos', 'φαλαινα': 'falaina', 'φαναρι': 'fanari', 'φασολι': 'fasoli', 'φεγγαρι': 'fengari', 'φιδι': 'fidi', 'φλιτζανι': 'flitzani',
         'φραουλα': 'fraoula', 'φτερο': 'ftero', 'φωκια': 'fokia', 'φωσ': 'fos', 'φωτια': 'fotia', 'χαμογελο': 'chamogelo', 'χαρταετοσ': 'chartaetos',
-        'χαρτησ': 'chartis', 'χαρτι': 'charti', 'χελι': 'cheli', 'χελωνα': 'xelona', 'χερι': 'cheri', 'χιονανθρωποσ': 'chionanthropos',
-        'χιονι': 'chioni', 'χοροσ': 'choros', 'χταποδι': 'xtapodi', 'ψαλιδι': 'psalidi', 'ψαρασ': 'psaras', 'ψαρι': 'psari', 'ψητο': 'psito',
-        'ψιψινα': 'gata', 'ψυγειο': 'psygeio', 'ψωμι': 'psomi',
+        'χαρτησ': 'chartis', 'χαρτι': 'charti', 'χελωνα': 'xelona', 'χερι': 'cheri', 'χιονανθρωποσ': 'chionanthropos', 'χιονι': 'chioni',
+        'χοροσ': 'choros', 'χταποδι': 'xtapodi', 'ψαλιδι': 'psalidi', 'ψαρασ': 'psaras', 'ψαρι': 'psari', 'ψητο': 'psito', 'ψιψινα': 'gata',
+        'ψυγειο': 'psygeio', 'ψωμι': 'psomi',
     };
 
     // τα κλειδιά περνούν από την ίδια fold() (π.χ. το τελικό ς γίνεται σ), ώστε να ταιριάζουν με τις λέξεις του παιχνιδιού
     const MAP = {}; Object.keys(PICS).forEach((k) => { MAP[fold(k)] = PICS[k]; });
 
     // αύξησε τον αριθμό όταν αλλάζεις κάποια εικόνα, για να την ξαναφορτώσουν οι browsers
-    const V = 7;
+    const V = 8;
 
     const wrap = (emoji, word) => {
         const file = MAP[fold(word)];
