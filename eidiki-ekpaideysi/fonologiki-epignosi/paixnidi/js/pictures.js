@@ -20,35 +20,37 @@
         'βατομουρα': 'vatomoura', 'βατομουρο': 'vatomoura', 'βατραχοσ': 'vatraxos', 'βγεσ': 'vges', 'βελονα': 'veloni', 'βελονι': 'veloni',
         'βερικοκο': 'verikoko', 'βιβλιο': 'vivlio', 'βιδα': 'vida', 'βιολι': 'violi', 'βοτανο': 'votano', 'βοτσαλα': 'votsala', 'βοτσαλο': 'votsala',
         'βουνο': 'vouno', 'βροχη': 'vrochi', 'βρυση': 'vrysi', 'γαιδαρος': 'gaidouri', 'γαιδουρι': 'gaidouri', 'γαλα': 'gala', 'γατα': 'gata',
-        'γατακι': 'gata', 'γατος': 'gata', 'γεφυρα': 'gefyra', 'γομα': 'goma', 'γραβατα': 'gravata', 'δασοσ': 'dasos', 'δελφινι': 'delfini',
-        'δεμα': 'dema', 'δεντρακι': 'dentro', 'δεντρο': 'dentro', 'δρακοσ': 'drakos', 'δωρο': 'doro', 'εκκλησια': 'ekklisia', 'ελατο': 'elato',
-        'ελαφι': 'elafi', 'ελεφαντασ': 'elefantas', 'ελια': 'elia', 'ελικοπτερο': 'elikoptero', 'ζαμπον': 'zabon', 'ζαρι': 'zaria', 'ζαρια': 'zaria',
-        'ζωα': 'zoa', 'ζωγραφια': 'zografia', 'ηλιοσ': 'ilios', 'ημερολογιο': 'imerologio', 'ηφαιστειο': 'ifaisteio', 'θαλασσα': 'thalassa',
-        'θεατρο': 'theatro', 'θερμομετρο': 'thermometro', 'θυριδα': 'thyrida', 'καδοσ': 'kados', 'καλαθι': 'kalathi', 'καμηλα': 'kamila',
-        'καπελο': 'kapelo', 'καρεκλα': 'karekla', 'καροτο': 'karoto', 'κερασι': 'kerasi', 'κερι': 'keri', 'κεφαλι': 'kefali', 'κλειδι': 'kleidi',
+        'γατακι': 'gata', 'γατος': 'gata', 'γεφυρα': 'gefyra', 'γομα': 'goma', 'γουρουνι': 'gourouni', 'γραβατα': 'gravata', 'δασοσ': 'dasos',
+        'δελφινι': 'delfini', 'δεμα': 'dema', 'δεντρακι': 'dentro', 'δεντρο': 'dentro', 'δρακοσ': 'drakos', 'δωρο': 'doro', 'εκκλησια': 'ekklisia',
+        'ελατο': 'elato', 'ελαφι': 'elafi', 'ελεφαντασ': 'elefantas', 'ελια': 'elia', 'ελικοπτερο': 'elikoptero', 'ζαμπον': 'zabon', 'ζαρι': 'zaria',
+        'ζαρια': 'zaria', 'ζεβρα': 'zevra', 'ζωα': 'zoa', 'ζωγραφια': 'zografia', 'ζωο': 'zoo', 'ηλιοσ': 'ilios', 'ημερολογιο': 'imerologio',
+        'ηφαιστειο': 'ifaisteio', 'θαλασσα': 'thalassa', 'θεατρο': 'theatro', 'θερμομετρο': 'thermometro', 'θυριδα': 'thyrida', 'καδοσ': 'kados',
+        'καλαθι': 'kalathi', 'καλαμαρι': 'kalamari', 'καμηλα': 'kamila', 'κανατα': 'kanata', 'καπελο': 'kapelo', 'καρεκλα': 'karekla',
+        'καροτο': 'karoto', 'καρπουζι': 'karpouzi', 'κερασι': 'kerasi', 'κερι': 'keri', 'κεφαλη': 'kefali', 'κεφαλι': 'kefali', 'κλειδι': 'kleidi',
         'κολονα': 'kolona', 'κοπελα': 'kopela', 'κοτα': 'kota', 'κουνελι': 'kouneli', 'κουταλι': 'koutali', 'κουτι': 'kouti', 'κρεβατι': 'krevati',
-        'λαδι': 'ladi', 'λεμονι': 'lemoni', 'λεωφορειο': 'leoforeio', 'λιονταρι': 'liodari', 'λουλουδι': 'louloudi', 'λοφοσ': 'lofos',
-        'λυκοσ': 'lykos', 'μαιμου': 'maimou', 'μαμα': 'mitera', 'μανιταρι': 'manitari', 'μαξιλαρι': 'maxilari', 'ματι': 'mati', 'μελι': 'meli',
-        'μελισσα': 'melissa', 'μηλο': 'milo', 'μητερα': 'mitera', 'μολυβι': 'molyvi', 'μπαλονι': 'baloni', 'μπανανα': 'banana', 'μπιζελι': 'bizeli',
-        'μυτη': 'myti', 'μωρο': 'moro', 'ναοσ': 'naos', 'νεραιδα': 'neraida', 'νερο': 'nero', 'νησι': 'nisi', 'νοτα': 'nota', 'ντοματα': 'domata',
-        'νυχι': 'nychi', 'οδηγοσ': 'odigos', 'οδοντοβουρτσα': 'ododovourtsa', 'οδοσ': 'odos', 'ομελετα': 'omeleta', 'ομπρελα': 'obrela',
-        'ονειρο': 'oneiro', 'πανι': 'pani', 'παπακι': 'papaki', 'πατατα': 'patata', 'πεπονι': 'peponi', 'πεταλουδα': 'petalouda', 'πιτα': 'pita',
-        'ποδηλατο': 'podilato', 'ποδι': 'podi', 'πορτα': 'porta', 'ποταμι': 'potami', 'πουλι': 'pouli', 'ραδιοφωνο': 'radiofono', 'ρακετα': 'raketa',
-        'ροδα': 'roda', 'ρολοι': 'roloi', 'σαλατα': 'salata', 'σαπουνι': 'sapouni', 'σελιδα': 'selida', 'σεντονι': 'sedoni', 'σκαλα': 'skala',
-        'σκυλακι': 'skylaki', 'σκυλοσ': 'skylos', 'σοκολατα': 'sokolata', 'σπιτι': 'spiti', 'συννεφο': 'synnefo', 'τηγανι': 'tigani',
-        'τηλεφωνο': 'tilefono', 'τονοσ': 'tonos', 'τοπι': 'topi', 'τρενο': 'treno', 'τυρι': 'tyri', 'φακοσ': 'fakos', 'φαλαινα': 'falaina',
-        'φαναρι': 'fanari', 'φασολι': 'fasoli', 'φεγγαρι': 'fengari', 'φιδι': 'fidi', 'φλιτζανι': 'flitzani', 'φραουλα': 'fraoula', 'φτερο': 'ftero',
-        'φωσ': 'fos', 'φωτια': 'fotia', 'χαμογελο': 'chamogelo', 'χαρταετοσ': 'chartaetos', 'χαρτησ': 'chartis', 'χελι': 'cheli', 'χελωνα': 'xelona',
-        'χερι': 'cheri', 'χιονανθρωποσ': 'chionanthropos', 'χιονι': 'chioni', 'χοροσ': 'choros', 'χταποδι': 'xtapodi', 'ψαλιδι': 'psalidi',
-        'ψαρασ': 'psaras', 'ψαρι': 'psari', 'ψητο': 'psito', 'ψιψινα': 'gata', 'ψυγειο': 'psygeio', 'ψωμι': 'psomi',
-        'screenshot 2026-10-07 130606': 'screenshot-2026-10-07-130606',
+        'λαδι': 'ladi', 'λαχανικα': 'lachanika', 'λεμονι': 'lemoni', 'λεωφορειο': 'leoforeio', 'λιονταρι': 'liodari', 'λουλουδι': 'louloudi',
+        'λοφοσ': 'lofos', 'λυκοσ': 'lykos', 'μαιμου': 'maimou', 'μαμα': 'mitera', 'μανιταρι': 'manitari', 'μαξιλαρι': 'maxilari', 'ματι': 'mati',
+        'μελι': 'meli', 'μελισσα': 'melissa', 'μηλο': 'milo', 'μητερα': 'mitera', 'μολυβι': 'molyvi', 'μπαλα': 'bala', 'μπαλονι': 'baloni',
+        'μπανανα': 'banana', 'μπιζελι': 'bizeli', 'μυτη': 'myti', 'μωρο': 'moro', 'ναοσ': 'naos', 'νεραιδα': 'neraida', 'νερο': 'nero',
+        'νησι': 'nisi', 'νοτα': 'nota', 'ντοματα': 'domata', 'νυχι': 'nychi', 'οδηγοσ': 'odigos', 'οδοντοβουρτσα': 'ododovourtsa', 'οδοσ': 'odos',
+        'ομελετα': 'omeleta', 'ομπρελα': 'obrela', 'ονειρο': 'oneiro', 'πανα': 'pani', 'πανι': 'pani', 'παπακι': 'papaki', 'παπι': 'papi',
+        'παραθυρο': 'parathyro', 'πατατα': 'patata', 'πεπονι': 'peponi', 'πεταλουδα': 'petalouda', 'πιτα': 'pita', 'ποδηλατο': 'podilato',
+        'ποδι': 'podi', 'πορτα': 'porta', 'ποταμι': 'potami', 'πουλι': 'pouli', 'ραδιοφωνο': 'radiofono', 'ρακετα': 'raketa', 'ροδα': 'roda',
+        'ρολοι': 'roloi', 'ρυζι': 'ryzi', 'σαλατα': 'salata', 'σανδαλι': 'sandali', 'σαπουνι': 'sapouni', 'σελιδα': 'selida', 'σεντονι': 'sedoni',
+        'σκαλα': 'skala', 'σκυλακι': 'skylaki', 'σκυλοσ': 'skylos', 'σοκολατα': 'sokolata', 'σπιτι': 'spiti', 'συννεφο': 'synnefo',
+        'τηγανι': 'tigani', 'τηλεφωνο': 'tilefono', 'τονοσ': 'tonos', 'τοπι': 'topi', 'τουρτα': 'tourta', 'τρενο': 'treno', 'τυρι': 'tyri',
+        'φακοσ': 'fakos', 'φαλαινα': 'falaina', 'φαναρι': 'fanari', 'φασολι': 'fasoli', 'φεγγαρι': 'fengari', 'φιδι': 'fidi', 'φλιτζανι': 'flitzani',
+        'φραουλα': 'fraoula', 'φτερο': 'ftero', 'φωκια': 'fokia', 'φωσ': 'fos', 'φωτια': 'fotia', 'χαμογελο': 'chamogelo', 'χαρταετοσ': 'chartaetos',
+        'χαρτησ': 'chartis', 'χελι': 'cheli', 'χελωνα': 'xelona', 'χερι': 'cheri', 'χιονανθρωποσ': 'chionanthropos', 'χιονι': 'chioni',
+        'χοροσ': 'choros', 'χταποδι': 'xtapodi', 'ψαλιδι': 'psalidi', 'ψαρασ': 'psaras', 'ψαρι': 'psari', 'ψητο': 'psito', 'ψιψινα': 'gata',
+        'ψυγειο': 'psygeio', 'ψωμι': 'psomi',
     };
 
     // τα κλειδιά περνούν από την ίδια fold() (π.χ. το τελικό ς γίνεται σ), ώστε να ταιριάζουν με τις λέξεις του παιχνιδιού
     const MAP = {}; Object.keys(PICS).forEach((k) => { MAP[fold(k)] = PICS[k]; });
 
     // αύξησε τον αριθμό όταν αλλάζεις κάποια εικόνα, για να την ξαναφορτώσουν οι browsers
-    const V = 5;
+    const V = 6;
 
     const wrap = (emoji, word) => {
         const file = MAP[fold(word)];
