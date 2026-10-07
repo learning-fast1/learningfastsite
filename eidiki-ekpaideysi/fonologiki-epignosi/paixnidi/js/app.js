@@ -135,6 +135,8 @@ Phono.app = {
         Phono.confetti.stop();
         if (window.speechSynthesis) window.speechSynthesis.cancel();
         Phono.audio.currentGameId = null;
+        // the bigger-pictures layout (css/big-games.css) only belongs to the stage being played
+        document.body.classList.remove('big-game'); delete document.body.dataset.game; delete document.body.dataset.level;
         // Invalidates any in-flight speak()/speakSyllables()/speakPhonemes()
         // chain left over from the stage being left — see the comment on
         // Phono.audio.navGeneration for why cancel() alone isn't enough.
@@ -519,6 +521,16 @@ Phono.app = {
             totalRounds: this.settings.roundCount,
         });
         Phono.audio.currentGameId = gameId;
+        // Stages that use the bigger layout (css/big-games.css). Not included: wordCounting, rhymeMemory.
+        const BIG_GAMES = [
+            'wordSizeCompare', 'wordPosition', 'sentenceBuilder', 'wordDeletion',
+            'syllableSynthesis', 'syllableCounting', 'syllableSplit', 'syllableRemoval',
+            'findRhyme', 'rhymeOddOneOut', 'produceRhyme',
+            'findInitialPhoneme', 'initialSoundMC', 'groupBySound', 'soundOddOneOut', 'findFinalPhoneme',
+            'phonemeSynthesis', 'phonemeAnalysis', 'elkoninBoxes', 'phonemeDeletion',
+        ];
+        document.body.classList.toggle('big-game', BIG_GAMES.includes(gameId));
+        document.body.dataset.game = gameId; document.body.dataset.level = levelId;
 
         // Render game wrapper
         const { el } = Phono.helpers;

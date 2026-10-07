@@ -1,0 +1,104 @@
+/* ============================================================
+   ΜΕΓΑΛΥΤΕΡΑ ΣΤΑΔΙΑ — εικόνες και επιλογές
+   Ισχύει μόνο όταν το body έχει την κλάση .big-game (την βάζει η app.js
+   για τα παιχνίδια της λίστας BIG_GAMES). Όλα τα μεγέθη βγαίνουν από
+   τη μονάδα --u = το μικρότερο από 1vh και 1vw, με clamp(), ώστε:
+     - σε laptop / πίνακα / tablet να μεγαλώνουν και να χωράνε στην οθόνη,
+     - σε κινητό να μένουν στα μεγέθη που είχαν.
+   ============================================================ */
+.big-game { --u: min(1vh, 1vw); --card: 13; --cardonly: 16; --main: 15; }
+/* picture size per game (in units of --u): cards with picture+word, cards with only a picture, and the main picture */
+.big-game[data-game="wordSizeCompare"] { --card: 17; }
+.big-game[data-game="syllableSynthesis"] { --card: 10.5; }
+.big-game[data-game="rhymeOddOneOut"] { --card: 12; }
+.big-game[data-game="findRhyme"] { --main: 10.5; --cardonly: 11; }
+.big-game[data-game="produceRhyme"] { --main: 19; }
+.big-game[data-game="findInitialPhoneme"], .big-game[data-game="findFinalPhoneme"] { --main: 17; }
+.big-game[data-game="initialSoundMC"], .big-game[data-game="phonemeSynthesis"], .big-game[data-game="soundOddOneOut"] { --card: 11; }
+.big-game[data-game="syllableRemoval"], .big-game[data-game="phonemeDeletion"] { --main: 13; }
+
+/* ---------- σελίδα ---------- */
+.big-game #app { max-width: min(1180px, 100%); }
+.big-game .game-screen { padding: clamp(4px, calc(var(--u) * 1), 16px); }
+.big-game .game-header { margin-bottom: clamp(0px, calc(var(--u) * .4), 8px); padding: clamp(2px, calc(var(--u) * .6), 10px) 0; }
+.big-game .game-header .game-header-title { font-size: clamp(1.4rem, calc(var(--u) * 4.4), 3rem); }
+.big-game .game-body { padding-top: clamp(4px, calc(var(--u) * 1.2), 20px); gap: clamp(8px, calc(var(--u) * 2), 28px); }
+.big-game .game-instruction { font-size: clamp(1.1rem, calc(var(--u) * 3.5), 2.2rem); max-width: min(900px, 94%); }
+.big-game .tap-area,
+.big-game .drag-area,
+.big-game .sorting-area,
+.big-game .elkonin-container,
+.big-game .sound-change-area { gap: clamp(8px, calc(var(--u) * 2), 28px); }
+.big-game .sentence-row .btn-small { font-size: clamp(.9rem, calc(var(--u) * 2.4), 1.4rem); padding: clamp(6px, calc(var(--u) * 1), 14px) clamp(10px, calc(var(--u) * 2), 26px); }
+.big-game .sentence-row .btn-icon { width: clamp(40px, calc(var(--u) * 6), 76px); height: clamp(40px, calc(var(--u) * 6), 76px); font-size: clamp(1.1rem, calc(var(--u) * 3), 1.9rem); }
+
+/* ---------- κάρτες επιλογής (εικόνα + λέξη) ---------- */
+.big-game .choices-grid { max-width: min(100%, calc(var(--u) * 150)); gap: clamp(10px, calc(var(--u) * 2.4), 28px); }
+.big-game .choice-card { padding: clamp(8px, calc(var(--u) * 2), 26px); gap: clamp(2px, calc(var(--u) * .8), 12px); justify-content: center; border-radius: clamp(14px, calc(var(--u) * 2.4), 30px); }
+.big-game .choice-card .choice-emoji { font-size: clamp(46px, calc(var(--u) * var(--card)), 200px); line-height: 1.15; display: flex; align-items: center; justify-content: center; }
+.big-game .choice-card .choice-emoji:only-child { font-size: clamp(50px, calc(var(--u) * var(--cardonly)), 230px); }
+.big-game .choice-card .choice-word { font-size: clamp(1.3rem, calc(var(--u) * 4.4), 3.2rem); }
+
+/* κάρτες μόνο με λέξη ή γράμμα */
+.big-game .choice-card .choice-word:only-child { font-size: clamp(1.5rem, calc(var(--u) * 5.2), 3.6rem); }
+.big-game[data-game="findInitialPhoneme"] .choice-card .choice-word:only-child,
+.big-game[data-game="findFinalPhoneme"] .choice-card .choice-word:only-child { font-size: clamp(2rem, calc(var(--u) * 9), 6rem); line-height: 1.1; }
+.big-game[data-game="findInitialPhoneme"] .choice-card,
+.big-game[data-game="findFinalPhoneme"] .choice-card { padding: clamp(10px, calc(var(--u) * 2.6), 34px); }
+.big-game[data-game="wordDeletion"] .choice-card .choice-word:only-child { font-size: clamp(1.15rem, calc(var(--u) * 4.2), 3rem); }
+.big-game[data-game="wordPosition"] .choice-card .choice-word:only-child { font-size: clamp(1.5rem, calc(var(--u) * 6.2), 4rem); }
+.big-game[data-game="wordPosition"] .choice-card, .big-game[data-game="wordDeletion"] .choice-card { padding: clamp(10px, calc(var(--u) * 2.4), 30px); }
+
+/* ---------- η κύρια εικόνα και η κύρια λέξη ---------- */
+.big-game .game-main-emoji { font-size: clamp(60px, calc(var(--u) * var(--main)), 210px); line-height: 1.1; }
+.big-game .game-main-word { font-size: clamp(2rem, calc(var(--u) * 7), 5rem); }
+
+/* ---------- κουτιά συλλαβών / λέξεων ---------- */
+.big-game .syllable-boxes { gap: clamp(8px, calc(var(--u) * 1.8), 24px); }
+.big-game .syllable-box { min-width: clamp(80px, calc(var(--u) * 15), 190px); min-height: clamp(70px, calc(var(--u) * 12), 150px); padding: clamp(8px, calc(var(--u) * 1.8), 24px); font-size: clamp(1.5rem, calc(var(--u) * 5.8), 4rem); border-radius: clamp(12px, calc(var(--u) * 2), 28px); }
+.big-game[data-game="wordPosition"] .syllable-box,
+.big-game[data-game="wordDeletion"] .syllable-box { font-size: clamp(1.2rem, calc(var(--u) * 5), 3.4rem); min-width: clamp(80px, calc(var(--u) * 16), 200px); }
+.big-game .wordsize-syllable-boxes .syllable-box-mini { min-width: clamp(34px, calc(var(--u) * 5), 64px); min-height: clamp(34px, calc(var(--u) * 5), 64px); }
+
+/* ---------- κουμπί πατήματος και αριθμοί (μέτρημα) ---------- */
+.big-game .tap-button { width: clamp(90px, calc(var(--u) * 19), 220px); height: clamp(90px, calc(var(--u) * 19), 220px); font-size: clamp(40px, calc(var(--u) * 8), 100px); }
+.big-game .number-choice-btn { width: clamp(56px, calc(var(--u) * 10), 130px); height: clamp(56px, calc(var(--u) * 10), 130px); font-size: clamp(1.5rem, calc(var(--u) * 5), 3.4rem); }
+.big-game .clap-number-choices { gap: clamp(8px, calc(var(--u) * 1.8), 24px); }
+
+/* ---------- σύρσιμο (πρόταση, συλλαβές, ομάδες, ήχοι) ---------- */
+.big-game .drop-zone { min-width: clamp(80px, calc(var(--u) * 19), 250px); min-height: clamp(60px, calc(var(--u) * 13), 170px); font-size: clamp(1.1rem, calc(var(--u) * 3.6), 2.6rem); }
+.big-game .drop-zone-container { gap: clamp(8px, calc(var(--u) * 1.6), 22px); min-height: clamp(80px, calc(var(--u) * 13), 170px); }
+.big-game .draggable-items { gap: clamp(8px, calc(var(--u) * 1.8), 24px); }
+.big-game .draggable-item { padding: clamp(8px, calc(var(--u) * 2), 28px) clamp(12px, calc(var(--u) * 3.2), 44px); font-size: clamp(1.1rem, calc(var(--u) * 5.2), 3.6rem); border-radius: clamp(12px, calc(var(--u) * 2), 26px); }
+.big-game .syllable-build-word { min-width: clamp(240px, calc(var(--u) * 52), 620px); min-height: clamp(70px, calc(var(--u) * 14), 170px); }
+.big-game .drop-zone-hint { font-size: clamp(.9rem, calc(var(--u) * 2.8), 1.8rem); }
+.big-game .clap-sentence { font-size: clamp(1.4rem, calc(var(--u) * 5.6), 3.8rem); max-width: min(900px, 94%); padding: clamp(10px, calc(var(--u) * 2.4), 30px); }
+
+/* ομαδοποίηση ήχων */
+.big-game .sort-categories { gap: clamp(8px, calc(var(--u) * 2), 28px); }
+.big-game .sort-category { min-width: clamp(140px, calc(var(--u) * 26), 340px); max-width: clamp(220px, calc(var(--u) * 38), 480px); min-height: clamp(150px, calc(var(--u) * 33), 420px); }
+.big-game .sort-category-label { font-size: clamp(1.5rem, calc(var(--u) * 5), 3.4rem); }
+.big-game .sort-items-source { gap: clamp(8px, calc(var(--u) * 1.8), 24px); }
+.big-game .sort-draggable { padding: clamp(8px, calc(var(--u) * 1.6), 22px); gap: clamp(2px, calc(var(--u) * .6), 8px); }
+.big-game .sort-draggable .sort-emoji { font-size: clamp(2rem, calc(var(--u) * 10), 7rem); line-height: 1.15; }
+.big-game .sort-draggable .sort-word { font-size: clamp(.9rem, calc(var(--u) * 2.8), 1.9rem); }
+
+/* κουτιά και ήχοι (Elkonin, φωνήματα) */
+.big-game .elkonin-boxes { gap: clamp(6px, calc(var(--u) * 1.4), 20px); }
+.big-game .elkonin-box { width: clamp(64px, calc(var(--u) * 14), 180px); height: clamp(64px, calc(var(--u) * 14), 180px); border-radius: clamp(12px, calc(var(--u) * 2), 28px); }
+.big-game .phoneme-tokens-source { gap: clamp(8px, calc(var(--u) * 1.8), 24px); }
+.big-game .phoneme-draggable { width: clamp(56px, calc(var(--u) * 11), 150px); height: clamp(56px, calc(var(--u) * 11), 150px); font-size: clamp(1.3rem, calc(var(--u) * 5), 3.6rem); }
+.big-game .phoneme-bubble { width: clamp(48px, calc(var(--u) * 9), 120px); height: clamp(48px, calc(var(--u) * 9), 120px); font-size: clamp(1.2rem, calc(var(--u) * 4.2), 3rem); }
+.big-game .phoneme-display { gap: clamp(8px, calc(var(--u) * 1.8), 24px); }
+.big-game .letter-display { gap: clamp(4px, calc(var(--u) * 1), 14px); }
+.big-game .letter-box { width: clamp(56px, calc(var(--u) * 11), 150px); height: clamp(64px, calc(var(--u) * 13), 170px); font-size: clamp(1.6rem, calc(var(--u) * 6.4), 4.4rem); }
+
+/* κουμπιά «Τα κατάφερε / Χρειάζεται βοήθεια» και τα υπόλοιπα κουμπιά του σταδίου */
+.big-game .tap-controls .btn,
+.big-game .round-footer .btn { font-size: clamp(1rem, calc(var(--u) * 3), 1.9rem); padding: clamp(8px, calc(var(--u) * 1.6), 22px) clamp(16px, calc(var(--u) * 3.4), 44px); }
+
+/* ---------- μικρές οθόνες: όσα μεγάλωσαν πολύ να μη βγουν εκτός ---------- */
+@media (max-width: 520px) {
+    .big-game .choices-grid { gap: 10px; }
+    .big-game .choice-card { padding: 8px; }
+}
