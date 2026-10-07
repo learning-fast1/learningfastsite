@@ -856,7 +856,14 @@ Phono.helpers = {
         const elem = document.createElement(tag);
         Object.entries(attrs).forEach(([key, val]) => {
             if (key === 'className') elem.className = val;
-            else if (key === 'textContent') elem.textContent = val;
+            else if (key === 'textContent') {
+                // a picture with our own image (see js/pictures.js): show the image instead of the emoji
+                if (val instanceof String && val.img) {
+                    const im = document.createElement('img');
+                    im.className = 'pic-img'; im.src = val.img; im.alt = ''; im.draggable = false;
+                    elem.appendChild(im);
+                } else elem.textContent = val;
+            }
             else if (key === 'innerHTML') elem.innerHTML = val;
             else if (key.startsWith('on')) elem.addEventListener(key.slice(2).toLowerCase(), val);
             else if (key === 'style' && typeof val === 'object') Object.assign(elem.style, val);

@@ -2458,3 +2458,6 @@ input {
         display: none;
     }
 }
+
+/* our own pictures (js/pictures.js) sit where the emoji sat, sized from the same font-size */
+.pic-img { height: 1.15em; width: auto; max-width: 1.7em; object-fit: contain; vertical-align: middle; pointer-events: none; -webkit-user-drag: none; }
