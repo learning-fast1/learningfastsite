@@ -27,11 +27,14 @@
     // τα κλειδιά περνούν από την ίδια fold() (π.χ. το τελικό ς γίνεται σ), ώστε να ταιριάζουν με τις λέξεις του παιχνιδιού
     const MAP = {}; Object.keys(PICS).forEach((k) => { MAP[fold(k)] = PICS[k]; });
 
+    // αύξησε τον αριθμό όταν αλλάζεις κάποια εικόνα, για να την ξαναφορτώσουν οι browsers
+    const V = 2;
+
     const wrap = (emoji, word) => {
         const file = MAP[fold(word)];
         if (!file || !emoji) return emoji;
         const s = new String(String(emoji));
-        s.img = 'img/pics/' + file + '.png';
+        s.img = 'img/pics/' + file + '.png?v=' + V;
         return s;
     };
 
@@ -47,7 +50,7 @@
     // προφόρτωση, λίγο μετά την εκκίνηση και μία-μία, ώστε να μη καθυστερεί η πρώτη οθόνη
     try {
         const files = [...new Set(Object.values(PICS))];
-        let k = 0; const tick = () => { if (k >= files.length) return; const i = new Image(); i.src = 'img/pics/' + files[k++] + '.png'; setTimeout(tick, 120); };
+        let k = 0; const tick = () => { if (k >= files.length) return; const i = new Image(); i.src = 'img/pics/' + files[k++] + '.png?v=' + V; setTimeout(tick, 120); };
         setTimeout(tick, 2500);
     } catch (e) {}
 
