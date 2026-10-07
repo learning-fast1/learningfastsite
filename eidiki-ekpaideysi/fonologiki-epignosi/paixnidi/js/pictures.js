@@ -54,16 +54,17 @@
         'τουρτα': 'tourta', 'τρακτερ': 'trakter', 'τραπεζι': 'trapezi', 'τρενο': 'treno', 'τριγωνο': 'trigono', 'τσαντα': 'tsada', 'τυρι': 'tyri',
         'φακοσ': 'fakos', 'φαλαινα': 'falaina', 'φαναρι': 'fanari', 'φασολι': 'fasoli', 'φεγγαρι': 'fengari', 'φιδι': 'fidi', 'φλιτζανι': 'flitzani',
         'φραουλα': 'fraoula', 'φτερο': 'ftero', 'φυλλο': 'fyllo', 'φυλο': 'fylo', 'φωκια': 'fokia', 'φωσ': 'fos', 'φωτια': 'fotia',
-        'χαμογελο': 'chamogelo', 'χαρταετοσ': 'chartaetos', 'χαρτησ': 'chartis', 'χαρτι': 'charti', 'χελιδονι': 'chelidoni', 'χελωνα': 'xelona',
-        'χερι': 'cheri', 'χιονανθρωποσ': 'chionanthropos', 'χιονι': 'chioni', 'χοροσ': 'choros', 'χταποδι': 'xtapodi', 'ψαλιδι': 'psalidi',
-        'ψαρασ': 'psaras', 'ψαρι': 'psari', 'ψητο': 'psito', 'ψιλλοσ': 'psillos', 'ψιψινα': 'gata', 'ψυγειο': 'psygeio', 'ψωμι': 'psomi',
+        'χαμογελο': 'chamogelo', 'χαρταετοσ': 'chartaetos', 'χαρτησ': 'chartis', 'χαρτι': 'charti', 'χελι': 'cheli', 'χελιδονι': 'chelidoni',
+        'χελωνα': 'xelona', 'χερι': 'cheri', 'χιονανθρωποσ': 'chionanthropos', 'χιονι': 'chioni', 'χοροσ': 'choros', 'χταποδι': 'xtapodi',
+        'ψαλιδι': 'psalidi', 'ψαρασ': 'psaras', 'ψαρι': 'psari', 'ψητο': 'psito', 'ψιλλοσ': 'psillos', 'ψιψινα': 'gata', 'ψυγειο': 'psygeio',
+        'ψωμι': 'psomi',
     };
 
     // τα κλειδιά περνούν από την ίδια fold() (π.χ. το τελικό ς γίνεται σ), ώστε να ταιριάζουν με τις λέξεις του παιχνιδιού
     const MAP = {}; Object.keys(PICS).forEach((k) => { MAP[fold(k)] = PICS[k]; });
 
     // αύξησε τον αριθμό όταν αλλάζεις κάποια εικόνα, για να την ξαναφορτώσουν οι browsers
-    const V = 10;
+    const V = 11;
 
     const wrap = (emoji, word) => {
         const file = MAP[fold(word)];
