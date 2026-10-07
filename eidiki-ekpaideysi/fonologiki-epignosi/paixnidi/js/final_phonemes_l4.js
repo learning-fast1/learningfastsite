@@ -42,7 +42,6 @@ Phono.data.finalPhonemesL4 = [
 
     { word: "μαϊμού", final: "ου", type: "vowel", imageable: true, emoji: "🐒" },
     { word: "αλεπού", final: "ου", type: "vowel", imageable: true, emoji: "🦊" },
-    { word: "παπού", final: "ου", type: "vowel", imageable: true, emoji: "👴" },
 
     { word: "κεφαλή", final: "η", type: "vowel", imageable: true, emoji: "🙂" },
     { word: "αυγή", final: "η", type: "vowel", imageable: true, emoji: "🌅" },
