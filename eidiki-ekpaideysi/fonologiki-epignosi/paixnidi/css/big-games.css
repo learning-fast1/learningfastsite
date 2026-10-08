@@ -105,3 +105,8 @@
 
 .choices-grid.words-hidden .choice-word { display: none; }
 .big-game[data-game="phonemeSynthesis"] { --card: 14; }
+/* Μέτρα τις Συλλαβές: εικόνα + λέξη + τύμπανο + αριθμοί πρέπει να χωράνε μαζί */
+.big-game[data-game="syllableCounting"] { --main: 9; }
+.big-game[data-game="syllableCounting"] .game-main-word { font-size: clamp(1.6rem, calc(var(--u) * 5.2), 3.4rem); line-height: 1.1; }
+.big-game[data-game="syllableCounting"] .tap-button { width: clamp(70px, calc(var(--u) * 13), 150px); height: clamp(70px, calc(var(--u) * 13), 150px); }
+.big-game[data-game="syllableCounting"] .tap-area { gap: clamp(4px, calc(var(--u) * .9), 14px); }

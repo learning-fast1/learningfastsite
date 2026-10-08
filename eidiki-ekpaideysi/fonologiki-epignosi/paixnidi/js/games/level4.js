@@ -155,7 +155,7 @@ Phono.games.findInitialPhoneme = {
             }),
             el('button', {
                 className: 'btn btn-secondary btn-small',
-                textContent: '🔒 Λέξεις (δάσκαλος)',
+                textContent: '🔒 Λέξεις (δάσκαλος/α)',
                 onClick: () => this.showWordList(),
             }),
         ]);
@@ -579,7 +579,7 @@ Phono.games.findFinalPhoneme = {
             }),
             el('button', {
                 className: 'btn btn-secondary btn-small',
-                textContent: '🔒 Λέξεις (δάσκαλος)',
+                textContent: '🔒 Λέξεις (δάσκαλος/α)',
                 onClick: () => this.showWordList(),
             }),
         ]);

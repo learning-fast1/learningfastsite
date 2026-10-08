@@ -8,7 +8,7 @@
         (Phono.audio.speak / speakSyllables, lang el-GR), με 🔊 επανάληψη.
         Εξαίρεση: το "Ένωσε τις Συλλαβές" δεν έχει καθόλου ήχο από την
         εφαρμογή — τις συλλαβές τις λέει ο ίδιος ο εκπαιδευτικός, αφού
-        δει όλες τις λέξεις της συνεδρίας από το "🔒 Λέξεις (δάσκαλος)".
+        δει όλες τις λέξεις της συνεδρίας από το "🔒 Λέξεις (δάσκαλος/α)".
      2. Κάθε προσπάθεια καταγράφεται στο Phono.sessionLog.
      3. Όλα τα ερεθίσματα τραβιούνται από τον ενιαίο πίνακα
         Phono.data.wordsL2 (js/words_l2.js), φιλτραρισμένα κατά stage.
@@ -64,18 +64,13 @@ Phono.games.syllableCounting = {
         const instruction = el('p', { className: 'game-instruction', textContent: 'Χτύπα για κάθε συλλαβή της λέξης!' });
         const emojiDiv = el('div', { className: 'game-main-emoji', textContent: this.currentWord.emoji });
 
-        // The written word stays hidden by default (common rule #2) — only
-        // the picture + audio identify it. The therapist can still peek
-        // via the lock button below, independent of the toggle.
+        // The written word is shown under the picture, so the child sees
+        // the word while counting its syllables.
+        const wordDiv = el('div', { className: 'game-main-word', textContent: this.currentWord.word });
         const wordRow = el('div', { className: 'sentence-row' }, [
             this.createVoiceToggle(),
             this.createRepeatButton(() => Phono.audio.speak(this.currentWord.word)),
         ]);
-        const revealBtn = el('button', {
-            className: 'btn btn-secondary btn-small',
-            textContent: '🔒 Λέξεις (δάσκαλος)',
-            onClick: () => this.showWordList(),
-        });
         const modeBtn = el('button', {
             className: 'btn btn-secondary btn-small',
             textContent: this.hardMode ? 'Χωρίς βοήθεια (χωρίς τελείες)' : 'Βοήθεια - τελείες',
@@ -155,51 +150,11 @@ Phono.games.syllableCounting = {
         checkArea.appendChild(choicesDiv);
 
         this.container.appendChild(el('div', { className: 'tap-area compact-tap-area' }, [
-            instruction, emojiDiv, wordRow,
-            el('div', { className: 'sentence-row' }, [revealBtn, modeBtn]),
+            instruction, emojiDiv, wordDiv, wordRow,
+            el('div', { className: 'sentence-row' }, [modeBtn]),
             counterDiv, tapBtn, tapControls, checkArea,
         ]));
         Phono.audio.speak(this.currentWord.word);
-    },
-
-    /** Teacher-only word list for the WHOLE session, not just the current
-     * round — same reasoning and fixed-overlay pattern as
-     * syllableSynthesis.showWordList. */
-    showWordList() {
-        const { el } = Phono.helpers;
-        const close = () => overlay.remove();
-
-        const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', textAlign: 'left' } });
-        this.roundWords.forEach((w, i) => {
-            const isCurrent = i === Phono.engine.currentRound;
-            list.appendChild(el('div', {
-                style: {
-                    display: 'flex', justifyContent: 'space-between', gap: 'var(--space-md)',
-                    padding: 'var(--space-xs) var(--space-sm)', borderRadius: 'var(--radius-md)',
-                    background: isCurrent ? 'var(--primary-light)' : 'transparent',
-                    fontWeight: isCurrent ? '800' : '600',
-                },
-            }, [
-                el('span', { textContent: `${i + 1}. ${w.word}` }),
-                el('span', { textContent: `${w.syllables.join('-')} (${w.syllables.length})`, style: { color: 'var(--text-secondary)' } }),
-            ]));
-        });
-
-        const overlay = el('div', {
-            className: 'teacher-note-overlay',
-            onClick: (e) => { if (e.target === overlay) close(); },
-        }, [
-            el('div', { className: 'teacher-note-card' }, [
-                el('div', { className: 'teacher-note-title', textContent: '🔒 Λέξεις της συνεδρίας' }),
-                el('p', {
-                    textContent: 'Σημείωσε τις λέξεις ή βγάλε τις φωτογραφία για να τις διαβάζεις στο παιδί.',
-                    style: { color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' },
-                }),
-                list,
-                el('button', { className: 'btn btn-primary', textContent: 'Κατάλαβα', onClick: close, style: { marginTop: 'var(--space-lg)' } }),
-            ]),
-        ]);
-        document.getElementById('app').appendChild(overlay);
     },
 
     handleTap() {
@@ -317,7 +272,7 @@ Phono.games.syllableSynthesis = {
         const controlsRow = el('div', { className: 'sentence-row' }, [
             el('button', {
                 className: 'btn btn-secondary btn-small',
-                textContent: '🔒 Λέξεις (δάσκαλος)',
+                textContent: '🔒 Λέξεις (δάσκαλος/α)',
                 onClick: () => this.showWordList(),
             }),
         ]);
@@ -518,7 +473,7 @@ Phono.games.syllableSplit = {
         const controlsRow = el('div', { className: 'sentence-row' }, [
             el('button', {
                 className: 'btn btn-secondary btn-small',
-                textContent: '🔒 Λέξεις (δάσκαλος)',
+                textContent: '🔒 Λέξεις (δάσκαλος/α)',
                 onClick: () => this.showWordList(),
             }),
         ]);
@@ -698,7 +653,7 @@ Phono.games.syllableRemoval = {
         const controlsRow = el('div', { className: 'sentence-row' }, [
             el('button', {
                 className: 'btn btn-secondary btn-small',
-                textContent: '🔒 Λέξεις (δάσκαλος)',
+                textContent: '🔒 Λέξεις (δάσκαλος/α)',
                 onClick: () => this.showWordList(),
             }),
         ]);
