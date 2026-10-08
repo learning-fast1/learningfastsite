@@ -67,7 +67,7 @@
         'φραουλα': 'fraoula', 'φρυδι': 'frydi', 'φτερο': 'ftero', 'φυλλο': 'fyllo', 'φυλο': 'fylo', 'φωκια': 'fokia', 'φωσ': 'fos', 'φωτια': 'fotia',
         'χαλι': 'chali', 'χαμογελο': 'chamogelo', 'χαρταετοσ': 'chartaetos', 'χαρτησ': 'chartis', 'χαρτι': 'charti', 'χελι': 'cheli',
         'χελιδονι': 'chelidoni', 'χελωνα': 'xelona', 'χερι': 'cheri', 'χιονανθρωποσ': 'chionanthropos', 'χιονι': 'chioni', 'χορο': 'choro',
-        'χοροσ': 'choros', 'χταποδι': 'xtapodi', 'χτενα': 'chtena', 'ψαλιδα': 'psalidi', 'ψαλιδι': 'psalidi', 'ψαρασ': 'psaras', 'ψαρι': 'psari',
+        'χοροσ': 'choros', 'χταποδι': 'xtapodi', 'χτενα': 'chtena', 'ψαλιδι': 'psalidi', 'ψαρασ': 'psaras', 'ψαρι': 'psari',
         'ψητο': 'psito', 'ψιλλοσ': 'psillos', 'ψιψινα': 'gata', 'ψυγειο': 'psygeio', 'ψυλλοσ': 'psillos', 'ψωμακι': 'psomi', 'ψωμι': 'psomi',
         'ψωνια': 'psonia',
     };

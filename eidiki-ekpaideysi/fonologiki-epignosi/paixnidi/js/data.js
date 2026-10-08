@@ -277,7 +277,6 @@ Phono.data = {
         { word: "ψαράς", syllables: ["ψα", "ράς"], phonemes: ["ψ", "α", "ρ", "α", "σ"], emoji: "🎣", initialSound: "ψ", category: "αντικείμενα" },
         { word: "ψιψίνα", syllables: ["ψι", "ψί", "να"], phonemes: ["ψ", "ι", "ψ", "ι", "ν", "α"], emoji: "🐱", initialSound: "ψ", category: "ζώα" },
         { word: "ψητό", syllables: ["ψη", "τό"], phonemes: ["ψ", "η", "τ", "ο"], emoji: "🍖", initialSound: "ψ", category: "τρόφιμα" },
-        { word: "ψαλίδα", syllables: ["ψα", "λί", "δα"], phonemes: ["ψ", "α", "λ", "ι", "δ", "α"], emoji: "🐛", initialSound: "ψ", category: "ζώα" },
         { word: "ψύλλος", syllables: ["ψύλ", "λος"], phonemes: ["ψ", "ι", "λ", "ο", "σ"], emoji: "🦟", initialSound: "ψ", category: "ζώα" },
     ],
 
