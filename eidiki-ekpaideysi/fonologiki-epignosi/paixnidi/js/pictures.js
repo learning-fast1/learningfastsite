@@ -76,7 +76,7 @@
     const MAP = {}; Object.keys(PICS).forEach((k) => { MAP[fold(k)] = PICS[k]; });
 
     // αύξησε τον αριθμό όταν αλλάζεις κάποια εικόνα, για να την ξαναφορτώσουν οι browsers
-    const V = 15;
+    const V = 16;
 
     const wrap = (emoji, word) => {
         const file = MAP[fold(word)];
