@@ -33,14 +33,12 @@ Phono.data.rhymesL3 = [
     { word: "πουλί", family: "ί", easy: true, emoji: "🐦" },
     { word: "κλειδί", family: "ί", easy: true, emoji: "🔑" },
     { word: "χαρτί", family: "ί", easy: true, emoji: "📄" },
-    { word: "σκουπί", family: "ί", easy: true, emoji: "🧹" },
 
     // FAMILY "ό" — oxytone, stress on the final -ό
     { word: "νερό", family: "ό", easy: false, emoji: "💧" },
     { word: "μωρό", family: "ό", easy: false, emoji: "👶" },
     { word: "φτερό", family: "ό", easy: false, emoji: "🪶" },
     { word: "γλυκό", family: "ό", easy: false, emoji: "🍬" },
-    { word: "κερό", family: "ό", easy: false, emoji: "🕯️" },
     { word: "χορό", family: "ό", easy: false, emoji: "💃" },
 
     // FAMILY "άτα" — stress on the penultimate syllable, -άτα
