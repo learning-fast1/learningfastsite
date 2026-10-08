@@ -334,7 +334,18 @@ Phono.games.syllableSynthesis = {
             ...distractors.map(d => Object.assign({}, d, { correct: false })),
         ]);
 
-        const choicesGrid = el('div', { className: 'choices-grid' });
+        // The words under the pictures are hidden so the child finds the
+        // picture by sound, not by reading. "Βοήθεια" shows them.
+        const choicesGrid = el('div', { className: 'choices-grid words-hidden' });
+        const helpBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: 'Βοήθεια',
+            onClick: () => {
+                const hidden = choicesGrid.classList.toggle('words-hidden');
+                helpBtn.textContent = hidden ? 'Βοήθεια' : 'Κρύψε τις λέξεις';
+            },
+        });
+        controlsRow.appendChild(helpBtn);
         choices.forEach(choice => {
             const card = el('div', { className: 'choice-card', onClick: () => this.checkAnswer(card) }, [
                 el('span', { className: 'choice-emoji', textContent: choice.emoji }),
