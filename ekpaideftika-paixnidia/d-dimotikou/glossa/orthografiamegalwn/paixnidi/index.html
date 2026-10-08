@@ -93,6 +93,27 @@
   body.in-game .header-title img { height: clamp(32px, 4vw, 44px); }
   body.in-game .header-title h1 { font-size: clamp(1rem, 2.4vw, 1.4rem); }
 
+  /* Οθόνη αποτελεσμάτων: συμπαγής κεφαλίδα και κάρτα, ώστε το «Παίξε Ξανά» να φαίνεται χωρίς scroll */
+  body.in-result .header { margin-bottom: 8px; }
+  body.in-result .site-back-link { margin-bottom: 4px; padding: 4px 12px; }
+  body.in-result .header-title { flex-direction: row; gap: 10px; margin-bottom: 2px; }
+  body.in-result .header-title img { height: clamp(32px, 4vw, 44px); }
+  body.in-result .header-title h1 { font-size: clamp(1.1rem, 2.6vw, 1.6rem); }
+  body.in-result .result-card { padding: 28px 36px; }
+  body.in-result .result-emoji { font-size: 3.2rem; margin-bottom: 6px; }
+  body.in-result .result-card h2 { font-size: 1.7rem; margin-bottom: 4px; }
+  body.in-result .result-score { font-size: 3rem; margin: 6px 0; }
+  body.in-result .result-meta { margin-bottom: 16px; }
+  @media (max-height: 720px) {
+    body.in-result .result-card { padding: 16px 30px; }
+    body.in-result .result-emoji { font-size: 2.4rem; margin-bottom: 2px; }
+    body.in-result .result-card h2 { font-size: 1.4rem; }
+    body.in-result .result-score { font-size: 2.3rem; margin: 2px 0; }
+    body.in-result #res-score2 { font-size: 1.6rem !important; margin: 0 0 4px !important; }
+    body.in-result .result-meta { margin-bottom: 10px; font-size: .9rem; }
+    body.in-result .btn-primary { padding: 12px 32px; }
+  }
+
   /* ─── MENU ─── */
   #screen-menu { display: flex; flex-direction: column; align-items: center; gap: 24px; }
 
@@ -860,31 +881,31 @@ const endingsData = [
   { article: "οι",  pre: "θρόν",     post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
   { article: "οι",  pre: "μύθ",      post: "",  answer: "οι", options: ["οι","ει","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
   // ── Ονομαστική πληθ. αρσενικών σε -ης → -ες ──────────
-  { article: "οι",  pre: "μαθητ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
-  { article: "οι",  pre: "αθλητ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
-  { article: "οι",  pre: "πολίτ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
-  { article: "οι",  pre: "εργάτ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
-  { article: "οι",  pre: "επιβάτ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
-  { article: "οι",  pre: "ποιητ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
-  { article: "οι",  pre: "κριτ",     post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
-  { article: "οι",  pre: "πελάτ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
-  { article: "οι",  pre: "στρατιώτ", post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
-  { article: "οι",  pre: "τεχνίτ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "μαθητ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "αθλητ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "πολίτ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "εργάτ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "επιβάτ",   post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "ποιητ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "κριτ",     post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "πελάτ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "στρατιώτ", post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
+  { article: "οι",  pre: "τεχνίτ",   post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, αρσενικό" },
   // ── Ονομαστική πληθ. θηλυκών (1η κλίση) → -ες ────────
-  { article: "οι",  pre: "γυναίκ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "καρέκλ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "ντομάτ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "πατάτ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "αδελφ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "μαμάδ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "μπάλ",     post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "κούκλ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "πόρτ",     post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "σκάλ",     post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "βάρκ",     post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "τσάντ",    post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "γάτ",      post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
-  { article: "οι",  pre: "ομπρέλ",   post: "ς", answer: "ε",  options: ["ε","αι","η","ι"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "γυναίκ",   post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "καρέκλ",   post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "ντομάτ",   post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "πατάτ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "αδελφ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "μαμάδ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "μπάλ",     post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "κούκλ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "πόρτ",     post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "σκάλ",     post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "βάρκ",     post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "τσάντ",    post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "γάτ",      post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
+  { article: "οι",  pre: "ομπρέλ",   post: "",  answer: "ες", options: ["ες","αις","ης","ις"],  hint: "Ονομαστική, πληθυντικός, θηλυκό" },
   // ── Ονομαστική πληθ. θηλυκών (3η κλίση) → -εις ───────
   { article: "οι",  pre: "τάξ",      post: "",  answer: "εις", options: ["εις","ης","οις","ις"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
   { article: "οι",  pre: "δυνάμ",    post: "",  answer: "εις", options: ["εις","ης","οις","ις"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
@@ -899,29 +920,29 @@ const endingsData = [
   { article: "οι",  pre: "εκφράσ",   post: "",  answer: "εις", options: ["εις","ης","οις","ις"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
   { article: "οι",  pre: "εξηγήσ",   post: "",  answer: "εις", options: ["εις","ης","οις","ις"], hint: "Ονομαστική, πληθυντικός, θηλυκό" },
   // ── Γενική πληθ. αρσενικών → -ων ──────────────────────
-  { article: "των", pre: "δασκάλ",   post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "δρόμ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "φίλ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "μαθητ",    post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "κήπ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "λύκ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "βράχ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "σκύλ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "πύργ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "κόσμ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "τρόπ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
-  { article: "των", pre: "τόπ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "δασκάλ",   post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "δρόμ",     post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "φίλ",      post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "μαθητ",    post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "κήπ",      post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "λύκ",      post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "βράχ",     post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "σκύλ",     post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "πύργ",     post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "κόσμ",     post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "τρόπ",     post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
+  { article: "των", pre: "τόπ",      post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, αρσενικό" },
   // ── Γενική πληθ. θηλυκών (1η κλίση) → -ων ────────────
-  { article: "των", pre: "γυναικ",   post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
-  { article: "των", pre: "αδελφ",    post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
-  { article: "των", pre: "χωρ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
-  { article: "των", pre: "φων",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
-  { article: "των", pre: "μαμάδ",    post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
-  { article: "των", pre: "γατ",      post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
-  { article: "των", pre: "πορτ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
-  { article: "των", pre: "βαρκ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
-  { article: "των", pre: "σκαλ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
-  { article: "των", pre: "μπαλ",     post: "ν", answer: "ω",  options: ["ω","ο","ου"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "γυναικ",   post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "αδελφ",    post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "χωρ",      post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "φων",      post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "μαμάδ",    post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "γατ",      post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "πορτ",     post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "βαρκ",     post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "σκαλ",     post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, θηλυκό" },
+  { article: "των", pre: "μπαλ",     post: "",  answer: "ων", options: ["ων","ον","ουν"],      hint: "Γενική, πληθυντικός, θηλυκό" },
   // ── Γενική πληθ. θηλυκών (3η κλίση) → -εων ───────────
   { article: "των", pre: "τάξ",      post: "",   answer: "εων", options: ["εων","αιων","ηων","ιων"],  hint: "Γενική, πληθυντικός, θηλυκό" },
   { article: "των", pre: "δυνάμ",    post: "",   answer: "εων", options: ["εων","αιων","ηων","ιων"],  hint: "Γενική, πληθυντικός, θηλυκό" },
@@ -976,6 +997,7 @@ function show(id) {
   ['screen-menu','screen-game','screen-game-2p','screen-result'].forEach(s => document.getElementById(s).style.display = 'none');
   document.getElementById(id).style.display = (id === 'screen-menu') ? 'flex' : 'block';
   document.body.classList.toggle('in-game', id === 'screen-game' || id === 'screen-game-2p');
+  document.body.classList.toggle('in-result', id === 'screen-result');
 }
 
 function goMenu() {
@@ -1043,6 +1065,7 @@ function startGame(m, totalQ) {
     }, 0);
     show('screen-game-2p');
     render2P();
+    updateStats2P();
   } else {
     astroPos = 0;
     const track = document.getElementById('astro-track');
