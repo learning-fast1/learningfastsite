@@ -1145,12 +1145,13 @@ function checkAnswer(chosen, correct, btn, pNum) {
       updateStats();
       reinforceCategory(correct);
       if (lives <= 0) {
+        updateAstronaut(true, true);
         document.querySelectorAll('#answers .ans-btn').forEach(b => {
           if (b.textContent.toLowerCase() === correct.toLowerCase()) b.classList.add('correct');
           b.disabled = true;
         });
         if (blank) { blank.textContent = correct; blank.classList.add('filled-wrong'); }
-        setTimeout(() => showResult(), 1400);
+        setTimeout(() => showResult(), 2200);
       }
     }
 
@@ -1260,9 +1261,13 @@ function showResult() {
 /* ══════════════════════════════════════════════
    UTILS
 ══════════════════════════════════════════════ */
-function updateAstronaut(correct) {
-  if (correct) astroPos = Math.min(astroPos + 1, 10);
-  else         astroPos = Math.max(astroPos - 1, 0);
+// Ο πύραυλος δείχνει πόσο προχώρησε ο γύρος: κάθε ερώτηση που ολοκληρώνεται τον
+// πηγαίνει ένα βήμα πιο κοντά, ώστε να φτάνει στη Γη ακριβώς με το τέλος του γύρου.
+// Το λάθος δεν τον γυρνά πίσω (μόνο αναβοσβήνει κόκκινος). arrive = true τον στέλνει
+// κατευθείαν στη Γη (όταν ο γύρος τελειώνει νωρίτερα, π.χ. χωρίς ζωές).
+function updateAstronaut(correct, arrive) {
+  if (arrive) astroPos = TOTAL_Q;
+  else if (correct) astroPos = Math.min(qIndex + 1, TOTAL_Q);
   const ship  = document.getElementById('astro-ship');
   const path  = document.getElementById('astro-path');
   const track = document.getElementById('astro-track');
@@ -1395,11 +1400,12 @@ function checkAnswer2P(chosen, correct, btn, pNum) {
   }
 }
 
+// Όπως στον έναν παίκτη: ο πύραυλος κάθε παίκτη προχωρά με κάθε ερώτηση που
+// απαντά σωστά, και φτάνει στη Γη με το τέλος του γύρου. Το λάθος δεν τον γυρνά πίσω.
 function updateMiniRocket(pNum, correct) {
-  if (pNum === 1) {
-    astroPos1 = correct ? Math.min(astroPos1+1, TOTAL_Q) : Math.max(astroPos1-1, 0);
-  } else {
-    astroPos2 = correct ? Math.min(astroPos2+1, TOTAL_Q) : Math.max(astroPos2-1, 0);
+  if (correct) {
+    if (pNum === 1) astroPos1 = Math.min(qIndex + 1, TOTAL_Q);
+    else            astroPos2 = Math.min(qIndex + 1, TOTAL_Q);
   }
   const p    = pNum === 1 ? 'p1' : 'p2';
   const pos  = pNum === 1 ? astroPos1 : astroPos2;
