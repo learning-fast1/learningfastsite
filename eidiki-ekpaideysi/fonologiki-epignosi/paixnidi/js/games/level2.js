@@ -180,7 +180,7 @@ Phono.games.syllableCounting = {
                     fontWeight: isCurrent ? '800' : '600',
                 },
             }, [
-                el('span', { textContent: `${i + 1}. ${w.emoji} ${w.word}` }),
+                el('span', { textContent: `${i + 1}. ${w.word}` }),
                 el('span', { textContent: `${w.syllables.join('-')} (${w.syllables.length})`, style: { color: 'var(--text-secondary)' } }),
             ]));
         });
@@ -381,7 +381,7 @@ Phono.games.syllableSynthesis = {
                     fontWeight: isCurrent ? '800' : '600',
                 },
             }, [
-                el('span', { textContent: `${i + 1}. ${w.emoji} ${w.word}` }),
+                el('span', { textContent: `${i + 1}. ${w.word}` }),
                 el('span', { textContent: w.syllables.join('-'), style: { color: 'var(--text-secondary)' } }),
             ]));
         });
@@ -583,7 +583,7 @@ Phono.games.syllableSplit = {
                     fontWeight: isCurrent ? '800' : '600',
                 },
             }, [
-                el('span', { textContent: `${i + 1}. ${w.emoji} ${w.word}` }),
+                el('span', { textContent: `${i + 1}. ${w.word}` }),
                 el('span', { textContent: `${w.syllables.join('-')} (παγίδα: ${w.splitTrap})`, style: { color: 'var(--text-secondary)' } }),
             ]));
         });

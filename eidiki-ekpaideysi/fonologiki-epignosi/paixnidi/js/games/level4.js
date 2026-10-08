@@ -196,7 +196,7 @@ Phono.games.findInitialPhoneme = {
                     fontWeight: isCurrent ? '800' : '600',
                 },
             }, [
-                el('span', { textContent: `${i + 1}. ${w.emoji} ${w.word}` }),
+                el('span', { textContent: `${i + 1}. ${w.word}` }),
                 el('span', { textContent: `/${w.initial}/`, style: { color: 'var(--text-secondary)' } }),
             ]));
         });
@@ -623,7 +623,7 @@ Phono.games.findFinalPhoneme = {
                     fontWeight: isCurrent ? '800' : '600',
                 },
             }, [
-                el('span', { textContent: `${i + 1}. ${w.emoji} ${w.word}` }),
+                el('span', { textContent: `${i + 1}. ${w.word}` }),
                 el('span', { textContent: `/${w.final}/`, style: { color: 'var(--text-secondary)' } }),
             ]));
         });

@@ -353,6 +353,10 @@ Phono.games.elkoninBoxes = {
         const emojiDiv = el('div', { className: 'game-main-emoji', textContent: this.currentWord.emoji });
         const wordDiv = el('div', { className: 'game-main-word', textContent: this.currentWord.word, style: { fontSize: 'var(--text-2xl)' } });
 
+        // The written word is only a model: it shows for 3 seconds, then
+        // disappears (the space stays) so the child builds it from the sounds.
+        Phono.helpers.later(() => { wordDiv.style.visibility = 'hidden'; }, 3000);
+
         const boxesDiv = el('div', { className: 'elkonin-boxes', id: 'elkonin-boxes' });
         this.currentWord.phonemes.forEach((ph, i) => {
             const box = el('div', {
@@ -592,7 +596,7 @@ Phono.games.phonemeDeletion = {
                     fontWeight: isCurrent ? '800' : '600',
                 },
             }, [
-                el('span', { textContent: `${i + 1}. ${item.emoji} ${item.word} (χωρίς /${phoneme}/)` }),
+                el('span', { textContent: `${i + 1}. ${item.word} (χωρίς /${phoneme}/)` }),
                 el('span', { textContent: `→ ${remaining}`, style: { color: 'var(--text-secondary)' } }),
             ]));
         });

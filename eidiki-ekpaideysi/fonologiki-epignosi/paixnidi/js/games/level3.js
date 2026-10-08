@@ -114,8 +114,8 @@ Phono.games.findRhyme = {
                     fontWeight: isCurrent ? '800' : '600',
                 },
             }, [
-                el('span', { textContent: `${i + 1}. ${baseMeta.emoji} ${item.base}` }),
-                el('span', { textContent: `→ ${correctMeta.emoji} ${item.correct}`, style: { color: 'var(--text-secondary)' } }),
+                el('span', { textContent: `${i + 1}. ${item.base}` }),
+                el('span', { textContent: `→ ${item.correct}`, style: { color: 'var(--text-secondary)' } }),
             ]));
         });
 
