@@ -9,7 +9,7 @@
 .big-game { --u: min(1vh, 1vw); --card: 13; --cardonly: 16; --main: 15; }
 /* picture size per game (in units of --u): cards with picture+word, cards with only a picture, and the main picture */
 .big-game[data-game="wordSizeCompare"] { --card: 17; }
-.big-game[data-game="syllableSynthesis"] { --card: 10.5; }
+.big-game[data-game="syllableSynthesis"] { --card: 14; }
 .big-game[data-game="rhymeOddOneOut"] { --card: 12; }
 .big-game[data-game="findRhyme"] { --main: 10.5; --cardonly: 11; }
 .big-game[data-game="produceRhyme"] { --main: 19; }
