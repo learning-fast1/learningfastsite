@@ -1068,7 +1068,7 @@ Phono.games.wordDeletion = {
         const instruction = el('p', {
             className: 'game-instruction',
             id: 'worddel-instruction',
-            innerHTML: `Πες την πρόταση χωρίς το <strong style="text-decoration: underline;">${targetWord.toUpperCase()}</strong>!`,
+            innerHTML: `Πες την πρόταση χωρίς το <strong style="text-decoration: underline;">${Phono.helpers.upperNoTonos(targetWord)}</strong>!`,
         });
         const instructionRow = el('div', { className: 'sentence-row' }, [
             instruction,

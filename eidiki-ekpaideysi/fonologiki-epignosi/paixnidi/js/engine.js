@@ -851,6 +851,10 @@ Phono.confetti = {
    HELPERS — Shared utility functions
    =========================================== */
 Phono.helpers = {
+    // Capital letters are written without the accent mark (ΣΚΥΛΟΣ, not ΣΚΎΛΟΣ). The diaeresis stays (ΜΑΪΜΟΥ).
+    upperNoTonos(s) {
+        return String(s).toUpperCase().normalize('NFD').replace(/́/g, '').normalize('NFC');
+    },
     /** Create DOM element with attributes */
     el(tag, attrs = {}, children = []) {
         const elem = document.createElement(tag);

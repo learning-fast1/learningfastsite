@@ -381,10 +381,10 @@ Phono.games.produceRhyme = {
         const sameFamily = Phono.data.rhymesL3ByFamily(family).filter(w => w.word !== this.targetWord.word);
 
         // Emphasize the shared ending within the target word itself, e.g.
-        // "πατάτα" + family "άτα" -> "πατΆΤΑ".
+        // "πατάτα" + family "άτα" -> "πατΑΤΑ" (capitals have no accent mark).
         const word = this.targetWord.word;
         const emphasized = word.toLowerCase().endsWith(family.toLowerCase())
-            ? word.slice(0, word.length - family.length) + word.slice(word.length - family.length).toUpperCase()
+            ? word.slice(0, word.length - family.length) + Phono.helpers.upperNoTonos(word.slice(word.length - family.length))
             : word;
 
         const close = () => overlay.remove();
