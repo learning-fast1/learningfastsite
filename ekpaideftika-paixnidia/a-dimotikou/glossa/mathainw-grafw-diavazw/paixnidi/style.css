@@ -421,3 +421,10 @@ html, body, button, .brick, .card, .opt, .choice, .syl, .letter-tile, .stage-car
   .fill-pic { font-size: clamp(40px, 16vh, 80px); }
   .choices { margin-top: 6px; }
 }
+
+/* αρχική: τα γράμματα παίρνουν όσο ύψος χρειάζονται, η κεφαλίδα δεν συμπιέζεται και το copyright μένει στο τέλος */
+.hero, .top { flex: none; }
+.letters { flex: 1 0 auto; min-height: auto; }
+.copy { flex: none; margin: 14px 0 0; padding-bottom: env(safe-area-inset-bottom, 0); }
+.hero { margin-bottom: 6px; }
+.letters { margin-top: 20px; padding-top: 4px; }
