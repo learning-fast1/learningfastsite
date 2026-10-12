@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S07M3VNB5N');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Διάκριση Συμφώνων — Παιχνίδι ανάγνωσης για παιδιά: συλλαβές και λέξεις με σύμφωνα που μπερδεύονται (φ-β, θ-δ, χ-γ, σ-ζ, π-μπ…).">
+    <meta name="theme-color" content="#B8A9E8">
+    <title>Διάκριση Συμφώνων – Learning Fast</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Outfit:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css?v=14">
+</head>
+<body class="colors-on">
+    <!-- Main App Container -->
+    <div id="app"></div>
+
+    <!-- Floating Background Shapes (always visible) -->
+    <div id="bg-shapes" aria-hidden="true">
+        <div class="bg-shape shape-circle shape-1"></div>
+        <div class="bg-shape shape-circle shape-2"></div>
+        <div class="bg-shape shape-circle shape-3"></div>
+        <div class="bg-shape shape-square shape-4"></div>
+        <div class="bg-shape shape-circle shape-5"></div>
+        <div class="bg-shape shape-triangle shape-6"></div>
+        <div class="bg-shape shape-circle shape-7"></div>
+        <div class="bg-shape shape-square shape-8"></div>
+    </div>
+
+    <!-- Confetti Canvas (for celebrations) -->
+    <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+    <!-- Scripts (load order matters). Bump ?v= whenever a file changes. -->
+    <script src="js/data.js?v=11"></script>
+    <script src="js/app.js?v=17"></script>
+<script src="../../../../../assets/js/new-game-popup.js"></script>
+</body>
+</html>
