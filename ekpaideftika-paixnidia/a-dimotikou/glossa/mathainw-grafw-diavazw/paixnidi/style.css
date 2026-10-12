@@ -428,3 +428,10 @@ html, body, button, .brick, .card, .opt, .choice, .syl, .letter-tile, .stage-car
 .copy { flex: none; margin: 14px 0 0; padding-bottom: env(safe-area-inset-bottom, 0); }
 .hero { margin-bottom: 6px; }
 .letters { margin-top: 20px; padding-top: 4px; }
+
+/* μόνο κινητά: πιο μικρά τα κουμπιά «← Learning Fast» και «Μηδενισμός προόδου» */
+@media (max-width: 600px), (max-height: 500px) and (hover: none) {
+  .home-top { gap: 6px; }
+  .home-top .pill-btn { padding: 5px 10px; font-size: 11.5px; box-shadow: 0 2px 0 var(--sand-d); }
+  .home-top .round-btn { width: 34px; height: 34px; font-size: 16px; }
+}

@@ -169,7 +169,37 @@ const STAGES = [
   { t: 'Γράφω τις λέξεις', i: '✏️', c: 'c-sage', run: stageWrite },
 ];
 
+/* ---------- προφόρτωση εικόνων ---------- */
+// Οι εικόνες των λέξεων του γράμματος φορτώνουν μόλις ανοίξει το γράμμα· οι υπόλοιπες σιγά σιγά στο παρασκήνιο,
+// ώστε να φαίνονται αμέσως όταν χρειαστούν (εκτός αν ο χρήστης έχει ενεργή την εξοικονόμηση δεδομένων).
+const preloaded = new Set();
+function preloadImgs(urls) {
+  urls.forEach((u) => {
+    if (!u || preloaded.has(u)) return;
+    preloaded.add(u);
+    const im = new Image();
+    im.decoding = 'async';
+    im.src = encodeURI(u);
+  });
+}
+function preloadLetter(L) {
+  preloadImgs(WORDS.filter(([w]) => startsWith(w.normalize('NFC'), L.l)).map((x) => x[2]));
+}
+function preloadAllLater() {
+  const conn = navigator.connection;
+  if (conn && conn.saveData) return;
+  const rest = WORDS.map((x) => x[2]).filter(Boolean);
+  let k = 0;
+  const step = () => {
+    preloadImgs(rest.slice(k, k + 6));
+    k += 6;
+    if (k < rest.length) setTimeout(step, 250);
+  };
+  (window.requestIdleCallback || ((fn) => setTimeout(fn, 1500)))(step);
+}
+
 function stageMap(L) {
+  preloadLetter(L);
   app.innerHTML = '';
   const top = h('div', 'top');
   const back = h('button', 'round-btn', '←');
@@ -869,3 +899,5 @@ if (jump.length === 2) {
 // iOS Safari αγνοεί το user-scalable=no: κόβουμε το zoom με τσίμπημα και το διπλό κλικ.
 ['gesturestart', 'gesturechange', 'gestureend'].forEach((t) => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }));
 document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+
+preloadAllLater();
