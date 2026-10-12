@@ -788,3 +788,7 @@ function confetti() {
 
 setColors(colorsOn());
 showHome();
+
+// iOS Safari αγνοεί το user-scalable=no: κόβουμε το zoom με τσίμπημα (gesture events) και με διπλό πάτημα.
+['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });

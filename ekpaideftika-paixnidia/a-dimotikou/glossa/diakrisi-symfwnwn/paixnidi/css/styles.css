@@ -675,3 +675,6 @@ body.colors-on .cb { color: var(--letter-b); }
 
 /* οδηγία κάτω από τον τίτλο του σταδίου */
 .game-instruction { margin: 4px 0 0; font-size: var(--text-lg, 1.15rem); font-weight: 700; color: var(--text-secondary, #5b5878); text-align: center; }
+
+/* Αφής: χωρίς zoom με διπλό πάτημα ή τσίμπημα· το πάτημα γίνεται αμέσως κλικ. */
+html, body, button, .tile, .choice-btn, [data-act] { touch-action: manipulation; }
