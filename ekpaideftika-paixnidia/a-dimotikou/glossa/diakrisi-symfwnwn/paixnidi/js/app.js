@@ -501,6 +501,7 @@ function renderGame() {
             <div class="topbar">
                 <button class="btn-icon" data-act="exit" title="Έξοδος" aria-label="Επιστροφή">${BACK_ICON}</button>
                 <div class="topbar-group">
+                    ${(stage.n === 5 || stage.n === 6) && !g.intro && !g.vowelPanel ? `<button class="btn btn-small btn-white topbar-words" data-act="words" title="Πρόσθεσε δικές σου λέξεις" aria-label="Δικές μου λέξεις">＋ Λέξεις</button>` : ''}
                     ${canCard && !g.intro && !g.vowelPanel ? `<button class="btn-icon" data-act="view" title="${cardMode ? 'Προβολή λίστας' : 'Προβολή κάρτας'}" aria-label="${cardMode ? 'Προβολή λίστας' : 'Προβολή κάρτας'}">${cardMode ? GRID_ICON : CARD_ICON}</button>` : ''}
                     ${colorToggleBtn()}
                 </div>

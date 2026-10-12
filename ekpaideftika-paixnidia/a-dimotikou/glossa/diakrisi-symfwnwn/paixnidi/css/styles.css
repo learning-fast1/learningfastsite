@@ -689,3 +689,5 @@ html, body, button, .tile, .choice-btn, [data-act] { touch-action: manipulation;
 .cw-msg { min-height: 1.2em; margin: 8px 0 0; color: #c0392b; font-size: .9rem; font-weight: 600; }
 .cw-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .cw-actions .btn { flex: 1 1 auto; }
+
+.topbar-words { white-space: nowrap; align-self: center; }
