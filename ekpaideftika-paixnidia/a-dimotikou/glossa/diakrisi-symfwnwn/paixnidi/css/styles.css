@@ -672,3 +672,6 @@ body.colors-on .cb { color: var(--letter-b); }
     box-shadow: 0 2px 8px rgba(0,0,0,.12);
 }
 .back-site:hover { background: #fff; }
+
+/* οδηγία κάτω από τον τίτλο του σταδίου */
+.game-instruction { margin: 4px 0 0; font-size: var(--text-lg, 1.15rem); font-weight: 700; color: var(--text-secondary, #5b5878); text-align: center; }

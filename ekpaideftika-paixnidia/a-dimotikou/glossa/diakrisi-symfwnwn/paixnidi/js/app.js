@@ -471,6 +471,7 @@ function renderGame() {
             <div class="game-head">
                 <h2>${stage.title}</h2>
                 <div class="part-label">${part.label}</div>
+                ${g.intro || g.vowelPanel || part.layout === 'choice' ? '' : `<p class="game-instruction">${part.words ? 'Διάβασε τις πιο κάτω λέξεις' : 'Διάβασε τις πιο κάτω συλλαβές'}</p>`}
             </div>
             <div class="progress-row">
                 <div class="progress-bar"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
