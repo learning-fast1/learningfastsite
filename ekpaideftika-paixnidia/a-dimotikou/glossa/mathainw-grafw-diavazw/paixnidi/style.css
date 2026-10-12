@@ -395,3 +395,29 @@ html, body { height: 100%; overflow: hidden; }
 .wslot.accent-pick { cursor: pointer; animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 .wslot.accent-pick.shake { animation: shake .35s; }
+
+/* =========================================================
+   Κινητά / tablet: όλα να χωράνε και να πατιούνται
+   ========================================================= */
+/* αν κάπου ξεπεράσει την οθόνη, να κυλά αντί να κόβεται */
+#app { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+/* χωρίς zoom με διπλό πάτημα ή τσίμπημα· το πάτημα γίνεται αμέσως κλικ */
+html, body, button, .brick, .card, .opt, .choice, .syl, .letter-tile, .stage-card { touch-action: manipulation; }
+.stage5 .syl.last { touch-action: none; }
+
+/* στάδιο 4: οι επιλογές σε μία γραμμή */
+.choices { flex-wrap: nowrap; }
+.choice { width: clamp(52px, min(13vh, 21vw), 92px); height: clamp(52px, min(13vh, 21vw), 92px); }
+.opt { width: clamp(60px, min(15vh, 21vw), 112px); height: clamp(60px, min(15vh, 21vw), 112px); }
+@media (max-width: 700px) {
+  /* στάδιο 5: τα γράμματα προς επιλογή σε γραμμές των 4 */
+  .vcol { grid-auto-flow: row; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: none; gap: 0 10px; width: min(100%, 420px); }
+  .vcol .syl.small { min-width: 0; width: 100%; padding: 0 4px; margin-top: 10px; }
+  .build-area { gap: 8px; margin-top: 4px; }
+  .syl-ph { height: clamp(70px, 14vh, 104px); }
+}
+@media (max-height: 460px) {
+  .fill-pic .pic { height: clamp(60px, 22vh, 110px); }
+  .fill-pic { font-size: clamp(40px, 16vh, 80px); }
+  .choices { margin-top: 6px; }
+}
