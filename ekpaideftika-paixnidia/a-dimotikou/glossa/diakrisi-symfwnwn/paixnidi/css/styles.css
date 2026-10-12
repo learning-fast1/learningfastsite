@@ -693,3 +693,18 @@ html, body, button, .tile, .choice-btn, [data-act] { touch-action: manipulation;
 .topbar-words { white-space: nowrap; align-self: center; }
 .topbar-words { padding: 12px 22px; font-size: 1.1rem; font-weight: 800; border-radius: 999px; box-shadow: var(--shadow-md); }
 @media (max-width: 480px) { .topbar-words { padding: 11px 18px; font-size: 1rem; } }
+
+/* οθόνη κωδικού */
+#gate { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--bg-primary, #fff8f0); touch-action: manipulation; }
+#gate .gate-back { position: absolute; top: 14px; left: 14px; padding: 8px 16px; border-radius: 999px; background: rgba(255,255,255,.9); color: #5b5878; font-weight: 700; font-size: .9rem; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.gate-card { box-sizing: border-box; width: min(380px, 100%); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; background: #fff; border-radius: 24px; padding: 28px 24px; box-shadow: 0 12px 40px rgba(90, 80, 130, .18); user-select: text; -webkit-user-select: text; }
+.gate-card h1 { margin: 0; font-size: 1.6rem; }
+.gate-card p { margin: 0; color: #5b5878; }
+.gate-letters { display: flex; gap: 10px; }
+.gate-letters span { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 16px; font-size: 2rem; font-weight: 800; }
+.gate-letters .la { background: var(--letter-a-bg, #e3f2fd); color: var(--letter-a, #1976d2); transform: rotate(-6deg); }
+.gate-letters .lb { background: var(--letter-b-bg, #fff3e0); color: var(--letter-b, #e65100); transform: rotate(6deg); }
+.gate-input { box-sizing: border-box; width: 100%; padding: 14px 16px; border: 2px solid #d9d2f0; border-radius: 14px; font: inherit; font-size: 1.2rem; text-align: center; }
+.gate-input:focus { outline: none; border-color: #8c7ad6; }
+.gate-msg { min-height: 1.2em; color: #c0392b; font-weight: 700; font-size: .95rem; }
+.gate-btn { width: 100%; padding: 14px 20px; border: none; border-radius: 999px; background: linear-gradient(135deg, #b8a9e8, #8c7ad6); color: #fff; font: inherit; font-size: 1.15rem; font-weight: 800; cursor: pointer; }
