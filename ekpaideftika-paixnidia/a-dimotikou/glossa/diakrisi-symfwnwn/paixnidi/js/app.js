@@ -7,6 +7,7 @@
 const STORAGE_PROGRESS = 'diakrisi-progress';
 const STORAGE_COLORS = 'diakrisi-colors';
 const STORAGE_VOWELS = 'diakrisi-vowels';
+const STORAGE_CUSTOM = 'diakrisi-custom-words';
 const WORDS_PER_LETTER = 12;
 const LEVEL_COLORS = ['#FFE082', '#A8E6CF', '#B8A9E8', '#87CEEB', '#FFB7B2'];
 
@@ -99,6 +100,28 @@ function countSyllables(word) {
     return Math.max(count, 1);
 }
 
+/* ---------------- Δικές μου λέξεις (αποθηκεύονται στον υπολογιστή της εκπαιδευτικού) ---------------- */
+
+function loadCustom() {
+    try {
+        const o = JSON.parse(localStorage.getItem(STORAGE_CUSTOM));
+        return o && typeof o === 'object' ? o : {};
+    } catch { return {}; }
+}
+
+function saveCustom(o) {
+    try { localStorage.setItem(STORAGE_CUSTOM, JSON.stringify(o)); return true; } catch { return false; }
+}
+
+function customFor(unit) {
+    const l = loadCustom()[unit];
+    return Array.isArray(l) ? l : [];
+}
+
+function customWordsOfPair(pair) {
+    return [...new Set(customFor(pair.a).concat(customFor(pair.b)))];
+}
+
 function wordInfo(word, unit) {
     const tokens = tokenize(word);
     const units = tokens.map(t => t.base);
@@ -109,7 +132,18 @@ function wordInfo(word, unit) {
 
 // Λέξεις ταξινομημένες από εύκολες σε δύσκολες. Αν περισσεύουν, κρατάμε
 // δείγμα απλωμένο σε όλο το εύρος δυσκολίας (όχι μόνο τις πιο εύκολες).
-function wordsFor(unit, avoid, keep = []) {
+function wordsFor(unit, avoid, keep = [], withCustom = false) {
+    const picked = baseWordsFor(unit, avoid, keep);
+    if (!withCustom) return picked;
+    const have = new Set(picked.map(i => i.word));
+    const extra = customFor(unit)
+        .filter(w => !have.has(w))
+        .map(w => wordInfo(w, unit))
+        .filter(info => info.units.includes(unit));
+    return picked.concat(extra).sort((x, y) => x.difficulty - y.difficulty);
+}
+
+function baseWordsFor(unit, avoid, keep = []) {
     const seen = new Set();
     const all = (WORDS[unit] || [])
         .filter(w => !seen.has(w) && seen.add(w))
@@ -174,12 +208,12 @@ function mixedWords(d) {
     return items;
 }
 
-function pairData(pair) {
+function pairData(pair, withCustom = false) {
     const vowels = selectedVowels();
     const sylA = vowels.map(v => syllableItem(pair.a, v, 'a'));
     const sylB = vowels.map(v => syllableItem(pair.b, v, 'b'));
-    const wordsA = wordsFor(pair.a, pair.avoidA || [pair.b], pair.keepA).map(w => wordItem(w, pair.a, 'a'));
-    const wordsB = wordsFor(pair.b, pair.avoidB || [pair.a], pair.keepB).map(w => wordItem(w, pair.b, 'b'));
+    const wordsA = wordsFor(pair.a, pair.avoidA || [pair.b], pair.keepA, withCustom).map(w => wordItem(w, pair.a, 'a'));
+    const wordsB = wordsFor(pair.b, pair.avoidB || [pair.a], pair.keepB, withCustom).map(w => wordItem(w, pair.b, 'b'));
     return { sylA, sylB, wordsA, wordsB };
 }
 
@@ -187,7 +221,7 @@ const range = n => [...Array(n).keys()];
 
 // Επιστρέφει τα «μέρη» κάθε σταδίου. Κάθε μέρος έχει items και τη σειρά ανάγνωσης (order).
 function buildStage(pair, n) {
-    const d = pairData(pair);
+    const d = pairData(pair, n === 5 || n === 6); // οι δικές μου λέξεις μπαίνουν μόνο στα στάδια «Λέξεις» και «Μπερδεμένες λέξεις»
     const A = `<b class="la-text">${esc(pair.a)}</b>`;
     const B = `<b class="lb-text">${esc(pair.b)}</b>`;
 
@@ -417,6 +451,8 @@ function renderGame() {
         const vowelPick = stage.syllables && g.partIdx === 0 ? `
                 <div class="vowel-summary">Φωνήεντα: <b>${selectedVowels().map(esc).join(' · ')}</b></div>
                 <button class="btn btn-white" data-act="vowels">Επιλογή φωνηέντων</button>` : '';
+        const customBtn = stage.n === 5 || stage.n === 6 ? `
+                <button class="btn btn-white" data-act="words">＋ Δικές μου λέξεις${customWordsOfPair(g.pair).length ? ` (${customWordsOfPair(g.pair).length})` : ''}</button>` : '';
         board = `
             <div class="intro-card">
                 <h3>${g.parts.length > 1 ? `Μέρος ${g.partIdx + 1} από ${g.parts.length}` : stage.title}</h3>
@@ -424,6 +460,7 @@ function renderGame() {
                 <div class="intro-actions">
                     <button class="btn btn-primary btn-large" data-act="begin">Ξεκινάμε!</button>
                     ${vowelPick}
+                    ${customBtn}
                 </div>
             </div>`;
     } else if (part.layout === 'choice') {
@@ -704,6 +741,7 @@ $app.addEventListener('click', e => {
         case 'ok': return mark('ok');
         case 'pick': return pick(el.dataset.side, el);
         case 'view': cardMode = !cardMode; return renderGame();
+        case 'words': return openWordsDialog();
         case 'vowels': game.vowelPanel = true; game.draft = selectedVowels(); return renderGame();
         case 'toggle-vowel': {
             const v = el.dataset.v;
@@ -727,6 +765,7 @@ $app.addEventListener('click', e => {
 
 document.addEventListener('keydown', e => {
     if (!game) return;
+    if (e.target.closest && e.target.closest('textarea, input')) return;
     if (game.vowelPanel) {
         if (e.key === 'Escape') { game.vowelPanel = false; renderGame(); }
         return;
@@ -747,6 +786,62 @@ document.addEventListener('keydown', e => {
     else if (e.key === 'Backspace' || e.key === 'ArrowLeft') { e.preventDefault(); undo(); }
     else if (e.key === 'Escape') { showStages(game.pair.id); }
 });
+
+/* ---------------- Παράθυρο «Δικές μου λέξεις» ---------------- */
+
+function openWordsDialog() {
+    const pair = game.pair;
+    const overlay = document.createElement('div');
+    overlay.className = 'cw-overlay';
+    overlay.innerHTML = `
+        <div class="cw-card" role="dialog" aria-modal="true" aria-labelledby="cw-title">
+            <h3 id="cw-title">Δικές μου λέξεις</h3>
+            <p>Γράψε λέξεις με το <b class="la-text">${esc(pair.a)}</b> ή το <b class="lb-text">${esc(pair.b)}</b>, μία σε κάθε γραμμή.
+               Θα εμφανίζονται στα στάδια «Λέξεις» και «Μπερδεμένες λέξεις», με χρωματισμένο το γράμμα.
+               Αποθηκεύονται μόνο σε αυτόν τον υπολογιστή.</p>
+            <textarea class="cw-text" rows="8" spellcheck="false" placeholder="π.χ. φούρνος&#10;βιβλίο"></textarea>
+            <div class="cw-msg" role="alert"></div>
+            <div class="cw-actions">
+                <button class="btn btn-primary" data-cw="save">Αποθήκευση</button>
+                <button class="btn btn-white" data-cw="cancel">Άκυρο</button>
+                <button class="btn btn-white cw-clear" data-cw="clear">Σβήσε όλες</button>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+    const ta = overlay.querySelector('.cw-text');
+    const msg = overlay.querySelector('.cw-msg');
+    ta.value = customWordsOfPair(pair).join('\n');
+    ta.focus();
+
+    const close = () => overlay.remove();
+    const store = (a, b) => {
+        const all = loadCustom();
+        if (a.length) all[pair.a] = a; else delete all[pair.a];
+        if (b.length) all[pair.b] = b; else delete all[pair.b];
+        if (!saveCustom(all)) { msg.textContent = 'Δεν ήταν δυνατή η αποθήκευση σε αυτόν τον υπολογιστή (ο browser δεν το επιτρέπει).'; return false; }
+        return true;
+    };
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) return close();
+        const act = e.target.closest('[data-cw]');
+        if (!act) return;
+        if (act.dataset.cw === 'cancel') return close();
+        if (act.dataset.cw === 'clear') {
+            if (!confirm('Να σβηστούν όλες οι δικές σου λέξεις για αυτά τα γράμματα;')) return;
+            if (store([], [])) { close(); startStage(pair.id, game.n); }
+            return;
+        }
+        const words = [...new Set(ta.value.split(/[\n,;]+/).map(w => w.trim()).filter(Boolean))];
+        const bad = words.filter(w => !/^[\p{L}'’-]+$/u.test(w) || !tokenize(w).some(t => t.base === pair.a || t.base === pair.b));
+        if (bad.length) {
+            msg.textContent = 'Αυτές οι λέξεις δεν έχουν ούτε «' + pair.a + '» ούτε «' + pair.b + '» (ή έχουν μη επιτρεπτό χαρακτήρα): ' + bad.join(', ');
+            return;
+        }
+        const has = unit => words.filter(w => tokenize(w).some(t => t.base === unit));
+        if (store(has(pair.a), has(pair.b))) { close(); startStage(pair.id, game.n); }
+    });
+    overlay.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+}
 
 /* ---------------- Κομφετί ---------------- */
 
