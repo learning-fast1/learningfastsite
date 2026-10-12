@@ -103,6 +103,16 @@ let playerBoards = [];
 let selectedMode = null;
 let selectedLevel = 1;
 let gameTimer = null;
+let homeTimer = null; // επιστροφή στην αρχική, μόνο όταν τελειώσουν ΟΛΟΙ οι παίκτες
+
+// Κάθε παίκτης τελειώνει τη δική του τράπουλα (ή επανάληψη λαθών) ξεχωριστά. Στην αρχική οθόνη
+// γυρίζουμε μόνο όταν έχουν τελειώσει όλοι· αλλιώς ο πρώτος που τελειώνει έδιωχνε και τον άλλο.
+function checkAllFinished() {
+    if (playerBoards.length && playerBoards.every(b => b.finished)) {
+        clearTimeout(homeTimer);
+        homeTimer = setTimeout(goToStartScreen, 2500);
+    }
+}
 let gameDuration = 0;
 
 // GA4 Event Tracking Helper
@@ -218,6 +228,7 @@ class PlayerBoard {
         this.correctScore = 0;
         this.wrongScore = 0;
         this.wrongWords = [];
+        this.finished = false;
         this.updateScore();
         this.loadWord();
     }
@@ -407,10 +418,12 @@ class PlayerBoard {
         if (this.wrongWords.length === 0) {
             this.feedbackMessageEl.textContent = 'Μπράβο! Δεν έκανες κανένα λάθος!';
             this.feedbackMessageEl.className = 'feedback-message success pop-in';
-            setTimeout(() => goToStartScreen(), 2500);
+            this.finished = true;
+            checkAllFinished();
             return;
         }
         this.isReviewMode = true;
+        this.finished = false;
         this.playerWords = buildRoundRobinDeck(this.wrongWords, w => this.level === 1 ? w.article : w.option);
         this.wrongWords = [];
         this.currentWordIndex = 0;
@@ -457,8 +470,9 @@ class PlayerBoard {
             this.optionBtns.forEach(btn => { btn.disabled = true; });
             this.nextBtn.classList.add('hidden');
 
-            // Αυτόματη επιστροφή στην αρχική μετά από 2.5 δευτ.
-            setTimeout(() => goToStartScreen(), 2500);
+            // Αυτός ο παίκτης τελείωσε· στην αρχική γυρνάμε όταν τελειώσουν όλοι.
+            this.finished = true;
+            checkAllFinished();
         } else {
             this.loadWord();
         }
@@ -489,6 +503,7 @@ window.goBackToLevel = function() {
 
 // Επιστροφή στην αρχική οθόνη μετά το τέλος γύρου/επανάληψης
 function goToStartScreen() {
+    clearTimeout(homeTimer);
     // Σταμάτα τον timer αν τρέχει
     if (gameTimer) {
         clearInterval(gameTimer);
@@ -512,6 +527,7 @@ function goToStartScreen() {
 
 // Start Game based on Mode and Time
 window.startGame = function(seconds) {
+    clearTimeout(homeTimer);
     timeScreenEl.classList.add('hidden');
     gameContainerEl.classList.remove('hidden');
 
@@ -606,6 +622,8 @@ function endGame() {
         retryBtn.classList.remove('hidden');
         retryBtn.onclick = () => {
             endOverlay.classList.add('hidden');
+            clearTimeout(homeTimer);
+            playerBoards.forEach(board => { board.finished = false; });
             timerDisplayEl.textContent = 'Επανάληψη λαθών!';
             timerDisplayEl.classList.remove('timer-ended');
             timerDisplayEl.classList.add('timer-review');
