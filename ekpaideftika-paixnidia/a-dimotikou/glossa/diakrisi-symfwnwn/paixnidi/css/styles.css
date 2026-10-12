@@ -691,3 +691,5 @@ html, body, button, .tile, .choice-btn, [data-act] { touch-action: manipulation;
 .cw-actions .btn { flex: 1 1 auto; }
 
 .topbar-words { white-space: nowrap; align-self: center; }
+.topbar-words { padding: 12px 22px; font-size: 1.1rem; font-weight: 800; border-radius: 999px; box-shadow: var(--shadow-md); }
+@media (max-width: 480px) { .topbar-words { padding: 11px 18px; font-size: 1rem; } }
