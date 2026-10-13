@@ -15,7 +15,8 @@
   h1 { font-size: 1.35rem; margin: 10px 0 2px; }
   .sub { color: var(--soft); margin: 0 0 12px; font-size: .95rem; line-height: 1.45; }
   .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-  .tab { flex: 1; padding: 12px 8px; border: 2px solid var(--line); border-radius: 14px; background: var(--card); font: inherit; font-size: 1rem; font-weight: 800; color: var(--soft); cursor: pointer; }
+  .tabs { flex-wrap: wrap; }
+  .tab { flex: 1 1 22%; min-width: 0; font-size: .9rem !important; padding: 12px 8px; border: 2px solid var(--line); border-radius: 14px; background: var(--card); font: inherit; font-size: 1rem; font-weight: 800; color: var(--soft); cursor: pointer; }
   .tab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
   .chip { min-width: 44px; padding: 8px 10px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); font: inherit; font-size: 1.05rem; font-weight: 700; color: var(--ink); cursor: pointer; }
@@ -61,6 +62,7 @@
     <button class="tab on" id="tabSounds" type="button">Ήχοι</button>
     <button class="tab" id="tabWords" type="button">Λέξεις</button>
     <button class="tab" id="tabSent" type="button">Προτάσεις</button>
+    <button class="tab" id="tabVar" type="button">Χωρίς μια λέξη</button>
   </div>
 
   <div class="chips" id="chips"></div>
@@ -143,9 +145,24 @@
     });
     return out;
   })();
-  var ALL = SOUNDS.concat(WORDS, SENTENCES);
+  /* οι επιλογές του σταδίου «Πες την πρόταση χωρίς μια λέξη»: η πρόταση με μία λέξη να λείπει (3-4 λέξεις) */
+  var VARIANTS = (function () {
+    var seen = {}, out = [];
+    (Phono.data.sentences || []).forEach(function (q) {
+      if (!q.words || q.words.length < 3 || q.words.length > 4) return;
+      q.words.forEach(function (w, i) {
+        var t = q.words.filter(function (_, j) { return j !== i; }).join(' ').normalize('NFC');
+        if (seen[t]) return;
+        seen[t] = 1;
+        var h = 5381; for (var k = 0; k < t.length; k++) h = ((h << 5) + h + t.charCodeAt(k)) >>> 0;
+        out.push({ kind: 'variant', key: 't:' + t, label: t, file: 'd-' + h.toString(16), hint: 'Η πρόταση «' + q.text + '» χωρίς τη λέξη «' + w + '». Πες μόνο όσα μένουν, φυσικά και καθαρά.' });
+      });
+    });
+    return out;
+  })();
+  var ALL = SOUNDS.concat(WORDS, SENTENCES, VARIANTS);
   var tab = 'sounds', LIST = SOUNDS, idx = 0, done = {}, stream = null, recording = false, timer = null, audioEl = null, MAX_MS = 4500;
-  function maxMs(s) { return s && s.kind === 'sentence' ? 12000 : 4500; }
+  function maxMs(s) { return s && (s.kind === 'sentence' || s.kind === 'variant') ? 12000 : 4500; }
 
   var $ = function (id) { return document.getElementById(id); };
   var chips = $('chips'), big = $('big'), type = $('type'), hint = $('hint'), status = $('status'), bar = $('bar'), whereEl = $('where');
@@ -161,6 +178,7 @@
     $('tabSounds').className = 'tab' + (isSounds ? ' on' : '');
     $('tabWords').className = 'tab' + (tab === 'words' ? ' on' : '');
     $('tabSent').className = 'tab' + (tab === 'sentences' ? ' on' : '');
+    $('tabVar').className = 'tab' + (tab === 'variants' ? ' on' : '');
     chips.style.display = isSounds ? '' : 'none';
     $('wordsBar').style.display = isSounds ? 'none' : '';
     $('navRow').style.display = isSounds ? 'none' : '';
@@ -177,8 +195,8 @@
     }
     var s = LIST[idx];
     big.textContent = s.label;
-    big.className = 'big' + (s.kind === 'word' ? ' word' + (s.label.length > 11 ? ' long' : '') : (s.kind === 'sentence' ? ' sent' : ''));
-    type.textContent = s.kind === 'sound' ? TYPE[s.type] : (s.kind === 'sentence' ? 'Πρόταση ' : 'Λέξη ') + (idx + 1) + ' από ' + LIST.length;
+    big.className = 'big' + (s.kind === 'word' ? ' word' + (s.label.length > 11 ? ' long' : '') : (s.kind === 'sentence' || s.kind === 'variant' ? ' sent' : ''));
+    type.textContent = s.kind === 'sound' ? TYPE[s.type] : (s.kind === 'sentence' ? 'Πρόταση ' : (s.kind === 'variant' ? 'Επιλογή ' : 'Λέξη ')) + (idx + 1) + ' από ' + LIST.length;
     hint.textContent = s.hint;
     playBtn.disabled = !done[s.key];
     delBtn.disabled = !done[s.key];
@@ -186,8 +204,8 @@
     $('prev').disabled = recording || idx === 0;
     $('nextMissing').disabled = recording;
     var nd = countDone(LIST);
-    if (!isSounds) { bar.style.width = Math.round(100 * nd / LIST.length) + '%'; whereEl.textContent = 'Ηχογραφημένες ' + (tab === 'sentences' ? 'προτάσεις' : 'λέξεις') + ': ' + nd + ' από ' + LIST.length; }
-    count.textContent = 'Ηχογραφημένοι ήχοι: ' + countDone(SOUNDS) + '/' + SOUNDS.length + ' · λέξεις: ' + countDone(WORDS) + '/' + WORDS.length + ' · προτάσεις: ' + countDone(SENTENCES) + '/' + SENTENCES.length;
+    if (!isSounds) { bar.style.width = Math.round(100 * nd / LIST.length) + '%'; whereEl.textContent = 'Ηχογραφημένες ' + (tab === 'sentences' ? 'προτάσεις' : (tab === 'variants' ? 'επιλογές' : 'λέξεις')) + ': ' + nd + ' από ' + LIST.length; }
+    count.textContent = 'Ηχογραφημένοι ήχοι: ' + countDone(SOUNDS) + '/' + SOUNDS.length + ' · λέξεις: ' + countDone(WORDS) + '/' + WORDS.length + ' · προτάσεις: ' + countDone(SENTENCES) + '/' + SENTENCES.length + ' · χωρίς μια λέξη: ' + countDone(VARIANTS) + '/' + VARIANTS.length;
     var total = countDone(ALL);
     zipBtn.disabled = total === 0;
     sendBtn.style.display = pcOk ? '' : 'none';
@@ -197,7 +215,7 @@
   }
   function setTab(t) {
     if (recording) return;
-    tab = t; LIST = t === 'sounds' ? SOUNDS : (t === 'words' ? WORDS : SENTENCES);
+    tab = t; LIST = t === 'sounds' ? SOUNDS : (t === 'words' ? WORDS : (t === 'sentences' ? SENTENCES : VARIANTS));
     var first = LIST.findIndex(function (s) { return !done[s.key]; });
     idx = first < 0 ? 0 : first;
     setStatus(''); draw();
@@ -365,7 +383,7 @@
     for (var i = 0; i < ALL.length; i++) {
       var s = ALL[i], blob = await Phono.recordings.get(s.key);
       if (!blob) continue;
-      var path = (s.kind === 'sound' ? 'audio/sounds/' : (s.kind === 'sentence' ? 'audio/sentences/' : 'audio/words/')) + s.file + '.wav';
+      var path = (s.kind === 'sound' ? 'audio/sounds/' : (s.kind === 'sentence' ? 'audio/sentences/' : (s.kind === 'variant' ? 'audio/variants/' : 'audio/words/'))) + s.file + '.wav';
       files.push({ name: path, data: new Uint8Array(await blob.arrayBuffer()) });
       map[s.key] = path;
     }
@@ -395,6 +413,7 @@
   $('tabSounds').onclick = function () { setTab('sounds'); };
   $('tabWords').onclick = function () { setTab('words'); };
   $('tabSent').onclick = function () { setTab('sentences'); };
+  $('tabVar').onclick = function () { setTab('variants'); };
   delBtn.onclick = async function () {
     var s = LIST[idx];
     if (!confirm('Να σβηστεί η ηχογράφηση «' + s.label + '»;')) return;
@@ -426,6 +445,7 @@
     var start = new URLSearchParams(location.search).get('tab');
     if (start === 'words') { tab = 'words'; LIST = WORDS; }
     if (start === 'sentences') { tab = 'sentences'; LIST = SENTENCES; }
+    if (start === 'variants') { tab = 'variants'; LIST = VARIANTS; }
     var first = LIST.findIndex(function (s) { return !done[s.key]; });
     idx = first < 0 ? 0 : first;
     draw();
