@@ -332,7 +332,7 @@
     var peakRms = 0;
     for (var q = 0; q < rms.length; q++) peakRms = Math.max(peakRms, rms[q]);
     if (peakRms < 0.003) return null;
-    var thr = Math.max(0.006, peakRms * 0.08);
+    var thr = Math.max(0.01, peakRms * 0.08);
     var a = rms.findIndex(function (v) { return v > thr; });
     var b = rms.length - 1 - rms.slice().reverse().findIndex(function (v) { return v > thr; });
     a = Math.max(0, (a - 6) * frame);
