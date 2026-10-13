@@ -191,8 +191,14 @@ Phono.audio = {
      * needed instead of after a network wait. A recording made on this device still comes first. */
     async preloadSounds() {
         const files = (Phono.soundFiles) || {};
-        for (const key of Object.keys(files)) {
-            if (key.startsWith('t:')) continue;
+        // the isolated sounds first (few, needed at once), then the recorded words quietly in the background —
+        // but not on a slow connection or with data saving on.
+        const conn = navigator.connection;
+        const lean = conn && (conn.saveData || /(^|-)2g|3g/.test(conn.effectiveType || ''));
+        const keys = Object.keys(files).filter(k => !k.startsWith('t:')).concat(lean ? [] : Object.keys(files).filter(k => k.startsWith('t:')));
+        let n = 0;
+        for (const key of keys) {
+            if (key.startsWith('t:') && ++n % 8 === 0) await new Promise(r => setTimeout(r, 400));
             try {
                 const url = await this._soundUrl(key);
                 if (!url || url.startsWith('blob:')) continue;
