@@ -112,42 +112,53 @@
     recBtn.className = 'btn ' + (recording ? 'recording' : 'rec');
   }
 
-  /* ---------- ηχογράφηση ---------- */
-  function pickMime() {
-    var c = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm', 'audio/ogg;codecs=opus'];
-    for (var i = 0; i < c.length; i++) if (window.MediaRecorder && MediaRecorder.isTypeSupported(c[i])) return c[i];
-    return '';
-  }
+  /* ---------- ηχογράφηση ----------
+     Καταγράφουμε απευθείας τα δείγματα του μικροφώνου (όχι MediaRecorder): έτσι δουλεύει το ίδιο σε iPhone/Safari και Android,
+     χωρίς αποκωδικοποίηση αρχείου, που σε πολλά κινητά αποτυγχάνει. */
+  var actx = null, srcNode = null, procNode = null, pcm = [], pcmRate = 44100;
+  function setErr(prefix, e) { setStatus(prefix + (e && (e.name || e.message) ? ' (' + (e.name || '') + (e.message ? ': ' + e.message : '') + ')' : ''), 'err'); }
+
   async function startRec() {
-    if (!navigator.mediaDevices || !window.MediaRecorder) { setStatus('Αυτός ο browser δεν υποστηρίζει ηχογράφηση. Δοκίμασε Chrome ή Safari.', 'err'); return; }
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !AC) { setStatus('Αυτός ο browser δεν υποστηρίζει ηχογράφηση. Δοκίμασε Chrome ή Safari.', 'err'); return; }
+    try {
+      // το AudioContext φτιάχνεται μέσα στο πάτημα του κουμπιού (απαίτηση του iPhone)
+      actx = actx || new AC();
+      if (actx.state === 'suspended') await actx.resume();
+    } catch (e) { setErr('Δεν ξεκίνησε ο ήχος του browser.', e); return; }
     try {
       // χωρίς «καθαρισμό θορύβου»: θα έκοβε ήχους όπως σσσ ή φφφ σαν να ήταν θόρυβος
       stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
     } catch (e) { setStatus('Δεν δόθηκε άδεια για το μικρόφωνο. Επέτρεψέ το από τις ρυθμίσεις του browser.', 'err'); return; }
-    chunks = [];
-    var mime = pickMime();
-    mr = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
-    mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
-    mr.onstop = onStopped;
-    mr.start();
-    recording = true;
-    setStatus('Ηχογραφεί… πες τον ήχο και πάτα «Σταμάτα».');
-    timer = setTimeout(stopRec, MAX_MS);
-    draw();
+    try {
+      pcm = []; pcmRate = actx.sampleRate;
+      srcNode = actx.createMediaStreamSource(stream);
+      procNode = actx.createScriptProcessor(4096, 1, 1);
+      procNode.onaudioprocess = function (e) { if (recording) pcm.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
+      var mute = actx.createGain(); mute.gain.value = 0; // να μη ακούγεται το μικρόφωνο στο ηχείο
+      srcNode.connect(procNode); procNode.connect(mute); mute.connect(actx.destination);
+      recording = true;
+      setStatus('Ηχογραφεί… πες τον ήχο και πάτα «Σταμάτα».');
+      timer = setTimeout(stopRec, MAX_MS);
+      draw();
+    } catch (e) { setErr('Δεν ξεκίνησε η ηχογράφηση.', e); }
   }
   function stopRec() {
     if (!recording) return;
     clearTimeout(timer);
     recording = false;
-    try { mr.stop(); } catch (e) { /* ignore */ }
+    try { srcNode.disconnect(); procNode.disconnect(); } catch (e) { /* ignore */ }
     setStatus('Επεξεργασία…');
     draw();
+    onStopped();
   }
   async function onStopped() {
     var s = LIST[idx];
     try {
-      var blob = new Blob(chunks, { type: (mr && mr.mimeType) || 'audio/webm' });
-      var wav = await processToWav(blob);
+      var total = 0; pcm.forEach(function (c) { total += c.length; });
+      var all = new Float32Array(total), o = 0;
+      pcm.forEach(function (c) { all.set(c, o); o += c.length; });
+      var wav = processSamples(resample(all, pcmRate, OUT_RATE));
       if (!wav) { setStatus('Δεν ακούστηκε ήχος. Δοκίμασε ξανά πιο κοντά στο μικρόφωνο.', 'err'); draw(); return; }
       await Phono.recordings.put(s.key, wav);
       done[s.key] = true;
@@ -155,7 +166,7 @@
       draw();
       play(s.key);
     } catch (e) {
-      setStatus('Κάτι πήγε στραβά με την ηχογράφηση. Δοκίμασε ξανά.', 'err');
+      setErr('Κάτι πήγε στραβά με την ηχογράφηση. Δοκίμασε ξανά.', e);
       draw();
     }
   }
@@ -168,15 +179,16 @@
   }
 
   /* ---------- επεξεργασία ήχου → WAV ---------- */
-  async function processToWav(blob) {
-    var ac = new (window.AudioContext || window.webkitAudioContext)();
-    var decoded = await ac.decodeAudioData(await blob.arrayBuffer());
-    ac.close();
-    var len = Math.ceil(decoded.duration * OUT_RATE);
-    var off = new OfflineAudioContext(1, len, OUT_RATE);
-    var src = off.createBufferSource();
-    src.buffer = decoded; src.connect(off.destination); src.start();
-    var data = (await off.startRendering()).getChannelData(0);
+  function resample(data, from, to) {
+    if (from === to) return data;
+    var len = Math.floor(data.length * to / from), out = new Float32Array(len), ratio = from / to;
+    for (var i = 0; i < len; i++) {
+      var pos = i * ratio, i0 = Math.floor(pos), i1 = Math.min(i0 + 1, data.length - 1), f = pos - i0;
+      out[i] = data[i0] * (1 - f) + data[i1] * f;
+    }
+    return out;
+  }
+  function processSamples(data) {
     // κόψιμο σιωπής: ενέργεια ανά 10ms, κατώφλι σχετικό με το πιο δυνατό σημείο
     var frame = Math.round(OUT_RATE * 0.01), rms = [];
     for (var i = 0; i < data.length; i += frame) {
@@ -184,7 +196,8 @@
       for (var j = i; j < end; j++) sum += data[j] * data[j];
       rms.push(Math.sqrt(sum / (end - i)));
     }
-    var peakRms = Math.max.apply(null, rms.concat([0]));
+    var peakRms = 0;
+    for (var q = 0; q < rms.length; q++) peakRms = Math.max(peakRms, rms[q]);
     if (peakRms < 0.003) return null;
     var thr = Math.max(0.006, peakRms * 0.08);
     var a = rms.findIndex(function (v) { return v > thr; });
