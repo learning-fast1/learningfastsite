@@ -38,9 +38,11 @@ Phono.soundHint = function (s) {
     return 'Πες το φωνήεν καθαρά και σύντομα.';
 };
 
-/* ---------- IndexedDB ---------- */
+/* ---------- IndexedDB (με εφεδρική αποθήκευση στη μνήμη) ----------
+   Στο iPhone ο browser δεν επιτρέπει πάντα αποθήκευση (π.χ. σε σελίδα με πιστοποιητικό που δεν είναι «επίσημο»).
+   Τότε οι ηχογραφήσεις μένουν στη μνήμη όσο είναι ανοιχτή η σελίδα (persistent = false) και στέλνονται κανονικά στον υπολογιστή. */
 Phono.recordings = (function () {
-    var DB = 'phono-recordings', STORE = 'sounds', dbp = null;
+    var DB = 'phono-recordings', STORE = 'sounds', dbp = null, mem = {};
     function open() {
         if (dbp) return dbp;
         dbp = new Promise(function (resolve, reject) {
@@ -48,7 +50,8 @@ Phono.recordings = (function () {
             var rq = indexedDB.open(DB, 1);
             rq.onupgradeneeded = function () { rq.result.createObjectStore(STORE); };
             rq.onsuccess = function () { resolve(rq.result); };
-            rq.onerror = function () { reject(rq.error); };
+            rq.onerror = function () { reject(rq.error || new Error('indexedDB open failed')); };
+            rq.onblocked = function () { reject(new Error('indexedDB blocked')); };
         });
         return dbp;
     }
@@ -57,13 +60,29 @@ Phono.recordings = (function () {
             return new Promise(function (resolve, reject) {
                 var tx = db.transaction(STORE, mode), out = fn(tx.objectStore(STORE));
                 tx.oncomplete = function () { resolve(out && out.result); };
-                tx.onerror = function () { reject(tx.error); };
+                tx.onerror = function () { reject(tx.error || new Error('indexedDB error')); };
+                tx.onabort = function () { reject(tx.error || new Error('indexedDB aborted')); };
             });
         });
     }
-    return {
-        get: function (key) { return run('readonly', function (s) { return s.get(key); }); },
-        put: function (key, blob) { return run('readwrite', function (s) { return s.put(blob, key); }); },
-        del: function (key) { return run('readwrite', function (s) { return s.delete(key); }); },
+    var api = {
+        persistent: true,
+        get: function (key) {
+            return run('readonly', function (s) { return s.get(key); }).then(function (v) {
+                if (!v) return mem[key] || null;
+                return v instanceof Blob ? v : new Blob([v], { type: 'audio/wav' });
+            }).catch(function () { return mem[key] || null; });
+        },
+        put: function (key, blob) {
+            mem[key] = blob;
+            return blob.arrayBuffer().then(function (buf) {
+                return run('readwrite', function (s) { return s.put(buf, key); });
+            }).catch(function () { api.persistent = false; });
+        },
+        del: function (key) {
+            delete mem[key];
+            return run('readwrite', function (s) { return s.delete(key); }).catch(function () { /* ignore */ });
+        },
     };
+    return api;
 })();

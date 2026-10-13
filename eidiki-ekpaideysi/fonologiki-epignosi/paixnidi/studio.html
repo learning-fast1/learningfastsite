@@ -70,7 +70,7 @@
   </div>
 </div>
 
-<script src="js/sounds.js"></script>
+<script src="js/sounds.js?v=2"></script>
 <script>
 (function () {
   var LIST = Phono.soundList;
@@ -118,10 +118,13 @@
   var actx = null, srcNode = null, procNode = null, pcm = [], pcmRate = 44100;
   // στέλνει το σφάλμα στον τοπικό server (αν υπάρχει), για να φαίνεται στον υπολογιστή
   function report(where, e) {
-    try { fetch('/studio-log', { method: 'POST', body: where + ' | ' + (e && (e.name + ': ' + e.message)) + ' | ' + navigator.userAgent }).catch(function () {}); } catch (x) { /* ignore */ }
+    var d = e && (e.name || e.message) ? e.name + ': ' + e.message : String(e);
+    try { fetch('/studio-log', { method: 'POST', body: where + ' | ' + d + ' | ' + navigator.userAgent }).catch(function () {}); } catch (x) { /* ignore */ }
   }
   function setErr(prefix, e) {
-    report(prefix, e); setStatus(prefix + (e && (e.name || e.message) ? ' (' + (e.name || '') + (e.message ? ': ' + e.message : '') + ')' : ''), 'err'); }
+    report(prefix, e);
+    setStatus(prefix + ' (' + (e && (e.name || e.message) ? (e.name || '') + (e.message ? ': ' + e.message : '') : String(e)) + ')', 'err');
+  }
 
   async function startRec() {
     var AC = window.AudioContext || window.webkitAudioContext;
@@ -158,20 +161,23 @@
     onStopped();
   }
   async function onStopped() {
-    var s = LIST[idx];
+    var s = LIST[idx], step = 'επεξεργασία', wav;
     try {
       var total = 0; pcm.forEach(function (c) { total += c.length; });
+      if (!total) { setStatus('Δεν καταγράφηκε ήχος από το μικρόφωνο. Δοκίμασε ξανά.', 'err'); report('κανένα δείγμα', 'pcm κενό, rate=' + pcmRate + ', ctx=' + (actx && actx.state)); draw(); return; }
       var all = new Float32Array(total), o = 0;
       pcm.forEach(function (c) { all.set(c, o); o += c.length; });
-      var wav = processSamples(resample(all, pcmRate, OUT_RATE));
+      wav = processSamples(resample(all, pcmRate, OUT_RATE));
       if (!wav) { setStatus('Δεν ακούστηκε ήχος. Δοκίμασε ξανά πιο κοντά στο μικρόφωνο.', 'err'); draw(); return; }
+      step = 'αποθήκευση';
       await Phono.recordings.put(s.key, wav);
       done[s.key] = true;
-      setStatus('Αποθηκεύτηκε ✓', 'ok');
+      setStatus(Phono.recordings.persistent ? 'Αποθηκεύτηκε ✓' : 'Αποθηκεύτηκε προσωρινά ✓ — στείλ’ τα στον υπολογιστή πριν κλείσεις τη σελίδα.', 'ok');
       draw();
+      step = 'αναπαραγωγή';
       play(s.key);
     } catch (e) {
-      setErr('Κάτι πήγε στραβά με την ηχογράφηση. Δοκίμασε ξανά.', e);
+      setErr('Κάτι πήγε στραβά με την ηχογράφηση (' + step + ').', e);
       draw();
     }
   }
