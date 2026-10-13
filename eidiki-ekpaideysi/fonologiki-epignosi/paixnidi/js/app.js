@@ -766,7 +766,7 @@ Phono.app = {
             el('div', { className: 'complete-buttons' }, [
                 el('button', {
                     className: 'btn btn-secondary',
-                    innerHTML: '🔄 Παίξε Ξανά',
+                    innerHTML: 'Παίξε Ξανά',
                     onClick: () => {
                         Phono.audio.playSfx('pop');
                         this.navigate('game', { gameId, levelId });
@@ -775,7 +775,7 @@ Phono.app = {
                 }),
                 nextGame ? el('button', {
                     className: 'btn btn-primary',
-                    innerHTML: '➡️ Επόμενο',
+                    innerHTML: 'Επόμενο',
                     onClick: () => {
                         Phono.audio.playSfx('pop');
                         this.navigate('game', { gameId: nextGame.id, levelId });
@@ -784,7 +784,7 @@ Phono.app = {
                 }) : null,
                 el('button', {
                     className: 'btn btn-accent btn-small',
-                    innerHTML: '📋 Επίπεδα',
+                    innerHTML: 'Επίπεδα',
                     onClick: () => {
                         Phono.audio.playSfx('click');
                         this.navigate('gameSelect', { levelId });
