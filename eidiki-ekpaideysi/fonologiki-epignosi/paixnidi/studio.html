@@ -116,7 +116,12 @@
      Καταγράφουμε απευθείας τα δείγματα του μικροφώνου (όχι MediaRecorder): έτσι δουλεύει το ίδιο σε iPhone/Safari και Android,
      χωρίς αποκωδικοποίηση αρχείου, που σε πολλά κινητά αποτυγχάνει. */
   var actx = null, srcNode = null, procNode = null, pcm = [], pcmRate = 44100;
-  function setErr(prefix, e) { setStatus(prefix + (e && (e.name || e.message) ? ' (' + (e.name || '') + (e.message ? ': ' + e.message : '') + ')' : ''), 'err'); }
+  // στέλνει το σφάλμα στον τοπικό server (αν υπάρχει), για να φαίνεται στον υπολογιστή
+  function report(where, e) {
+    try { fetch('/studio-log', { method: 'POST', body: where + ' | ' + (e && (e.name + ': ' + e.message)) + ' | ' + navigator.userAgent }).catch(function () {}); } catch (x) { /* ignore */ }
+  }
+  function setErr(prefix, e) {
+    report(prefix, e); setStatus(prefix + (e && (e.name || e.message) ? ' (' + (e.name || '') + (e.message ? ': ' + e.message : '') + ')' : ''), 'err'); }
 
   async function startRec() {
     var AC = window.AudioContext || window.webkitAudioContext;
