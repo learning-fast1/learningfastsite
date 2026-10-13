@@ -322,7 +322,11 @@ Phono.audio = {
             // 2-letter syllable (e.g. "δι") as an abbreviation and spell
             // out the letter names ("δέλτα γιώτα") instead of reading it
             // as a syllable.
-            await new Promise(resolve => this._queueUtterance(syllables[i] + '.', 0.7, resolve));
+            // a recorded word/syllable (studio.html) is played instead of the computer voice
+            const recUrl = await this._soundUrl('t:' + syllables[i]);
+            if (gen !== this.navGeneration) return new Promise(() => {});
+            if (recUrl) await this._playRecorded(recUrl, gen);
+            else await new Promise(resolve => this._queueUtterance(syllables[i] + '.', 0.7, resolve));
             if (i < syllables.length - 1) {
                 await this._wait(delay);
             }
