@@ -9,7 +9,7 @@
 
   var script = document.currentScript;
   var base = script && script.src ? script.src : location.href;
-  var imgUrl = new URL('../images/mathainw-grafw-diavazw.jpg', base).href;
+  var imgUrl = new URL('../images/diakrisi-symfwnwn.jpg', base).href;
 
   var css = [
     '.lf-np-overlay{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(26,26,46,.62);font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;animation:lf-np-fade .25s ease-out}',
@@ -46,16 +46,16 @@
     var title = document.createElement('h2');
     title.className = 'lf-np-title';
     title.id = 'lf-np-title';
-    title.textContent = 'Νέο εκπαιδευτικό παιχνίδι!';
+    title.textContent = 'Νέο παιχνίδι για τη Διάκριση των Συμφώνων!';
 
     var text = document.createElement('p');
     text.className = 'lf-np-text';
-    text.textContent = 'Στα παιχνίδια θα βρείτε το νέο εκπαιδευτικό παιχνίδι "Μαθαίνω να γράφω και να διαβάζω" για παιδιά Α΄ δημοτικού ή για παιδιά με γενικές/ειδικές μαθησιακές δυσκολίες. Στο παιχνίδι τα παιδιά αναγνωρίζουν και εντοπίζουν το κάθε γράμμα, συνθέτουν συλλαβές και λέξεις. Θα το βρείτε στην αρχική οθόνη.';
+    text.textContent = 'Έχει ανέβει στην ιστοσελίδα του Learning Fast νέο εκπαιδευτικό ψηφιακό παιχνίδι που βοηθά τα παιδιά να εξασκηθούν στη διάκριση συμφώνων που συχνά μοιάζουν ή συγχέονται κατά την ανάγνωση και τη γραφή. Μέσα από διαδραστικές δραστηριότητες και παιγνιώδη εξάσκηση, τα παιδιά μαθαίνουν να αναγνωρίζουν τα γράμματα με μεγαλύτερη ακρίβεια και να ενισχύουν τη σύνδεση ανάμεσα στα γράμματα και τους ήχους τους.';
 
     var img = document.createElement('img');
     img.className = 'lf-np-img';
     img.src = imgUrl;
-    img.alt = 'Μαθαίνω να γράφω και να διαβάζω – η αρχική οθόνη του παιχνιδιού';
+    img.alt = 'Διάκριση Συμφώνων – η αρχική οθόνη του παιχνιδιού';
 
     card.appendChild(close);
     card.appendChild(title);
