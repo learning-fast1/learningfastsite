@@ -65,6 +65,7 @@
   <div class="export">
     <p id="count">Ηχογραφημένοι: 0 από 21</p>
     <p>Όταν τελειώσεις (ή όποτε θες), κατέβασε το zip και στείλ' το μου, ώστε οι ηχογραφήσεις να ανέβουν στο site και να τις ακούν όλοι.</p>
+    <button class="btn primary" id="send" type="button" disabled style="display:none">📤 Στείλε στον υπολογιστή</button>
     <button class="btn primary" id="zip" type="button" disabled>⬇ Κατέβασε το zip</button>
   </div>
 </div>
@@ -79,6 +80,7 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var chips = $('chips'), big = $('big'), type = $('type'), hint = $('hint'), status = $('status');
+  var sendBtn = $('send'), PIN = new URLSearchParams(location.search).get('pin') || '', pcOk = false;
   var recBtn = $('rec'), playBtn = $('play'), nextBtn = $('next'), delBtn = $('del'), zipBtn = $('zip'), count = $('count');
 
   function setStatus(msg, cls) { status.textContent = msg || ''; status.className = 'status' + (cls ? ' ' + cls : ''); }
@@ -104,6 +106,8 @@
     var n = Object.keys(done).length;
     count.textContent = 'Ηχογραφημένοι: ' + n + ' από ' + LIST.length;
     zipBtn.disabled = n === 0;
+    sendBtn.style.display = pcOk ? '' : 'none';
+    sendBtn.disabled = n === 0;
     recBtn.textContent = recording ? '⏹ Σταμάτα' : (done[s.key] ? '🎙️ Ηχογράφηση ξανά' : '🎙️ Ηχογράφηση');
     recBtn.className = 'btn ' + (recording ? 'recording' : 'rec');
   }
@@ -258,7 +262,29 @@
   };
   zipBtn.onclick = exportZip;
 
+  /* ---------- αποστολή απευθείας στον υπολογιστή (όταν η σελίδα ανοίγει από τον τοπικό server) ---------- */
+  sendBtn.onclick = async function () {
+    sendBtn.disabled = true;
+    var sent = 0, failed = 0, total = Object.keys(done).length;
+    setStatus('Στέλνω… 0/' + total);
+    for (var i = 0; i < LIST.length; i++) {
+      var s = LIST[i];
+      if (!done[s.key]) continue;
+      try {
+        var blob = await Phono.recordings.get(s.key);
+        var r = await fetch('/studio-upload?file=' + encodeURIComponent(s.file) + '&pin=' + encodeURIComponent(PIN), { method: 'POST', body: blob });
+        if (!r.ok) throw new Error(await r.text());
+        sent++;
+      } catch (e) { failed++; }
+      setStatus('Στέλνω… ' + (sent + failed) + '/' + total);
+    }
+    sendBtn.disabled = false;
+    if (failed) setStatus('Στάλθηκαν ' + sent + ', απέτυχαν ' + failed + '. Έλεγξε ότι το PIN στη διεύθυνση είναι σωστό.', 'err');
+    else setStatus('Στάλθηκαν ' + sent + ' ήχοι στον υπολογιστή ✓', 'ok');
+  };
+
   (async function init() {
+    try { var pr = await fetch('/studio-ping', { cache: 'no-store' }); pcOk = pr.ok && (await pr.json()).ok === true; } catch (e) { pcOk = false; }
     for (var i = 0; i < LIST.length; i++) {
       try { if (await Phono.recordings.get(LIST[i].key)) done[LIST[i].key] = true; } catch (e) { /* ignore */ }
     }
