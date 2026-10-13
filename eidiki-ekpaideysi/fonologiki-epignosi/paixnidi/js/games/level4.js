@@ -72,8 +72,12 @@ function level4TierForRound(round, total) {
  * installed Greek voice.
  */
 function level4SpeakPhoneme(phoneme, type) {
-    const text = type === 'cont' ? phoneme.repeat(3) : (phoneme + '.');
-    Phono.audio.speak(text, 0.75);
+    // The educator's own recording first (studio.html); the computer voice only when there is none.
+    Phono.audio.playSound(phoneme).then(played => {
+        if (played) return;
+        const text = type === 'cont' ? phoneme.repeat(3) : (phoneme + '.');
+        Phono.audio.speak(text, 0.75);
+    });
 }
 
 /**

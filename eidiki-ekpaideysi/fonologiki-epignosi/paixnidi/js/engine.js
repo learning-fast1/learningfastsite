@@ -167,6 +167,36 @@ Phono.audio = {
         return this._cachedVoice;
     },
 
+    /** Plays the educator's recording of an isolated sound (studio.html), if there is one:
+     * first the recording made on this device, then the file that was uploaded to the site.
+     * Resolves true when a recording was played (or the voice is muted), false when there is
+     * none — the caller then falls back to the computer voice. */
+    async playSound(key) {
+        if (this.muted) return true;
+        if (this.currentGameId && this.isVoiceMuted(this.currentGameId)) return true;
+        const url = await this._soundUrl(key === 'ς' ? 'σ' : key);
+        if (!url) return false;
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (this._soundEl) { try { this._soundEl.pause(); } catch (e) { /* ignore */ } }
+        const a = new Audio(url);
+        this._soundEl = a;
+        try { await a.play(); } catch (e) { return false; }
+        return true;
+    },
+
+    _soundUrls: {},
+    async _soundUrl(key) {
+        if (this._soundUrls[key]) return this._soundUrls[key];
+        let url = null;
+        try {
+            const blob = Phono.recordings && await Phono.recordings.get(key);
+            if (blob) url = URL.createObjectURL(blob);
+        } catch (e) { /* no IndexedDB: use the uploaded file */ }
+        if (!url && Phono.soundFiles && Phono.soundFiles[key]) url = Phono.soundFiles[key];
+        if (url) this._soundUrls[key] = url;
+        return url;
+    },
+
     /** Speak text using Web Speech API (Greek) */
     speak(text, rate = 0.95) {
         if (this.muted) return Promise.resolve();
