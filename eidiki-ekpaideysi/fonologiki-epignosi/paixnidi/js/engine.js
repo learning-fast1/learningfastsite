@@ -185,8 +185,10 @@ Phono.audio = {
     },
 
     _soundUrls: {},
+    _soundMiss: new Set(),
     async _soundUrl(key) {
         if (this._soundUrls[key]) return this._soundUrls[key];
+        if (this._soundMiss.has(key)) return null;
         let url = null;
         try {
             const blob = Phono.recordings && await Phono.recordings.get(key);
@@ -194,11 +196,41 @@ Phono.audio = {
         } catch (e) { /* no IndexedDB: use the uploaded file */ }
         if (!url && Phono.soundFiles && Phono.soundFiles[key]) url = Phono.soundFiles[key];
         if (url) this._soundUrls[key] = url;
+        else this._soundMiss.add(key);
         return url;
     },
 
-    /** Speak text using Web Speech API (Greek) */
+    /** Plays a recorded file and resolves when it ends. A new recording (or the computer voice) cuts it
+     * short and releases whatever was waiting for it, like speechSynthesis.cancel() does for the TTS. */
+    _playRecorded(url, gen) {
+        return new Promise((resolve) => {
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            if (this._soundDone) { const d = this._soundDone; this._soundDone = null; d(); }
+            if (this._soundEl) { try { this._soundEl.pause(); } catch (e) { /* ignore */ } }
+            const a = new Audio(url);
+            this._soundEl = a;
+            const done = () => { if (this._soundDone === done) this._soundDone = null; if (gen !== this.navGeneration) return; resolve(); };
+            this._soundDone = done;
+            a.onended = done;
+            a.onerror = done;
+            a.play().catch(done);
+        });
+    },
+
+    /** Says a word/sentence: the educator's recording when there is one (studio.html), otherwise the computer voice. */
     speak(text, rate = 0.95) {
+        if (this.muted) return Promise.resolve();
+        if (this.currentGameId && this.isVoiceMuted(this.currentGameId)) return Promise.resolve();
+        const gen = this.navGeneration;
+        return this._soundUrl('t:' + text).then((url) => {
+            // The app navigated away meanwhile: never resolve, like the computer-voice path does.
+            if (gen !== this.navGeneration) return new Promise(() => {});
+            return url ? this._playRecorded(url, gen) : this._speakTts(text, rate);
+        });
+    },
+
+    /** Speak text using Web Speech API (Greek) */
+    _speakTts(text, rate = 0.95) {
         if (this.muted) return Promise.resolve();
         if (this.currentGameId && this.isVoiceMuted(this.currentGameId)) return Promise.resolve();
         const gen = this.navGeneration;

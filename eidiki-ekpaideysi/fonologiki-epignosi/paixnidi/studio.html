@@ -14,12 +14,20 @@
   header a { color: var(--accent2); font-weight: 700; text-decoration: none; font-size: .9rem; }
   h1 { font-size: 1.35rem; margin: 10px 0 2px; }
   .sub { color: var(--soft); margin: 0 0 12px; font-size: .95rem; line-height: 1.45; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+  .tab { flex: 1; padding: 12px 8px; border: 2px solid var(--line); border-radius: 14px; background: var(--card); font: inherit; font-size: 1rem; font-weight: 800; color: var(--soft); cursor: pointer; }
+  .tab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
   .chip { min-width: 44px; padding: 8px 10px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); font: inherit; font-size: 1.05rem; font-weight: 700; color: var(--ink); cursor: pointer; }
   .chip.done { border-color: var(--ok); color: var(--ok); }
   .chip.current { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .progress { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 0 0 8px; }
+  .progress > i { display: block; height: 100%; background: var(--ok); width: 0; transition: width .2s; }
+  .where { color: var(--soft); font-size: .9rem; margin: 0 0 12px; text-align: center; }
   .card { background: var(--card); border-radius: 22px; padding: 22px 18px 18px; text-align: center; box-shadow: 0 8px 28px rgba(80, 70, 130, .12); }
-  .big { font-size: 6.5rem; font-weight: 800; line-height: 1.05; margin: 4px 0 6px; }
+  .big { font-size: 6.5rem; font-weight: 800; line-height: 1.05; margin: 4px 0 6px; word-break: break-word; }
+  .big.word { font-size: 3rem; }
+  .big.word.long { font-size: 2.2rem; }
   .type { display: inline-block; padding: 4px 12px; border-radius: 999px; background: #eee9fb; color: var(--accent2); font-weight: 700; font-size: .85rem; }
   .hint { margin: 12px 0 16px; color: var(--soft); line-height: 1.5; font-size: 1rem; }
   .status { min-height: 1.4em; margin: 8px 0 0; font-weight: 700; color: var(--soft); }
@@ -29,6 +37,7 @@
   .btn.rec { background: var(--rec); color: #fff; }
   .btn.recording { background: #fff; color: var(--rec); border: 3px solid var(--rec); animation: pulse 1s infinite; }
   .btn.primary { background: linear-gradient(135deg, #9a8be6, var(--accent2)); color: #fff; }
+  .btn.small { font-size: .95rem; padding: 12px 10px; }
   .btn[disabled] { opacity: .45; cursor: default; }
   .row { display: flex; gap: 10px; }
   .row .btn { margin-top: 10px; }
@@ -45,9 +54,18 @@
     <span style="color:var(--soft);font-size:.85rem">Κρυφή σελίδα</span>
   </header>
   <h1>Στούντιο ήχων</h1>
-  <p class="sub">Ηχογράφησε τους ήχους που λέει το παιχνίδι. Μόλις τους ηχογραφήσεις, ακούγονται αμέσως στο παιχνίδι σε αυτή τη συσκευή. Στο τέλος κατεβάζεις ένα zip για να ανέβουν στο site.</p>
+  <p class="sub">Ηχογράφησε τους ήχους και τις λέξεις που λέει το παιχνίδι. Ό,τι ηχογραφείς ακούγεται αμέσως στο παιχνίδι σε αυτή τη συσκευή· όταν ανοίγεις τη σελίδα από τον υπολογιστή, στέλνεται και στον υπολογιστή.</p>
+
+  <div class="tabs">
+    <button class="tab on" id="tabSounds" type="button">Ήχοι</button>
+    <button class="tab" id="tabWords" type="button">Λέξεις</button>
+  </div>
 
   <div class="chips" id="chips"></div>
+  <div id="wordsBar" style="display:none">
+    <div class="progress"><i id="bar"></i></div>
+    <p class="where" id="where"></p>
+  </div>
 
   <div class="card">
     <div class="big" id="big">–</div>
@@ -59,57 +77,112 @@
       <button class="btn" id="play" type="button" disabled>▶ Άκουσε</button>
       <button class="btn primary" id="next" type="button">Επόμενος ➜</button>
     </div>
+    <div class="row" id="navRow" style="display:none">
+      <button class="btn small" id="prev" type="button">⬅ Προηγούμενη</button>
+      <button class="btn small" id="nextMissing" type="button">⏭ Επόμενη που λείπει</button>
+    </div>
     <button class="btn del" id="del" type="button" disabled>Σβήσε αυτή την ηχογράφηση</button>
   </div>
 
   <div class="export">
-    <p id="count">Ηχογραφημένοι: 0 από 21</p>
-    <p>Όταν τελειώσεις (ή όποτε θες), κατέβασε το zip και στείλ' το μου, ώστε οι ηχογραφήσεις να ανέβουν στο site και να τις ακούν όλοι.</p>
+    <p id="count">Ηχογραφημένα: 0</p>
+    <p>Όταν τελειώσεις (ή όποτε θες), στείλε τα στον υπολογιστή, ή κατέβασε το zip και στείλ' το μου, ώστε να ανέβουν στο site και να τα ακούν όλοι.</p>
     <button class="btn primary" id="send" type="button" disabled style="display:none">📤 Στείλε στον υπολογιστή</button>
     <button class="btn primary" id="zip" type="button" disabled>⬇ Κατέβασε το zip</button>
   </div>
 </div>
 
-<script src="js/sounds.js?v=2"></script>
+<script src="js/data.js?v=91"></script>
+<script src="js/words_l2.js?v=90"></script>
+<script src="js/rhymes_l3.js?v=90"></script>
+<script src="js/initial_phonemes_l4.js?v=90"></script>
+<script src="js/final_phonemes_l4.js?v=90"></script>
+<script src="js/phonemes_l5.js?v=90"></script>
+<script src="js/sounds.js?v=3"></script>
 <script>
 (function () {
-  var LIST = Phono.soundList;
   var TYPE = { cont: 'Παρατεινόμενος ήχος', stop: 'Σύντομος ήχος', vowel: 'Φωνήεν' };
-  var OUT_RATE = 24000, MAX_MS = 4500;
-  var idx = 0, done = {}, stream = null, mr = null, chunks = [], recording = false, timer = null, audioEl = null;
+  var OUT_RATE = 24000;
+
+  /* ---------- τι ηχογραφείται ---------- */
+  var LAT = { α: 'a', β: 'v', γ: 'g', δ: 'd', ε: 'e', ζ: 'z', η: 'i', θ: 'th', ι: 'i', κ: 'k', λ: 'l', μ: 'm', ν: 'n', ξ: 'x', ο: 'o', π: 'p', ρ: 'r', σ: 's', ς: 's', τ: 't', υ: 'y', φ: 'f', χ: 'ch', ψ: 'ps', ω: 'o' };
+  function latin(text) {
+    var b = text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    return b.split('').map(function (c) { return LAT[c] !== undefined ? LAT[c] : (/[a-z0-9]/.test(c) ? c : '-'); }).join('').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'x';
+  }
+  var SOUNDS = Phono.soundList.map(function (s) {
+    return { kind: 'sound', key: s.key, label: s.key, file: s.file, type: s.type, hint: Phono.soundHint(s) };
+  });
+  var WORDS = (function () {
+    var D = Phono.data, seen = {}, words = [];
+    ['words', 'oneSyllableWords', 'wordsL2', 'rhymesL3', 'initialPhonemesL4', 'finalPhonemesL4', 'phonemesL5'].forEach(function (b) {
+      (D[b] || []).forEach(function (w) { var t = w.word && String(w.word).normalize('NFC'); if (t && !seen[t]) { seen[t] = 1; words.push(t); } });
+    });
+    words.sort(function (a, b) { return a.localeCompare(b, 'el'); });
+    var used = {};
+    return words.map(function (w) {
+      var f = 'w-' + latin(w), n = f, i = 2;
+      while (used[n]) n = f + '-' + (i++);
+      used[n] = 1;
+      return { kind: 'word', key: 't:' + w, label: w, file: n, hint: 'Πες τη λέξη φυσικά και καθαρά, όπως θα την έλεγες σε ένα παιδί.' };
+    });
+  })();
+  var ALL = SOUNDS.concat(WORDS);
+  var tab = 'sounds', LIST = SOUNDS, idx = 0, done = {}, stream = null, recording = false, timer = null, audioEl = null, MAX_MS = 4500;
 
   var $ = function (id) { return document.getElementById(id); };
-  var chips = $('chips'), big = $('big'), type = $('type'), hint = $('hint'), status = $('status');
+  var chips = $('chips'), big = $('big'), type = $('type'), hint = $('hint'), status = $('status'), bar = $('bar'), whereEl = $('where');
   var sendBtn = $('send'), PIN = new URLSearchParams(location.search).get('pin') || '', pcOk = false;
   var recBtn = $('rec'), playBtn = $('play'), nextBtn = $('next'), delBtn = $('del'), zipBtn = $('zip'), count = $('count');
 
   function setStatus(msg, cls) { status.textContent = msg || ''; status.className = 'status' + (cls ? ' ' + cls : ''); }
+  function countDone(list) { return list.filter(function (s) { return done[s.key]; }).length; }
 
   /* ---------- οθόνη ---------- */
   function draw() {
+    var isSounds = tab === 'sounds';
+    $('tabSounds').className = 'tab' + (isSounds ? ' on' : '');
+    $('tabWords').className = 'tab' + (!isSounds ? ' on' : '');
+    chips.style.display = isSounds ? '' : 'none';
+    $('wordsBar').style.display = isSounds ? 'none' : '';
+    $('navRow').style.display = isSounds ? 'none' : '';
     chips.innerHTML = '';
-    LIST.forEach(function (s, i) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'chip' + (done[s.key] ? ' done' : '') + (i === idx ? ' current' : '');
-      b.textContent = s.key + (done[s.key] ? ' ✓' : '');
-      b.onclick = function () { if (!recording) { idx = i; draw(); } };
-      chips.appendChild(b);
-    });
+    if (isSounds) {
+      LIST.forEach(function (s, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip' + (done[s.key] ? ' done' : '') + (i === idx ? ' current' : '');
+        b.textContent = s.label + (done[s.key] ? ' ✓' : '');
+        b.onclick = function () { if (!recording) { idx = i; draw(); } };
+        chips.appendChild(b);
+      });
+    }
     var s = LIST[idx];
-    big.textContent = s.key;
-    type.textContent = TYPE[s.type];
-    hint.textContent = Phono.soundHint(s);
+    big.textContent = s.label;
+    big.className = 'big' + (s.kind === 'word' ? ' word' + (s.label.length > 11 ? ' long' : '') : '');
+    type.textContent = s.kind === 'sound' ? TYPE[s.type] : 'Λέξη ' + (idx + 1) + ' από ' + LIST.length;
+    hint.textContent = s.hint;
     playBtn.disabled = !done[s.key];
     delBtn.disabled = !done[s.key];
     nextBtn.disabled = recording;
-    var n = Object.keys(done).length;
-    count.textContent = 'Ηχογραφημένοι: ' + n + ' από ' + LIST.length;
-    zipBtn.disabled = n === 0;
+    $('prev').disabled = recording || idx === 0;
+    $('nextMissing').disabled = recording;
+    var nd = countDone(LIST);
+    if (!isSounds) { bar.style.width = Math.round(100 * nd / LIST.length) + '%'; whereEl.textContent = 'Ηχογραφημένες λέξεις: ' + nd + ' από ' + LIST.length; }
+    count.textContent = 'Ηχογραφημένοι ήχοι: ' + countDone(SOUNDS) + '/' + SOUNDS.length + ' · λέξεις: ' + countDone(WORDS) + '/' + WORDS.length;
+    var total = countDone(ALL);
+    zipBtn.disabled = total === 0;
     sendBtn.style.display = pcOk ? '' : 'none';
-    sendBtn.disabled = n === 0;
+    sendBtn.disabled = total === 0;
     recBtn.textContent = recording ? '⏹ Σταμάτα' : (done[s.key] ? '🎙️ Ηχογράφηση ξανά' : '🎙️ Ηχογράφηση');
     recBtn.className = 'btn ' + (recording ? 'recording' : 'rec');
+  }
+  function setTab(t) {
+    if (recording) return;
+    tab = t; LIST = t === 'sounds' ? SOUNDS : WORDS;
+    var first = LIST.findIndex(function (s) { return !done[s.key]; });
+    idx = first < 0 ? 0 : first;
+    setStatus(''); draw();
   }
 
   /* ---------- ηχογράφηση ----------
@@ -146,7 +219,7 @@
       var mute = actx.createGain(); mute.gain.value = 0; // να μη ακούγεται το μικρόφωνο στο ηχείο
       srcNode.connect(procNode); procNode.connect(mute); mute.connect(actx.destination);
       recording = true;
-      setStatus('Ηχογραφεί… πες τον ήχο και πάτα «Σταμάτα».');
+      setStatus('Ηχογραφεί… πες το και πάτα «Σταμάτα».');
       timer = setTimeout(stopRec, MAX_MS);
       draw();
     } catch (e) { setErr('Δεν ξεκίνησε η ηχογράφηση.', e); }
@@ -160,6 +233,13 @@
     draw();
     onStopped();
   }
+  async function uploadOne(s) {
+    var blob = await Phono.recordings.get(s.key);
+    if (!blob) return false;
+    var r = await fetch('/studio-upload?file=' + encodeURIComponent(s.file) + '&key=' + encodeURIComponent(s.key) + '&pin=' + encodeURIComponent(PIN), { method: 'POST', body: blob });
+    if (!r.ok) throw new Error(await r.text());
+    return true;
+  }
   async function onStopped() {
     var s = LIST[idx], step = 'επεξεργασία', wav;
     try {
@@ -172,7 +252,13 @@
       step = 'αποθήκευση';
       await Phono.recordings.put(s.key, wav);
       done[s.key] = true;
-      setStatus(Phono.recordings.persistent ? 'Αποθηκεύτηκε ✓' : 'Αποθηκεύτηκε προσωρινά ✓ — στείλ’ τα στον υπολογιστή πριν κλείσεις τη σελίδα.', 'ok');
+      var msg = Phono.recordings.persistent ? 'Αποθηκεύτηκε ✓' : 'Αποθηκεύτηκε προσωρινά ✓';
+      if (pcOk) {
+        step = 'αποστολή στον υπολογιστή';
+        try { await uploadOne(s); msg += ' · στάλθηκε στον υπολογιστή ✓'; }
+        catch (e) { msg += ' · ΔΕΝ στάλθηκε (έλεγξε το PIN)'; report('αποστολή', e); }
+      } else if (!Phono.recordings.persistent) msg += ' — κατέβασε το zip πριν κλείσεις τη σελίδα.';
+      setStatus(msg, 'ok');
       draw();
       step = 'αναπαραγωγή';
       play(s.key);
@@ -258,20 +344,21 @@
   async function exportZip() {
     zipBtn.disabled = true; setStatus('Φτιάχνω το zip…');
     var files = [], map = {};
-    for (var i = 0; i < LIST.length; i++) {
-      var s = LIST[i], blob = await Phono.recordings.get(s.key);
+    for (var i = 0; i < ALL.length; i++) {
+      var s = ALL[i], blob = await Phono.recordings.get(s.key);
       if (!blob) continue;
-      files.push({ name: 'audio/sounds/' + s.file + '.wav', data: new Uint8Array(await blob.arrayBuffer()) });
-      map[s.key] = 'audio/sounds/' + s.file + '.wav';
+      var path = (s.kind === 'sound' ? 'audio/sounds/' : 'audio/words/') + s.file + '.wav';
+      files.push({ name: path, data: new Uint8Array(await blob.arrayBuffer()) });
+      map[s.key] = path;
     }
-    var manifest = '/* Οι ηχογραφήσεις της εκπαιδευτικού που έχουν ανέβει στο site (ήχος → αρχείο).\n   Το αρχείο αυτό το φτιάχνει το Στούντιο (studio.html) μαζί με τα αρχεία ήχου. */\nwindow.Phono = window.Phono || {};\nPhono.soundFiles = ' + JSON.stringify(map, null, 2) + ';\n';
+    var manifest = '/* Οι ηχογραφήσεις της εκπαιδευτικού που έχουν ανέβει στο site (ήχος ή «t:λέξη» → αρχείο). */\nwindow.Phono = window.Phono || {};\nPhono.soundFiles = ' + JSON.stringify(map, null, 2) + ';\n';
     files.push({ name: 'js/sounds_manifest.js', data: new TextEncoder().encode(manifest) });
     var zip = makeZip(files), a = document.createElement('a');
     var d = new Date(), pad = function (n) { return ('0' + n).slice(-2); };
     a.href = URL.createObjectURL(zip);
     a.download = 'fonologiki-ixoi-' + d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '.zip';
     document.body.appendChild(a); a.click(); a.remove();
-    setStatus('Το zip κατέβηκε ✓ (' + (files.length - 1) + ' ήχοι)', 'ok');
+    setStatus('Το zip κατέβηκε ✓ (' + (files.length - 1) + ' ηχογραφήσεις)', 'ok');
     draw();
   }
 
@@ -279,39 +366,46 @@
   recBtn.onclick = function () { recording ? stopRec() : startRec(); };
   playBtn.onclick = function () { play(LIST[idx].key); };
   nextBtn.onclick = function () { if (idx < LIST.length - 1) { idx++; setStatus(''); draw(); } };
+  $('prev').onclick = function () { if (idx > 0) { idx--; setStatus(''); draw(); } };
+  $('nextMissing').onclick = function () {
+    for (var k = 1; k <= LIST.length; k++) {
+      var j = (idx + k) % LIST.length;
+      if (!done[LIST[j].key]) { idx = j; setStatus(''); draw(); return; }
+    }
+    setStatus('Τις έχεις ηχογραφήσει όλες ✓', 'ok');
+  };
+  $('tabSounds').onclick = function () { setTab('sounds'); };
+  $('tabWords').onclick = function () { setTab('words'); };
   delBtn.onclick = async function () {
     var s = LIST[idx];
-    if (!confirm('Να σβηστεί η ηχογράφηση του «' + s.key + '»;')) return;
+    if (!confirm('Να σβηστεί η ηχογράφηση «' + s.label + '»;')) return;
     await Phono.recordings.del(s.key); delete done[s.key]; setStatus(''); draw();
   };
   zipBtn.onclick = exportZip;
 
-  /* ---------- αποστολή απευθείας στον υπολογιστή (όταν η σελίδα ανοίγει από τον τοπικό server) ---------- */
+  /* αποστολή όλων απευθείας στον υπολογιστή (όταν η σελίδα ανοίγει από τον τοπικό server) */
   sendBtn.onclick = async function () {
     sendBtn.disabled = true;
-    var sent = 0, failed = 0, total = Object.keys(done).length;
+    var sent = 0, failed = 0, total = countDone(ALL);
     setStatus('Στέλνω… 0/' + total);
-    for (var i = 0; i < LIST.length; i++) {
-      var s = LIST[i];
+    for (var i = 0; i < ALL.length; i++) {
+      var s = ALL[i];
       if (!done[s.key]) continue;
-      try {
-        var blob = await Phono.recordings.get(s.key);
-        var r = await fetch('/studio-upload?file=' + encodeURIComponent(s.file) + '&pin=' + encodeURIComponent(PIN), { method: 'POST', body: blob });
-        if (!r.ok) throw new Error(await r.text());
-        sent++;
-      } catch (e) { failed++; }
+      try { await uploadOne(s); sent++; } catch (e) { failed++; }
       setStatus('Στέλνω… ' + (sent + failed) + '/' + total);
     }
     sendBtn.disabled = false;
     if (failed) setStatus('Στάλθηκαν ' + sent + ', απέτυχαν ' + failed + '. Έλεγξε ότι το PIN στη διεύθυνση είναι σωστό.', 'err');
-    else setStatus('Στάλθηκαν ' + sent + ' ήχοι στον υπολογιστή ✓', 'ok');
+    else setStatus('Στάλθηκαν ' + sent + ' στον υπολογιστή ✓', 'ok');
   };
 
   (async function init() {
     try { var pr = await fetch('/studio-ping', { cache: 'no-store' }); pcOk = pr.ok && (await pr.json()).ok === true; } catch (e) { pcOk = false; }
-    for (var i = 0; i < LIST.length; i++) {
-      try { if (await Phono.recordings.get(LIST[i].key)) done[LIST[i].key] = true; } catch (e) { /* ignore */ }
+    for (var i = 0; i < ALL.length; i++) {
+      try { if (await Phono.recordings.get(ALL[i].key)) done[ALL[i].key] = true; } catch (e) { /* ignore */ }
     }
+    var start = new URLSearchParams(location.search).get('tab');
+    if (start === 'words') { tab = 'words'; LIST = WORDS; }
     var first = LIST.findIndex(function (s) { return !done[s.key]; });
     idx = first < 0 ? 0 : first;
     draw();
