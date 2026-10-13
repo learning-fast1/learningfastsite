@@ -311,6 +311,7 @@ Phono.games.initialSoundMC = {
                 className: 'phoneme-bubble consonant visible',
                 fontSize: 'var(--text-2xl)',
             }),
+            el('span', { className: 'sound-tap-hint', textContent: 'Πάτησε το γράμμα για να το ακούσεις!' }),
         ]);
 
         const choicesGrid = el('div', { className: 'choices-grid' });

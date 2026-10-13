@@ -110,3 +110,6 @@
 .big-game[data-game="syllableCounting"] .game-main-word { font-size: clamp(1.6rem, calc(var(--u) * 5.2), 3.4rem); line-height: 1.1; }
 .big-game[data-game="syllableCounting"] .tap-button { width: clamp(70px, calc(var(--u) * 13), 150px); height: clamp(70px, calc(var(--u) * 13), 150px); }
 .big-game[data-game="syllableCounting"] .tap-area { gap: clamp(4px, calc(var(--u) * .9), 14px); }
+
+/* «Πάτησε το γράμμα για να το ακούσεις!» δίπλα στο γράμμα */
+.sound-tap-hint { font-size: clamp(1rem, calc(var(--u, 1vh) * 3), 1.9rem); font-weight: 800; color: var(--text-secondary, #6b6785); text-align: left; max-width: 26em; line-height: 1.25; }
