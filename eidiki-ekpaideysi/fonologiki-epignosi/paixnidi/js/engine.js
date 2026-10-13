@@ -176,12 +176,29 @@ Phono.audio = {
         if (this.currentGameId && this.isVoiceMuted(this.currentGameId)) return true;
         const url = await this._soundUrl(key === 'ς' ? 'σ' : key);
         if (!url) return false;
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        if (this._soundEl) { try { this._soundEl.pause(); } catch (e) { /* ignore */ } }
-        const a = new Audio(url);
-        this._soundEl = a;
-        try { await a.play(); } catch (e) { return false; }
+        try { await this._startRecorded(url, null); } catch (e) { return false; }
         return true;
+    },
+
+    /* ONE audio element is used for every recording. iPhone/Safari only lets an element play without a tap if
+       that same element was started by a tap earlier, so it is "unlocked" by the first touch (silent clip) and
+       reused afterwards — a new Audio() per word was blocked, and the recorded word stayed silent. */
+    _audioEl() { if (!this._el) this._el = new Audio(); return this._el; },
+    _unlockAudio() {
+        if (this._unlocked) return;
+        this._unlocked = true;
+        const a = this._audioEl();
+        a.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+        a.play().catch(() => { this._unlocked = false; });
+    },
+    _startRecorded(url, onEnd) {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (this._soundDone) { const d = this._soundDone; this._soundDone = null; d(); }
+        const a = this._audioEl();
+        a.onended = onEnd; a.onerror = onEnd;
+        try { a.pause(); } catch (e) { /* ignore */ }
+        a.src = url;
+        return a.play();
     },
 
     _soundUrls: {},
@@ -225,16 +242,9 @@ Phono.audio = {
      * short and releases whatever was waiting for it, like speechSynthesis.cancel() does for the TTS. */
     _playRecorded(url, gen) {
         return new Promise((resolve) => {
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-            if (this._soundDone) { const d = this._soundDone; this._soundDone = null; d(); }
-            if (this._soundEl) { try { this._soundEl.pause(); } catch (e) { /* ignore */ } }
-            const a = new Audio(url);
-            this._soundEl = a;
             const done = () => { if (this._soundDone === done) this._soundDone = null; if (gen !== this.navGeneration) return; resolve(); };
             this._soundDone = done;
-            a.onended = done;
-            a.onerror = done;
-            a.play().catch(done);
+            this._startRecorded(url, done).catch(done);
         });
     },
 
@@ -1003,3 +1013,6 @@ Phono.helpers = {
 
 // Preload the educator's recorded sounds as soon as the page has loaded.
 window.addEventListener('load', () => { Phono.audio.preloadSounds(); });
+
+// The first touch unlocks the audio element used for the recordings (see _audioEl).
+['pointerdown', 'touchstart', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, () => Phono.audio._unlockAudio(), { passive: true }));
