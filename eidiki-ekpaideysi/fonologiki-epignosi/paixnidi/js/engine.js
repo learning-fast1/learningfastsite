@@ -203,6 +203,37 @@ Phono.audio = {
         return a.play();
     },
 
+    /** For a recording that says a word's sounds one by one (« γ… ά… τ… α »): loads it and finds when each sound
+     * starts, so the bubbles can appear exactly with the voice. Resolves { url, onsets } (onsets in seconds, one per
+     * sound) or null when there is no recording / the voice is off. If the pauses can't be told apart, the
+     * sounds are spread evenly over the length of the recording. */
+    async prepareSequence(key, n) {
+        if (this.muted) return null;
+        if (this.currentGameId && this.isVoiceMuted(this.currentGameId)) return null;
+        const url = await this._soundUrl(key);
+        if (!url) return null;
+        let onsets = null, duration = 0;
+        try {
+            const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+            const data = await (await fetch(url)).arrayBuffer();
+            const buf = await new Promise((res, rej) => { const p = new AC(1, 1, 24000).decodeAudioData(data, res, rej); if (p && p.then) p.then(res, rej); });
+            duration = buf.duration;
+            const x = buf.getChannelData(0), fr = Math.max(1, Math.round(buf.sampleRate * 0.01)), rms = [];
+            for (let i = 0; i < x.length; i += fr) { let s = 0, e = Math.min(x.length, i + fr); for (let j = i; j < e; j++) s += x[j] * x[j]; rms.push(Math.sqrt(s / (e - i))); }
+            let top = 0; rms.forEach(v => { if (v > top) top = v; });
+            const thr = Math.max(0.01, top * 0.12), segs = [];
+            let start = -1, gap = 0;
+            rms.forEach((v, i) => {
+                if (v > thr) { if (start < 0) start = i; gap = 0; }
+                else if (start >= 0 && ++gap >= 5) { segs.push(start); start = -1; gap = 0; } // a 50ms pause ends a sound
+            });
+            if (start >= 0) segs.push(start);
+            if (segs.length === n) onsets = segs.map(i => Math.max(0, i * 0.01 - 0.04));
+        } catch (e) { /* the sounds are spread evenly below */ }
+        if (!onsets && duration) onsets = Array.from({ length: n }, (_, i) => (i / n) * duration * 0.9);
+        return { url, onsets };
+    },
+
     _soundUrls: {},
     _soundMiss: new Set(),
 

@@ -54,13 +54,16 @@ Phono.games.phonemeSynthesis = {
 
         const instruction = el('p', { className: 'game-instruction', textContent: 'Δες τους ήχους. Ποια λέξη φτιάχνουν;' });
 
-        // Phoneme bubbles with animated reveal — visual only, no audio.
+        // Phoneme bubbles with animated reveal. With the educator's recording of the word's sounds
+        // (studio.html, « γ… ά… τ… α ») each bubble appears exactly as its sound is heard;
+        // without a recording they appear on a fixed beat, silently, as before.
         const phonemeDisplay = el('div', { className: 'phoneme-display', id: 'phoneme-display' });
+        const bubbles = [], seps = [];
         this.currentWord.phonemes.forEach((ph, i) => {
             if (i > 0) {
                 const sep = el('span', { className: 'phoneme-separator', textContent: '+' });
                 phonemeDisplay.appendChild(sep);
-                Phono.helpers.later(() => sep.classList.add('visible'), 400 + i * 500);
+                seps[i] = sep;
             }
             const isVowel = Phono.helpers.isVowelSound(ph);
             const bubble = el('div', {
@@ -68,8 +71,22 @@ Phono.games.phonemeSynthesis = {
                 textContent: ph,
             });
             phonemeDisplay.appendChild(bubble);
-            Phono.helpers.later(() => bubble.classList.add('visible'), 300 + i * 500);
+            bubbles.push(bubble);
         });
+        const roundToken = this._roundToken = {};
+        const reveal = (times, audioUrl) => {
+            if (this._roundToken !== roundToken) return;
+            bubbles.forEach((b, i) => {
+                Phono.helpers.later(() => b.classList.add('visible'), times[i]);
+                if (i > 0) Phono.helpers.later(() => seps[i].classList.add('visible'), Math.max(0, times[i] - 100));
+            });
+            if (audioUrl) Phono.helpers.later(() => Phono.audio._startRecorded(audioUrl, null).catch(() => {}), 300);
+        };
+        const beat = this.currentWord.phonemes.map((_, i) => 300 + i * 500);
+        Phono.audio.prepareSequence('p:' + this.currentWord.word, this.currentWord.phonemes.length).then(seq => {
+            if (seq && seq.onsets) reveal(seq.onsets.map(t => 300 + Math.round(t * 1000)), seq.url);
+            else reveal(beat, null);
+        }, () => reveal(beat, null));
 
         const distractors = Phono.data.getDistractors(this.currentWord.word, 3);
         const allChoices = Phono.data.shuffle([

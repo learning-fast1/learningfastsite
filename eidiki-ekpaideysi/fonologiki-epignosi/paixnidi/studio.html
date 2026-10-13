@@ -63,6 +63,7 @@
     <button class="tab" id="tabWords" type="button">Λέξεις</button>
     <button class="tab" id="tabSent" type="button">Προτάσεις</button>
     <button class="tab" id="tabVar" type="button">Χωρίς μια λέξη</button>
+    <button class="tab" id="tabBlend" type="button">Ένωσε τους ήχους</button>
   </div>
 
   <div class="chips" id="chips"></div>
@@ -160,9 +161,13 @@
     });
     return out;
   })();
-  var ALL = SOUNDS.concat(WORDS, SENTENCES, VARIANTS);
+  /* «Ένωσε τους ήχους»: η λέξη λέγεται ως σειρά ήχων, π.χ. γ… ά… τ… α, σε ΜΙΑ ηχογράφηση */
+  var BLEND = (Phono.data.phonemesL5 || []).filter(function (w) { return w.imageable && w.count >= 4 && w.count <= 6; }).map(function (w) {
+    return { kind: 'blend', key: 'p:' + w.word.normalize('NFC'), label: w.phonemes.join(' + '), file: 'p-' + latin(w.word), hint: 'Η λέξη «' + w.word + '». Πες τους ήχους ΜΑΖΙ σε μία ηχογράφηση, ένα-ένα με μικρή παύση ανάμεσά τους (π.χ. «γ… ά… τ… α»), ήχους και όχι ονόματα γραμμάτων.' };
+  });
+  var ALL = SOUNDS.concat(WORDS, SENTENCES, VARIANTS, BLEND);
   var tab = 'sounds', LIST = SOUNDS, idx = 0, done = {}, stream = null, recording = false, timer = null, audioEl = null, MAX_MS = 4500;
-  function maxMs(s) { return s && (s.kind === 'sentence' || s.kind === 'variant') ? 12000 : 4500; }
+  function maxMs(s) { return s && (s.kind === 'sentence' || s.kind === 'variant' || s.kind === 'blend') ? 12000 : 4500; }
 
   var $ = function (id) { return document.getElementById(id); };
   var chips = $('chips'), big = $('big'), type = $('type'), hint = $('hint'), status = $('status'), bar = $('bar'), whereEl = $('where');
@@ -179,6 +184,7 @@
     $('tabWords').className = 'tab' + (tab === 'words' ? ' on' : '');
     $('tabSent').className = 'tab' + (tab === 'sentences' ? ' on' : '');
     $('tabVar').className = 'tab' + (tab === 'variants' ? ' on' : '');
+    $('tabBlend').className = 'tab' + (tab === 'blend' ? ' on' : '');
     chips.style.display = isSounds ? '' : 'none';
     $('wordsBar').style.display = isSounds ? 'none' : '';
     $('navRow').style.display = isSounds ? 'none' : '';
@@ -195,7 +201,7 @@
     }
     var s = LIST[idx];
     big.textContent = s.label;
-    big.className = 'big' + (s.kind === 'word' ? ' word' + (s.label.length > 11 ? ' long' : '') : (s.kind === 'sentence' || s.kind === 'variant' ? ' sent' : ''));
+    big.className = 'big' + (s.kind === 'word' ? ' word' + (s.label.length > 11 ? ' long' : '') : (s.kind === 'sentence' || s.kind === 'variant' ? ' sent' : (s.kind === 'blend' ? ' word long' : '')));
     type.textContent = s.kind === 'sound' ? TYPE[s.type] : (s.kind === 'sentence' ? 'Πρόταση ' : (s.kind === 'variant' ? 'Επιλογή ' : 'Λέξη ')) + (idx + 1) + ' από ' + LIST.length;
     hint.textContent = s.hint;
     playBtn.disabled = !done[s.key];
@@ -205,7 +211,7 @@
     $('nextMissing').disabled = recording;
     var nd = countDone(LIST);
     if (!isSounds) { bar.style.width = Math.round(100 * nd / LIST.length) + '%'; whereEl.textContent = 'Ηχογραφημένες ' + (tab === 'sentences' ? 'προτάσεις' : (tab === 'variants' ? 'επιλογές' : 'λέξεις')) + ': ' + nd + ' από ' + LIST.length; }
-    count.textContent = 'Ηχογραφημένοι ήχοι: ' + countDone(SOUNDS) + '/' + SOUNDS.length + ' · λέξεις: ' + countDone(WORDS) + '/' + WORDS.length + ' · προτάσεις: ' + countDone(SENTENCES) + '/' + SENTENCES.length + ' · χωρίς μια λέξη: ' + countDone(VARIANTS) + '/' + VARIANTS.length;
+    count.textContent = 'Ηχογραφημένοι ήχοι: ' + countDone(SOUNDS) + '/' + SOUNDS.length + ' · λέξεις: ' + countDone(WORDS) + '/' + WORDS.length + ' · προτάσεις: ' + countDone(SENTENCES) + '/' + SENTENCES.length + ' · χωρίς μια λέξη: ' + countDone(VARIANTS) + '/' + VARIANTS.length + ' · ένωσε τους ήχους: ' + countDone(BLEND) + '/' + BLEND.length;
     var total = countDone(ALL);
     zipBtn.disabled = total === 0;
     sendBtn.style.display = pcOk ? '' : 'none';
@@ -215,7 +221,7 @@
   }
   function setTab(t) {
     if (recording) return;
-    tab = t; LIST = t === 'sounds' ? SOUNDS : (t === 'words' ? WORDS : (t === 'sentences' ? SENTENCES : VARIANTS));
+    tab = t; LIST = t === 'sounds' ? SOUNDS : (t === 'words' ? WORDS : (t === 'sentences' ? SENTENCES : (t === 'variants' ? VARIANTS : BLEND)));
     var first = LIST.findIndex(function (s) { return !done[s.key]; });
     idx = first < 0 ? 0 : first;
     setStatus(''); draw();
@@ -383,7 +389,7 @@
     for (var i = 0; i < ALL.length; i++) {
       var s = ALL[i], blob = await Phono.recordings.get(s.key);
       if (!blob) continue;
-      var path = (s.kind === 'sound' ? 'audio/sounds/' : (s.kind === 'sentence' ? 'audio/sentences/' : (s.kind === 'variant' ? 'audio/variants/' : 'audio/words/'))) + s.file + '.wav';
+      var path = (s.kind === 'sound' ? 'audio/sounds/' : (s.kind === 'sentence' ? 'audio/sentences/' : (s.kind === 'variant' ? 'audio/variants/' : (s.kind === 'blend' ? 'audio/phonemes/' : 'audio/words/')))) + s.file + '.wav';
       files.push({ name: path, data: new Uint8Array(await blob.arrayBuffer()) });
       map[s.key] = path;
     }
@@ -414,6 +420,7 @@
   $('tabWords').onclick = function () { setTab('words'); };
   $('tabSent').onclick = function () { setTab('sentences'); };
   $('tabVar').onclick = function () { setTab('variants'); };
+  $('tabBlend').onclick = function () { setTab('blend'); };
   delBtn.onclick = async function () {
     var s = LIST[idx];
     if (!confirm('Να σβηστεί η ηχογράφηση «' + s.label + '»;')) return;
@@ -446,6 +453,7 @@
     if (start === 'words') { tab = 'words'; LIST = WORDS; }
     if (start === 'sentences') { tab = 'sentences'; LIST = SENTENCES; }
     if (start === 'variants') { tab = 'variants'; LIST = VARIANTS; }
+    if (start === 'blend') { tab = 'blend'; LIST = BLEND; }
     var first = LIST.findIndex(function (s) { return !done[s.key]; });
     idx = first < 0 ? 0 : first;
     draw();
