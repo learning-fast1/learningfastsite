@@ -9,7 +9,7 @@
 
   var script = document.currentScript;
   var base = script && script.src ? script.src : location.href;
-  var imgUrl = new URL('../images/diakrisi-symfwnwn.jpg', base).href;
+  var imgUrl = new URL('../images/diakrisi-epipeda.jpg', base).href;
 
   var css = [
     '.lf-np-overlay{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(26,26,46,.62);font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;animation:lf-np-fade .25s ease-out}',
@@ -55,7 +55,7 @@
     var img = document.createElement('img');
     img.className = 'lf-np-img';
     img.src = imgUrl;
-    img.alt = 'Διάκριση Συμφώνων – η αρχική οθόνη του παιχνιδιού';
+    img.alt = 'Διάκριση Συμφώνων – τα 14 επίπεδα του παιχνιδιού';
 
     card.appendChild(close);
     card.appendChild(title);
