@@ -193,7 +193,9 @@ Phono.audio = {
     },
     _startRecorded(url, onEnd) {
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        // release whatever was waiting for the previous recording, THEN register the new one
         if (this._soundDone) { const d = this._soundDone; this._soundDone = null; d(); }
+        this._soundDone = onEnd || null;
         const a = this._audioEl();
         a.onended = onEnd; a.onerror = onEnd;
         try { a.pause(); } catch (e) { /* ignore */ }
@@ -243,7 +245,6 @@ Phono.audio = {
     _playRecorded(url, gen) {
         return new Promise((resolve) => {
             const done = () => { if (this._soundDone === done) this._soundDone = null; if (gen !== this.navGeneration) return; resolve(); };
-            this._soundDone = done;
             this._startRecorded(url, done).catch(done);
         });
     },
