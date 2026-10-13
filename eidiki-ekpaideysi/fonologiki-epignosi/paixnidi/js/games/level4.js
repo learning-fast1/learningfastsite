@@ -323,6 +323,10 @@ Phono.games.initialSoundMC = {
         });
 
         this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, soundBtnRow, choicesGrid]));
+
+        // The sound is played by itself one second after the pictures appear (the bubble repeats it).
+        const sound = this.currentSound, type = currentMeta ? currentMeta.type : 'cont';
+        Phono.helpers.later(() => level4SpeakPhoneme(sound, type), 1000);
     },
 
     checkAnswer(isCorrect, cardEl) {

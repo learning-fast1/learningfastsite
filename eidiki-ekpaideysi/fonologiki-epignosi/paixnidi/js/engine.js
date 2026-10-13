@@ -186,6 +186,21 @@ Phono.audio = {
 
     _soundUrls: {},
     _soundMiss: new Set(),
+
+    /** Downloads the uploaded sound files up front (21 small files), so a sound plays the moment it is
+     * needed instead of after a network wait. A recording made on this device still comes first. */
+    async preloadSounds() {
+        const files = (Phono.soundFiles) || {};
+        for (const key of Object.keys(files)) {
+            if (key.startsWith('t:')) continue;
+            try {
+                const url = await this._soundUrl(key);
+                if (!url || url.startsWith('blob:')) continue;
+                const r = await fetch(url);
+                if (r.ok) this._soundUrls[key] = URL.createObjectURL(await r.blob());
+            } catch (e) { /* the file is fetched when first played */ }
+        }
+    },
     async _soundUrl(key) {
         if (this._soundUrls[key]) return this._soundUrls[key];
         if (this._soundMiss.has(key)) return null;
@@ -975,3 +990,6 @@ Phono.helpers = {
         return vowelSounds.includes(phoneme.toLowerCase());
     },
 };
+
+// Preload the educator's recorded sounds as soon as the page has loaded.
+window.addEventListener('load', () => { Phono.audio.preloadSounds(); });
