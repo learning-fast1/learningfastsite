@@ -35,6 +35,7 @@ Phono.games.phonemeSynthesis = {
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
+        this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
         this.usedWords = [];
         this.loadRound();
@@ -79,7 +80,7 @@ Phono.games.phonemeSynthesis = {
         // Without a recording there is nothing to hear, so the letters appear on a fixed beat, as before.
         const roundToken = this._roundToken = {};
         let seq = null;
-        const startAudio = (delay) => { if (seq && seq.url) Phono.helpers.later(() => Phono.audio._startRecorded(seq.url, null).catch(() => {}), delay); };
+        const startAudio = (delay) => { if (Phono.audio.isVoiceMuted('phonemeSynthesis')) return; if (seq && seq.url) Phono.helpers.later(() => Phono.audio._startRecorded(seq.url, null).catch(() => {}), delay); };
         const showAll = () => { bubbles.forEach(b => b.classList.add('visible')); seps.forEach(sp => sp && sp.classList.add('visible')); };
         const showSynced = () => {
             bubbles.forEach(b => b.classList.remove('visible'));
@@ -108,6 +109,7 @@ Phono.games.phonemeSynthesis = {
             onClick: showSynced,
         });
         const soundRow = el('div', { className: 'sentence-row three-btn-row' }, [
+            this.createVoiceToggle ? this.createVoiceToggle('phonemeSynthesis') : null,
             this.createRepeatButton ? this.createRepeatButton(() => startAudio(0)) : null,
             lettersBtn,
         ].filter(Boolean));
@@ -187,6 +189,7 @@ Phono.games.phonemeAnalysis = {
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
+        this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
         this.usedWords = [];
         try { this.hardMode = localStorage.getItem('phono_phonemeCountingHardMode') === '1'; } catch (e) { this.hardMode = false; }
@@ -294,6 +297,7 @@ Phono.games.phonemeAnalysis = {
 
         // The word is said when the picture appears (the educator's recording), and can be heard again.
         const wordRow = el('div', { className: 'sentence-row' }, [
+            this.createVoiceToggle ? this.createVoiceToggle('phonemeAnalysis') : null,
             this.createRepeatButton ? this.createRepeatButton(() => Phono.audio.speak(this.currentWord.word)) : null,
             seeWordBtn,
         ].filter(Boolean));
@@ -392,6 +396,7 @@ Phono.games.elkoninBoxes = {
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
+        this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
         this.usedWords = [];
         this.loadRound();
@@ -429,6 +434,7 @@ Phono.games.elkoninBoxes = {
         const wordToken = this._wordToken = {};
         Phono.helpers.later(() => { if (this._wordToken === wordToken) setWord(false); }, 3000);
         const soundRow = el('div', { className: 'sentence-row' }, [
+            this.createVoiceToggle ? this.createVoiceToggle('elkoninBoxes') : null,
             this.createRepeatButton ? this.createRepeatButton(() => Phono.audio.speak(this.currentWord.word)) : null,
             seeWordBtn,
         ].filter(Boolean));

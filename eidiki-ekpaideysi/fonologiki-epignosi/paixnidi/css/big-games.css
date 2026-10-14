@@ -116,4 +116,4 @@
 
 /* τρία κουμπιά στη σειρά (Ένωσε τους ήχους): να χωράνε και σε στενό κινητό */
 .three-btn-row { flex-wrap: nowrap; gap: 6px; justify-content: center; }
-@media (max-width: 420px) { .three-btn-row .btn, .three-btn-row .btn-small { padding: 7px 9px; font-size: .8rem; white-space: nowrap; } .three-btn-row .btn-icon { width: 34px; height: 34px; font-size: 1rem; } }
+@media (max-width: 420px) { .three-btn-row { gap: 4px; } .three-btn-row .btn, .three-btn-row .btn-small { padding: 6px 6px !important; font-size: .74rem !important; white-space: nowrap; flex-shrink: 1; } .three-btn-row .btn-icon { width: 30px !important; height: 30px !important; padding: 0 !important; font-size: .9rem !important; flex: none; } }
