@@ -85,7 +85,10 @@ Phono.games.wordSizeCompare = {
         this.sides = sides;
         this.cards = {};
         this.cardOrder = [];
-        const choicesGrid = el('div', { className: 'choices-grid' });
+        // The words under the pictures start hidden; "Εμφάνιση λέξεων" shows them.
+        const choicesGrid = el('div', { className: 'choices-grid words-hidden' });
+        const showWordsBtn = el('button', { className: 'btn btn-secondary btn-small', textContent: 'Εμφάνιση λέξεων', onClick: () => { const hidden = choicesGrid.classList.toggle('words-hidden'); showWordsBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις'; } });
+        instructionRow.appendChild(showWordsBtn);
         sides.forEach(side => {
             const boxesDiv = el('div', { className: 'syllable-boxes wordsize-syllable-boxes', style: { display: 'none', marginTop: 'var(--space-sm)' } });
             const card = el('div', {

@@ -294,10 +294,10 @@ Phono.games.syllableSynthesis = {
         const choicesGrid = el('div', { className: 'choices-grid words-hidden' });
         const helpBtn = el('button', {
             className: 'btn btn-secondary btn-small',
-            textContent: 'Βοήθεια',
+            textContent: 'Εμφάνιση λέξεων',
             onClick: () => {
                 const hidden = choicesGrid.classList.toggle('words-hidden');
-                helpBtn.textContent = hidden ? 'Βοήθεια' : 'Κρύψε τις λέξεις';
+                helpBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις';
             },
         });
         controlsRow.appendChild(helpBtn);
