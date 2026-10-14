@@ -216,7 +216,11 @@ Phono.games.phonemeAnalysis = {
         const seeWordBtn = el('button', {
             className: 'btn btn-secondary btn-small',
             textContent: 'Δες τη λέξη',
-            onClick: () => { wordDiv.style.visibility = 'visible'; },
+            onClick: () => {
+                const hidden = wordDiv.style.visibility === 'hidden';
+                wordDiv.style.visibility = hidden ? 'visible' : 'hidden';
+                seeWordBtn.textContent = hidden ? 'Κρύψε τη λέξη' : 'Δες τη λέξη';
+            },
         });
         const modeBtn = el('button', {
             className: 'btn btn-secondary btn-small',
@@ -413,14 +417,15 @@ Phono.games.elkoninBoxes = {
 
         // The written word is only a model: it shows for 3 seconds, then
         // disappears (the space stays) so the child builds it from the sounds.
-        // "Δες τη λέξη" shows it again for 3 seconds.
-        const showWord = () => {
-            wordDiv.style.visibility = 'visible';
-            const token = this._wordToken = {};
-            Phono.helpers.later(() => { if (this._wordToken === token) wordDiv.style.visibility = 'hidden'; }, 3000);
+        // "Δες τη λέξη" shows it and stays until "Κρύψε τη λέξη" is pressed.
+        const seeWordBtn = el('button', { className: 'btn btn-secondary btn-small', textContent: 'Κρύψε τη λέξη' });
+        const setWord = (visible) => {
+            wordDiv.style.visibility = visible ? 'visible' : 'hidden';
+            seeWordBtn.textContent = visible ? 'Κρύψε τη λέξη' : 'Δες τη λέξη';
         };
-        showWord();
-        const seeWordBtn = el('button', { className: 'btn btn-secondary btn-small', textContent: 'Δες τη λέξη', onClick: showWord });
+        seeWordBtn.onclick = () => { this._wordToken = {}; setWord(wordDiv.style.visibility === 'hidden'); };
+        const wordToken = this._wordToken = {};
+        Phono.helpers.later(() => { if (this._wordToken === wordToken) setWord(false); }, 3000);
         const soundRow = el('div', { className: 'sentence-row' }, [
             this.createRepeatButton ? this.createRepeatButton(() => Phono.audio.speak(this.currentWord.word)) : null,
             seeWordBtn,
