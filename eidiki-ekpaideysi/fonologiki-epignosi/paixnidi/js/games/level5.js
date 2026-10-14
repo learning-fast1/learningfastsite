@@ -210,7 +210,14 @@ Phono.games.phonemeAnalysis = {
 
         const instruction = el('p', { className: 'game-instruction', textContent: 'Πόσους ήχους (φωνήματα) ακούς στη λέξη;' });
         const emojiDiv = el('div', { className: 'game-main-emoji', textContent: this.currentWord.emoji });
-        const wordDiv = el('div', { className: 'game-main-word', textContent: this.currentWord.word });
+        // The written word stays hidden (the space is kept): the child counts the sounds of the word they HEAR.
+        // "Δες τη λέξη" shows it.
+        const wordDiv = el('div', { className: 'game-main-word', textContent: this.currentWord.word, style: { visibility: 'hidden' } });
+        const seeWordBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: 'Δες τη λέξη',
+            onClick: () => { wordDiv.style.visibility = 'visible'; },
+        });
         const modeBtn = el('button', {
             className: 'btn btn-secondary btn-small',
             textContent: this.hardMode ? 'Χωρίς βοήθεια (χωρίς τελείες)' : 'Βοήθεια - τελείες',
@@ -280,9 +287,10 @@ Phono.games.phonemeAnalysis = {
         checkArea.appendChild(choicesDiv);
 
         // The word is said when the picture appears (the educator's recording), and can be heard again.
-        const wordRow = this.createRepeatButton
-            ? el('div', { className: 'sentence-row' }, [this.createRepeatButton(() => Phono.audio.speak(this.currentWord.word))])
-            : null;
+        const wordRow = el('div', { className: 'sentence-row' }, [
+            this.createRepeatButton ? this.createRepeatButton(() => Phono.audio.speak(this.currentWord.word)) : null,
+            seeWordBtn,
+        ].filter(Boolean));
 
         this.container.appendChild(el('div', { className: 'tap-area' }, [
             instruction, emojiDiv, wordDiv, wordRow, modeBtn, counterDiv, tapBtn, tapControls, checkArea,
@@ -375,9 +383,10 @@ Phono.games.elkoninBoxes = {
     correctCount: 0,
     usedWords: [],
 
-    init(container, levelInfo) {
+    init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
+        this.createRepeatButton = createRepeatButton;
         this.usedWords = [];
         this.loadRound();
     },
@@ -404,7 +413,18 @@ Phono.games.elkoninBoxes = {
 
         // The written word is only a model: it shows for 3 seconds, then
         // disappears (the space stays) so the child builds it from the sounds.
-        Phono.helpers.later(() => { wordDiv.style.visibility = 'hidden'; }, 3000);
+        // "Δες τη λέξη" shows it again for 3 seconds.
+        const showWord = () => {
+            wordDiv.style.visibility = 'visible';
+            const token = this._wordToken = {};
+            Phono.helpers.later(() => { if (this._wordToken === token) wordDiv.style.visibility = 'hidden'; }, 3000);
+        };
+        showWord();
+        const seeWordBtn = el('button', { className: 'btn btn-secondary btn-small', textContent: 'Δες τη λέξη', onClick: showWord });
+        const soundRow = el('div', { className: 'sentence-row' }, [
+            this.createRepeatButton ? this.createRepeatButton(() => Phono.audio.speak(this.currentWord.word)) : null,
+            seeWordBtn,
+        ].filter(Boolean));
 
         const boxesDiv = el('div', { className: 'elkonin-boxes', id: 'elkonin-boxes' });
         this.currentWord.phonemes.forEach((ph, i) => {
@@ -454,7 +474,8 @@ Phono.games.elkoninBoxes = {
             el('span', { innerHTML: '<span style="color: var(--accent-cool)">●</span> Σύμφωνο' }),
         ]);
 
-        this.container.appendChild(el('div', { className: 'elkonin-container' }, [instruction, emojiDiv, wordDiv, boxesDiv, tokensDiv, legend]));
+        this.container.appendChild(el('div', { className: 'elkonin-container' }, [instruction, emojiDiv, wordDiv, soundRow, boxesDiv, tokensDiv, legend]));
+        Phono.audio.speak(this.currentWord.word);
 
         Phono.helpers.later(() => {
             Phono.dragDrop.init('#phoneme-tokens', '.phoneme-draggable', '.elkonin-box', (dragEl, dropZone) => {
