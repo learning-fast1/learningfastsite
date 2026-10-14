@@ -107,7 +107,7 @@ Phono.games.phonemeSynthesis = {
             textContent: 'Δες τα γράμματα',
             onClick: showSynced,
         });
-        const soundRow = el('div', { className: 'sentence-row' }, [
+        const soundRow = el('div', { className: 'sentence-row three-btn-row' }, [
             this.createRepeatButton ? this.createRepeatButton(() => startAudio(0)) : null,
             lettersBtn,
         ].filter(Boolean));
@@ -137,7 +137,9 @@ Phono.games.phonemeSynthesis = {
             },
         });
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, phonemeDisplay, soundRow, choicesGrid, helpBtn]));
+        // the three helpers in one row: Επανάληψη · Δες τα γράμματα · Βοήθεια (words under the pictures)
+        soundRow.appendChild(helpBtn);
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, phonemeDisplay, soundRow, choicesGrid]));
     },
 
     checkAnswer(isCorrect, cardEl) {

@@ -113,3 +113,7 @@
 
 /* «Πάτησε το γράμμα για να το ακούσεις!» δίπλα στο γράμμα */
 .sound-tap-hint { font-size: clamp(1rem, calc(var(--u, 1vh) * 3), 1.9rem); font-weight: 800; color: var(--text-secondary, #6b6785); text-align: left; max-width: 26em; line-height: 1.25; }
+
+/* τρία κουμπιά στη σειρά (Ένωσε τους ήχους): να χωράνε και σε στενό κινητό */
+.three-btn-row { flex-wrap: nowrap; gap: 6px; justify-content: center; }
+@media (max-width: 420px) { .three-btn-row .btn, .three-btn-row .btn-small { padding: 7px 9px; font-size: .8rem; white-space: nowrap; } .three-btn-row .btn-icon { width: 34px; height: 34px; font-size: 1rem; } }
