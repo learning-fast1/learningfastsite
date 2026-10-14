@@ -65,6 +65,7 @@
     <button class="tab" id="tabVar" type="button">Χωρίς μια λέξη</button>
     <button class="tab" id="tabBlend" type="button">Ένωσε τους ήχους</button>
     <button class="tab" id="tabSyl" type="button">Συλλαβές</button>
+    <button class="tab" id="tabQuiet" type="button">Σιγανά</button>
   </div>
 
   <div class="chips" id="chips"></div>
@@ -183,6 +184,15 @@
     });
   })();
   var ALL = SOUNDS.concat(WORDS, SENTENCES, VARIANTS, BLEND, SYLLABLES);
+  /* «Σιγανά»: ό,τι ακούγεται πιο σιγανά από τα υπόλοιπα — να ξαναηχογραφηθεί πιο δυνατά (πάνω στην ίδια ηχογράφηση) */
+  var QUIET_KEYS = ['κ', 'φ', 'p:πατάτα', 'p:κανάτα', 'p:πόδι', 'p:καπέλο', 'p:φασόλι'];
+  var QUIET = QUIET_KEYS.map(function (k) { return ALL.filter(function (x) { return x.key === k; })[0]; }).filter(Boolean).map(function (x) {
+    return Object.assign({}, x, { quiet: true, hint: 'ΞΑΝΑ, πιο δυνατά και πιο κοντά στο μικρόφωνο. ' + x.hint });
+  });
+  var redone = {};
+  try { redone = JSON.parse(localStorage.getItem('phono_requiet') || '{}') || {}; } catch (e) { redone = {}; }
+  function saveRedone() { try { localStorage.setItem('phono_requiet', JSON.stringify(redone)); } catch (e) { /* ignore */ } }
+  function isDone(x) { return x.quiet ? !!redone[x.key] : !!done[x.key]; }
   var tab = 'sounds', LIST = SOUNDS, idx = 0, done = {}, stream = null, recording = false, timer = null, audioEl = null, MAX_MS = 4500;
   function maxMs(s) { return s && (s.kind === 'sentence' || s.kind === 'variant' || s.kind === 'blend') ? 12000 : 4500; }
 
@@ -192,7 +202,7 @@
   var recBtn = $('rec'), playBtn = $('play'), nextBtn = $('next'), delBtn = $('del'), zipBtn = $('zip'), count = $('count');
 
   function setStatus(msg, cls) { status.textContent = msg || ''; status.className = 'status' + (cls ? ' ' + cls : ''); }
-  function countDone(list) { return list.filter(function (s) { return done[s.key]; }).length; }
+  function countDone(list) { return list.filter(function (s) { return isDone(s); }).length; }
 
   /* ---------- οθόνη ---------- */
   function draw() {
@@ -203,6 +213,7 @@
     $('tabVar').className = 'tab' + (tab === 'variants' ? ' on' : '');
     $('tabBlend').className = 'tab' + (tab === 'blend' ? ' on' : '');
     $('tabSyl').className = 'tab' + (tab === 'syllables' ? ' on' : '');
+    $('tabQuiet').className = 'tab' + (tab === 'quiet' ? ' on' : '');
     chips.style.display = isSounds ? '' : 'none';
     $('wordsBar').style.display = isSounds ? 'none' : '';
     $('navRow').style.display = isSounds ? 'none' : '';
@@ -228,19 +239,19 @@
     $('prev').disabled = recording || idx === 0;
     $('nextMissing').disabled = recording;
     var nd = countDone(LIST);
-    if (!isSounds) { bar.style.width = Math.round(100 * nd / LIST.length) + '%'; whereEl.textContent = 'Ηχογραφημένες ' + (tab === 'sentences' ? 'προτάσεις' : (tab === 'variants' ? 'επιλογές' : (tab === 'syllables' ? 'συλλαβές' : 'λέξεις'))) + ': ' + nd + ' από ' + LIST.length; }
+    if (!isSounds) { bar.style.width = Math.round(100 * nd / LIST.length) + '%'; whereEl.textContent = 'Ηχογραφημένες ' + (tab === 'sentences' ? 'προτάσεις' : (tab === 'variants' ? 'επιλογές' : (tab === 'syllables' ? 'συλλαβές' : (tab === 'quiet' ? 'σιγανά που ξαναηχογραφήθηκαν' : 'λέξεις')))) + ': ' + nd + ' από ' + LIST.length; }
     count.textContent = 'Ηχογραφημένοι ήχοι: ' + countDone(SOUNDS) + '/' + SOUNDS.length + ' · λέξεις: ' + countDone(WORDS) + '/' + WORDS.length + ' · προτάσεις: ' + countDone(SENTENCES) + '/' + SENTENCES.length + ' · χωρίς μια λέξη: ' + countDone(VARIANTS) + '/' + VARIANTS.length + ' · ένωσε τους ήχους: ' + countDone(BLEND) + '/' + BLEND.length + ' · συλλαβές: ' + countDone(SYLLABLES) + '/' + SYLLABLES.length;
     var total = countDone(ALL);
     zipBtn.disabled = total === 0;
     sendBtn.style.display = pcOk ? '' : 'none';
     sendBtn.disabled = total === 0;
-    recBtn.textContent = recording ? '⏹ Σταμάτα' : (done[s.key] ? '🎙️ Ηχογράφηση ξανά' : '🎙️ Ηχογράφηση');
+    recBtn.textContent = recording ? '⏹ Σταμάτα' : (isDone(s) || (s.quiet && done[s.key]) ? '🎙️ Ηχογράφηση ξανά' : '🎙️ Ηχογράφηση');
     recBtn.className = 'btn ' + (recording ? 'recording' : 'rec');
   }
   function setTab(t) {
     if (recording) return;
-    tab = t; LIST = t === 'sounds' ? SOUNDS : (t === 'words' ? WORDS : (t === 'sentences' ? SENTENCES : (t === 'variants' ? VARIANTS : (t === 'syllables' ? SYLLABLES : BLEND))));
-    var first = LIST.findIndex(function (s) { return !done[s.key]; });
+    tab = t; LIST = t === 'sounds' ? SOUNDS : (t === 'words' ? WORDS : (t === 'sentences' ? SENTENCES : (t === 'variants' ? VARIANTS : (t === 'syllables' ? SYLLABLES : (t === 'quiet' ? QUIET : BLEND)))));
+    var first = LIST.findIndex(function (s) { return !isDone(s); });
     idx = first < 0 ? 0 : first;
     setStatus(''); draw();
   }
@@ -312,6 +323,7 @@
       step = 'αποθήκευση';
       await Phono.recordings.put(s.key, wav);
       done[s.key] = true;
+      if (s.quiet) { redone[s.key] = true; saveRedone(); }
       var msg = Phono.recordings.persistent ? 'Αποθηκεύτηκε ✓' : 'Αποθηκεύτηκε προσωρινά ✓';
       if (pcOk) {
         step = 'αποστολή στον υπολογιστή';
@@ -430,7 +442,7 @@
   $('nextMissing').onclick = function () {
     for (var k = 1; k <= LIST.length; k++) {
       var j = (idx + k) % LIST.length;
-      if (!done[LIST[j].key]) { idx = j; setStatus(''); draw(); return; }
+      if (!isDone(LIST[j])) { idx = j; setStatus(''); draw(); return; }
     }
     setStatus('Τις έχεις ηχογραφήσει όλες ✓', 'ok');
   };
@@ -440,10 +452,11 @@
   $('tabVar').onclick = function () { setTab('variants'); };
   $('tabBlend').onclick = function () { setTab('blend'); };
   $('tabSyl').onclick = function () { setTab('syllables'); };
+  $('tabQuiet').onclick = function () { setTab('quiet'); };
   delBtn.onclick = async function () {
     var s = LIST[idx];
     if (!confirm('Να σβηστεί η ηχογράφηση «' + s.label + '»;')) return;
-    await Phono.recordings.del(s.key); delete done[s.key]; setStatus(''); draw();
+    await Phono.recordings.del(s.key); delete done[s.key]; delete redone[s.key]; saveRedone(); setStatus(''); draw();
   };
   zipBtn.onclick = exportZip;
 
@@ -474,7 +487,8 @@
     if (start === 'variants') { tab = 'variants'; LIST = VARIANTS; }
     if (start === 'blend') { tab = 'blend'; LIST = BLEND; }
     if (start === 'syllables') { tab = 'syllables'; LIST = SYLLABLES; }
-    var first = LIST.findIndex(function (s) { return !done[s.key]; });
+    if (start === 'quiet') { tab = 'quiet'; LIST = QUIET; }
+    var first = LIST.findIndex(function (s) { return !isDone(s); });
     idx = first < 0 ? 0 : first;
     draw();
   })();

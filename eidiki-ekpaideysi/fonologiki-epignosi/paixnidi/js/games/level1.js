@@ -1115,7 +1115,7 @@ Phono.games.wordDeletion = {
         const choices = Phono.data.shuffle([
             { text: correctText, correct: true },
             { text: wrongRemovalText, correct: false },
-            { text: scrambledText, correct: false },
+            { text: scrambledText, correct: false, scrambled: true },
         ]);
 
         // No emoji on these cards — same reasoning as wordPosition's
@@ -1128,6 +1128,7 @@ Phono.games.wordDeletion = {
             ]);
             card._correct = choice.correct;
             card._text = choice.text;
+            card._scrambled = !!choice.scrambled;
             choicesGrid.appendChild(card);
         });
 
@@ -1214,7 +1215,8 @@ Phono.games.wordDeletion = {
     checkAnswer(cardEl) {
         if (this.answered || cardEl.classList.contains('disabled')) return;
 
-        Phono.audio.speak(cardEl._text, 0.7);
+        // The scrambled option is never read aloud (it has no recording, and the computer voice would not match the educator's)
+        if (!cardEl._scrambled) Phono.audio.speak(cardEl._text, 0.7);
 
         if (cardEl._correct) {
             this.answered = true;
