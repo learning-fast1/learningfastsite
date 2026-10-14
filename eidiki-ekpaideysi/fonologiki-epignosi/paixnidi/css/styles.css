@@ -2466,3 +2466,7 @@ input {
 .game-header, .big-game .game-header { padding-right: 112px !important; }
 .game-header .game-header-progress { min-width: 70px; }
 @media (max-width: 420px) { .game-header, .big-game .game-header { padding-right: 96px !important; gap: var(--space-sm); } }
+
+/* the back arrow is fixed in the corner: the same spot in every stage (it used to be centred against a header whose height changes with the title) */
+#btn-back-game { position: fixed; top: 12px; left: 12px; z-index: 11; }
+.game-header-back-space { width: 48px; height: 48px; flex: none; }

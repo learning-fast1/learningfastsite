@@ -537,15 +537,8 @@ Phono.app = {
         const screen = el('div', { className: 'game-screen fade-in' }, [
             // Header
             el('div', { className: 'game-header' }, [
-                el('button', {
-                    className: 'btn btn-icon',
-                    textContent: '←',
-                    onClick: () => {
-                        Phono.audio.playSfx('click');
-                        this.navigate('gameSelect', { levelId: levelInfo.id });
-                    },
-                    id: 'btn-back-game',
-                }),
+                // keeps the back arrow's place in the header; the real button is fixed in the corner (see below)
+                el('div', { className: 'game-header-back-space' }),
                 el('div', { className: 'game-header-title', textContent: gameInfo.title }),
                 el('div', { className: 'game-header-progress' }, [
                     el('div', { className: 'progress-bar' }, [
@@ -583,7 +576,18 @@ Phono.app = {
             id: 'btn-teacher-info',
         });
 
+        // Back arrow: fixed in the top-left corner, so it never moves from one stage to the next
+        const backBtn = el('button', {
+            className: 'btn btn-icon',
+            textContent: '←',
+            onClick: () => {
+                Phono.audio.playSfx('click');
+                this.navigate('gameSelect', { levelId: levelInfo.id });
+            },
+            id: 'btn-back-game',
+        });
         this.container.appendChild(screen);
+        this.container.appendChild(backBtn);
         // Level 5 (Φωνήματα): each stage already has its own sound icon at the top, so the bottom-left one is left out.
         if (levelInfo.id !== 5) this.container.appendChild(soundBtn);
         this.container.appendChild(infoBtn);
