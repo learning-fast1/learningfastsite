@@ -2461,3 +2461,8 @@ input {
 
 /* our own pictures (js/pictures.js) sit where the emoji sat, sized from the same font-size */
 .pic-img { height: 1.15em; width: auto; max-width: 1.7em; object-fit: contain; vertical-align: middle; pointer-events: none; -webkit-user-drag: none; }
+
+/* ΟΔΗΓΙΕΣ is fixed in the top-right corner: keep the header (and its progress bar) clear of it, side by side */
+.game-header, .big-game .game-header { padding-right: 112px !important; }
+.game-header .game-header-progress { min-width: 70px; }
+@media (max-width: 420px) { .game-header, .big-game .game-header { padding-right: 96px !important; gap: var(--space-sm); } }
