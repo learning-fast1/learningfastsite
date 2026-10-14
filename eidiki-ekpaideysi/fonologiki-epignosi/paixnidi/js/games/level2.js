@@ -230,9 +230,9 @@ Phono.games.syllableCounting = {
 
 /* ===========================================
    GAME 2: syllableSynthesis — "Ένωσε τις Συλλαβές"
-   No audio from the app at all — the educator says the syllables out
-   loud themselves (paced however suits the child), and the child picks
-   which picture/word they spell out.
+   The syllables are said with the educator's recorded voice, one by one
+   (Επανάληψη says them again; the 🔊 icon mutes them so the educator can
+   say them herself), and the child picks which picture/word they spell out.
    =========================================== */
 Phono.games.syllableSynthesis = {
     container: null,
@@ -244,6 +244,8 @@ Phono.games.syllableSynthesis = {
     init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
+        this.createVoiceToggle = createVoiceToggle;
+        this.createRepeatButton = createRepeatButton;
         // Whole session picked up front (not per-round) so the teacher's
         // word list can show every word for the round right away —
         // same reasoning as syllableSplit's roundWords below.
@@ -267,9 +269,12 @@ Phono.games.syllableSynthesis = {
         const stage = Phono.data.wordsL2StageForTier(tier);
         const stagePool = Phono.data.wordsL2UpToStage(stage).filter(w => w.imageable);
 
-        const instruction = el('p', { className: 'game-instruction', textContent: 'Άκουσε τις συλλαβές που θα πει ο εκπαιδευτικός. Ποια λέξη είναι;' });
+        const instruction = el('p', { className: 'game-instruction', textContent: 'Άκουσε τις συλλαβές. Ποια λέξη είναι;' });
+        const sayWord = () => Phono.audio.speakSyllables(this.currentWord.syllables, 700);
 
         const controlsRow = el('div', { className: 'sentence-row' }, [
+            this.createVoiceToggle ? this.createVoiceToggle() : null,
+            this.createRepeatButton ? this.createRepeatButton(sayWord) : null,
             el('button', {
                 className: 'btn btn-secondary btn-small',
                 textContent: '🔒 Λέξεις (δάσκαλος/α)',
@@ -314,6 +319,7 @@ Phono.games.syllableSynthesis = {
         const footer = el('div', { className: 'round-footer', id: 'sylsynth-footer' });
 
         this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, controlsRow, choicesGrid, footer]));
+        sayWord();
     },
 
     /** Teacher-only word list for the WHOLE session, not just the current
