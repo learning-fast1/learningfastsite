@@ -417,7 +417,7 @@ Phono.games.groupBySound = {
                 el('div', {
                     className: 'sort-category-label',
                     style: { background: 'var(--primary-light)', display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', justifyContent: 'center' },
-                }, [labelBtn, el('span', { textContent: anchorMeta.emoji, style: { fontSize: '20px' } })]),
+                }, [labelBtn]),
                 el('div', { className: 'sort-category-items', id: `cat-items-${group.phoneme}` }),
             ]);
             categoriesDiv.appendChild(cat);

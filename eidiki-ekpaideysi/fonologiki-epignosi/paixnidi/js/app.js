@@ -584,7 +584,8 @@ Phono.app = {
         });
 
         this.container.appendChild(screen);
-        this.container.appendChild(soundBtn);
+        // Level 5 (Φωνήματα): each stage already has its own sound icon at the top, so the bottom-left one is left out.
+        if (levelInfo.id !== 5) this.container.appendChild(soundBtn);
         this.container.appendChild(infoBtn);
 
         // Initialize the specific game. The voice-toggle, highlight-toggle,

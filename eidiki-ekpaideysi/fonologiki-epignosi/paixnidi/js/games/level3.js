@@ -47,12 +47,21 @@ Phono.games.findRhyme = {
         // educator can read what each picture is at a glance without
         // tapping anything, in the same order as the cards below.
         const choiceWords = Phono.data.shuffle([this.currentItem.correct, ...this.currentItem.distractors]);
-        this.showTeacherCaption(choiceWords);
+        // The words are shown under the pictures at the start of every round; the educator can hide them.
+        const oldCaption = document.getElementById('findrhyme-caption');
+        if (oldCaption) oldCaption.remove();
 
         const targetEmoji = el('div', { className: 'game-main-emoji', textContent: baseMeta.emoji });
+        const choicesGrid = el('div', { className: 'choices-grid' });
+        const wordsBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: 'Κρύψε τις λέξεις',
+            onClick: () => { const hidden = choicesGrid.classList.toggle('words-hidden'); wordsBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις'; },
+        });
         const targetRow = el('div', { className: 'sentence-row' }, [
             this.createVoiceToggle(),
             this.createRepeatButton(() => Phono.audio.speak(this.currentItem.base)),
+            wordsBtn,
         ]);
 
         const revealBtn = el('button', {
@@ -61,11 +70,11 @@ Phono.games.findRhyme = {
             onClick: () => this.showWordList(),
         });
 
-        const choicesGrid = el('div', { className: 'choices-grid' });
         choiceWords.forEach(word => {
             const meta = Phono.data.rhymeL3Word(word);
             const card = el('div', { className: 'choice-card', onClick: () => this.checkAnswer(card) }, [
                 el('span', { className: 'choice-emoji', textContent: meta.emoji }),
+                el('span', { className: 'choice-word', textContent: word }),
             ]);
             card._correct = word === this.currentItem.correct;
             choicesGrid.appendChild(card);
@@ -507,13 +516,20 @@ Phono.games.rhymeOddOneOut = {
         ]);
 
         const instruction = el('p', { className: 'game-instruction', textContent: 'Δύο λέξεις ομοιοκαταληκτούν. Βρες αυτή που ΔΕΝ ταιριάζει!' });
+        const choicesGrid = el('div', { className: 'choices-grid' });
+        // The words are shown at the start of every round; the educator can hide them.
+        const wordsBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: 'Κρύψε τις λέξεις',
+            onClick: () => { const hidden = choicesGrid.classList.toggle('words-hidden'); wordsBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις'; },
+        });
         const instructionRow = el('div', { className: 'sentence-row' }, [
             instruction,
             this.createVoiceToggle(),
             this.createRepeatButton(() => Phono.audio.speakSyllables(allChoices.map(c => c.word), 350)),
+            wordsBtn,
         ]);
 
-        const choicesGrid = el('div', { className: 'choices-grid' });
         allChoices.forEach(choice => {
             const meta = Phono.data.rhymeL3Word(choice.word);
             const card = el('div', {
