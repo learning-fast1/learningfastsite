@@ -221,14 +221,24 @@ Phono.audio = {
             const x = buf.getChannelData(0), fr = Math.max(1, Math.round(buf.sampleRate * 0.01)), rms = [];
             for (let i = 0; i < x.length; i += fr) { let s = 0, e = Math.min(x.length, i + fr); for (let j = i; j < e; j++) s += x[j] * x[j]; rms.push(Math.sqrt(s / (e - i))); }
             let top = 0; rms.forEach(v => { if (v > top) top = v; });
-            const thr = Math.max(0.01, top * 0.12), segs = [];
-            let start = -1, gap = 0;
-            rms.forEach((v, i) => {
-                if (v > thr) { if (start < 0) start = i; gap = 0; }
-                else if (start >= 0 && ++gap >= 5) { segs.push(start); start = -1; gap = 0; } // a 50ms pause ends a sound
-            });
-            if (start >= 0) segs.push(start);
-            if (segs.length === n) onsets = segs.map(i => Math.max(0, i * 0.01 - 0.04));
+            // find the sounds: a quiet stretch (gap frames of 10ms) ends one. The usual settings first, then other
+            // settings until exactly n sounds are found (a sloppy pause, or a loud/soft sound, may need them).
+            const find = (thr, gapN) => {
+                const segs = []; let start = -1, gap = 0;
+                rms.forEach((v, i) => {
+                    if (v > thr) { if (start < 0) start = i; gap = 0; }
+                    else if (start >= 0 && ++gap >= gapN) { segs.push(start); start = -1; gap = 0; }
+                });
+                if (start >= 0) segs.push(start);
+                return segs;
+            };
+            const tries = [[0.12, 5]];
+            [4, 6, 3, 7, 9, 12, 2].forEach(g => [0.12, 0.08, 0.18, 0.05, 0.27, 0.35, 0.5].forEach(t => tries.push([t, g])));
+            for (const [t, g] of tries) {
+                const segs = find(Math.max(0.01, top * t), g);
+                // real sounds are at least 150ms apart: a count that only matches by cutting one sound in two is rejected
+                if (segs.length === n && segs.every((v, i) => i === 0 || v - segs[i - 1] >= 15)) { onsets = segs.map(i => Math.max(0, i * 0.01 - 0.04)); break; }
+            }
         } catch (e) { /* the sounds are spread evenly below */ }
         if (!onsets && duration) onsets = Array.from({ length: n }, (_, i) => (i / n) * duration * 0.9);
         return { url, onsets };

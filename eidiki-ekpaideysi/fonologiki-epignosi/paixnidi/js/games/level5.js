@@ -158,9 +158,10 @@ Phono.games.phonemeAnalysis = {
     usedWords: [],
     hardMode: false,
 
-    init(container, levelInfo) {
+    init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
+        this.createRepeatButton = createRepeatButton;
         this.usedWords = [];
         try { this.hardMode = localStorage.getItem('phono_phonemeCountingHardMode') === '1'; } catch (e) { this.hardMode = false; }
         this.loadRound();
@@ -254,9 +255,16 @@ Phono.games.phonemeAnalysis = {
         checkArea.appendChild(label);
         checkArea.appendChild(choicesDiv);
 
+        // The word is said when the picture appears (the educator's recording), and can be heard again.
+        const wordRow = this.createRepeatButton
+            ? el('div', { className: 'sentence-row' }, [this.createRepeatButton(() => Phono.audio.speak(this.currentWord.word))])
+            : null;
+
         this.container.appendChild(el('div', { className: 'tap-area' }, [
-            instruction, emojiDiv, wordDiv, modeBtn, counterDiv, tapBtn, tapControls, checkArea,
-        ]));
+            instruction, emojiDiv, wordDiv, wordRow, modeBtn, counterDiv, tapBtn, tapControls, checkArea,
+        ].filter(Boolean)));
+
+        Phono.audio.speak(this.currentWord.word);
     },
 
     handleTap() {
