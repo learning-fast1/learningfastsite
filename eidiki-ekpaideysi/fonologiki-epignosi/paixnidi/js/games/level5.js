@@ -32,9 +32,10 @@ Phono.games.phonemeSynthesis = {
     currentWord: null,
     usedWords: [],
 
-    init(container, levelInfo) {
+    init(container, levelInfo, createVoiceToggle, createHighlightToggle, createRepeatButton) {
         this.container = container;
         this.levelInfo = levelInfo;
+        this.createRepeatButton = createRepeatButton;
         this.usedWords = [];
         this.loadRound();
     },
@@ -52,7 +53,7 @@ Phono.games.phonemeSynthesis = {
         this.currentWord = Phono.data.getRandom(available);
         this.usedWords.push(this.currentWord.word);
 
-        const instruction = el('p', { className: 'game-instruction', textContent: 'Δες τους ήχους. Ποια λέξη φτιάχνουν;' });
+        const instruction = el('p', { className: 'game-instruction', textContent: 'Άκουσε τους ήχους. Ποια λέξη φτιάχνουν;' });
 
         // Phoneme bubbles with animated reveal. With the educator's recording of the word's sounds
         // (studio.html, « γ… ά… τ… α ») each bubble appears exactly as its sound is heard;
@@ -73,20 +74,43 @@ Phono.games.phonemeSynthesis = {
             phonemeDisplay.appendChild(bubble);
             bubbles.push(bubble);
         });
+        // The letters stay HIDDEN: the child hears the sounds (the educator's recording) and finds the picture.
+        // "Δες τα γράμματα" shows them, each one appearing as its sound is heard again.
+        // Without a recording there is nothing to hear, so the letters appear on a fixed beat, as before.
         const roundToken = this._roundToken = {};
-        const reveal = (times, audioUrl) => {
-            if (this._roundToken !== roundToken) return;
-            bubbles.forEach((b, i) => {
-                Phono.helpers.later(() => b.classList.add('visible'), times[i]);
-                if (i > 0) Phono.helpers.later(() => seps[i].classList.add('visible'), Math.max(0, times[i] - 100));
-            });
-            if (audioUrl) Phono.helpers.later(() => Phono.audio._startRecorded(audioUrl, null).catch(() => {}), 300);
+        let seq = null;
+        const startAudio = (delay) => { if (seq && seq.url) Phono.helpers.later(() => Phono.audio._startRecorded(seq.url, null).catch(() => {}), delay); };
+        const showAll = () => { bubbles.forEach(b => b.classList.add('visible')); seps.forEach(sp => sp && sp.classList.add('visible')); };
+        const showSynced = () => {
+            bubbles.forEach(b => b.classList.remove('visible'));
+            seps.forEach(sp => sp && sp.classList.remove('visible'));
+            if (seq && seq.onsets) {
+                bubbles.forEach((b, i) => {
+                    const t = 150 + Math.round(seq.onsets[i] * 1000);
+                    Phono.helpers.later(() => b.classList.add('visible'), t);
+                    if (i > 0) Phono.helpers.later(() => seps[i].classList.add('visible'), Math.max(0, t - 100));
+                });
+                startAudio(150);
+            } else showAll();
         };
-        const beat = this.currentWord.phonemes.map((_, i) => 300 + i * 500);
-        Phono.audio.prepareSequence('p:' + this.currentWord.word, this.currentWord.phonemes.length).then(seq => {
-            if (seq && seq.onsets) reveal(seq.onsets.map(t => 300 + Math.round(t * 1000)), seq.url);
-            else reveal(beat, null);
-        }, () => reveal(beat, null));
+        const beat = () => bubbles.forEach((b, i) => {
+            Phono.helpers.later(() => b.classList.add('visible'), 300 + i * 500);
+            if (i > 0) Phono.helpers.later(() => seps[i].classList.add('visible'), 400 + i * 500);
+        });
+        Phono.audio.prepareSequence('p:' + this.currentWord.word, this.currentWord.phonemes.length).then(found => {
+            if (this._roundToken !== roundToken) return;
+            seq = found;
+            if (seq) startAudio(300); else beat();
+        }, () => { if (this._roundToken === roundToken) beat(); });
+        const lettersBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: 'Δες τα γράμματα',
+            onClick: showSynced,
+        });
+        const soundRow = el('div', { className: 'sentence-row' }, [
+            this.createRepeatButton ? this.createRepeatButton(() => startAudio(0)) : null,
+            lettersBtn,
+        ].filter(Boolean));
 
         const distractors = Phono.data.getDistractors(this.currentWord.word, 3);
         const allChoices = Phono.data.shuffle([
@@ -113,7 +137,7 @@ Phono.games.phonemeSynthesis = {
             },
         });
 
-        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, phonemeDisplay, choicesGrid, helpBtn]));
+        this.container.appendChild(el('div', { className: 'tap-area' }, [instruction, phonemeDisplay, soundRow, choicesGrid, helpBtn]));
     },
 
     checkAnswer(isCorrect, cardEl) {
