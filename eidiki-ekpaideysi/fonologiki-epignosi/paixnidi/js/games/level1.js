@@ -417,6 +417,18 @@ Phono.games.wordCounting = {
             this.createRepeatButton(() => Phono.audio.speak(this.currentSentence.text, 0.5)),
         ]);
 
+        // The words are shown at the start of every round; the educator can hide them (the space stays) and show them again.
+        const wordsBtn = el('button', {
+            className: 'btn btn-secondary btn-small',
+            textContent: 'Κρύψε τις λέξεις',
+            onClick: () => {
+                const hide = sentenceDiv.style.visibility !== 'hidden';
+                sentenceDiv.style.visibility = hide ? 'hidden' : 'visible';
+                wordsBtn.textContent = hide ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις';
+            },
+        });
+        const wordsRow = el('div', { className: 'sentence-row' }, [wordsBtn]);
+
         // Clap counter
         const counterDiv = el('div', { className: 'clap-counter', id: 'clap-counter' });
 
@@ -448,7 +460,7 @@ Phono.games.wordCounting = {
         const checkArea = el('div', { className: 'clap-check-area', id: 'check-area', style: { display: 'none' } });
         this.buildAnswerChoices(checkArea);
 
-        const area = el('div', { className: 'clap-area' }, [instruction, sentenceRow, counterDiv, clapRow, checkArea]);
+        const area = el('div', { className: 'clap-area' }, [instruction, sentenceRow, wordsRow, counterDiv, clapRow, checkArea]);
         this.container.appendChild(area);
 
         // Speak the sentence
