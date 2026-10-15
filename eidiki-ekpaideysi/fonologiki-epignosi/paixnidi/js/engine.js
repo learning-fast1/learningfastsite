@@ -990,6 +990,19 @@ Phono.confetti = {
    HELPERS — Shared utility functions
    =========================================== */
 Phono.helpers = {
+    /** Picks one candidate that shares as few "keys" as possible with what the session has already shown (a word, a sentence,
+     * a letter/sound, a syllable...), so nothing repeats inside a session unless the pool is too small to avoid it.
+     * `keysOf(c)` returns the keys of a candidate; `used` is a Set that is updated with the chosen candidate's keys. */
+    pickFresh(cands, keysOf, used) {
+        let best = [], bestScore = Infinity;
+        cands.forEach(c => {
+            const score = keysOf(c).filter(k => used.has(k)).length;
+            if (score < bestScore) { bestScore = score; best = [c]; } else if (score === bestScore) best.push(c);
+        });
+        const pick = best[Math.floor(Math.random() * best.length)];
+        if (pick !== undefined) keysOf(pick).forEach(k => used.add(k));
+        return pick;
+    },
     // Capital letters are written without the accent mark (ΣΚΥΛΟΣ, not ΣΚΎΛΟΣ). The diaeresis stays (ΜΑΪΜΟΥ).
     upperNoTonos(s) {
         return String(s).toUpperCase().normalize('NFD').replace(/́/g, '').normalize('NFC');

@@ -745,15 +745,22 @@ Phono.games.phonemeDeletion = {
  * both first- and last-sound removal are precomputed per item so the
  * mode toggle can switch without re-deriving anything. */
 function level5BuildPhonemeDeletionItems(totalRounds) {
+    let best = null, bestDup = Infinity;
+    for (let attempt = 0; attempt < 60 && bestDup > 0; attempt++) {
+        const items = level5BuildPhonemeDeletionItemsOnce(totalRounds);
+        const dup = [i => i.word, i => i.first, i => i.last].reduce((n, key) => n + items.length - new Set(items.map(key)).size, 0);
+        if (dup < bestDup) { best = items; bestDup = dup; }
+    }
+    return best;
+}
+function level5BuildPhonemeDeletionItemsOnce(totalRounds) {
     const selBank = Phono.data.getPhonemesL5Pool().filter(w => w.count === 4 && w.imageable);
     const bank = selBank.length > 0 ? selBank : Phono.data.phonemesL5.filter(w => w.count === 4 && w.imageable);
-    const used = [];
+    const used = new Set();
     const items = [];
     for (let round = 0; round < totalRounds; round++) {
-        const pool = bank.filter(w => !used.includes(w.word));
-        const available = pool.length > 0 ? pool : bank;
-        const w = Phono.data.getRandom(available);
-        used.push(w.word);
+        // neither the word nor the sound taken away (first or last) repeats inside a session (unless the pool is too small to avoid it)
+        const w = Phono.helpers.pickFresh(bank, x => ['w:' + x.word, 'F:' + x.phonemes[0], 'L:' + x.phonemes[x.phonemes.length - 1]], used);
         items.push({
             word: w.word,
             emoji: w.emoji,

@@ -32,6 +32,7 @@ Phono.games.wordSizeCompare = {
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
         this.usedPairs = [];
+        this.usedWords = new Set();
         this.lastBigFirst = null;
         this.bigPositionStreak = 0;
         this.loadRound();
@@ -47,9 +48,8 @@ Phono.games.wordSizeCompare = {
         const tier = Phono.engine.getDifficultyTier();
         const stage = tier === 1 ? 'A' : tier === 2 ? 'B' : 'C';
 
-        const pool = Phono.data.wordSizePairs.filter(p => p.stage === stage && !this.usedPairs.includes(p.word1 + p.word2));
-        const available = pool.length > 0 ? pool : Phono.data.wordSizePairs.filter(p => p.stage === stage);
-        this.currentPair = Phono.data.getRandom(available);
+        // No word shows up twice in a session (a pair only repeats a word when the pool is too small to avoid it)
+        this.currentPair = Phono.helpers.pickFresh(Phono.data.wordSizePairs.filter(p => p.stage === stage), p => [p.word1, p.word2], this.usedWords);
         this.usedPairs.push(this.currentPair.word1 + this.currentPair.word2);
 
         const instruction = el('p', {

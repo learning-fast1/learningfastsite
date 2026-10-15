@@ -686,7 +686,7 @@ Phono.games.findFinalPhoneme = {
  * round now so a teacher word-list overlay can show rounds not yet played. */
 function level4BuildInitialPhonemeWords(totalRounds) {
     const words = [];
-    const usedWords = [];
+    const usedKeys = new Set();
     let lastLetter = null;
     for (let round = 0; round < totalRounds; round++) {
         const tier = level4TierForRound(round, totalRounds);
@@ -695,11 +695,9 @@ function level4BuildInitialPhonemeWords(totalRounds) {
         const byLetter = byTier.filter(w => level4LetterAllowed(w.initial));
         const basePool = byLetter.length > 0 ? byLetter : byTier;
         const noRepeatLetter = level4AvoidLastLetter(basePool, lastLetter, w => w.initial);
-        const pool = noRepeatLetter.filter(w => !usedWords.includes(w.word));
-        const available = pool.length > 0 ? pool : noRepeatLetter;
-        const word = Phono.data.getRandom(available);
+        // neither the word nor its letter repeats inside a session (unless the pool is too small to avoid it)
+        const word = Phono.helpers.pickFresh(noRepeatLetter, w => ['w:' + w.word, 'ltr:' + w.initial], usedKeys);
         words.push(word);
-        usedWords.push(word.word);
         lastLetter = word.initial;
     }
     return words;
@@ -710,7 +708,7 @@ function level4BuildInitialPhonemeWords(totalRounds) {
  * available), then a word ending in it, matching loadRound()'s old logic. */
 function level4BuildFinalPhonemeWords(totalRounds) {
     const words = [];
-    const usedWords = [];
+    const usedKeys = new Set();
     let lastLetter = null;
     for (let round = 0; round < totalRounds; round++) {
         const tier = level4TierForRound(round, totalRounds);
@@ -721,14 +719,11 @@ function level4BuildFinalPhonemeWords(totalRounds) {
 
         const distinctLetters = Array.from(new Set(basePool.map(w => w.final)));
         const letterChoices = level4AvoidLastLetter(distinctLetters, lastLetter, l => l);
-        const chosenLetter = Phono.data.getRandom(letterChoices);
+        const chosenLetter = Phono.helpers.pickFresh(letterChoices, l => ['ltr:' + l], usedKeys);
 
         const letterPool = basePool.filter(w => w.final === chosenLetter);
-        const pool = letterPool.filter(w => !usedWords.includes(w.word));
-        const available = pool.length > 0 ? pool : letterPool;
-        const word = Phono.data.getRandom(available);
+        const word = Phono.helpers.pickFresh(letterPool, w => ['w:' + w.word], usedKeys);
         words.push(word);
-        usedWords.push(word.word);
         lastLetter = word.final;
     }
     return words;
@@ -748,11 +743,33 @@ function level4WordEmoji(word) {
 /** Picks the whole session's oddity items up front, same
  * reshuffle-when-exhausted pattern as level2/level3's equivalents. */
 function level4BuildOddOneOutItems(totalRounds) {
-    const items = [];
-    let deck = [];
+    let best = null, bestDup = Infinity;
+    for (let attempt = 0; attempt < 60 && bestDup > 0; attempt++) {
+        const items = level4BuildOddOneOutItemsOnce(totalRounds);
+        const words = items.flatMap(it => [...it.same, it.odd]);
+        const letters = items.map(it => level4WordInitial(it.same[0]));
+        const dup = (words.length - new Set(words).size) + (letters.length - new Set(letters).size);
+        if (dup < bestDup) { best = items; bestDup = dup; }
+    }
+    return best;
+}
+function level4WordInitial(word) {
+    const meta = Phono.data.initialPhonemesL4.find(w => w.word === word);
+    return meta ? meta.initial : word[0];
+}
+function level4BuildOddOneOutItemsOnce(totalRounds) {
+    const bank = Phono.data.initialPhonemesL4.filter(w => w.imageable);
+    const byLetter = {};
+    bank.forEach(w => { (byLetter[w.initial] = byLetter[w.initial] || []).push(w); });
+    let letters = Object.keys(byLetter).filter(l => byLetter[l].length >= 3 && level4LetterAllowed(l));
+    if (letters.length === 0) letters = Object.keys(byLetter).filter(l => byLetter[l].length >= 3);
+    const used = new Set(), items = [];
     for (let round = 0; round < totalRounds; round++) {
-        if (deck.length === 0) deck = Phono.data.shuffle(Phono.data.soundOddOneOutItemsL4);
-        items.push(deck.pop());
+        const letter = Phono.helpers.pickFresh(letters, l => ['ltr:' + l], used);
+        const same = [];
+        for (let i = 0; i < 3; i++) same.push(Phono.helpers.pickFresh(byLetter[letter].filter(w => !same.includes(w)), w => ['w:' + w.word], used));
+        const odd = Phono.helpers.pickFresh(bank.filter(w => w.initial !== letter), w => ['w:' + w.word, 'ltr:' + w.initial], used);
+        items.push({ same: same.map(w => w.word), odd: odd.word });
     }
     return items;
 }

@@ -964,22 +964,23 @@ function level2BuildSyllableCountingWords(totalRounds, syllablePlan) {
  * last, tier 2 -> first, tier 3 -> middle) so the teacher's word list
  * can show every item for the round right away. */
 function level2BuildSyllableRemovalItems(totalRounds) {
-    const used = [];
-    const items = [];
-    for (let round = 0; round < totalRounds; round++) {
-        const tier = tierForRound(round, totalRounds);
-        const position = tier === 1 ? 'last' : tier === 2 ? 'first' : 'middle';
+    const used = new Set();
+    const items = new Array(totalRounds);
+    const positionOf = round => { const tier = tierForRound(round, totalRounds); return tier === 1 ? 'last' : tier === 2 ? 'first' : 'middle'; };
+    const poolSize = pos => Phono.data.getSyllableRemovalL2Pool().filter(item => item.position === pos).length;
+    const order = Array.from({ length: totalRounds }, (_, i) => i).sort((a, b) => poolSize(positionOf(a)) - poolSize(positionOf(b)));
+    for (const round of order) {
+        const position = positionOf(round);
 
         const selPool = Phono.data.getSyllableRemovalL2Pool();
-        const pool = selPool.filter(item => item.position === position && !used.includes(item.word + item.position));
         const posPool = selPool.filter(item => item.position === position);
-        // Third-tier fallback ignores the teacher's selection entirely —
+        // Fallback ignores the teacher's selection entirely —
         // needed since a narrow selection could have nothing at all for
         // this round's position yet.
-        const available = pool.length > 0 ? pool : (posPool.length > 0 ? posPool : Phono.data.syllableRemovalL2.filter(item => item.position === position));
-        const item = Phono.data.getRandom(available);
-        used.push(item.word + item.position);
-        items.push(item);
+        const available = posPool.length > 0 ? posPool : Phono.data.syllableRemovalL2.filter(item => item.position === position);
+        // Neither the word nor the removed syllable repeats inside a session (unless the pool is too small to avoid it)
+        const item = Phono.helpers.pickFresh(available, it => ['w:' + it.word, 'syl:' + it.syllables[it.removeIndex]], used);
+        items[round] = item;
     }
     return items;
 }

@@ -339,7 +339,12 @@ Phono.games.produceRhyme = {
         this.container.innerHTML = '';
 
         const selBases = Phono.data.produceRhymeBasesL3Pool();
-        const pool = selBases.filter(w => !this.usedWords.includes(w));
+        let pool = selBases.filter(w => !this.usedWords.includes(w));
+        if (pool.length === 0) {
+            // more rounds than curated bases: any other word of an allowed rhyme family (not the "easy" -ί / -άκι ones)
+            const fams = level3FamilyMap();
+            pool = Phono.data.rhymesL3.filter(w => !w.easy && fams[w.family].length >= 2 && Phono.data.rhymeFamilyAllowed(w.family) && !this.usedWords.includes(w.word)).map(w => w.word);
+        }
         const available = pool.length > 0 ? pool : selBases;
         const targetText = Phono.data.getRandom(available);
         this.usedWords.push(targetText);
@@ -581,13 +586,60 @@ Phono.games.rhymeOddOneOut = {
  * away — same reasoning as level2.js's roundWords helpers. Fisher-
  * Yates-without-replacement: shuffle the full 10-item pool, hand out
  * from it, reshuffle once exhausted (only matters if totalRounds > 10). */
+/** Rhyme words grouped by family. Every word in a family rhymes with the others of the same family and with no word of
+ * another family (see js/rhymes_l3.js), so a round built from them can never offer a wrong rhyme. */
+function level3FamilyMap() {
+    const map = {};
+    Phono.data.rhymesL3.forEach(w => { (map[w.family] = map[w.family] || []).push(w); });
+    return map;
+}
+/** Picks the family of a round: allowed by the teacher, with at least `need` words, a family not used yet first, and at most
+ * one "easy" family (shared grammatical ending: -ί, -άκι) per session. */
+function level3PickFamily(map, need, used, easyUsed) {
+    let names = Object.keys(map).filter(f => map[f].length >= need && Phono.data.rhymeFamilyAllowed(f));
+    if (names.length === 0) names = Object.keys(map).filter(f => map[f].length >= need);
+    const noEasy = names.filter(f => !(easyUsed.n >= 1 && map[f].some(w => w.easy)));
+    const family = Phono.helpers.pickFresh(noEasy.length > 0 ? noEasy : names, f => ['fam:' + f], used);
+    if (map[family].some(w => w.easy)) easyUsed.n++;
+    return family;
+}
+/** `n` words from families other than `family` (each from a different family when possible), as fresh as possible. */
+function level3PickOtherWords(map, family, n, used) {
+    const chosen = [], families = new Set([family]);
+    const all = Object.keys(map).flatMap(f => map[f]);
+    for (let i = 0; i < n; i++) {
+        let cands = all.filter(w => !families.has(w.family));
+        if (cands.length === 0) cands = all.filter(w => w.family !== family && !chosen.includes(w));
+        const w = Phono.helpers.pickFresh(cands, x => ['w:' + x.word], used);
+        chosen.push(w);
+        families.add(w.family);
+    }
+    return chosen;
+}
+/** The whole session's rounds, planned up front: no picture/word shows up twice unless the bank is too small to avoid it. */
 function level3BuildFindRhymeItems(totalRounds) {
-    const pool = Phono.data.findRhymeItemsL3Pool();
+    return level3BestPlan(() => level3BuildFindRhymeItemsOnce(totalRounds), it => [it.base, it.correct, ...it.distractors]);
+}
+/** Runs a random planner several times and keeps the plan in which the fewest words show up twice (none, when the bank allows). */
+function level3BestPlan(build, wordsOf) {
+    let best = null, bestDup = Infinity;
+    for (let attempt = 0; attempt < 300 && bestDup > 0; attempt++) {
+        const items = build();
+        const words = items.flatMap(wordsOf);
+        const dup = words.length - new Set(words).size;
+        if (dup < bestDup) { best = items; bestDup = dup; }
+    }
+    return best;
+}
+function level3BuildFindRhymeItemsOnce(totalRounds) {
+    const map = level3FamilyMap(), used = new Set(), easyUsed = { n: 0 };
     const items = [];
-    let deck = [];
     for (let round = 0; round < totalRounds; round++) {
-        if (deck.length === 0) deck = Phono.data.shuffle(pool);
-        items.push(deck.pop());
+        const family = level3PickFamily(map, 2, used, easyUsed);
+        const base = Phono.helpers.pickFresh(map[family], w => ['w:' + w.word], used);
+        const correct = Phono.helpers.pickFresh(map[family].filter(w => w !== base), w => ['w:' + w.word], used);
+        const distractors = level3PickOtherWords(map, family, 3, used);
+        items.push({ base: base.word, correct: correct.word, distractors: distractors.map(w => w.word) });
     }
     return items;
 }
@@ -596,12 +648,17 @@ function level3BuildFindRhymeItems(totalRounds) {
  * level3BuildFindRhymeItems above, for rhymeOddOneOut's curated
  * rhyming/odd triples. */
 function level3BuildOddOneOutItems(totalRounds) {
-    const pool = Phono.data.rhymeOddOneOutItemsL3Pool();
+    return level3BestPlan(() => level3BuildOddOneOutItemsOnce(totalRounds), it => [...it.rhyming, it.odd]);
+}
+function level3BuildOddOneOutItemsOnce(totalRounds) {
+    const map = level3FamilyMap(), used = new Set(), easyUsed = { n: 0 };
     const items = [];
-    let deck = [];
     for (let round = 0; round < totalRounds; round++) {
-        if (deck.length === 0) deck = Phono.data.shuffle(pool);
-        items.push(deck.pop());
+        const family = level3PickFamily(map, 2, used, easyUsed);
+        const first = Phono.helpers.pickFresh(map[family], w => ['w:' + w.word], used);
+        const second = Phono.helpers.pickFresh(map[family].filter(w => w !== first), w => ['w:' + w.word], used);
+        const odd = level3PickOtherWords(map, family, 1, used)[0];
+        items.push({ rhyming: [first.word, second.word], odd: odd.word });
     }
     return items;
 }
