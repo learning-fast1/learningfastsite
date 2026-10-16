@@ -250,6 +250,7 @@ Phono.games.syllableSynthesis = {
         // word list can show every word for the round right away —
         // same reasoning as syllableSplit's roundWords below.
         this.roundWords = level2BuildSyllableSynthesisWords(Phono.engine.totalRounds);
+        this.wordsHidden = true;
         this.loadRound();
     },
 
@@ -296,12 +297,14 @@ Phono.games.syllableSynthesis = {
 
         // The words under the pictures are hidden so the child finds the
         // picture by sound, not by reading. "Βοήθεια" shows them.
-        const choicesGrid = el('div', { className: 'choices-grid words-hidden' });
+        // starts hidden; once the educator shows the words they stay shown until the last round (and the other way round)
+        const choicesGrid = el('div', { className: 'choices-grid' + (this.wordsHidden ? ' words-hidden' : '') });
         const helpBtn = el('button', {
             className: 'btn btn-secondary btn-small',
-            textContent: 'Εμφάνιση λέξεων',
+            textContent: this.wordsHidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις',
             onClick: () => {
                 const hidden = choicesGrid.classList.toggle('words-hidden');
+                this.wordsHidden = hidden;
                 helpBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις';
             },
         });

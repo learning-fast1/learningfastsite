@@ -32,6 +32,7 @@ Phono.games.wordSizeCompare = {
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
         this.usedPairs = [];
+        this.wordsHidden = true;
         this.usedWords = new Set();
         this.lastBigFirst = null;
         this.bigPositionStreak = 0;
@@ -86,8 +87,9 @@ Phono.games.wordSizeCompare = {
         this.cards = {};
         this.cardOrder = [];
         // The words under the pictures start hidden; "Εμφάνιση λέξεων" shows them.
-        const choicesGrid = el('div', { className: 'choices-grid words-hidden' });
-        const showWordsBtn = el('button', { className: 'btn btn-secondary btn-small', textContent: 'Εμφάνιση λέξεων', onClick: () => { const hidden = choicesGrid.classList.toggle('words-hidden'); showWordsBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις'; } });
+        // starts hidden; once the educator shows the words they stay shown until the last round (and the other way round)
+        const choicesGrid = el('div', { className: 'choices-grid' + (this.wordsHidden ? ' words-hidden' : '') });
+        const showWordsBtn = el('button', { className: 'btn btn-secondary btn-small', textContent: this.wordsHidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις', onClick: () => { const hidden = choicesGrid.classList.toggle('words-hidden'); this.wordsHidden = hidden; showWordsBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις'; } });
         instructionRow.appendChild(showWordsBtn);
         sides.forEach(side => {
             const boxesDiv = el('div', { className: 'syllable-boxes wordsize-syllable-boxes', style: { display: 'none', marginTop: 'var(--space-sm)' } });
@@ -370,6 +372,7 @@ Phono.games.wordCounting = {
         this.createHighlightToggle = createHighlightToggle;
         this.createRepeatButton = createRepeatButton;
         this.usedSentences = [];
+        this.wordsHidden = false;
         this.lastWordCount = null;
         this.struggledLastRound = false;
         this.loadRound();
@@ -417,13 +420,15 @@ Phono.games.wordCounting = {
             this.createRepeatButton(() => Phono.audio.speak(this.currentSentence.text, 0.5)),
         ]);
 
-        // The words are shown at the start of every round; the educator can hide them (the space stays) and show them again.
+        // The words are shown when a session starts; the educator can hide them (the space stays), and they stay hidden until the last round.
+        if (this.wordsHidden) sentenceDiv.style.visibility = 'hidden';
         const wordsBtn = el('button', {
             className: 'btn btn-secondary btn-small',
-            textContent: 'Κρύψε τις λέξεις',
+            textContent: this.wordsHidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις',
             onClick: () => {
                 const hide = sentenceDiv.style.visibility !== 'hidden';
                 sentenceDiv.style.visibility = hide ? 'hidden' : 'visible';
+                this.wordsHidden = hide;
                 wordsBtn.textContent = hide ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις';
             },
         });
