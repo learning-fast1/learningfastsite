@@ -107,6 +107,10 @@ Phono.data.finalPhonemesL4 = [
     { word: "τρακτέρ", final: "ρ", type: "cons", imageable: true, emoji: "🚜" },
     { word: "γκαράζ", final: "ζ", type: "cons", imageable: true, emoji: "🚗" },
     { word: "μπλε", final: "ε", type: "vowel", imageable: true, emoji: "🔵" },
+    { word: "κέικ", final: "κ", type: "cons", imageable: true, emoji: "🍰" },
+    { word: "μπαρ", final: "ρ", type: "cons", imageable: true, emoji: "🍸" },
+    { word: "ασανσέρ", final: "ρ", type: "cons", imageable: true, emoji: "🛗" },
+    { word: "πικάπ", final: "π", type: "cons", imageable: true, emoji: "💿" },
 ];
 
 /** All imageable words sharing one final phoneme (e.g. "α" -> γάτα,
