@@ -717,7 +717,8 @@ function level4BuildFinalPhonemeWords(totalRounds) {
     for (let round = 0; round < totalRounds; round++) {
         const tier = level4TierForRound(round, totalRounds);
         const bank = Phono.data.finalPhonemesL4.filter(w => w.imageable);
-        const byTier = tier < 3 ? bank.filter(w => w.type === 'vowel') : bank;
+        // easiest third: vowels only; middle third: vowels and -ς; last third: every ending
+        const byTier = tier === 1 ? bank.filter(w => w.type === 'vowel') : (tier === 2 ? bank.filter(w => w.type === 'vowel' || w.final === 'ς') : bank);
         const byLetter = byTier.filter(w => level4LetterAllowed(w.final));
         const basePool = byLetter.length > 0 ? byLetter : byTier;
 
