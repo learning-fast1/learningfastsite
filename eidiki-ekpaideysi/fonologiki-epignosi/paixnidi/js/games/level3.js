@@ -27,6 +27,7 @@ Phono.games.findRhyme = {
         // Whole session picked up front (not per-round) so the teacher's
         // word list can show every item for the round right away.
         this.roundItems = level3BuildFindRhymeItems(Phono.engine.totalRounds);
+        this.wordsHidden = false;
         this.loadRound();
     },
 
@@ -53,10 +54,12 @@ Phono.games.findRhyme = {
 
         const targetEmoji = el('div', { className: 'game-main-emoji', textContent: baseMeta.emoji });
         const choicesGrid = el('div', { className: 'choices-grid' });
+        // the words are shown when a session starts; if the educator hides them they stay hidden until the last round
+        if (this.wordsHidden) choicesGrid.classList.add('words-hidden');
         const wordsBtn = el('button', {
             className: 'btn btn-secondary btn-small',
-            textContent: 'Κρύψε τις λέξεις',
-            onClick: () => { const hidden = choicesGrid.classList.toggle('words-hidden'); wordsBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις'; },
+            textContent: this.wordsHidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις',
+            onClick: () => { const hidden = choicesGrid.classList.toggle('words-hidden'); this.wordsHidden = hidden; wordsBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις'; },
         });
         const targetRow = el('div', { className: 'sentence-row' }, [
             this.createVoiceToggle(),
@@ -504,6 +507,7 @@ Phono.games.rhymeOddOneOut = {
         this.createVoiceToggle = createVoiceToggle;
         this.createRepeatButton = createRepeatButton;
         this.roundItems = level3BuildOddOneOutItems(Phono.engine.totalRounds);
+        this.wordsHidden = false;
         this.loadRound();
     },
 
@@ -522,11 +526,12 @@ Phono.games.rhymeOddOneOut = {
 
         const instruction = el('p', { className: 'game-instruction', textContent: 'Δύο λέξεις ομοιοκαταληκτούν. Βρες αυτή που ΔΕΝ ταιριάζει!' });
         const choicesGrid = el('div', { className: 'choices-grid' });
-        // The words are shown at the start of every round; the educator can hide them.
+        // the words are shown when a session starts; if the educator hides them they stay hidden until the last round
+        if (this.wordsHidden) choicesGrid.classList.add('words-hidden');
         const wordsBtn = el('button', {
             className: 'btn btn-secondary btn-small',
-            textContent: 'Κρύψε τις λέξεις',
-            onClick: () => { const hidden = choicesGrid.classList.toggle('words-hidden'); wordsBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις'; },
+            textContent: this.wordsHidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις',
+            onClick: () => { const hidden = choicesGrid.classList.toggle('words-hidden'); this.wordsHidden = hidden; wordsBtn.textContent = hidden ? 'Εμφάνιση λέξεων' : 'Κρύψε τις λέξεις'; },
         });
         const instructionRow = el('div', { className: 'sentence-row' }, [
             instruction,
