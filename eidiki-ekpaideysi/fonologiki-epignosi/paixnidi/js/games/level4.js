@@ -112,8 +112,12 @@ function level4CreateSoundButton(phoneme, type, opts) {
  * the target, e.g. σ next to ζ/φ/τ) and filling the rest randomly from
  * whatever's left, matching the spec's own example items.
  */
+// letters that make the same sound: never offered together as the right answer and a wrong one (η/ι/υ, ο/ω, σ/ς)
+const LEVEL4_SAME_SOUND = [['η', 'ι', 'υ'], ['ο', 'ω'], ['σ', 'ς']];
+function level4SameSound(a, b) { return LEVEL4_SAME_SOUND.some(g => g.includes(a) && g.includes(b)); }
+
 function level4PickPhonemeDistractors(bank, phonemeField, correctPhoneme, correctType, count) {
-    const allPhonemes = Array.from(new Set(bank.map(w => w[phonemeField]))).filter(p => p !== correctPhoneme);
+    const allPhonemes = Array.from(new Set(bank.map(w => w[phonemeField]))).filter(p => p !== correctPhoneme && !level4SameSound(p, correctPhoneme));
     const typeOf = p => { const w = bank.find(x => x[phonemeField] === p); return w ? w.type : null; };
     const sameType = allPhonemes.filter(p => typeOf(p) === correctType);
     const closePicks = Phono.data.shuffle(sameType).slice(0, Math.min(2, sameType.length));

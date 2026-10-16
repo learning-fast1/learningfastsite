@@ -91,6 +91,22 @@ Phono.data.finalPhonemesL4 = [
     // -ν (/n/) — rare, mostly loanwords; keep this family small
     { word: "ζαμπόν", final: "ν", type: "cons", imageable: true, emoji: "🥓" },
     { word: "σαμπουάν", final: "ν", type: "cons", imageable: true, emoji: "🧴" },
+
+    // === ΝΕΑ ΤΕΛΙΚΑ ΦΩΝΗΜΑΤΑ (η και λίγες ξένες λέξεις) ===
+    { word: "μύτη", final: "η", type: "vowel", imageable: true, emoji: "👃" },
+    { word: "βροχή", final: "η", type: "vowel", imageable: true, emoji: "🌧️" },
+    { word: "ζάχαρη", final: "η", type: "vowel", imageable: true, emoji: "🧂" },
+    { word: "μηχανή", final: "η", type: "vowel", imageable: true, emoji: "🏍️" },
+    { word: "βρύση", final: "η", type: "vowel", imageable: true, emoji: "🚰" },
+    { word: "πλάτη", final: "η", type: "vowel", imageable: true, emoji: "🧍" },
+    { word: "τσέπη", final: "η", type: "vowel", imageable: true, emoji: "👖" },
+    { word: "αδελφή", final: "η", type: "vowel", imageable: true, emoji: "👧" },
+    { word: "εξοχή", final: "η", type: "vowel", imageable: true, emoji: "🏞️" },
+    { word: "νεφέλη", final: "η", type: "vowel", imageable: true, emoji: "☁️" },
+    { word: "ρομπότ", final: "τ", type: "cons", imageable: true, emoji: "🤖" },
+    { word: "τρακτέρ", final: "ρ", type: "cons", imageable: true, emoji: "🚜" },
+    { word: "γκαράζ", final: "ζ", type: "cons", imageable: true, emoji: "🚗" },
+    { word: "μπλε", final: "ε", type: "vowel", imageable: true, emoji: "🔵" },
 ];
 
 /** All imageable words sharing one final phoneme (e.g. "α" -> γάτα,
