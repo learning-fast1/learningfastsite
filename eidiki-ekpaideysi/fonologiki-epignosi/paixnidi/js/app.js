@@ -51,7 +51,8 @@ const CONTENT_PICKER_TARGETS = {
                 if (!byFamily[w.family]) byFamily[w.family] = { family: w.family, easy: w.easy, words: [] };
                 byFamily[w.family].words.push(w.word);
             });
-            return Object.values(byFamily);
+            // a family with a single word has nobody to rhyme with yet (its word is only used as a wrong choice), so it is not offered
+            return Object.values(byFamily).filter(f => f.words.length >= 2);
         },
         keyOf: f => f.family,
         labelOf: f => `-${f.family} (${f.words.slice(0, 3).join(', ')}${f.words.length > 3 ? '…' : ''})`,
