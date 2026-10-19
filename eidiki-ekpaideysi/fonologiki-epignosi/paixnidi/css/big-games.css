@@ -11,7 +11,7 @@
 .big-game[data-game="wordSizeCompare"] { --card: 17; }
 .big-game[data-game="syllableSynthesis"] { --card: 14; }
 .big-game[data-game="rhymeOddOneOut"] { --card: 12; }
-.big-game[data-game="findRhyme"] { --main: 10.5; --cardonly: 11; }
+.big-game[data-game="findRhyme"] { --main: 10.5; --card: 10; --cardonly: 11; }
 .big-game[data-game="produceRhyme"] { --main: 19; }
 .big-game[data-game="findInitialPhoneme"], .big-game[data-game="findFinalPhoneme"] { --main: 17; }
 .big-game[data-game="initialSoundMC"], .big-game[data-game="soundOddOneOut"] { --card: 11; }

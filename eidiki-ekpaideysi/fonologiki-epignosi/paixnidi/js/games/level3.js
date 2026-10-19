@@ -609,15 +609,20 @@ function level3PickFamily(map, need, used, easyUsed) {
     return family;
 }
 /** `n` words from families other than `family` (each from a different family when possible), as fresh as possible. */
-function level3PickOtherWords(map, family, n, used) {
+function level3Look(word) { return (Phono.data.rhymeLookGroups && Phono.data.rhymeLookGroups[word]) || null; }
+function level3PickOtherWords(map, family, n, used, roundWords) {
     const chosen = [], families = new Set([family]);
+    const looks = new Set((roundWords || []).map(level3Look).filter(Boolean)); // pictures already in this round
     const all = Object.keys(map).flatMap(f => map[f]);
     for (let i = 0; i < n; i++) {
-        let cands = all.filter(w => !families.has(w.family));
+        const free = x => !(level3Look(x.word) && looks.has(level3Look(x.word)));
+        let cands = all.filter(w => !families.has(w.family) && free(w));
+        if (cands.length === 0) cands = all.filter(w => w.family !== family && !chosen.includes(w) && free(w));
         if (cands.length === 0) cands = all.filter(w => w.family !== family && !chosen.includes(w));
         const w = Phono.helpers.pickFresh(cands, x => ['w:' + x.word], used);
         chosen.push(w);
         families.add(w.family);
+        if (level3Look(w.word)) looks.add(level3Look(w.word));
     }
     return chosen;
 }
@@ -643,7 +648,7 @@ function level3BuildFindRhymeItemsOnce(totalRounds) {
         const family = level3PickFamily(map, 2, used, easyUsed);
         const base = Phono.helpers.pickFresh(map[family], w => ['w:' + w.word], used);
         const correct = Phono.helpers.pickFresh(map[family].filter(w => w !== base), w => ['w:' + w.word], used);
-        const distractors = level3PickOtherWords(map, family, 3, used);
+        const distractors = level3PickOtherWords(map, family, 3, used, [base.word, correct.word]);
         items.push({ base: base.word, correct: correct.word, distractors: distractors.map(w => w.word) });
     }
     return items;
@@ -662,7 +667,7 @@ function level3BuildOddOneOutItemsOnce(totalRounds) {
         const family = level3PickFamily(map, 2, used, easyUsed);
         const first = Phono.helpers.pickFresh(map[family], w => ['w:' + w.word], used);
         const second = Phono.helpers.pickFresh(map[family].filter(w => w !== first), w => ['w:' + w.word], used);
-        const odd = level3PickOtherWords(map, family, 1, used)[0];
+        const odd = level3PickOtherWords(map, family, 1, used, [first.word, second.word])[0];
         items.push({ rhyming: [first.word, second.word], odd: odd.word });
     }
     return items;

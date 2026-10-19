@@ -178,6 +178,157 @@ Phono.data.rhymesL3 = [
     { word: "ομπρέλα", family: "έλα", emoji: "☂️" },
     // FAMILY "έμα" — new words from the educator's rhyme list
     { word: "δέμα", family: "έμα", emoji: "📦" },
+    // FAMILY "όμα" — new words from the educator's rhyme list
+    { word: "σώμα", family: "όμα", emoji: "🧍" },
+    // FAMILY "έντρο" — new words from the educator's rhyme list
+    { word: "δέντρο", family: "έντρο", emoji: "🌳" },
+    // FAMILY "ήμα" — new words from the educator's rhyme list
+    { word: "σήμα", family: "ήμα", emoji: "🛑" },
+    { word: "νήμα", family: "ήμα", emoji: "🧵" },
+    { word: "λίμα", family: "ήμα", emoji: "🔧" },
+    // FAMILY "άτα" — new words from the educator's rhyme list
+    { word: "πιάτα", family: "άτα", emoji: "🍽️" },
+    // FAMILY "ήλα" — new words from the educator's rhyme list
+    { word: "μήλα", family: "ήλα", emoji: "🍎" },
+    { word: "φύλλα", family: "ήλα", emoji: "🍂" },
+    { word: "πιπίλα", family: "ήλα", emoji: "🍼" },
+    { word: "ξύλα", family: "ήλα", emoji: "🪵" },
+    // FAMILY "ίνι" — new words from the educator's rhyme list
+    { word: "πίνει", family: "ίνι", emoji: "🥤" },
+    { word: "δίνει", family: "ίνι", emoji: "🎁" },
+    { word: "καναρίνι", family: "ίνι", emoji: "🐤" },
+    // FAMILY "όμα" — new words from the educator's rhyme list
+    { word: "χρώμα", family: "όμα", emoji: "🎨" },
+    { word: "πώμα", family: "όμα", emoji: "🍾" },
+    { word: "χώμα", family: "όμα", emoji: "🟤" },
+    // FAMILY "άνα" — new words from the educator's rhyme list
+    { word: "μελιτζάνα", family: "άνα", emoji: "🍆" },
+    // FAMILY "αία" — new words from the educator's rhyme list
+    { word: "σημαία", family: "αία", emoji: "🇬🇷" },
+    { word: "κεραία", family: "αία", emoji: "📡" },
+    // FAMILY "ό" — new words from the educator's rhyme list
+    { word: "κινητό", family: "ό", emoji: "📱" },
+    { word: "φαγητό", family: "ό", emoji: "🍝" },
+    { word: "φυτό", family: "ό", emoji: "🪴" },
+    // FAMILY "άνος" — new words from the educator's rhyme list
+    { word: "κράνος", family: "άνος", emoji: "⛑️" },
+    { word: "νάνος", family: "άνος", emoji: "🧙" },
+    // FAMILY "έρι" — new words from the educator's rhyme list
+    { word: "κασέρι", family: "έρι", emoji: "🧀" },
+    { word: "πιπέρι", family: "έρι", emoji: "🫑" },
+    { word: "ταίρι", family: "έρι", emoji: "👫" },
+    { word: "μαχαίρι", family: "έρι", emoji: "🔪" },
+    // FAMILY "ωτός" — new words from the educator's rhyme list
+    { word: "λωτός", family: "ωτός", emoji: "🍊" },
+    { word: "κιβωτός", family: "ωτός", emoji: "🚢" },
+    // FAMILY "ίτσα" — new words from the educator's rhyme list
+    { word: "σκίτσα", family: "ίτσα", emoji: "✏️" },
+    // FAMILY "άδι" — new words from the educator's rhyme list
+    { word: "κοπάδι", family: "άδι", emoji: "🐑" },
+    { word: "λιβάδι", family: "άδι", emoji: "🌾" },
+    { word: "σκοτάδι", family: "άδι", emoji: "🌑" },
+    { word: "πηγάδι", family: "άδι", emoji: "🕳️" },
+    // FAMILY "ίκι" — new words from the educator's rhyme list
+    { word: "αποθήκη", family: "ίκι", emoji: "🏚️" },
+    { word: "βιβλιοθήκη", family: "ίκι", emoji: "📚" },
+    { word: "φιστίκι", family: "ίκι", emoji: "🥜" },
+    { word: "θήκη", family: "ίκι", emoji: "📱" },
+    // FAMILY "ιέρα" — new words from the educator's rhyme list
+    { word: "μπανιέρα", family: "ιέρα", emoji: "🛁" },
+    { word: "καφετιέρα", family: "ιέρα", emoji: "☕" },
+    // FAMILY "ίση" — new words from the educator's rhyme list
+    { word: "φύση", family: "ίση", emoji: "🏞️" },
+    { word: "πτήση", family: "ίση", emoji: "✈️" },
+    // FAMILY "άδα" — new words from the educator's rhyme list
+    { word: "λεμονάδα", family: "άδα", emoji: "🍋" },
+    { word: "μακαρονάδα", family: "άδα", emoji: "🍝" },
+    { word: "βαρκάδα", family: "άδα", emoji: "🚣" },
+    // FAMILY "ήρι" — new words from the educator's rhyme list
+    { word: "σουρωτήρι", family: "ήρι", emoji: "🥣" },
+    { word: "ξυπνητήρι", family: "ήρι", emoji: "⏰" },
+    // FAMILY "όνι" — new words from the educator's rhyme list
+    { word: "βαγόνι", family: "όνι", emoji: "🚃" },
+    { word: "βελόνι", family: "όνι", emoji: "🪡" },
+    { word: "σαλόνι", family: "όνι", emoji: "🛋️" },
+    { word: "ζώνη", family: "όνι", emoji: "🥋" },
+    { word: "πιόνι", family: "όνι", emoji: "♟️" },
+    { word: "παγόνι", family: "όνι", emoji: "🦚" },
+    // FAMILY "ίδι" — new words from the educator's rhyme list
+    { word: "παιχνίδι", family: "ίδι", emoji: "🧸" },
+    { word: "κρεμμύδι", family: "ίδι", emoji: "🧅" },
+    { word: "ξύδι", family: "ίδι", emoji: "🍾" },
+    { word: "μύδι", family: "ίδι", emoji: "🦪" },
+    // FAMILY "ίδα" — new words from the educator's rhyme list
+    { word: "ακρίδα", family: "ίδα", emoji: "🦗" },
+    { word: "ασπίδα", family: "ίδα", emoji: "🛡️" },
+    { word: "γίδα", family: "ίδα", emoji: "🐐" },
+    { word: "καρύδα", family: "ίδα", emoji: "🥥" },
+    { word: "λεπίδα", family: "ίδα", emoji: "🪒" },
+    { word: "γαρίδα", family: "ίδα", emoji: "🦐" },
+    // FAMILY "είο" — new words from the educator's rhyme list
+    { word: "φορείο", family: "είο", emoji: "🚑" },
+    { word: "δοχείο", family: "είο", emoji: "🥡" },
+    { word: "σχολείο", family: "είο", emoji: "🏫" },
+    { word: "ηχείο", family: "είο", emoji: "🔊" },
+    { word: "λαχείο", family: "είο", emoji: "🎟️" },
+    // FAMILY "ένα" — new words from the educator's rhyme list
+    { word: "τρένα", family: "ένα", emoji: "🚂" },
+    { word: "πένα", family: "ένα", emoji: "🖊️" },
+    { word: "ένα", family: "ένα", emoji: "1️⃣" },
+    // FAMILY "άρι" — new words from the educator's rhyme list
+    { word: "βάρη", family: "άρι", emoji: "🏋️" },
+    { word: "σιτάρι", family: "άρι", emoji: "🌾" },
+    { word: "θυμάρι", family: "άρι", emoji: "🌿" },
+    // FAMILY "άμι" — new words from the educator's rhyme list
+    { word: "σαλάμι", family: "άμι", emoji: "🥓" },
+    // FAMILY "άντα" — new words from the educator's rhyme list
+    { word: "πάντα", family: "άντα", emoji: "🐼" },
+    // FAMILY "όλα" — new words from the educator's rhyme list
+    { word: "μπριζόλα", family: "όλα", emoji: "🥩" },
+    // FAMILY "ούπα" — new words from the educator's rhyme list
+    { word: "σούπα", family: "ούπα", emoji: "🥣" },
+    // FAMILY "άνι" — new words from the educator's rhyme list
+    { word: "τρυπάνι", family: "άνι", emoji: "🔧" },
+    { word: "μελάνι", family: "άνι", emoji: "🖋️" },
+    // FAMILY "άσι" — new words from the educator's rhyme list
+    { word: "φαράσι", family: "άσι", emoji: "🧹" },
+    // FAMILY "έντρο" — new words from the educator's rhyme list
+    { word: "κέντρο", family: "έντρο", emoji: "🎯" },
+    // FAMILY "ύρα" — new words from the educator's rhyme list
+    { word: "μπύρα", family: "ύρα", emoji: "🍺" },
+    { word: "λύρα", family: "ύρα", emoji: "🎻" },
+    // FAMILY "ίτα" — new words from the educator's rhyme list
+    { word: "μαργαρίτα", family: "ίτα", emoji: "🌼" },
+    { word: "γρανίτα", family: "ίτα", emoji: "🍧" },
+    // FAMILY "ύλος" — new words from the educator's rhyme list
+    { word: "μύλος", family: "ύλος", emoji: "🌬️" },
+    // FAMILY "ιά" — new words from the educator's rhyme list
+    { word: "ψησταριά", family: "ιά", emoji: "🍖" },
+    { word: "ζυγαριά", family: "ιά", emoji: "⚖️" },
+    { word: "πουλιά", family: "ιά", emoji: "🐦" },
+    { word: "φωλιά", family: "ιά", emoji: "🪺" },
+    { word: "αγκαλιά", family: "ιά", emoji: "🤗" },
+    // FAMILY "όνος" — new words from the educator's rhyme list
+    { word: "πόνος", family: "όνος", emoji: "🤕" },
+    // FAMILY "έτα" — new words from the educator's rhyme list
+    { word: "κασέτα", family: "έτα", emoji: "📼" },
+    // FAMILY "όδι" — new words from the educator's rhyme list
+    { word: "βόδι", family: "όδι", emoji: "🐂" },
+    // FAMILY "άρος" — new words from the educator's rhyme list
+    { word: "φάρος", family: "άρος", emoji: "🗼" },
+    { word: "γλάρος", family: "άρος", emoji: "🕊️" },
+    // FAMILY "άτι" — new words from the educator's rhyme list
+    { word: "παλάτι", family: "άτι", emoji: "🏰" },
+    // FAMILY "έλα" — new words from the educator's rhyme list
+    { word: "σέλα", family: "έλα", emoji: "🏇" },
+    // FAMILY "ώνω" — new words from the educator's rhyme list
+    { word: "θυμώνω", family: "ώνω", emoji: "😠" },
+    { word: "ιδρώνω", family: "ώνω", emoji: "😓" },
+    // FAMILY "έμα" — new words from the educator's rhyme list
+    { word: "στέμμα", family: "έμα", emoji: "👑" },
+    // FAMILY "ήνα" — new words from the educator's rhyme list
+    { word: "χήνα", family: "ήνα", emoji: "🪿" },
+    { word: "αχτίνα", family: "ήνα", emoji: "☀️" },
 ];
 
 /** All words in one rhyme family (e.g. "άτα" -> πατάτα, ντομάτα, ...). */
@@ -310,3 +461,22 @@ Phono.data.rhymeOddOneOutItemsL3 = [
 Phono.data.produceRhymeBasesL3 = [
     "μπαλόνι", "πατάτα", "φεγγάρι", "φίδι", "μέλι", "κεφάλι", "βελόνα", "νερό", "κουτί",
 ];
+
+/* ----------------------------------------------------------
+   Words whose PICTURES look alike (a couple, birds, a phone and its case...). Two words of the same group never show up
+   together in one round of "Βρες τη ρίμα" / "Βρες το διαφορετικό", so the child is never shown two pictures that could both be the answer.
+   ---------------------------------------------------------- */
+Phono.data.rhymeLookGroups = (function () {
+    const groups = [
+        ['ζευγάρι', 'ταίρι'],
+        ['πουλί', 'πουλιά', 'καναρίνι', 'γλάρος'],
+        ['λουλούδι', 'μαργαρίτα', 'φυτό'],
+        ['κινητό', 'θήκη'],
+        ['βαγόνι', 'τρένα'],
+        ['λάδι', 'ξύδι'],
+        ['φαγητό', 'μακαρονάδα'],
+    ];
+    const map = {};
+    groups.forEach((g, i) => g.forEach(w => { map[w] = 'look' + i; }));
+    return map;
+})();

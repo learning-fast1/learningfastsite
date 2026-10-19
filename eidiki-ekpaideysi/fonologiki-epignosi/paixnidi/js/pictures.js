@@ -92,7 +92,7 @@
         'τρενα': 'trena', 'μηλα': 'mila', 'λαχειο': 'lacheio', 'πηγαδι': 'pigadi',
         'φιστικι': 'fistiki',
         'βημα': 'vima', 'σημα': 'sima', 'πινει': 'pinei', 'δινει': 'dinei',
-        'χρωμα': 'chroma', 'σημαια': 'simaia', 'φαγητο': 'fagito', 'νανοσ': 'nanos',
+        'χρωμα': 'chroma', 'σημαια': 'simaia', 'φαγητο': 'fagito-2', 'νανοσ': 'nanos',
         'ταιρι': 'tairi', 'σκοταδι': 'skotadi', 'φυση': 'fysi', 'πτηση': 'ptisi',
         'μακαροναδα': 'makaronada', 'βαρκαδα': 'varkada', 'βαγονι': 'vagoni', 'σαλονι': 'saloni',
         'ακριδα': 'akrida', 'ενα': 'ena', 'βαρη': 'vari', 'παντα': 'pada',
