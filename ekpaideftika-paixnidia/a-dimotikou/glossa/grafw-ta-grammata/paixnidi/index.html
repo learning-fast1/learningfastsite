@@ -26,16 +26,7 @@ body{margin:0}
   --display:"Comfortaa", "Varela Round", system-ui, sans-serif;
   --body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#121827; --paper:#1A2236; --ink:#E9EEF8; --muted:#9AA7C2;
-  --line:#2E3A55; --base:#C9645C; --guide:#6F7FA3; --track:#232D45;
-  --accent:#8FD459; --accent-soft:#2C3F22; --on-accent:#16260B; --star:#FFBE45; --ok:#3CC48C;
-  --c1:#8FD459; --c2:#FF6F8C; --c3:#FFA552; --c4:#B98AF0; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#121827; --paper:#1A2236; --ink:#E9EEF8; --muted:#9AA7C2;
-  --line:#2E3A55; --base:#C9645C; --guide:#6F7FA3; --track:#232D45;
-  --accent:#8FD459; --accent-soft:#2C3F22; --on-accent:#16260B; --star:#FFBE45; --ok:#3CC48C;
-  --c1:#8FD459; --c2:#FF6F8C; --c3:#FFA552; --c4:#B98AF0; color-scheme:dark}
+:root{color-scheme:light}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
