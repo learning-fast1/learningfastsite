@@ -29,20 +29,7 @@
   --head: 'Comfortaa', 'Trebuchet MS', 'Segoe UI', sans-serif;
   --body: 'Nunito', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #1E1A33; --surface: #2A2546; --text: #F1EEFF; --muted: #BDB5DD; --line: #423B66;
-    --primary-tint: #352E5C; --pink-tint: #4A2F45; --sky-tint: #22405A; --leaf-tint: #24453A; --sun-tint: #4A4130;
-    --card-back: linear-gradient(140deg, #E4DFF8 0%, #DCEFF6 55%, #F5DFE8 100%); /* ανοιχτό, για να διαβάζεται το μωβ λογότυπο */
-    --card-edge: #8F84D6; --shadow: 0 10px 30px rgba(0, 0, 0, .3);
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #1E1A33; --surface: #2A2546; --text: #F1EEFF; --muted: #BDB5DD; --line: #423B66;
-  --primary-tint: #352E5C; --pink-tint: #4A2F45; --sky-tint: #22405A; --leaf-tint: #24453A; --sun-tint: #4A4130;
-  --card-back: linear-gradient(140deg, #E4DFF8 0%, #DCEFF6 55%, #F5DFE8 100%); /* ανοιχτό, για να διαβάζεται το μωβ λογότυπο */
-  --card-edge: #8F84D6; --shadow: 0 10px 30px rgba(0, 0, 0, .3);
-}
+:root { color-scheme: light; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -107,17 +94,10 @@ button:disabled { cursor: default; opacity: .45; }
   text-decoration: none; box-shadow: var(--shadow); border: 2px solid var(--line); transition: transform .15s ease;
 }
 .site-back-link:hover { transform: translateY(-2px); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .site-back-link { color: #CFC7F8; } }
-:root[data-theme="dark"] .site-back-link { color: #CFC7F8; }
 /* σε στενές οθόνες το logo κατεβαίνει, ώστε να μην πέφτει πάνω στον σύνδεσμο */
 @media (max-width: 700px) { #home .hero { padding-top: 72px; } }
 .hero { text-align: center; padding: clamp(16px, 4vh, 40px) 16px 8px; }
 .logo { display: block; width: clamp(110px, 18vw, 160px); height: auto; margin: 0 auto 4px; }
-/* στη σκοτεινή εμφάνιση τα μωβ γράμματα του logo χρειάζονται ανοιχτό φόντο */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .logo { background: #FBF9FF; border-radius: 22px; padding: 8px 14px; }
-}
-:root[data-theme="dark"] .logo { background: #FBF9FF; border-radius: 22px; padding: 8px 14px; }
 .hero h1 { font-size: clamp(2rem, 7vw, 3.2rem); color: var(--text); }
 .subtitle { font-size: clamp(1.1rem, 3vw, 1.35rem); color: var(--muted); margin: 8px 0 0; }
 .modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 20px 0; }
