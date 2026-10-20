@@ -379,7 +379,7 @@ $('mUp').onclick=()=>setMode('U');$('mLo').onclick=()=>setMode('L');
 $('prev').onclick=()=>load(idx-1);$('next').onclick=()=>load(idx+1);
 $('again').onclick=()=>load(idx);$('demo').onclick=runDemo;
 const setLvl=l=>{lvl=l;[['lvF','full'],['lvP','part'],['lvA','auto'],['lvE','free']].forEach(([id,k])=>$(id).setAttribute('aria-pressed',k===l));
-  const ch=list()[idx];if(!done)load(idx)};
+  load(idx)};  // pressing a guidance level always restarts the chosen letter from the beginning, even if it was already written
 $('lvF').onclick=()=>setLvl('full');$('lvP').onclick=()=>setLvl('part');$('lvA').onclick=()=>setLvl('auto');$('lvE').onclick=()=>setLvl('free');
 $('snd').onclick=e=>{sound=!sound;e.currentTarget.setAttribute('aria-pressed',sound);$('sndW').style.opacity=sound?1:0};
 addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='ArrowLeft')load(idx-1)});
