@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S07M3VNB5N');
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Γράφω τα Γράμματα – Learning Fast</title>
+<meta name="description" content="Δωρεάν ψηφιακό παιχνίδι ιχνηλάτησης ελληνικών γραμμάτων για τάμπλετ και κινητό. Κεφαλαία και πεζά, με επίπεδα καθοδήγησης.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Manrope:wght@500;600;700;800&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+/* Layout: notebook page — letter shelf on the left (strip on phones), large tracing sheet on the right */
+:root{
+  --bg:#EEF3FA; --paper:#FFFFFF; --ink:#1E2A47; --muted:#5D6B88;
+  --line:#C9D4E6; --base:#E5736A; --guide:#8C9AB8; --track:#E7EDF7;
+  --accent:#7AC943; --accent-soft:#E6F5D8; --on-accent:#1E3510; --star:#F5A524; --ok:#1F9D6A;
+  --c1:#5DAF26; --c2:#E5486A; --c3:#F08A24; --c4:#9B51E0;
+  --display:"Comfortaa", "Varela Round", system-ui, sans-serif;
+  --body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121827; --paper:#1A2236; --ink:#E9EEF8; --muted:#9AA7C2;
+  --line:#2E3A55; --base:#C9645C; --guide:#6F7FA3; --track:#232D45;
+  --accent:#8FD459; --accent-soft:#2C3F22; --on-accent:#16260B; --star:#FFBE45; --ok:#3CC48C;
+  --c1:#8FD459; --c2:#FF6F8C; --c3:#FFA552; --c4:#B98AF0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121827; --paper:#1A2236; --ink:#E9EEF8; --muted:#9AA7C2;
+  --line:#2E3A55; --base:#C9645C; --guide:#6F7FA3; --track:#232D45;
+  --accent:#8FD459; --accent-soft:#2C3F22; --on-accent:#16260B; --star:#FFBE45; --ok:#3CC48C;
+  --c1:#8FD459; --c2:#FF6F8C; --c3:#FFA552; --c4:#B98AF0; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.wrap{max-width:1180px;margin:0 auto;padding-block:14px 20px;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(22px,3.4vw,30px);margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 span{color:var(--c1)}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand .logo{height:clamp(42px,6vw,58px);width:auto;display:block;flex:none}
+.copy{margin:2px 0 0;text-align:center;font-size:12.5px;color:var(--muted)}
+.seg{display:inline-flex;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;color:var(--muted);font:700 15px var(--body);padding:8px 16px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.app{display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px;align-items:start}
+.shelf{background:var(--paper);border:1.5px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.shelf h2{margin:0;font:800 12px var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.letters{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.letters button{position:relative;aspect-ratio:1;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);
+  border-radius:12px;font:700 22px var(--display);cursor:pointer;display:grid;place-items:center;padding:0}
+.letters button[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.letters button .dot{position:absolute;top:3px;right:4px;font-size:10px;color:var(--star);line-height:1}
+.letters button[aria-current="true"] .dot{color:var(--on-accent)}
+.stage-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.sheet{position:relative;background:var(--paper);border:1.5px solid var(--line);border-radius:22px;overflow:hidden;
+  height:min(70vh,640px);min-height:380px}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.badge{position:absolute;left:14px;top:12px;display:flex;align-items:baseline;gap:10px;pointer-events:none}
+.badge .big{font:700 34px var(--display);color:var(--ink)}
+.badge .word{font:600 16px var(--body);color:var(--muted)}
+.badge .word b{color:var(--c1);font-weight:800}
+.status{position:absolute;right:14px;top:14px;font:700 13px var(--body);color:var(--muted);background:var(--bg);
+  border-radius:999px;padding:6px 12px;pointer-events:none}
+.cheer{position:absolute;inset:auto 0 22px 0;text-align:center;pointer-events:none;font:700 clamp(28px,6vw,46px) var(--display);
+  color:var(--ok);opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s}
+.cheer.show{opacity:1;transform:none}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.grp{display:flex;flex-wrap:wrap;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);
+  font:700 15px var(--body);padding:10px 14px;border-radius:14px;cursor:pointer;min-height:44px}
+.btn svg{width:18px;height:18px;flex:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+button:focus-visible{outline:3px solid var(--star);outline-offset:2px}
+.hint{font-size:13px;color:var(--muted);margin:0;line-height:1.5}
+.seg .lbl-long{font-weight:700}
+@media (pointer:coarse){.seg button{min-height:42px}.letters button{min-height:44px}}
+@media (max-width:860px){
+  .seg button{padding:8px 12px}
+  .seg .lbl-long{display:none}
+  /* the four guidance buttons share the whole row, so they never push the page wider than a narrow phone */
+  .grp:has(#lvl){width:100%}
+  #lvl{display:flex;width:100%;min-width:0}
+  #lvl button{flex:1 1 0;min-width:0;padding:8px 4px;font-size:14px;white-space:nowrap}
+  .app{grid-template-columns:minmax(0,1fr)}
+  .shelf{order:2}
+  .letters{grid-template-columns:repeat(auto-fill,minmax(46px,1fr))}
+  .sheet{height:min(64vh,118vw);min-height:340px}
+  .btn .lbl-long{display:none}
+}
+@media (prefers-reduced-motion:reduce){.cheer{transition:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img class="logo" src="logo.png" alt="Learning Fast" width="480" height="300">
+      <h1>Γράφω τα <span>Γράμματα</span></h1>
+    </div>
+    <div class="seg" role="group" aria-label="Είδος γραμμάτων">
+      <button id="mUp" aria-pressed="true">ΚΕΦΑΛΑΙΑ</button>
+      <button id="mLo" aria-pressed="false">πεζά</button>
+    </div>
+  </header>
+
+  <div class="app">
+    <aside class="shelf">
+      <h2>Διάλεξε γράμμα</h2>
+      <div class="letters" id="letters"></div>
+      <p class="hint">Το αστεράκι δείχνει τα γράμματα που έχει ήδη γράψει το παιδί σε αυτή τη συσκευή.</p>
+    </aside>
+
+    <section class="stage-col">
+      <div class="sheet" id="sheet">
+        <canvas id="cv" aria-label="Πίνακας ιχνηλάτησης γράμματος"></canvas>
+        <div class="badge"><span class="big" id="bigL">Α</span><span class="word" id="word"></span></div>
+        <div class="status" id="status">Γραμμή 1 από 3</div>
+        <div class="cheer" id="cheer">Μπράβο! ⭐</div>
+      </div>
+      <div class="bar">
+        <div class="grp">
+          <button class="btn" id="prev" aria-label="Προηγούμενο γράμμα"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span class="lbl-long">Προηγούμενο</span></button>
+          <button class="btn primary" id="next" aria-label="Επόμενο γράμμα"><span class="lbl-long">Επόμενο</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+          <button class="btn" id="demo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Δείξε μου</button>
+          <button class="btn" id="again"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/></svg>Ξανά</button>
+        </div>
+        <div class="grp">
+          <div class="seg" id="lvl" role="group" aria-label="Επίπεδο καθοδήγησης">
+            <button id="lvF" aria-pressed="true">Πλήρης<span class="lbl-long"> καθοδήγηση</span></button>
+            <button id="lvP" aria-pressed="false">Μερική<span class="lbl-long"> καθοδήγηση</span></button>
+            <button id="lvA" aria-pressed="false">Αυτόνομα</button>
+            <button id="lvE" aria-pressed="false">Ελεύθερη<span class="lbl-long"> γραφή</span></button>
+          </div>
+          <button class="btn" id="snd" aria-pressed="true" aria-label="Ήχος"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="sndW" d="M16.5 8.5a5 5 0 0 1 0 7"/></svg></button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <footer class="copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</footer>
+</div>
+
+<script>
+(()=>{
+/* ---------- geometry helpers (units: cap/ascender line y=0, x-height y=50, baseline y=120, descender y=170) ---------- */
+const L=(...a)=>{const p=[];for(let i=0;i<a.length;i+=2)p.push([a[i],a[i+1]]);return p};
+const A=(cx,cy,rx,ry,a0,a1)=>{const p=[],n=Math.max(8,Math.ceil(Math.abs(a1-a0)/4));
+  for(let i=0;i<=n;i++){const a=(a0+(a1-a0)*i/n)*Math.PI/180;p.push([cx+rx*Math.cos(a),cy+ry*Math.sin(a)])}return p};
+const S=(...a)=>{const q=L(...a),p=[];for(let i=0;i<q.length-1;i++){
+  const p0=q[Math.max(0,i-1)],p1=q[i],p2=q[i+1],p3=q[Math.min(q.length-1,i+2)];
+  for(let t=0;t<1;t+=.1){const t2=t*t,t3=t2*t;
+    p.push([0,1].map(k=>.5*(2*p1[k]+(-p0[k]+p2[k])*t+(2*p0[k]-5*p1[k]+4*p2[k]-p3[k])*t2+(-p0[k]+3*p1[k]-3*p2[k]+p3[k])*t3)))}}
+  p.push(q[q.length-1]);return p};
+const st=(...parts)=>parts.reduce((a,b)=>a.concat(b),[]);
+
+const UP={
+'Α':[L(50,0,8,120),L(50,0,92,120),L(26,76,74,76)],
+'Β':[L(18,0,18,120),st(L(18,0,55,0),A(55,28,28,28,-90,90),L(55,56,18,56)),st(L(18,56,58,56),A(58,88,32,32,-90,90),L(58,120,18,120))],
+'Γ':[L(22,0,22,120),L(22,0,85,0)],
+'Δ':[L(50,0,8,120),L(50,0,92,120),L(8,120,92,120)],
+'Ε':[L(20,0,20,120),L(20,0,85,0),L(20,60,72,60),L(20,120,85,120)],
+'Ζ':[L(15,0,85,0,15,120,85,120)],
+'Η':[L(15,0,15,120),L(85,0,85,120),L(15,60,85,60)],
+'Θ':[A(50,60,40,60,-90,-450),L(28,60,72,60)],
+'Ι':[L(50,0,50,120)],
+'Κ':[L(18,0,18,120),L(85,0,18,68),L(18,68,88,120)],
+'Λ':[L(50,0,8,120),L(50,0,92,120)],
+'Μ':[L(10,0,10,120),L(10,0,50,85),L(90,0,50,85),L(90,0,90,120)],
+'Ν':[L(15,0,15,120),L(15,0,85,120),L(85,0,85,120)],
+'Ξ':[L(15,0,85,0),L(25,60,75,60),L(15,120,85,120)],
+'Ο':[A(50,60,42,60,-90,-450)],
+'Π':[L(2,0,98,0),L(22,0,22,120),L(78,0,78,120)],
+'Ρ':[L(18,0,18,120),st(L(18,0,55,0),A(55,32,32,32,-90,90),L(55,64,18,64))],
+'Σ':[L(85,0,15,0,55,60,15,120,85,120)],
+'Τ':[L(10,0,90,0),L(50,0,50,120)],
+'Υ':[L(10,0,50,60),L(90,0,50,60,50,120)],
+'Φ':[A(50,58,42,32,-90,-450),L(50,0,50,120)],
+'Χ':[L(12,0,88,120),L(88,0,12,120)],
+'Ψ':[st(L(10,8,10,45),A(50,45,40,40,180,0),L(90,45,90,8)),L(50,0,50,120)],
+'Ω':[st(L(8,120,30,120),A(50,58,44,50,115,425),L(70,120,92,120))]
+};
+const LO={
+'α':[A(42,86,30,34,-90,-450),L(76,52,76,108,84,119,91,117)],
+'β':[L(20,25,20,170),st(A(42,25,22,22,180,450),A(45,85,30,35,-90,90),L(45,120,22,108))],
+'γ':[S(10,54,24,60,38,85,50,115,60,140,60,160,46,174,29,167,27,148,36,125,50,104,64,78,78,60,90,52)],
+'δ':[st(S(70,8,45,4,33,18,42,36,58,52),A(48,88,32,34,-72,288))],
+'ε':[st(A(50,68,26,18,-20,-270),A(52,103,30,17,-90,-340))],
+'ζ':[S(25,8,72,8,32,55,22,85,30,110,60,125,62,145,50,165)],
+'η':[L(18,50,18,120),st(A(48,80,30,26,180,360),L(78,80,78,120))],
+'θ':[A(50,60,30,58,-90,-450),L(22,60,78,60)],
+'ι':[S(45,50,45,108,55,120,66,115)],
+'κ':[L(20,50,20,120),L(75,50,20,90),L(20,90,80,120)],
+'λ':[S(16,4,30,10,42,38,55,82,68,122,78,141,87,150),S(51,70,42,92,30,118,22,137,14,153)],
+'μ':[L(20,50,20,170),st(A(45,92,25,28,180,0),L(70,92,70,50)),S(70,50,70,110,80,120,88,117)],
+'ν':[L(12,50,50,120,88,50)],
+'ξ':[S(30,4,68,4,45,22,40,40,62,52,40,58,28,78,32,100,60,118,62,145,50,165)],
+'ο':[A(50,85,30,35,-90,-450)],
+'π':[L(2,52,98,52),L(28,52,28,120),L(72,52,72,120)],
+'ρ':[st(A(50,85,28,35,-90,-540),L(22,85,22,170))],
+'σ':[st(A(45,87,30,35,-90,-450),L(45,52,88,52))],
+'ς':[st(A(50,69,21,17,-30,-270),A(51,103,21,17,-90,140))],
+'τ':[L(2,50,98,50),S(50,50,50,106,62,120,74,115)],
+'υ':[st(L(15,52,15,88),A(50,88,35,32,180,0),L(85,88,85,52))],
+'φ':[S(16,54,12,76,16,101,30,117,50,122,70,113,80,92,77,68,65,53,53,51,47,63,48,92,48,125,48,170)],
+'χ':[L(12,50,88,170),L(88,50,12,170)],
+'ψ':[st(L(12,50,12,85),A(50,85,38,35,180,0),L(88,85,88,50)),L(50,30,50,170)],
+'ω':[st(S(28,52,16,75,16,102,28,120,40,118,50,96),S(50,96,60,118,72,120,84,102,84,75,72,52))]
+};
+const WORDS={'Α':'αστέρι','Β':'βάρκα','Γ':'γάτα','Δ':'δέντρο','Ε':'ελέφαντας','Ζ':'ζέβρα','Η':'ήλιος','Θ':'θάλασσα','Ι':'ιππόκαμπος','Κ':'καράβι','Λ':'λεμόνι','Μ':'μήλο','Ν':'νερό','Ξ':'ξύλο','Ο':'ομπρέλα','Π':'πεταλούδα','Ρ':'ρόδι','Σ':'σπίτι','Τ':'τρένο','Υ':'ύπνος','Φ':'φεγγάρι','Χ':'χελώνα','Ψ':'ψάρι','Ω':'ωκεανός'};
+const pair=l=>({'α':'Α','β':'Β','γ':'Γ','δ':'Δ','ε':'Ε','ζ':'Ζ','η':'Η','θ':'Θ','ι':'Ι','κ':'Κ','λ':'Λ','μ':'Μ','ν':'Ν','ξ':'Ξ','ο':'Ο','π':'Π','ρ':'Ρ','σ':'Σ','ς':'Σ','τ':'Τ','υ':'Υ','φ':'Φ','χ':'Χ','ψ':'Ψ','ω':'Ω'}[l]||l);
+
+const STEP=1.5;
+function resample(pts){const out=[pts[0]];let acc=0;
+  for(let i=1;i<pts.length;i++){let [x0,y0]=pts[i-1];const [x1,y1]=pts[i];let d=Math.hypot(x1-x0,y1-y0);
+    while(acc+d>=STEP){const t=(STEP-acc)/d;x0=x0+(x1-x0)*t;y0=y0+(y1-y0)*t;out.push([x0,y0]);d=Math.hypot(x1-x0,y1-y0);acc=0}
+    acc+=d}
+  const last=pts[pts.length-1],e=out[out.length-1];if(Math.hypot(last[0]-e[0],last[1]-e[1])>.3)out.push(last);return out}
+
+/* letters whose on-screen glyph should match the tracing shape, not the font */
+const GLY=new Set(['φ','ς']);
+function gly(ch){const d=LO[ch].map(s=>'M'+resample(s).map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L')).join(' ');
+  return '<svg viewBox="-2 -10 100 190" aria-hidden="true" style="height:1.4em;width:auto;vertical-align:-0.44em;overflow:visible"><path d="'+d+'" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'}
+
+/* ---------- state ---------- */
+const $=id=>document.getElementById(id);
+const cv=$('cv'),ctx=cv.getContext('2d'),sheet=$('sheet');
+let mode='U',idx=0,strokes=[],cur=0,prog=0,drawing=false,lvl='full',sound=true,done=false,demo=null,trail=[],pulseT=0,parts=[],wrongFlash=0;
+let stars={};try{stars=JSON.parse(localStorage.getItem('gr-trace-stars')||'{}')}catch(e){}
+const saveStars=()=>{try{localStorage.setItem('gr-trace-stars',JSON.stringify(stars))}catch(e){}};
+const list=()=>Object.keys(mode==='U'?UP:LO);
+/* guidance levels: full = thick track, dashed guide, arrows, numbers, colours · part = thinner, no arrows/numbers, colours stay · auto = only the grey band of Μερική (no dashed line) · free = a blank page, the child writes alone */
+const tol=()=>lvl==='full'?20:lvl==='part'?14:16;
+const guided=()=>lvl==='full'||lvl==='part'||!!demo;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function load(i){idx=(i+list().length)%list().length;const ch=list()[idx];
+  strokes=(mode==='U'?UP:LO)[ch].map(s=>resample(s));cur=0;prog=0;done=false;drawing=false;demo=null;trail=[];parts=[];
+  const upC=mode==='U'?ch:pair(ch),loC=mode==='U'?ch.toLowerCase():ch;
+  $('bigL').innerHTML=upC+' '+(GLY.has(loC)?gly(loC):loC);
+  const w=WORDS[pair(ch)]||'';const first=w.charAt(0);
+  $('word').innerHTML=w&&ch!=='ς'?'<b>'+first+'</b>'+w.slice(1):(ch==='ς'?'ήλιο<b>ς</b>':'');
+  $('cheer').classList.remove('show');renderShelf();updStatus()}
+function updStatus(){$('status').textContent=done?'Τέλεια!':'Γραμμή '+(cur+1)+' από '+strokes.length}
+function renderShelf(){const box=$('letters');box.innerHTML='';
+  list().forEach((ch,i)=>{const b=document.createElement('button');if(GLY.has(ch))b.innerHTML=gly(ch);else b.textContent=ch;b.setAttribute('aria-label','Γράμμα '+ch);
+    if(i===idx)b.setAttribute('aria-current','true');
+    if(stars[mode+ch]){const d=document.createElement('span');d.className='dot';d.textContent='★';b.appendChild(d)}
+    b.onclick=()=>load(i);box.appendChild(b)})}
+
+/* ---------- view transform ---------- */
+let scale=1,ox=0,oy=0,W=0,H=0;
+function frame(){return mode==='U'?{x0:-18,x1:118,y0:-24,y1:146}:{x0:-18,x1:118,y0:-24,y1:194}}
+function resize(){const r=sheet.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2.5);
+  W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+  const f=frame(),top=58,bot=20;scale=Math.min(W/(f.x1-f.x0),(H-top-bot)/(f.y1-f.y0));
+  ox=(W-(f.x1-f.x0)*scale)/2-f.x0*scale;oy=top+((H-top-bot)-(f.y1-f.y0)*scale)/2-f.y0*scale}
+const tx=p=>[ox+p[0]*scale,oy+p[1]*scale];
+const toUnits=(x,y)=>[(x-ox)/scale,(y-oy)/scale];
+
+/* ---------- drawing ---------- */
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function pathOf(pts,a=0,b=pts.length-1){ctx.beginPath();const p=tx(pts[a]);ctx.moveTo(p[0],p[1]);
+  for(let i=a+1;i<=b;i++){const q=tx(pts[i]);ctx.lineTo(q[0],q[1])}}
+function arrowAt(pts,i,col){const a=pts[Math.max(0,i-2)],b=pts[Math.min(pts.length-1,i+2)];
+  const ang=Math.atan2(b[1]-a[1],b[0]-a[0]),[x,y]=tx(pts[i]),s=Math.max(7,scale*5);
+  ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.beginPath();ctx.moveTo(-s*.6,-s*.7);ctx.lineTo(s*.5,0);ctx.lineTo(-s*.6,s*.7);
+  ctx.strokeStyle=col;ctx.lineWidth=Math.max(3,scale*1.6);ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ctx.restore()}
+function numAt(p,n,bg,fg,r){const [x,y]=tx(p);ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fillStyle=bg;ctx.fill();
+  ctx.fillStyle=fg;ctx.font='800 '+Math.round(r*1.15)+'px Manrope, system-ui, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n,x,y+1)}
+
+function draw(){
+  const C={line:css('--line'),base:css('--base'),guide:css('--guide'),track:css('--track'),accent:css('--accent'),star:css('--star'),paper:css('--paper'),ink:css('--ink'),
+    cols:[css('--c1'),css('--c2'),css('--c3'),css('--c4')]};
+  ctx.clearRect(0,0,W,H);
+  // notebook lines
+  const lines=mode==='U'?[[-10,'s'],[60,'d'],[130,'b']]:[[-10,'s'],[40,'d'],[130,'b'],[180,'s']];
+  lines.forEach(([y,k])=>{const Y=oy+y*scale;ctx.beginPath();ctx.moveTo(0,Y);ctx.lineTo(W,Y);
+    ctx.strokeStyle=k==='b'?C.base:C.line;ctx.lineWidth=k==='b'?3:1.5;ctx.setLineDash(k==='d'?[8,8]:[]);ctx.stroke()});
+  ctx.setLineDash([]);
+  // Εύκολο: φαρδύς δρόμος και χοντρό μολύβι. Δύσκολο: στενός δρόμος και λεπτό μολύβι (και πιο αυστηρή ανοχή στο δάχτυλο)
+  const thick=lvl==='full'?Math.max(14,scale*14):Math.max(9,scale*7),ink=lvl==='full'?Math.max(10,scale*9):Math.max(6,scale*4.5);
+  const inkCol=i=>((lvl==='auto'||lvl==='free')&&!demo)?C.ink:C.cols[i%4];
+  ctx.lineCap='round';ctx.lineJoin='round';
+  // soft track
+  if(guided()||lvl==='auto')strokes.forEach(s=>{pathOf(s);ctx.strokeStyle=C.track;ctx.lineWidth=thick+6;ctx.stroke()});
+  // dashed guides
+  if(guided())strokes.forEach((s,i)=>{if(i<cur&&!demo)return;pathOf(s);ctx.setLineDash([Math.max(6,scale*4),Math.max(7,scale*5)]);
+    ctx.strokeStyle=i===cur?C.accent:C.guide;ctx.globalAlpha=i===cur?.75:.7;ctx.lineWidth=Math.max(3,scale*1.8);ctx.stroke();ctx.globalAlpha=1});
+  ctx.setLineDash([]);
+  // finished ink
+  const showUpto=demo?demo.s:cur, showProg=demo?demo.p:prog;
+  for(let i=0;i<strokes.length;i++){
+    if(i<showUpto||(done&&!demo)){pathOf(strokes[i]);ctx.strokeStyle=inkCol(i);ctx.globalAlpha=demo?.55:1;ctx.lineWidth=ink;ctx.stroke()}
+    else if(i===showUpto&&showProg>0){pathOf(strokes[i],0,Math.floor(showProg));ctx.strokeStyle=inkCol(i);ctx.globalAlpha=demo?.55:1;ctx.lineWidth=ink;ctx.stroke()}
+    ctx.globalAlpha=1}
+  // help: arrows + numbers
+  if(lvl==='full'&&!done&&!demo){const s=strokes[cur],gap=Math.round(28/STEP);
+    for(let i=Math.floor(prog)+gap;i<s.length-6;i+=gap)arrowAt(s,i,C.accent);
+    strokes.forEach((s2,i)=>{if(i>cur)numAt(s2[0],i+1,C.guide,C.paper,Math.max(10,scale*5.2))});}
+  // live finger trail
+  if(trail.length>1){ctx.beginPath();ctx.moveTo(trail[0][0],trail[0][1]);trail.forEach(p=>ctx.lineTo(p[0],p[1]));
+    ctx.strokeStyle=C.ink;ctx.globalAlpha=.12;ctx.lineWidth=4;ctx.stroke();ctx.globalAlpha=1}
+  // guide dot (where to put the finger)
+  if(!done&&(lvl==='full'||lvl==='part'||demo||wrongFlash>0)){const s=demo?strokes[demo.s]:strokes[cur],p=demo?s[Math.min(s.length-1,Math.floor(demo.p))]:s[Math.min(s.length-1,Math.floor(prog))];
+    const pulse=reduce||drawing||demo?0:Math.sin(pulseT/220)*.18,r=Math.max(13,scale*7)*(1+pulse);
+    const [x,y]=tx(p);ctx.beginPath();ctx.arc(x,y,r+5,0,7);ctx.fillStyle=C.star;ctx.globalAlpha=.25;ctx.fill();ctx.globalAlpha=1;
+    if(lvl==='full'&&!demo&&prog<1){numAt(p,cur+1,C.star,'#1E2A47',r)}else{star(x,y,r,C.star)}
+    if(wrongFlash>0){ctx.beginPath();ctx.arc(x,y,r+12+(1-wrongFlash)*10,0,7);ctx.strokeStyle=C.star;ctx.lineWidth=3;ctx.globalAlpha=wrongFlash;ctx.stroke();ctx.globalAlpha=1}}
+  // confetti
+  parts.forEach(p=>{ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.globalAlpha=Math.max(0,p.l);
+    if(p.s)star(0,0,p.z,p.c);else ctx.fillRect(-p.z/2,-p.z/4,p.z,p.z/2);ctx.restore()});
+}
+function star(x,y,r,col){ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;ctx.lineTo(x+rr*Math.cos(a),y+rr*Math.sin(a))}
+  ctx.closePath();ctx.fillStyle=col;ctx.fill()}
+
+/* ---------- sound ---------- */
+let ac=null;
+function tone(f,t0,d,v=.15){if(!sound||!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;
+  g.gain.setValueAtTime(0,ac.currentTime+t0);g.gain.linearRampToValueAtTime(v,ac.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+t0+d);
+  o.connect(g).connect(ac.destination);o.start(ac.currentTime+t0);o.stop(ac.currentTime+t0+d+.05)}
+const ding=()=>{tone(784,0,.25);tone(1047,.08,.3)};
+const fanfare=()=>[523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.35,.13));
+
+/* ---------- input ---------- */
+function pt(e){const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
+function advance(px,py){if(done)return;const s=strokes[cur],u=toUnits(px,py),T=tol(),win=Math.round((lvl==='full'?34:lvl==='part'?26:30)/STEP);
+  let best=-1,bd=1e9;const a=Math.floor(prog),b=Math.min(s.length-1,a+win);
+  for(let i=a;i<=b;i++){const d=Math.hypot(s[i][0]-u[0],s[i][1]-u[1]);if(d<bd){bd=d;best=i}}
+  if(bd<T&&best>prog)prog=best;
+  // the stroke counts as finished once the finger reaches the END AREA (not only the exact last point): a child who stops a few pixels short is not stuck
+  const en=s[s.length-1];if(prog>s.length*.7&&Math.hypot(en[0]-u[0],en[1]-u[1])<T*.85)prog=s.length-1;
+  if(prog>=s.length-2){cur++;prog=0;
+    if(cur>=strokes.length){finish()}else{ding();drawing=false;trail=[]}
+    updStatus()}}
+function finish(){done=true;drawing=false;cur=strokes.length-1;const ch=list()[idx];stars[mode+ch]=(stars[mode+ch]||0)+1;saveStars();renderShelf();
+  fanfare();$('cheer').classList.add('show');
+  if(!reduce){const cs=[css('--c1'),css('--c2'),css('--c3'),css('--c4'),css('--star')];
+    for(let i=0;i<70;i++)parts.push({x:W/2,y:H*.45,vx:(Math.random()-.5)*14,vy:-Math.random()*12-3,r:Math.random()*6,vr:(Math.random()-.5)*.3,
+      z:6+Math.random()*10,c:cs[i%5],l:1.4,s:i%4===0})}}
+cv.addEventListener('pointerdown',e=>{
+  if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(_){}}
+  if(done||demo)return;cv.setPointerCapture(e.pointerId);
+  const [x,y]=pt(e),u=toUnits(x,y),s=strokes[cur],p=s[Math.floor(prog)];
+  // must start near the star (or anywhere just ahead of it)
+  let near=Math.hypot(p[0]-u[0],p[1]-u[1])<tol()*(lvl==='auto'||lvl==='free'?2.4:1.6);
+  if(!near){for(let i=Math.floor(prog);i<Math.min(s.length,prog+12);i++)if(Math.hypot(s[i][0]-u[0],s[i][1]-u[1])<tol()){near=true;break}}
+  if(near){drawing=true;trail=[[x,y]];advance(x,y)}else{wrongFlash=1}
+});
+cv.addEventListener('pointermove',e=>{if(!drawing)return;const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+  for(const ev of (evs.length?evs:[e])){const [x,y]=pt(ev);trail.push([x,y]);if(trail.length>60)trail.shift();advance(x,y);if(!drawing)break}});
+const up=()=>{drawing=false;trail=[]};
+cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+
+/* ---------- demo ---------- */
+function runDemo(){if(demo)return;load(idx);demo={s:0,p:0}}
+function tickDemo(dt){if(!demo)return;demo.p+=dt*.045;const s=strokes[demo.s];
+  if(demo.p>=s.length-1){demo.s++;demo.p=0;if(demo.s>=strokes.length){demo=null;load(idx)}}}
+
+/* ---------- loop ---------- */
+let last=performance.now();
+function loop(t){const dt=Math.min(50,t-last);last=t;pulseT=t;tickDemo(dt);
+  if(wrongFlash>0)wrongFlash=Math.max(0,wrongFlash-dt/500);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.r+=p.vr;p.l-=dt/1400});parts=parts.filter(p=>p.l>0&&p.y<H+40);
+  draw();requestAnimationFrame(loop)}
+
+/* ---------- controls ---------- */
+function setMode(m){mode=m;$('mUp').setAttribute('aria-pressed',m==='U');$('mLo').setAttribute('aria-pressed',m==='L');resize();load(0)}
+$('mUp').onclick=()=>setMode('U');$('mLo').onclick=()=>setMode('L');
+$('prev').onclick=()=>load(idx-1);$('next').onclick=()=>load(idx+1);
+$('again').onclick=()=>load(idx);$('demo').onclick=runDemo;
+const setLvl=l=>{lvl=l;[['lvF','full'],['lvP','part'],['lvA','auto'],['lvE','free']].forEach(([id,k])=>$(id).setAttribute('aria-pressed',k===l));
+  const ch=list()[idx];if(!done)load(idx)};
+$('lvF').onclick=()=>setLvl('full');$('lvP').onclick=()=>setLvl('part');$('lvA').onclick=()=>setLvl('auto');$('lvE').onclick=()=>setLvl('free');
+$('snd').onclick=e=>{sound=!sound;e.currentTarget.setAttribute('aria-pressed',sound);$('sndW').style.opacity=sound?1:0};
+addEventListener('keydown',e=>{if(e.key==='ArrowRight')load(idx+1);if(e.key==='ArrowLeft')load(idx-1)});
+new ResizeObserver(resize).observe(sheet);
+resize();load(0);requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>
