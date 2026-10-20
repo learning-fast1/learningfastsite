@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LearningFast Memory</title>
+<meta name="description" content="Εκπαιδευτικό παιχνίδι μνήμης με κάρτες για παιδιά Νηπιαγωγείου και Δημοτικού. Ατομικό, για δύο παίκτες ή συνεργατικό.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='4' width='40' height='52' rx='9' fill='%235FC2DE'/%3E%3Crect x='18' y='10' width='40' height='52' rx='9' fill='%237C6FD9'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Nunito:wght@400;600;700;800&subset=greek&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-screen="home">
+
+<!-- HOME -->
+<section id="home" class="screen on" aria-labelledby="home-title">
+  <a class="site-back-link" href="https://learning-fast.com/">← learning-fast.com</a>
+  <div class="wrap homewrap">
+   <div class="homecard">
+    <div class="hero">
+      <img class="logo" src="logo.png" alt="Learning Fast" width="1143" height="714">
+      <h1 id="home-title">Παιχνίδι μνήμης</h1>
+      <p class="subtitle">Παίξε, θυμήσου, ανακάλυψε!</p>
+    </div>
+    <div class="modes">
+      <button class="mode" data-mode="solo"><span>Ατομικό παιχνίδι</span></button>
+      <button class="mode" data-mode="versus"><span>Δύο παίκτες (αντίπαλοι)</span></button>
+      <button class="mode" data-mode="coop"><span>Συνεργατικό παιχνίδι</span></button>
+    </div>
+    <div class="homebar">
+      <button class="btn ghost" id="howbtn">Πώς παίζεται</button>
+      <button class="btn ghost" id="setbtn"><span aria-hidden="true">⚙️</span> Ρυθμίσεις</button>
+    </div>
+    <p class="center"><button class="linkbtn" id="teacherbtn">Για εκπαιδευτικούς</button></p>
+   </div>
+  </div>
+  <footer class="copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</footer>
+</section>
+
+<!-- SETUP (βήματα) -->
+<section id="setup" class="screen" aria-labelledby="setup-title">
+  <div class="wrap">
+   <div class="panel setupcard">
+    <div class="stephead">
+      <p class="steps" id="stepinfo"></p>
+      <ol class="stepdots" id="stepdots" aria-hidden="true"></ol>
+    </div>
+    <h2 id="setup-title"></h2>
+
+    <!-- ατομικό: ποιος παίζει -->
+    <div class="step" id="step-who" hidden>
+      <div class="pick people" id="wholist" role="radiogroup" aria-labelledby="setup-title"></div>
+      <div class="lastinfo" id="whoinfo" role="status" aria-live="polite" hidden></div>
+    </div>
+
+    <!-- δύο παίκτες / συνεργατικό: ποιοι παίζουν -->
+    <div class="step" id="step-players" hidden>
+      <div class="slots">
+        <div class="slot">
+          <label for="sel1" class="slotlabel"><span class="pl p1" aria-hidden="true">1</span> Παίκτης 1</label>
+          <select id="sel1"></select>
+          <input id="name1" maxlength="14" placeholder="Ψευδώνυμο (προαιρετικό)" aria-label="Ψευδώνυμο παίκτη 1" autocomplete="off">
+          <div class="lastinfo" id="info1" role="status" aria-live="polite" hidden></div>
+        </div>
+        <div class="slot">
+          <label for="sel2" class="slotlabel"><span class="pl p2" aria-hidden="true">2</span> Παίκτης 2</label>
+          <select id="sel2"></select>
+          <input id="name2" maxlength="14" placeholder="Ψευδώνυμο (προαιρετικό)" aria-label="Ψευδώνυμο παίκτη 2" autocomplete="off">
+          <div class="lastinfo" id="info2" role="status" aria-live="polite" hidden></div>
+        </div>
+      </div>
+      <p class="note err" id="slotsmsg" role="alert"></p>
+    </div>
+
+    <!-- καταχώρηση νέου παίκτη (στα βήματα «ποιος παίζει») -->
+    <!-- κλειστό από προεπιλογή: ανοίγει μόνο για νέο παίκτη, ώστε να μη μοιάζει ότι ζητά όνομα για τον επιλεγμένο -->
+    <div class="addbox" id="addbox" hidden>
+      <button class="btn ghost small" id="newplayerbtn" aria-expanded="false" aria-controls="addform">+ Νέος παίκτης</button>
+      <div id="addform" hidden>
+        <label for="newname" class="addlabel">Όνομα νέου παίκτη</label>
+        <div class="addrow">
+          <input id="newname" maxlength="20" placeholder="Όνομα ή ψευδώνυμο" autocomplete="off">
+          <button class="btn small alt" id="addbtn">Καταχώρηση</button>
+          <button class="btn ghost small" id="addcancel">Άκυρο</button>
+        </div>
+        <p class="note">Αρκεί ένα μικρό όνομα ή ψευδώνυμο. Οι παίκτες αποθηκεύονται μόνο σε αυτή τη συσκευή.</p>
+      </div>
+      <p class="note" id="addmsg" role="status"></p>
+    </div>
+
+    <div class="step" id="step-level" hidden>
+      <div class="pick levels" id="levellist" role="radiogroup" aria-labelledby="setup-title"></div>
+      <div class="pairsrow">
+        <span id="pairslabel">Ζευγάρια:</span>
+        <button class="round" id="pairsminus" aria-label="Λιγότερα ζευγάρια">−</button>
+        <output id="pairsval" aria-labelledby="pairslabel" aria-live="polite"></output>
+        <button class="round" id="pairsplus" aria-label="Περισσότερα ζευγάρια">+</button>
+      </div>
+    </div>
+
+    <div class="step" id="step-collection" hidden>
+      <div class="pick collections" id="collist" role="radiogroup" aria-labelledby="setup-title"></div>
+    </div>
+
+    <div class="row setupnav">
+      <button class="btn ghost" id="setupback">Πίσω</button>
+      <button class="btn" id="setupnext">Επόμενο</button>
+    </div>
+   </div>
+  </div>
+</section>
+
+<!-- PLAY -->
+<section id="play" class="screen" aria-label="Παιχνίδι">
+  <div class="hud">
+    <button class="iconbtn" id="exitbtn" aria-label="Έξοδος από την παρτίδα"><span aria-hidden="true">✕</span></button>
+    <div class="status" id="status"></div>
+    <span class="timer" id="timer" hidden aria-label="Χρόνος"></span>
+    <button class="iconbtn" id="mutebtn"></button>
+    <button class="btn small hint" id="hintbtn"><span aria-hidden="true">💡</span> Βοήθεια</button>
+  </div>
+  <div class="players" id="players" hidden></div>
+  <div class="msgbar">
+    <p class="msg" id="msg" role="status" aria-live="polite"></p>
+    <button class="iconbtn speak" id="speakbtn" aria-label="Άκουσε το μήνυμα" hidden><span aria-hidden="true">🔈</span></button>
+    <button class="btn small" id="skipprev" hidden>Είμαι έτοιμος/η</button>
+  </div>
+  <div class="board" id="board">
+    <div class="grid" id="grid" role="group" aria-label="Κάρτες"></div>
+  </div>
+</section>
+
+<!-- RESULT -->
+<section id="result" class="screen" aria-labelledby="res-title">
+  <div class="wrap">
+    <div class="panel center">
+      <div class="bigicon" id="resicon" aria-hidden="true">🎉</div>
+      <h2 id="res-title"></h2>
+      <p id="ressub" class="lead"></p>
+      <div class="scores" id="resscores"></div>
+      <dl class="stats" id="resstats"></dl>
+      <p class="note" id="resprev"></p>
+      <div class="resbtns">
+        <button class="btn" id="againbtn">Ξαναπαίξε</button>
+        <button class="btn alt" id="levelbtn">Άλλο επίπεδο</button>
+        <button class="btn ghost" id="homebtn">Αρχική οθόνη</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO PLAY -->
+<section id="how" class="screen" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="panel">
+      <h2 id="how-title">Πώς παίζεται</h2>
+      <ol class="howlist">
+        <li><span class="hico" aria-hidden="true">👆👆</span><span>Άνοιξε <b>δύο</b> κάρτες.</span></li>
+        <li><span class="hico" aria-hidden="true">🍎🍎</span><span>Ίδιες εικόνες; <b>Μένουν ανοιχτές!</b></span></li>
+        <li><span class="hico" aria-hidden="true">🍎🐱</span><span>Διαφορετικές; Κλείνουν. <b>Θυμήσου πού ήταν.</b></span></li>
+        <li><span class="hico" aria-hidden="true">⭐</span><span>Βρες όλα τα ζευγάρια!</span></li>
+      </ol>
+      <p class="note">Με το πληκτρολόγιο: τα βελάκια μετακινούν, το Enter ή το Κενό ανοίγει την κάρτα.</p>
+      <div class="row">
+        <span></span>
+        <button class="btn" data-home>Εντάξει</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section id="settings" class="screen" aria-labelledby="set-title">
+  <div class="wrap">
+    <div class="panel">
+      <h2 id="set-title">Ρυθμίσεις</h2>
+      <div class="setlist">
+        <label class="sw"><input type="checkbox" id="s-preview"><span class="swt"><b>Προεπισκόπηση καρτών</b><small>Όλες οι κάρτες φαίνονται για λίγο πριν την έναρξη.</small></span></label>
+        <div class="sub" id="s-prevbox">
+          <label class="sw"><input type="checkbox" id="s-prevauto"><span class="swt"><b>Διάρκεια ανάλογα με το επίπεδο</b><small>8, 6, 5 και 4 δευτερόλεπτα.</small></span></label>
+          <div class="pairsrow" id="s-prevmanual">
+            <span id="s-prevlabel">Δευτερόλεπτα:</span>
+            <button class="round" id="s-prevminus" aria-label="Λιγότερα δευτερόλεπτα">−</button>
+            <output id="s-prevsec" aria-labelledby="s-prevlabel" aria-live="polite"></output>
+            <button class="round" id="s-prevplus" aria-label="Περισσότερα δευτερόλεπτα">+</button>
+          </div>
+        </div>
+        <label class="sw"><input type="checkbox" id="s-hints"><span class="swt"><b>Κουμπί «Βοήθεια»</b><small>Δείχνει για λίγο ένα ζευγάρι. Καταγράφεται στα αποτελέσματα.</small></span></label>
+        <label class="sw"><input type="checkbox" id="s-reminders"><span class="swt"><b>Υπενθυμίσεις</b><small>Σύντομα μηνύματα όπως «Θυμήσου πού είδες το μήλο».</small></span></label>
+        <label class="sw"><input type="checkbox" id="s-timer"><span class="swt"><b>Εμφάνιση χρονομέτρου</b><small>Ο χρόνος καταγράφεται πάντα, αλλά δεν φαίνεται αν είναι κλειστό. Στο επίπεδο 1 δεν εμφανίζεται ποτέ.</small></span></label>
+        <label class="sw"><input type="checkbox" id="s-sound"><span class="swt"><b>Ήχοι</b><small>Ήπιοι ήχοι στην επιτυχία. Δεν υπάρχουν ήχοι αποτυχίας.</small></span></label>
+        <div class="range">
+          <label for="s-mismatch"><b>Πόσο μένουν ανοιχτές δύο διαφορετικές κάρτες</b></label>
+          <div class="rrow"><input type="range" id="s-mismatch" step="100"><output id="s-mismatchval" for="s-mismatch"></output></div>
+        </div>
+      </div>
+      <div class="setplayers">
+        <b>Παίκτες και επιδόσεις</b>
+        <small>Δείτε τις επιδόσεις κάθε μαθητή ανά μέρα/στάδιο.</small>
+        <button class="btn ghost small" id="setplayersbtn">Επιδόσεις</button>
+      </div>
+      <div class="row"><span></span><button class="btn" data-home>Αποθήκευση</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEACHER -->
+<section id="teacher" class="screen" aria-labelledby="t-title">
+  <div class="wrap wide">
+    <div id="gate" class="panel gate">
+      <h2 id="t-title">Για εκπαιδευτικούς</h2>
+      <p id="gateq"></p>
+      <input id="gatein" inputmode="numeric" aria-labelledby="gateq" autocomplete="off">
+      <p class="note" id="gatemsg" role="alert"></p>
+      <div class="row"><button class="btn ghost" data-home>Πίσω</button><button class="btn" id="gateok">Είσοδος</button></div>
+    </div>
+    <div id="tpanel" hidden>
+      <div class="row top"><h2>Παίκτες και επιδόσεις</h2><button class="btn ghost small" data-home>Κλείσιμο</button></div>
+      <p class="note">Τα δεδομένα αποθηκεύονται μόνο σε αυτόν τον browser, σε αυτή τη συσκευή. Δεν συγχρονίζονται και δεν αποστέλλονται πουθενά. Προτείνεται μικρό όνομα ή ψευδώνυμο αντί για ονοματεπώνυμο. Το όνομα κρατιέται μόνο στη λίστα παικτών. Οι παρτίδες συνδέονται με έναν κωδικό.</p>
+
+      <h3>Παίκτες</h3>
+      <div class="addrow">
+        <input id="tnewname" maxlength="20" placeholder="Όνομα ή ψευδώνυμο" aria-label="Όνομα νέου παίκτη" autocomplete="off">
+        <button class="btn small alt" id="taddbtn">Καταχώρηση παίκτη</button>
+      </div>
+      <p class="note" id="taddmsg" role="alert"></p>
+      <div id="tplayers"></div>
+
+      <h3 id="thist-title">Παρτίδες</h3>
+      <p><label class="tfilter">Εμφάνιση: <select id="tfilter"></select></label></p>
+      <div id="tsummary"></div>
+      <div class="tablewrap"><table class="hist" id="thist"></table></div>
+      <h3>Πώς διαβάζονται τα στοιχεία</h3>
+      <p class="note"><b>Κινήσεις</b>: κάθε προσπάθεια με δύο κάρτες. <b>Χωρίς ζευγάρι</b>: προσπάθειες με δύο διαφορετικές κάρτες. <b>Ποσοστό</b>: πόσα από τα ζευγάρια της παρτίδας βρήκε το παιδί. Αν τελείωσε την παρτίδα, είναι πάντα 100%. Αν σταμάτησε στη μέση, δείχνει μέχρι πού έφτασε (π.χ. βρήκε 3 από τα 6 ζευγάρια = 50%). <b>Βοήθειες</b>: καταγράφονται χωριστά, γιατί μια παρτίδα με βοήθεια δεν είναι ισοδύναμη με μια χωρίς. Ο χρόνος δεν περιλαμβάνει την προεπισκόπηση.</p>
+      <p class="note">Οι αριθμοί είναι δείκτες επίδοσης σε αυτό το παιχνίδι. Δεν αποτελούν διαγνωστικό εργαλείο ούτε μέτρηση της «μνήμης» ή της «προσοχής» του παιδιού. Η δυσκολία δεν αλλάζει ποτέ αυτόματα. Το επίπεδο το επιλέγει ο ενήλικας.</p>
+      <p><button class="btn ghost small danger" id="tclear">Διαγραφή όλων των αποτελεσμάτων</button></p>
+    </div>
+  </div>
+</section>
+
+<dialog id="confirm" aria-labelledby="confirm-text">
+  <p id="confirm-text"></p>
+  <div class="row">
+    <button class="btn ghost" id="confirm-no"></button>
+    <button class="btn" id="confirm-yes"></button>
+  </div>
+</dialog>
+
+<script src="js/config.js"></script>
+<script src="js/collections.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/board.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
