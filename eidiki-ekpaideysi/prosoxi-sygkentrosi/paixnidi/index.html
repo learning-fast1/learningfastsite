@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S07M3VNB5N');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Βουτιά Συγκέντρωσης</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Didact+Gothic&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<!-- inline: διαβάζεται από το js/treasure.js για τη λήψη του διπλώματος -->
+<style id="dipcss">
+.dip{background:#fff;color:#0A3440;border-radius:18px;padding:10px;border:3px solid #2A8FA3;font-family:'Didact Gothic','Segoe UI',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dipin{border:2px dashed #C9A15B;border-radius:12px;padding:0 34px 22px;position:relative;overflow:hidden;text-align:center}
+.dipwave{display:block;width:calc(100% + 68px);height:44px;margin:0 -34px}
+.dipseal{width:90px;margin:6px auto 0}
+.dip h1{font-family:'Comfortaa','Trebuchet MS',sans-serif;font-weight:700;color:#17687A;font-size:2.1rem;margin:4px 0 8px}
+.dipsub{margin:4px 0;font-size:1.05rem}
+.dipname{font-family:'Comfortaa','Trebuchet MS',sans-serif;font-weight:700;font-size:2.6rem;margin:6px auto;padding:0 30px 4px;border-bottom:3px solid #FFC933;display:inline-block}
+.dipgrid{list-style:none;padding:0;margin:16px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px 18px;text-align:left}
+.dipgrid li{display:flex;align-items:center;gap:10px;border-bottom:1px solid #E7D3AC;padding:5px 0}
+.dipgrid .dn{flex:0 0 30px;height:30px;border-radius:50%;background:#FFC933;display:grid;place-items:center;font-weight:700}
+.dipgrid small{color:#3D6570}
+.dipgrid .ds{margin-left:auto;color:#E8A100;letter-spacing:1px;white-space:nowrap}
+.dipgrid .ds .off{color:#E7D3AC}
+.dipfoot{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-top:22px}
+.dipfoot .sig{border-top:2px solid #0A3440;padding-top:4px;min-width:220px}
+.dipsite{margin:14px 0 0;color:#17687A;font-size:.85rem}
+</style>
+</head>
+<body>
+
+<!-- PROFILES -->
+<section id="profiles" class="screen on">
+  <div class="ocean">
+    <div class="bubbles" aria-hidden="true"></div>
+    <div class="hero">
+      <h1>Βουτιά Συγκέντρωσης</h1>
+      <p>Κατέβα στον βυθό, στάθμο με στάθμο, και γύμνασε την προσοχή σου.</p>
+    </div>
+    <svg class="wave" viewBox="0 0 1200 36" preserveAspectRatio="none" aria-hidden="true"><path d="M0 18 C150 36 300 0 450 18 S750 36 900 18 1050 0 1200 18 V36 H0Z" fill="var(--bg)"/></svg>
+  </div>
+  <div class="wrap">
+    <h2>Ποιος παίζει;</h2>
+    <div class="plist" id="plist"></div>
+    <div class="addrow">
+      <input id="newname" maxlength="20" placeholder="Γράψε το όνομά σου" aria-label="Όνομα παιδιού">
+      <button class="btn" id="addbtn">Νέος δύτης</button>
+    </div>
+    <p style="text-align:center;margin:10px 0 0"><button class="linkbtn" data-teacher>Για εκπαιδευτικούς</button></p>
+  </div>
+  <footer class="copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</footer>
+</section>
+
+<!-- MAP -->
+<section id="map" class="screen">
+  <div class="ocean mapocean">
+    <div class="bubbles" aria-hidden="true"></div>
+    <div class="topbar">
+      <button class="btn small ghost" style="color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4)" id="switchp">Αλλαγή παίκτη</button>
+      <span class="who" id="whoname"></span>
+    </div>
+    <div class="dive" id="dive"><div class="rope"></div></div>
+    <div class="seafloor"></div>
+    <div class="teacherlink"><button class="linkbtn" data-teacher>Για εκπαιδευτικούς</button></div>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section id="intro" class="screen">
+  <div class="wrap fit">
+    <div class="card">
+      <h2 id="introtitle"></h2>
+      <p class="note" id="introlevel"></p>
+      <div class="demo" id="introdemo"></div>
+      <p class="instr" id="introtext"></p>
+      <button class="speak" id="speakbtn">🔊 Άκουσε τις οδηγίες</button>
+      <h3>Ποιο κόλπο θα χρησιμοποιήσεις;</h3>
+      <div class="choices" id="strategies"></div>
+      <div class="row">
+        <button class="btn ghost" id="introback">Πίσω</button>
+        <button class="btn" id="startbtn">Ξεκίνα τη βουτιά</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAY -->
+<section id="play" class="screen">
+  <div class="hud">
+    <button id="pausebtn" aria-label="Παύση">❚❚</button>
+    <div class="oxy" aria-label="Πρόοδος γύρου"><i id="oxy"></i></div>
+    <span class="pts" id="pts">0 ✦</span>
+  </div>
+  <div class="arena" id="arena">
+    <div class="ray" style="left:12%"></div><div class="ray" style="left:48%"></div><div class="ray" style="left:78%"></div>
+  </div>
+  <div class="pause" id="pausebox">
+    <div>
+      <h2>Παύση</h2>
+      <p>Πάρε μια βαθιά ανάσα.</p>
+      <p><button class="btn" id="resumebtn">Συνέχεια</button></p>
+      <p><button class="btn ghost" style="color:#fff" id="quitbtn">Έξοδος από τον γύρο</button></p>
+    </div>
+  </div>
+</section>
+
+<!-- RESULT -->
+<section id="result" class="screen">
+  <div class="wrap fit">
+    <div class="card">
+      <h2 style="text-align:center" id="restitle">Μπράβο!</h2>
+      <div class="bigstars" id="resstars"></div>
+      <p class="levelup" id="reslevel"></p>
+      <div class="tip" id="restip"></div>
+      <h3>Πόσο καλά πρόσεξα;</h3>
+      <div class="faces" id="selfrate"></div>
+      <h3>Πού αλλού μπορώ να προσέχω έτσι;</h3>
+      <div class="choices" id="transfer"></div>
+      <div class="row">
+        <button class="btn ghost" id="againbtn">Ξανά</button>
+        <button class="btn" id="donebtn">Στον χάρτη</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BREAK -->
+<section id="brk" class="screen">
+  <div class="wrap fit" style="text-align:center">
+    <div class="card">
+      <div style="font-size:4rem">🐢</div>
+      <h2>Ώρα για διάλειμμα</h2>
+      <p>Έπαιξες αρκετή ώρα. Σήκω, τεντώσου και πιες λίγο νερό.</p>
+      <button class="btn" id="brkok">Εντάξει</button>
+    </div>
+  </div>
+</section>
+
+<!-- TREASURE -->
+<section id="treasure" class="screen">
+  <div class="ocean fullocean">
+    <div class="bubbles" aria-hidden="true"></div>
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
+    <div class="wrap fit" style="text-align:center;position:relative">
+      <div class="chest" id="chest"></div>
+      <h1 id="trtitle" style="font-size:clamp(1.8rem,5vw,2.6rem)"></h1>
+      <p id="trtext" style="max-width:38ch;margin:8px auto"></p>
+      <div class="pearlrow" id="pearlrow"></div>
+      <p><button class="btn" id="todiploma">Δες το δίπλωμά σου</button></p>
+      <p><button class="btn ghost" style="color:#fff;box-shadow:inset 0 0 0 2px rgba(255,255,255,.4)" id="trmap">Στον χάρτη</button></p>
+    </div>
+  </div>
+</section>
+
+<!-- DIPLOMA -->
+<section id="diploma" class="screen">
+  <div class="wrap" style="max-width:980px">
+    <div id="dipbox" class="fit" data-minzoom=".3"></div>
+    <div class="row noprint">
+      <button class="btn ghost" id="dipback">Πίσω</button>
+      <span style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn ghost" id="dipedit">Αλλαγή ονόματος</button><button class="btn ghost" id="dipdl">Λήψη αρχείου</button><button class="btn" id="dipprint">Εκτύπωση</button></span>
+    </div>
+    <p class="note noprint">Αν η εκτύπωση δεν ανοίξει, πάτα «Λήψη αρχείου» και εκτύπωσε το αρχείο από τον υπολογιστή.</p>
+  </div>
+</section>
+
+<!-- MISSION RESULT -->
+<section id="mresult" class="screen">
+  <div class="wrap fit">
+    <div class="card">
+      <h2 style="text-align:center">Η αποστολή ολοκληρώθηκε!</h2>
+      <div style="text-align:center;margin:4px 0"><div class="pearlbig"></div></div>
+      <p class="levelup" id="mrpearl"></p>
+      <div class="mlist" id="mrlist"></div>
+      <div class="tip" id="mrtip"></div>
+      <h3>Πόσο καλά πρόσεξα;</h3>
+      <div class="faces" id="mrself"></div>
+      <div class="row"><span></span><button class="btn" id="mrdone">Στον χάρτη</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEACHER -->
+<section id="teacher" class="screen">
+  <div class="wrap teacher">
+    <div id="gate" class="gate card fit">
+      <h2>Για εκπαιδευτικούς</h2>
+      <p id="gateq"></p>
+      <input id="gatein" inputmode="numeric" aria-label="Απάντηση">
+      <div class="row"><button class="btn ghost" id="gateback">Πίσω</button><button class="btn" id="gateok">Είσοδος</button></div>
+    </div>
+    <div id="tpanel" hidden>
+      <div class="row" style="margin-top:0"><h2 style="margin:0">Πρόοδος μαθητών</h2><button class="btn ghost small" id="tback">Κλείσιμο</button></div>
+      <p><label>Μαθητής: <select id="tsel"></select></label></p>
+      <div id="tbody"></div>
+      <h2>Πώς διαβάζονται τα στοιχεία</h2>
+      <p class="note"><b>Παραλείψεις</b>: ο στόχος εμφανίστηκε και το παιδί δεν πάτησε, ένδειξη απροσεξίας. <b>Λανθασμένα πατήματα</b>: πάτησε ενώ δεν έπρεπε ή βιάστηκε, ένδειξη παρορμητικότητας. <b>Μεταβλητότητα χρόνου (SD)</b>: μεγάλες διακυμάνσεις στην ταχύτητα απάντησης συνδέονται με διακυμάνσεις της προσοχής. <b>1ο / 2ο μισό</b>: ακρίβεια στην αρχή και στο τέλος του γύρου· πτώση δείχνει δυσκολία διατήρησης της προσοχής. <b>Κόστος εναλλαγής</b> (στάθμος 5): πόσα ms πιο αργά απαντά το παιδί αμέσως μετά από αλλαγή κανόνα· όσο μικραίνει, τόσο πιο ευέλικτη γίνεται η προσοχή. <b>Συγκρούσεις</b> (στάθμος 6): βράχοι που δεν απέφυγε ενώ παρακολουθούσε το παράθυρο, ένδειξη δυσκολίας στη διαίρεση της προσοχής.</p>
+      <p class="note">Η δυσκολία προσαρμόζεται αυτόματα: ακρίβεια 80% και πάνω ανεβάζει επίπεδο, κάτω από 60% το κατεβάζει, πάντα μέσα στη ζώνη (Εύκολο, Μέτριο, Δύσκολο ή Αυτόματο) που έχετε ορίσει για τον στάθμο. Ο επόμενος στάθμος ανοίγει μόλις το παιδί κάνει έναν γύρο με ακρίβεια 80% και πάνω (2 αστέρια) στον προηγούμενο. Προτεινόμενη χρήση: 10–15 λεπτά, 3–5 φορές την εβδομάδα. Τα δεδομένα αποθηκεύονται μόνο σε αυτή τη συσκευή.</p>
+    </div>
+  </div>
+</section>
+
+<!-- asked before the diploma is issued (js/treasure.js) -->
+<div class="modal" id="dipask" hidden role="dialog" aria-modal="true" aria-labelledby="dipasktitle">
+  <div class="mcin">
+    <h2 id="dipasktitle">Ποιο όνομα να γράφει το δίπλωμα;</h2>
+    <p class="note">Γράψε το όνομα όπως θέλεις να τυπωθεί στο δίπλωμα.</p>
+    <input id="dipnamein" maxlength="40" aria-label="Όνομα στο δίπλωμα" autocomplete="off">
+    <div class="row"><button class="btn ghost" id="dipcancel">Πίσω</button><button class="btn" id="dipok">Συνέχεια</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- recorded instructions from the Studio (../studio); empty until recordings are imported -->
+<script src="audio/manifest.js"></script>
+<script src="js/core.js"></script>
+<script src="js/art.js"></script>
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/games/stage1.js"></script>
+<script src="js/games/stage2.js"></script>
+<script src="js/games/stage3.js"></script>
+<script src="js/games/stage4.js"></script>
+<script src="js/games/stage5.js"></script>
+<script src="js/games/stage6.js"></script>
+<script src="js/screens.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/treasure.js"></script>
+<script src="js/mission.js"></script>
+<script src="js/teacher.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
