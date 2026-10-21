@@ -284,3 +284,10 @@ select{border:2px solid var(--line);border-radius:12px;padding:10px;font:inherit
 }
 
 #newnote .row{justify-content:center}
+
+/* back to the Learning Fast site (start screen) */
+.homebar{position:relative;z-index:2;padding:10px 14px 0;text-align:left}
+.backlf{display:inline-flex;align-items:center;min-height:40px;padding:8px 16px;border-radius:999px;color:#fff;text-decoration:none;font-family:var(--head);font-weight:700;font-size:.9rem;box-shadow:inset 0 0 0 2px rgba(255,255,255,.5);background:rgba(255,255,255,.1)}
+.backlf:hover{background:rgba(255,255,255,.2)}
+.backlf:active{transform:translateY(1px)}
+#profiles .hero{padding-top:clamp(2px,1.5vh,14px)}
