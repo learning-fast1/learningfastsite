@@ -282,3 +282,5 @@ select{border:2px solid var(--line);border-radius:12px;padding:10px;font:inherit
   #diploma .wrap{padding:0;max-width:none}
   .fit{zoom:1!important}
 }
+
+#newnote .row{justify-content:center}

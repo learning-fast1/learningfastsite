@@ -10,7 +10,11 @@ function renderProfiles(){
   if(!ids.length){box.innerHTML='<p class="note" style="grid-column:1/-1">Δεν υπάρχει ακόμη δύτης. Γράψε ένα όνομα για να ξεκινήσεις.</p>';}
   ids.forEach(id=>{const p=store.profiles[id];const b=el('button',{class:'pcard'});b.innerHTML=`<div class="av" style="background:${p.color}">${p.icon}</div>${esc(p.name)}`;b.onclick=()=>{cur=id;store.last=id;save();renderMap();show('map');};box.appendChild(b);});
 }
-$('#addbtn').onclick=()=>{const n=$('#newname').value.trim();if(!n)return $('#newname').focus();const id='p'+Date.now().toString(36);const k=Object.keys(store.profiles).length;store.profiles[id]={name:n,color:AVC[k%AVC.length],icon:AVI[k%AVI.length],levels:{},best:{},sessions:[],unlockAll:false,created:new Date().toISOString()};$('#newname').value='';save();renderProfiles();};
+$('#addbtn').onclick=()=>{const n=$('#newname').value.trim();if(!n)return $('#newname').focus();const id='p'+Date.now().toString(36);const k=Object.keys(store.profiles).length;store.profiles[id]={name:n,color:AVC[k%AVC.length],icon:AVI[k%AVI.length],levels:{},best:{},sessions:[],unlockAll:false,created:new Date().toISOString()};$('#newname').value='';save();renderProfiles();showNewPlayerNote();};
+/* notice shown after every new player: the game should be adjusted to the child in the teacher settings */
+function showNewPlayerNote(){$('#newnote').hidden=false;$('#newnoteok').focus();}
+$('#newnoteok').onclick=()=>{$('#newnote').hidden=true;};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#newnote').hidden)$('#newnote').hidden=true;});
 $('#newname').addEventListener('keydown',e=>{if(e.key==='Enter')$('#addbtn').click();});
 
 /* ---------- map ---------- */
