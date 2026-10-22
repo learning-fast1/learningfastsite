@@ -18,7 +18,7 @@ function missionCard(s,L){
   return new Promise(res=>{
     const S=STAGES[s-1];
     const c=el('div',{class:'mcard'});
-    c.innerHTML=`<div class="mcin"><p class="note">Στάθμος ${s} από 6</p><h2>${S.name}</h2><div class="demo">${demoHTML(s,L)}</div><p>${instructions(s,L)}</p><div class="row" style="justify-content:center"><button class="speak">🔊 Άκουσε</button><button class="btn">Είμαι έτοιμος/η</button></div></div>`;
+    c.innerHTML=`<div class="mcin"><p class="note">Στάθμος ${s} από 6</p><h2>${S.name}</h2><div class="demo">${demoHTML(s,L)}</div><p>${instructions(s,L)}</p>${extraNote(s)?`<p class="note">${extraNote(s)}</p>`:''}<div class="row" style="justify-content:center"><button class="speak">🔊 Άκουσε</button><button class="btn">Είμαι έτοιμος/η</button></div></div>`;
     arena.appendChild(c);
     c.querySelector('.speak').onclick=()=>sayVoice(voiceId(s,L),instructions(s,L));
     const go=c.querySelector('.btn');go.focus();

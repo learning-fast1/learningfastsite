@@ -117,6 +117,7 @@ function openIntro(s){
   $('#introlevel').textContent=`Επίπεδο ${L}`;
   $('#introdemo').innerHTML=demoHTML(s,L);
   $('#introtext').textContent=instructions(s,L);
+  $('#introextra').textContent=extraNote(s);$('#introextra').hidden=!extraNote(s);
   const box=$('#strategies');box.innerHTML='';
   STRATS.forEach(x=>{const b=el('button',{class:'choice','aria-pressed':String(strategy===x.id)});b.innerHTML=`<span class="ic">${x.ic}</span><span>${x.t}</span>`;b.onclick=()=>{strategy=x.id;box.querySelectorAll('.choice').forEach(c=>c.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');};box.appendChild(b);});
   show('intro');
