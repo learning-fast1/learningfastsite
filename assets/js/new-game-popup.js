@@ -11,7 +11,7 @@
   var base = script && script.src ? script.src : location.href;
   /* τα παιχνίδια της ανακοίνωσης: δύο, ένα σε κάθε μισό του παραθύρου */
   var GAMES = [
-    { name: 'Διάκριση Συμφώνων', img: new URL('../images/diakrisi-epipeda.jpg', base).href, alt: 'Διάκριση Συμφώνων – τα 14 επίπεδα του παιχνιδιού' },
+    { name: 'Γράφω τα Γράμματα', img: new URL('../images/grafw-ta-grammata.jpg', base).href, alt: 'Γράφω τα Γράμματα – το παιχνίδι γραφής των γραμμάτων' },
     { name: 'Βουτιά Συγκέντρωσης', img: new URL('../images/prosoxi-sygkentrosi.jpg', base).href, alt: 'Βουτιά Συγκέντρωσης – ο χάρτης του βυθού με τους έξι στάθμους' }
   ];
 
