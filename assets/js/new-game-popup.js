@@ -9,18 +9,26 @@
 
   var script = document.currentScript;
   var base = script && script.src ? script.src : location.href;
-  var imgUrl = new URL('../images/diakrisi-epipeda.jpg', base).href;
+  /* τα παιχνίδια της ανακοίνωσης: δύο, ένα σε κάθε μισό του παραθύρου */
+  var GAMES = [
+    { name: 'Διάκριση Συμφώνων', img: new URL('../images/diakrisi-epipeda.jpg', base).href, alt: 'Διάκριση Συμφώνων – τα 14 επίπεδα του παιχνιδιού' },
+    { name: 'Βουτιά Συγκέντρωσης', img: new URL('../images/prosoxi-sygkentrosi.jpg', base).href, alt: 'Βουτιά Συγκέντρωσης – ο χάρτης του βυθού με τους έξι στάθμους' }
+  ];
 
   var css = [
     '.lf-np-overlay{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(26,26,46,.62);font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;animation:lf-np-fade .25s ease-out}',
-    '.lf-np-card{position:relative;box-sizing:border-box;width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;background:#fff;color:#2d2a4a;border-radius:20px;padding:30px 28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center}',
+    '.lf-np-card{position:relative;box-sizing:border-box;width:min(880px,100%);max-height:calc(100vh - 32px);overflow:auto;background:#fff;color:#2d2a4a;border-radius:20px;padding:30px 28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center}',
     '.lf-np-close{position:absolute;top:10px;left:10px;width:40px;height:40px;border:none;border-radius:50%;background:#f0eefc;color:#6C63FF;font-size:24px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}',
     '.lf-np-close:hover,.lf-np-close:focus-visible{background:#6C63FF;color:#fff;outline:none}',
     '.lf-np-title{margin:6px 0 12px;font-size:1.6rem;font-weight:800;line-height:1.2;color:#4b3fb5}',
-    '.lf-np-text{margin:0 0 16px;font-size:1rem;line-height:1.55;color:#4a476a;text-align:left}',
+    '.lf-np-games{display:flex;align-items:flex-start}',
+    '.lf-np-game{flex:1 1 0;min-width:0;padding:0 14px}',
+    '.lf-np-game+.lf-np-game{border-left:2px solid #ece9fb}',
+    '.lf-np-gname{margin:12px 0 0;font-size:1.1rem;font-weight:800;line-height:1.3;color:#2d2a4a}',
+    '@media (max-width:640px){.lf-np-card{padding-top:56px}.lf-np-games{flex-direction:column;align-items:stretch;gap:18px}.lf-np-game{padding:0 4px}.lf-np-game+.lf-np-game{border-left:0;border-top:2px solid #ece9fb;padding-top:18px}}',
     '.lf-np-img{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15)}',
     '@keyframes lf-np-fade{from{opacity:0}to{opacity:1}}',
-    '@media (max-height:560px){.lf-np-card{padding:22px 20px 16px}.lf-np-title{font-size:1.3rem}.lf-np-text{font-size:.92rem;margin-bottom:10px}}'
+    '@media (max-height:560px){.lf-np-card{padding:22px 20px 16px}.lf-np-title{font-size:1.3rem}.lf-np-gname{font-size:1rem;margin-top:8px}}'
   ].join('\n');
 
   function show() {
@@ -46,21 +54,28 @@
     var title = document.createElement('h2');
     title.className = 'lf-np-title';
     title.id = 'lf-np-title';
-    title.textContent = 'Νέο παιχνίδι για τη Διάκριση των Συμφώνων!';
+    title.textContent = 'Δύο νέα παιχνίδια!';
 
-    var text = document.createElement('p');
-    text.className = 'lf-np-text';
-    text.textContent = 'Έχει ανέβει στην ιστοσελίδα του Learning Fast νέο εκπαιδευτικό ψηφιακό παιχνίδι που βοηθά τα παιδιά να εξασκηθούν στη διάκριση συμφώνων που συχνά μοιάζουν ή συγχέονται κατά την ανάγνωση και τη γραφή. Μέσα από διαδραστικές δραστηριότητες και παιγνιώδη εξάσκηση, τα παιδιά μαθαίνουν να αναγνωρίζουν τα γράμματα με μεγαλύτερη ακρίβεια και να ενισχύουν τη σύνδεση ανάμεσα στα γράμματα και τους ήχους τους.';
-
-    var img = document.createElement('img');
-    img.className = 'lf-np-img';
-    img.src = imgUrl;
-    img.alt = 'Διάκριση Συμφώνων – τα 14 επίπεδα του παιχνιδιού';
+    var row = document.createElement('div');
+    row.className = 'lf-np-games';
+    GAMES.forEach(function (g) {
+      var box = document.createElement('div');
+      box.className = 'lf-np-game';
+      var img = document.createElement('img');
+      img.className = 'lf-np-img';
+      img.src = g.img;
+      img.alt = g.alt;
+      var name = document.createElement('p');
+      name.className = 'lf-np-gname';
+      name.textContent = g.name;
+      box.appendChild(img);
+      box.appendChild(name);
+      row.appendChild(box);
+    });
 
     card.appendChild(close);
     card.appendChild(title);
-    card.appendChild(text);
-    card.appendChild(img);
+    card.appendChild(row);
     overlay.appendChild(card);
     document.body.appendChild(overlay);
     close.focus();
