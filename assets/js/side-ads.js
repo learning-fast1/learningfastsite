@@ -10,7 +10,7 @@
 
   var script = document.currentScript;
   var root = new URL('../../', script && script.src ? script.src : location.href);
-  function url(p) { return new URL(p, root).href; }
+  function url(p) { return /^https?:/.test(p) ? p : new URL(p, root).href; }
 
   var ADS = [
     {
@@ -26,6 +26,14 @@
       text: 'Για την επικοινωνία με τους γονείς: λογοθεραπευτές και ειδικοί παιδαγωγοί.',
       img: 'ekpaideftika-vivlia/tetradio-epikoinonias/preview-eidikou-paidagogou.png',
       href: 'ekpaideftika-vivlia/tetradio-epikoinonias/index.html'
+    },
+    {
+      id: 'to-portofoli-mou',
+      title: 'Το πορτοφόλι μου',
+      text: 'Δωρεάν εφαρμογή για να οργανώνουν οι νέοι τα χρήματά τους: έσοδα, έξοδα, αποταμιεύσεις και στόχους.',
+      img: 'assets/images/to-portofoli-mou.png',
+      href: 'https://toportofolimou.github.io/',
+      pos: 'center'
     }
   ];
 
@@ -68,6 +76,7 @@
       var a = document.createElement('a');
       a.className = 'lf-sa__card';
       a.href = url(ad.href);
+      if (/^https?:/.test(ad.href)) { a.target = '_blank'; a.rel = 'noopener'; }
       a.addEventListener('click', function () {
         if (typeof gtag === 'function') gtag('event', 'side_ad_click', { event_category: 'SideAd', event_label: ad.id });
       });
@@ -75,6 +84,7 @@
       img.className = 'lf-sa__img';
       img.src = url(ad.img);
       img.alt = '';
+      if (ad.pos) img.style.objectPosition = ad.pos;
       img.loading = 'lazy';
       var body = document.createElement('div');
       body.className = 'lf-sa__body';
