@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Οι Εγκλίσεις – Learning Fast</title>
+<meta name="description" content="Οι Εγκλίσεις: δωρεάν παιχνίδι για παιδιά 10 έως 14 χρονών. Οριστική, υποτακτική και προστακτική, με ενεστώτα και αόριστο, σε λέξεις και προτάσεις.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- media="print" keeps a slow font server from holding back the whole page; onload then applies the fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Didact+Gothic&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="top">
+  <a class="pill" href="https://learning-fast.com/">← Learning Fast</a>
+  <div class="logo-slot"><button class="brand" id="brand" type="button" aria-label="Αρχική του παιχνιδιού"><img src="logo.png" alt="Learning Fast"></button></div>
+  <div class="top-right">
+    <span class="pill" aria-label="Αστέρια"><span class="star">★</span> <span id="starTotal">0</span></span>
+    <button class="icon-btn" id="soundBtn" type="button" aria-label="Ήχος"></button>
+  </div>
+</header>
+<div id="app">
+  <main id="screen"></main>
+  <footer class="lf-foot" id="foot">
+    <p>© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται. · <a href="https://learning-fast.com/oroi-xrisis/">Όροι Χρήσης</a></p>
+  </footer>
+</div>
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-label="Ο κανόνας"></div>
+<div class="toast" id="toast" role="status"></div>
+<script src="js/data.js"></script>
+<script src="js/rounds.js"></script>
+<script src="js/app.js"></script>
+<script src="../../../../../assets/js/new-game-popup.js?v=6"></script>
+</body>
+</html>
