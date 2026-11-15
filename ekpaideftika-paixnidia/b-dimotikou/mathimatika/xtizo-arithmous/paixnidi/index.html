@@ -171,6 +171,12 @@ body.tool-erase .col-b .blk{cursor:not-allowed}
 .btn.pri{background:var(--nav);color:var(--nav-ink);border-color:var(--nav)}
 .btn:disabled{opacity:.45;cursor:default}
 input[type=number]{font:inherit;font-family:var(--f-display);font-weight:700;font-size:1.1rem;width:7.5ch;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.own{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line)}
+.own label.small{margin-bottom:2px}
+.own .row{flex-wrap:nowrap}
+.own input[type=number]{width:9ch;min-width:0;flex:0 1 9ch}
+.own .sign{font-family:var(--f-display);font-weight:700;font-size:1.3rem}
+.own .btn{flex:none}
 label.small{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
 .steps{margin:4px 0 8px;padding-left:1.2em;font-size:.88rem;line-height:1.35}
 .steps li{margin-bottom:3px}
@@ -441,6 +447,35 @@ function genBuild(L){const lo=10**(L-1),hi=10**L-1,n=rnd(lo,hi),d=digits(n);
   if(nc.length&&Math.random()<.3)return {type:'build',n,form:'nocol',forbid:nc[rnd(0,nc.length-1)]};
   return {type:'build',n,form:['digits','words','expanded'][rnd(0,2)],forbid:null};}
 
+/* the operation is chosen by the child: any numbers up to 9999 */
+function ownOp(a,b){
+  S.tray=[0,0,0,0];
+  S.t=S.mode==='add'?{type:'add',a,b,carries:[0,0,0,0],done:false}:{type:'sub',a,b,reg:digits(a),done:false};
+  setMat(a);renderTask();render();
+}
+function ownForm(t){
+  const sign=t.type==='add'?'+':'−';
+  return `<form class="own" id="own"><label class="small" for="oa">Γράψε τη δική σου πράξη</label>
+    <div class="row"><input id="oa" type="number" min="1" max="9999" inputmode="numeric" aria-label="Πρώτος αριθμός">
+    <span class="sign" aria-hidden="true">${sign}</span>
+    <input id="ob" type="number" min="1" max="9999" inputmode="numeric" aria-label="Δεύτερος αριθμός">
+    <button class="btn pri">Φτιάξε</button></div></form>`;
+}
+function bindOwn(){
+  const f=$('#own');if(!f)return;
+  f.addEventListener('submit',e=>{
+    e.preventDefault();
+    const A=$('#oa'),B=$('#ob');
+    if(A.value===''){A.focus();return;}
+    if(B.value===''){B.focus();return;}
+    const a=Number(A.value),b=Number(B.value);
+    if(!Number.isInteger(a)||!Number.isInteger(b)||a<1||b<1||a>9999||b>9999){sNo();toast('Γράψε ακέραιους αριθμούς από 1 μέχρι 9999.');return;}
+    if(S.mode==='add'&&a+b>9999){sNo();toast('Το άθροισμα πρέπει να είναι μέχρι 9999.');return;}
+    if(S.mode==='sub'&&b>=a){sNo();toast('Ο δεύτερος αριθμός πρέπει να είναι μικρότερος από τον πρώτο.');return;}
+    ownOp(a,b);
+  });
+}
+
 function newTask(){
   S.tray=[0,0,0,0];
   if(S.mode==='explore'){S.t=null;S.mat=[[],[],[],[]];}
@@ -605,14 +640,15 @@ function renderTask(){
       <ol class="steps"><li>Στον πίνακα είναι το <b>${t.a}</b>. Φέρε τους ανοιχτόχρωμους κύβους του <b>${t.b}</b>.</li>
       <li>Ξεκίνα από τις μονάδες. Αν μια στήλη έχει 10 ή περισσότερους κύβους, ένωσε 10 και ο νέος κύβος πάει αριστερά. Αυτό είναι το κρατούμενο.</li>
       <li>Όταν τελειώσεις, πάτα «Έλεγχος».</li></ol>
-      <div class="hint" id="hint"></div>${winBox}${opBtns}`;
+      <div class="hint" id="hint"></div>${winBox}${opBtns}${ownForm(t)}`;
   }else{
     c.innerHTML=`<div class="th"><h2>Αφαίρεση με δανεικό</h2>${next}</div><div class="big">${t.a} − ${t.b}</div>
       <ol class="steps"><li>Στον πίνακα είναι το <b>${t.a}</b>. Βγάλε από τον πίνακα τους κύβους του <b>${t.b}</b>.</li>
       <li>Ξεκίνα από τις μονάδες. Αν δεν φτάνουν οι κύβοι, σπάσε έναν κύβο από τη στήλη αριστερά.</li>
       <li>Όταν τελειώσεις, πάτα «Έλεγχος».</li></ol>
-      <div class="hint" id="hint"></div>${winBox}${opBtns}`;
+      <div class="hint" id="hint"></div>${winBox}${opBtns}${ownForm(t)}`;
   }
+  bindOwn();
 }
 
 function renderChrome(){
