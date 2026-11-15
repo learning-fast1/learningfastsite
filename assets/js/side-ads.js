@@ -38,21 +38,21 @@
   ];
 
   var css = [
-    '.lf-sa-wrap{display:flex;align-items:flex-start;gap:1.75rem;max-width:1400px;margin:0 auto 4rem;padding:0 1.5rem}',
+    '.lf-sa-wrap{display:flex;align-items:flex-start;gap:1.5rem;max-width:1400px;margin:0 auto 4rem;padding:0 1.5rem}',
     '.lf-sa-wrap>.game-detail{flex:1 1 0;min-width:0;max-width:none;margin:0;padding:0}',
-    '.lf-sa{flex:0 0 232px;position:sticky;top:90px;display:flex;flex-direction:column;gap:14px}',
-    '.lf-sa__head{margin:0;font-size:.8rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b6890}',
-    '.lf-sa__card{display:block;text-decoration:none;color:#2d2a4a;background:#fff;border:2px solid #ece9fb;border-radius:16px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.07);transition:transform .15s,box-shadow .15s}',
+    '.lf-sa{flex:0 0 158px;position:sticky;top:90px;display:flex;flex-direction:column;gap:10px}',
+    '.lf-sa__head{margin:0;font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b6890}',
+    '.lf-sa__card{display:block;text-decoration:none;color:#2d2a4a;background:#fff;border:2px solid #ece9fb;border-radius:12px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.07);transition:transform .15s,box-shadow .15s}',
     '.lf-sa__card:hover,.lf-sa__card:focus-visible{transform:translateY(-3px);box-shadow:0 10px 24px rgba(108,99,255,.25);outline:none}',
-    '.lf-sa__img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:top;background:#f4f2fd}',
-    '.lf-sa__body{padding:10px 12px 12px}',
-    '.lf-sa__title{margin:0 0 4px;font-size:1rem;font-weight:800;line-height:1.25}',
-    '.lf-sa__text{margin:0;font-size:.88rem;line-height:1.4;color:#4a476a}',
+    '.lf-sa__img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top;background:#f4f2fd}',
+    '.lf-sa__body{padding:7px 9px 9px}',
+    '.lf-sa__title{margin:0 0 2px;font-size:.85rem;font-weight:800;line-height:1.25}',
+    '.lf-sa__text{margin:0;font-size:.74rem;line-height:1.35;color:#4a476a}',
     '@media (max-width:1100px){',
     '.lf-sa-wrap{flex-direction:column;align-items:stretch;gap:2rem}',
     '.lf-sa{flex:none;position:static;flex-direction:row;flex-wrap:wrap}',
     '.lf-sa__head{flex:0 0 100%}',
-    '.lf-sa__card{flex:1 1 240px;max-width:340px}',
+    '.lf-sa__card{flex:1 1 150px;max-width:190px}',
     '}'
   ].join('\n');
 
