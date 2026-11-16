@@ -11,8 +11,8 @@
   var base = script && script.src ? script.src : location.href;
   /* τα παιχνίδια της ανακοίνωσης: δύο, ένα σε κάθε μισό του παραθύρου */
   var GAMES = [
-    { name: 'Γράφω τα Γράμματα', img: new URL('../images/grafw-ta-grammata.jpg', base).href, alt: 'Γράφω τα Γράμματα – το παιχνίδι γραφής των γραμμάτων' },
-    { name: 'Βουτιά Συγκέντρωσης', img: new URL('../images/prosoxi-sygkentrosi.jpg', base).href, alt: 'Βουτιά Συγκέντρωσης – ο χάρτης του βυθού με τους έξι στάθμους' }
+    { name: 'Τα Μαγαζάκια της Γειτονιάς', img: new URL('../images/magazaki.jpg?v=2', base).href, alt: 'Τα Μαγαζάκια της Γειτονιάς – ο χάρτης της γειτονιάς με τα έξι μαγαζιά' },
+    { name: 'Οι Εγκλίσεις', img: new URL('../images/egkliseis.png', base).href, alt: 'Οι Εγκλίσεις – τα τέσσερα επίπεδα του παιχνιδιού' }
   ];
 
   var css = [
