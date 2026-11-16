@@ -6,6 +6,16 @@ const LEVELS = [
     { id: 4, title: "Προπαίδεια του 3", type: "single", table: 3 },
     { id: 5, title: "Προπαίδεια του 4", type: "single", table: 4 },
     { id: 6, title: "Προπαίδεια του 5", type: "single", table: 5 },
+    /* Έλεγχος των εύκολων πινάκων μετά τον πίνακα του 5. Το id μένει 15 ώστε να μη χαθεί η πρόοδος των παιδιών (η πρόοδος κρατιέται ανά id). */
+    { id: 15, title: "Προπαίδειες 0, 1, 2, 5, 10", type: "distributed", isBoss: true, questions: 20,
+      distribution: [
+          { table: 0,  count: 2 },
+          { table: 1,  count: 2 },
+          { table: 2,  count: 4 },
+          { table: 5,  count: 6 },
+          { table: 10, count: 6 }
+      ]
+    },
     { id: 7, title: "Προπαίδεια του 6", type: "single", table: 6 },
     { id: 8, title: "Προπαίδεια του 7", type: "single", table: 7 },
     { id: 9, title: "Προπαίδεια του 8", type: "single", table: 8 },

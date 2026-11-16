@@ -248,7 +248,7 @@ body {
 /* Για να κάνουμε ζιγκ-ζαγκ (snake path) τοποθέτηση */
 .level-node:nth-child(even) { margin-left: 30vw; }
 .level-node:nth-child(odd) { margin-right: 30vw; }
-/* Αλλαγή χρώματος για τα boss levels 13 14 */
+/* Αλλαγή χρώματος για τα boss levels 13 14 15 */
 .level-node.boss {
     background: var(--primary-color);
     box-shadow: 0 6px 0 var(--primary-shadow), 0 10px 15px rgba(0,0,0,0.2);
