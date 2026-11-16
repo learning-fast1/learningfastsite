@@ -30,7 +30,27 @@ function nextRound(){
   $('#area').innerHTML='';const tray=$('#tray');tray.innerHTML='';tray.className='tray';
   renderDots();
   STAGE[G.n].round(G.items[G.round]);
+  fitArea();
 }
+
+/* Short phones (the browser's bars take height): if the round's picture does not fit the middle of the screen,
+   it shrinks there (down to 70%), so nothing needs scrolling. Rechecked whenever the round or Stelios' words change.
+   The talk with the cashier is left alone: its chat scrolls by design. */
+const FIT_MIN=.7;
+function fitArea(){
+  const a=$('#area');
+  a.style.setProperty('--fit','1');
+  if(!G||G.n===6||!$('#play').classList.contains('on'))return;
+  for(let k=0,z=1;k<4&&a.scrollHeight>a.clientHeight+1&&z>FIT_MIN;k++){
+    z=Math.max(FIT_MIN,z*(a.clientHeight-16)/(a.scrollHeight-16));
+    a.style.setProperty('--fit',z.toFixed(3));
+  }
+}
+let fitRaf=0;
+const refit=()=>{cancelAnimationFrame(fitRaf);fitRaf=requestAnimationFrame(fitArea);};
+new MutationObserver(refit).observe($('#area'),{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','class']});
+new MutationObserver(refit).observe($('#bubble'),{childList:true,subtree:true,characterData:true});
+addEventListener('resize',refit);
 /* ten dots for the rounds; a stage in parts shows «Μέρος 1/2» and the dots of the part in progress */
 function renderDots(){
   const d=$('#dots');

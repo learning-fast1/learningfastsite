@@ -111,8 +111,28 @@ button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid va
 .shop b{font-size:clamp(.98rem,1.4vw,1.1rem)}
 .shop small{font-family:var(--body);color:var(--ink-soft);font-size:.85rem;line-height:1.25}
 .shop .star{position:absolute;top:14px;right:6px;font-size:1.4rem;transform:rotate(12deg);filter:drop-shadow(0 2px 1px rgba(0,0,0,.2))}
-/* phones: one column, so the number stays beside the name and each card is one short row */
-@media (max-width:480px){.map{grid-template-columns:1fr;gap:10px;padding:12px}.shop{padding-bottom:10px}.shop b{font-size:1.1rem}}
+/* phones: two small columns and a smaller hero, so the whole map fits on the screen without scrolling */
+@media (max-width:480px){
+  .map{gap:8px;padding:8px;border-radius:18px}
+  .shop{padding:0 6px 8px;gap:2px;border-radius:14px}.shop .awn{margin:0 -6px 5px;height:10px}
+  .shop .ttl{gap:6px}.shop .num{width:24px;height:24px;font-size:.8rem}
+  .shop b{font-size:.98rem;line-height:1.2}.shop small{font-size:.76rem}
+  .hero{gap:10px;margin-bottom:8px}.hero .stelios{flex-basis:78px}
+  .hero h1{font-size:1.55rem;margin-bottom:6px}.hero .bubble{font-size:.92rem;padding:8px 12px}
+  .maptitle{font-size:1.1rem;margin:8px 0 6px}
+  #home .wrap{padding-bottom:12px}.lf-foot{margin-top:12px}
+}
+/* short landscape screens (tablets with the browser bars, phones on their side): a tighter hero */
+@media (orientation:landscape) and (max-height:640px){
+  .awning{height:14px}
+  .lflogo img{height:38px}.homebar .unitbtn{min-height:40px;padding:3px 12px 3px 5px}.homebar .unitbtn img{width:30px;height:30px}
+  .hero{margin-bottom:6px;align-items:center}.hero .stelios{flex-basis:clamp(64px,13vh,96px)}
+  .hero h1{font-size:clamp(1.5rem,6vh,2.1rem);margin-bottom:4px}.hero .bubble{padding:6px 14px}
+  .maptitle{font-size:1.1rem;margin:6px 0 6px}
+  .map{gap:10px;padding:10px}
+  .shop{padding-bottom:8px}.shop .awn{height:10px;margin-bottom:5px}
+  #home .wrap{padding-bottom:10px}.lf-foot{margin-top:10px}
+}
 .shop .soon{margin-top:4px;font-size:.75rem;background:#EEE9DF;color:var(--ink-soft);border-radius:999px;padding:2px 10px}
 .shop:disabled{opacity:.7}
 .shop:not(:disabled):active{transform:translateY(2px)}
@@ -136,7 +156,7 @@ button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid va
 .instr .bubble b{color:var(--teal-dk);white-space:nowrap}
 /* auto margins centre the content but, unlike align-items:center, never push it out of reach above the top */
 .area{display:flex;padding:8px 14px;min-height:0;overflow:auto}
-.area>*{margin:auto}
+.area>*{margin:auto;zoom:var(--fit,1)}   /* --fit: set by fitArea() in js/engine.js on short screens */
 .tray{background:var(--wood);border-top:4px solid var(--wood-dk);padding:12px 12px calc(12px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center}
 .tray.locked>*:not(.next){pointer-events:none}
 .tray.locked .pay{display:none}
@@ -454,6 +474,74 @@ button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid va
 .rlist .how.h3{background:#ECEAE5;color:var(--ink-soft)}
 .rlist small{flex:1 1 100%;color:var(--ink-soft);font-size:.88rem}
 #rextra[hidden]{display:none}
+/* the result screen is exactly one screen high: if the report is long, only its list scrolls, inside its card */
+#result.screen.on{display:flex;flex-direction:column;height:100vh;height:100dvh;min-height:0}
+#result .wrap{flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column;padding-bottom:12px}
+#result .resbox{flex:0 0 auto}
+#result .report{flex:0 1 auto;min-height:0;display:flex;flex-direction:column}
+#result .rlist{flex:1 1 auto;min-height:60px;overflow:auto;overscroll-behavior:contain;align-content:start;padding-right:2px}
+/* landscape: «Μπράβο» and the buttons on the left, the report on the right */
+@media (orientation:landscape) and (min-width:600px){
+  #result .wrap{flex-direction:row;align-items:stretch;gap:14px;max-width:1100px}
+  #result .resbox{flex:0 0 clamp(260px,32%,360px);overflow:auto;align-self:flex-start;max-height:100%}
+  #result .report{flex:1 1 auto;align-self:flex-start;max-height:100%}
+  #result .restop{flex-wrap:wrap}
+  #result .restop .stelios{flex-basis:72px}
+  #result .restop h2{font-size:1.6rem}
+  #result .row .btn{flex:1 1 auto}
+}
+/* short screens: a tighter header and report */
+@media (max-height:620px){
+  #result .wrap{padding-top:8px;padding-bottom:8px}
+  #result .resbox,#result .report{margin-top:6px;padding:12px}
+  #result .restop .stelios{flex-basis:56px}
+  #result .restop h2{font-size:1.4rem}
+  #result .restop p{font-size:.92rem}
+  #result .sticker{font-size:2rem}
+  #result .btn.redo{margin-top:8px}
+  #result .row{margin-top:8px}
+  .report h3{font-size:1rem;margin-bottom:4px}
+  .rdots i{width:16px;height:16px}
+  .rlegend{font-size:.78rem;margin-top:4px}
+  .report #rsum{margin:6px 0 4px;font-size:.92rem}
+  .rlist li{padding:5px 10px}
+}
+/* phones: a compact «Μπράβο»; the dots and their legend repeat what the list says, so they make room for it */
+@media (max-width:560px) and (orientation:portrait),(orientation:landscape) and (max-height:480px){
+  #result .rdots,#result .rlegend{display:none}
+  #result .wrap{padding:8px 10px}
+  #result .resbox,#result .report{margin-top:6px;padding:12px;border-radius:18px}
+  #result .restop{gap:10px}
+  #result .restop .stelios{flex-basis:52px}
+  #result .restop h2{font-size:1.35rem}
+  #result .restop p{font-size:.9rem;margin-top:2px}
+  #result .sticker{font-size:1.8rem}
+  #result .btn.redo{margin-top:8px;min-height:46px;padding:6px 12px}
+  #result .row{margin-top:8px;flex-wrap:nowrap}
+  #result .row .btn{min-height:46px;padding:6px 16px}
+  .report h3{font-size:.98rem;margin-bottom:2px}
+  .report #rsum{margin:4px 0;font-size:.9rem}
+  .rlist li{padding:5px 10px}.rlist .lab{font-size:.92rem}.rlist small{font-size:.82rem}
+}
+@media (orientation:landscape) and (max-height:480px){
+  #result .resbox{flex-basis:clamp(240px,34%,300px)}
+  #result .restop{flex-wrap:nowrap}
+  #result .sticker{display:none}
+}
+/* the smallest screens: Stelios's greeting and the map title give their room to the map */
+@media (orientation:portrait) and (max-height:540px),(orientation:landscape) and (max-height:420px){
+  .hero .bubble,.maptitle{display:none}
+  .hero{align-items:center;margin-bottom:8px}.hero .stelios{flex-basis:56px}
+  .hero h1{font-size:1.4rem;margin:0}
+  .homebar{padding-top:2px}.lflogo img{height:34px}
+}
+@media (orientation:portrait) and (max-height:480px),(orientation:landscape) and (max-height:360px){
+  .awning{height:12px}
+  .map{gap:6px;padding:6px}.shop{padding-bottom:5px}.shop .awn{height:8px;margin-bottom:4px}
+  #result .restop .stelios{display:none}
+}
+/* phones on their side: the line under each shop name gives its room to the map */
+@media (orientation:landscape) and (max-height:360px){.shop small{display:none}.shop .ttl{min-height:34px}}
 .restop{display:flex;align-items:center;gap:14px;position:relative}
 .restop .stelios{flex:0 0 96px}
 .restop h2{font-size:2rem;color:var(--teal-dk)}
