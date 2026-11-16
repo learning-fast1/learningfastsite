@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<!-- Google Analytics (η ιδιότητα όλου του site, όπως στις σελίδες της Ειδικής Εκπαίδευσης) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S07M3VNB5N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S07M3VNB5N');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Το Μαγαζάκι της Γειτονιάς – Learning Fast</title>
+<meta name="description" content="Το Μαγαζάκι της Γειτονιάς: δωρεάν παιχνίδι λειτουργικών μαθηματικών με ευρώ και κέρματα. Τα παιδιά αναγνωρίζουν χρήματα, πληρώνουν, υπολογίζουν ρέστα και μιλούν στον ταμία. Για το δημοτικό και την ειδική εκπαίδευση.">
+<link rel="canonical" href="https://learning-fast.com/eidiki-ekpaideysi/xrimata/paixnidi/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="el_GR">
+<meta property="og:site_name" content="Learning Fast">
+<meta property="og:title" content="Το Μαγαζάκι της Γειτονιάς – Learning Fast">
+<meta property="og:description" content="Δωρεάν παιχνίδι με ευρώ και κέρματα: αναγνωρίζω χρήματα, πληρώνω, υπολογίζω ρέστα και μιλάω στον ταμία.">
+<meta property="og:url" content="https://learning-fast.com/eidiki-ekpaideysi/xrimata/paixnidi/">
+<meta property="og:image" content="https://learning-fast.com/assets/images/magazaki.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Didact+Gothic&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css?v=20261116a">
+</head>
+<body>
+
+<!-- HOME: ρυθμίσεις εκπαιδευτικού + χάρτης της γειτονιάς -->
+<section id="home" class="screen on">
+  <div class="awning" aria-hidden="true"></div>
+  <!-- on wide screens these two sit in the corners, beside the content, so the title stays high -->
+  <div class="homebar">
+    <a class="lflogo" href="https://learning-fast.com/"><img src="img/logo-lf.png" alt="Learning Fast – αρχική σελίδα"></a>
+    <button class="unitbtn" type="button" data-unit-open></button>
+  </div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="stelios" id="hst"></div>
+      <div>
+        <h1>Το Μαγαζάκι της Γειτονιάς</h1>
+        <p class="bubble">Γεια σου! Είμαι ο κυρ-Στέλιος. Έλα να ψωνίσουμε μαζί!</p>
+      </div>
+    </div>
+
+    <h2 class="maptitle">Ο χάρτης της γειτονιάς</h2>
+    <div class="map" id="map"></div>
+  </div>
+
+  <footer class="lf-foot">
+    <p class="lf-copy">© 2026 Learning Fast. Όλα τα δικαιώματα διατηρούνται.</p>
+  </footer>
+</section>
+
+<!-- PLAY: ίδια διάταξη σε όλα τα στάδια (οδηγία πάνω, δράση στη μέση, πορτοφόλι/κουμπιά κάτω) -->
+<section id="play" class="screen">
+  <div class="pbar">
+    <button class="iconbtn" id="tomap" aria-label="Στον χάρτη"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.6 12 3.5l9 7.1"/><path d="M5.5 9v10.5a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9"/><path d="M10 20.5v-5.5h4v5.5"/></svg></button>
+    <button class="unitbtn onbar" type="button" data-unit-open></button>
+    <span class="shopname" id="shopname"></span>
+    <div class="dots" id="dots" role="img"></div>
+  </div>
+  <div class="instr">
+    <div class="stelios" id="pst"></div>
+    <div class="bubble" id="bubble" aria-live="polite"></div>
+  </div>
+  <div class="area" id="area"></div>
+  <div class="tray" id="tray"></div>
+</section>
+
+<!-- RESULT -->
+<section id="result" class="screen">
+  <div class="wrap">
+    <div class="card resbox">
+      <div class="restop">
+        <div class="stelios" id="rst"></div>
+        <div>
+          <h2 id="restitle"></h2>
+          <p id="ressub"></p>
+        </div>
+        <span class="sticker" aria-hidden="true">⭐</span>
+      </div>
+      <button class="btn redo" id="redobtn" hidden></button>
+      <div class="row">
+        <button class="btn ghost" id="againbtn">Ξανά</button>
+        <button class="btn" id="mapbtn">Στον χάρτη</button>
+      </div>
+    </div>
+
+    <!-- short report for the teacher: what was hard in this stage (js/report.js) -->
+    <div class="card report">
+      <h3>Για τον εκπαιδευτικό: πώς τα πήγε</h3>
+      <div class="rdots" id="rdots"></div>
+      <p class="rlegend"><i class="h0"></i>με την πρώτη <i class="h1"></i>μετά από υπόδειξη <i class="h2"></i>με οπτική βοήθεια <i class="h3"></i>του δείξαμε τη λύση</p>
+      <p id="rsum"></p>
+      <ul class="rlist" id="rlist"></ul>
+      <p class="note" id="rextra"></p>
+    </div>
+  </div>
+</section>
+
+<!-- teacher's settings, shown after a shop is picked on the map and before its stage starts (js/screens.js) -->
+<div class="modal" id="setup" hidden role="dialog" aria-modal="true" aria-labelledby="setuptitle">
+  <div class="card mcin setupbox">
+    <div class="setuphead">
+      <img id="setupimg" alt="">
+      <div><small>Ρυθμίσεις εκπαιδευτικού</small><h2 id="setuptitle"></h2></div>
+    </div>
+    <div id="settings"></div>
+    <p class="note">Δεν υπάρχει χρονόμετρο. Το παιδί προχωρά με τον δικό του ρυθμό.</p>
+    <div class="row">
+      <button class="btn ghost" type="button" id="setupback">Πίσω</button>
+      <button class="btn" type="button" id="setupgo">Ξεκίνα ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- asked every time the game opens; also opened by the «σεντ / λεπτά» button top-left (js/screens.js) -->
+<div class="modal" id="unitask" hidden role="dialog" aria-modal="true" aria-labelledby="unittitle">
+  <div class="card mcin">
+    <div class="stelios" id="ust"></div>
+    <h2 id="unittitle">Πώς λέμε τα κέρματα;</h2>
+    <p class="note">Διάλεξε πώς θα τα λέει ο κυρ-Στέλιος.</p>
+    <div class="unitopts">
+      <button type="button" data-unit="sent"><img src="img/money/50.png" alt=""><b>σεντ</b><small>«50 σεντ»</small></button>
+      <button type="button" data-unit="lepta"><img src="img/money/50.png" alt=""><b>λεπτά</b><small>«50 λεπτά»</small></button>
+    </div>
+  </div>
+</div>
+
+
+<script src="js/core.js?v=20261116a"></script>
+<script src="js/art.js?v=20261116a"></script>
+<script src="js/data.js?v=20261116a"></script>
+<script src="js/engine.js?v=20261116a"></script>
+<script src="js/games/stage1.js?v=20261116a"></script>
+<script src="js/games/stage2.js?v=20261116a"></script>
+<script src="js/games/stage3.js?v=20261116a"></script>
+<script src="js/games/stage4.js?v=20261116a"></script>
+<script src="js/games/stage5.js?v=20261116a"></script>
+<script src="js/games/stage6.js?v=20261116a"></script>
+<script src="js/report.js?v=20261116a"></script>
+<script src="js/screens.js?v=20261116a"></script>
+<script src="js/app.js?v=20261116a"></script>
+</body>
+</html>
