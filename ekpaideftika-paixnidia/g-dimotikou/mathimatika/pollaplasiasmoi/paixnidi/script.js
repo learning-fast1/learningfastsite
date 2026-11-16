@@ -16,12 +16,6 @@ const LEVELS = [
           { table: 10, count: 6 }
       ]
     },
-    { id: 7, title: "Προπαίδεια του 6", type: "single", table: 6 },
-    { id: 8, title: "Προπαίδεια του 7", type: "single", table: 7 },
-    { id: 9, title: "Προπαίδεια του 8", type: "single", table: 8 },
-    { id: 10, title: "Προπαίδεια του 9", type: "single", table: 9 },
-    { id: 11, title: "Προπαίδεια του 10", type: "single", table: 10 },
-    { id: 12, title: "Προπαίδεια του 11", type: "single", table: 11 },
     { id: 13, title: "Προπαίδειες από το 0 - 5", type: "distributed", isBoss: true, questions: 20,
       distribution: [
           { table: 0, count: 1 },
@@ -32,6 +26,12 @@ const LEVELS = [
           { table: 5, count: 6 }
       ]
     },
+    { id: 7, title: "Προπαίδεια του 6", type: "single", table: 6 },
+    { id: 8, title: "Προπαίδεια του 7", type: "single", table: 7 },
+    { id: 9, title: "Προπαίδεια του 8", type: "single", table: 8 },
+    { id: 10, title: "Προπαίδεια του 9", type: "single", table: 9 },
+    { id: 11, title: "Προπαίδεια του 10", type: "single", table: 10 },
+    { id: 12, title: "Προπαίδεια του 11", type: "single", table: 11 },
     { id: 14, title: "Τερματισμός: Όλοι μαζί", type: "distributed", isBoss: true, questions: 30,
       distribution: [
           { table: 0,  count: 1 },
