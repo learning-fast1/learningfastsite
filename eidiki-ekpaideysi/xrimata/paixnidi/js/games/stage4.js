@@ -22,6 +22,37 @@ function s4ways(stall,budget){
   return out;
 }
 
+/* The «spend it all» stall is built from the money down, so the prices group easily into whole euros:
+   the amount is split into parts of €2–€4 (€5 = €2 + €3, €7 = €3 + €4 …), and each part is two prices that make it
+   (€0,80 + €1,20 = €2) or one price taken twice (€1,50 + €1,50 = €3). Two more products are not needed.
+   The prices follow the level: whole euros (α), with 50 cents (β), in tens of cents and never whole euros (γ). */
+const S4SPLIT={4:[2,2],5:[2,3],6:[3,3],7:[3,4],8:[4,4]};
+const S4GRID={b:{from:50,step:50},c:{from:50,step:10}};   // (α: whole-euro prices always group easily, see setup)
+function s4grid(lvl,max){   // the prices of a level, up to `max`
+  const g=S4GRID[lvl],out=[];
+  for(let v=g.from;v<=max;v+=g.step)if(lvl!=='c'||v%100)out.push(v);
+  return out;
+}
+function s4stall(lvl,euros){
+  const used=new Set(),sol=[];
+  for(const t of shuffle(S4SPLIT[euros].slice())){
+    const whole=t*100,half=whole/2;
+    /* one price twice, when it is a «nice» half (€1,50 + €1,50) and not taken yet */
+    if(Math.random()<.3&&s4grid(lvl,whole).includes(half)&&half%100&&!used.has(half)){used.add(half);sol.push(half);continue;}
+    const xs=shuffle(s4grid(lvl,whole-1).filter(x=>{const y=whole-x;return x<y&&!used.has(x)&&!used.has(y)&&s4grid(lvl,whole).includes(y);}));
+    if(!xs.length){   // no two different prices make it (€2 in whole euros): one product twice (€1 + €1)
+      if(s4grid(lvl,whole).includes(half)&&!used.has(half)){used.add(half);sol.push(half);continue;}
+      return null;
+    }
+    used.add(xs[0]);used.add(whole-xs[0]);sol.push(xs[0],whole-xs[0]);
+  }
+  const extra=shuffle(s4grid(lvl,350).filter(v=>!used.has(v))).slice(0,6-used.size);
+  const prices=[...used,...extra].sort((a,b)=>a-b);
+  /* cheap products get the small prices and the watermelon the big ones, so they look real */
+  const prods=shuffle(MANAVIKO.slice()).slice(0,prices.length).map(id=>PRODUCTS[id]).sort((a,b)=>a.price-b.price);
+  return prods.map((p,i)=>({p,price:prices[i]}));
+}
+
 STAGE[4]={
   setup(lvl){
     let s=0;
@@ -30,15 +61,13 @@ STAGE[4]={
     const draw=()=>shuffle(MANAVIKO.slice()).map(id=>({p:PRODUCTS[id],price:at(PRODUCTS[id].price)}));
     return S4KIND.map(kind=>{
       if(kind==='shop'){
-        /* a stall on which the money can be spent exactly (the planned amount if possible, else a near one) */
-        const want=S4BUDGET[lvl][s++];
-        for(const e of [want,want+1,want-1,want+2,want-2])
-          for(let k=0;k<60;k++){
-            const stall=draw().slice(0,6).sort((a,b)=>a.price-b.price);
-            if(s4ways(stall,e*100).length)return {kind,budget:e*100,stall};
-          }
-        const stall=draw().slice(0,6).sort((a,b)=>a.price-b.price);   // (never needed so far) money = three of the products
-        return {kind,budget:sum(stall.slice(0,3).map(x=>x.price))*2,stall};
+        const euros=S4BUDGET[lvl][s++];
+        for(let k=0;k<60;k++){
+          const stall=lvl==='a'?draw().slice(0,6).sort((a,b)=>a.price-b.price):s4stall(lvl,euros);
+          if(stall&&stall.length===6&&s4ways(stall,euros*100).length)return {kind,budget:euros*100,stall};
+        }
+        const stall=draw().slice(0,6).sort((a,b)=>a.price-b.price);   // (never needed) money = two of the products, twice
+        return {kind,budget:sum(stall.slice(0,2).map(x=>x.price))*2,stall};
       }
       const pool=draw();
       /* the money is just enough (sometimes exactly) or just short, so the child has to add up */
