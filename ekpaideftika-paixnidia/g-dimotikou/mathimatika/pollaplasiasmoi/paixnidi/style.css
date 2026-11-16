@@ -248,7 +248,7 @@ body {
 /* Για να κάνουμε ζιγκ-ζαγκ (snake path) τοποθέτηση */
 .level-node:nth-child(even) { margin-left: 30vw; }
 .level-node:nth-child(odd) { margin-right: 30vw; }
-/* Αλλαγή χρώματος για τα boss levels 13 14 15 */
+/* Αλλαγή χρώματος για τα boss levels 13 14 15 16 */
 .level-node.boss {
     background: var(--primary-color);
     box-shadow: 0 6px 0 var(--primary-shadow), 0 10px 15px rgba(0,0,0,0.2);
@@ -478,6 +478,25 @@ body {
     border: 5px solid var(--accent-color);
     animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+/* ── ΕΠΙΛΟΓΗ ΠΡΟΠΑΙΔΕΙΩΝ ── */
+.pick-help { font-size: 17px; color: #495057; margin: 0 0 14px; }
+.pick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 6px; }
+.pick-chip {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    padding: 12px 0;
+    border-radius: 14px;
+    border: 3px solid #ced4da;
+    background: #f8f9fa;
+    color: #495057;
+    cursor: pointer;
+    transition: 0.1s;
+}
+.pick-chip.on { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
+.pick-chip:focus-visible, .pick-cancel:focus-visible { outline: 3px solid var(--accent-color); outline-offset: 2px; }
+.btn-primary:disabled { opacity: .45; cursor: default; box-shadow: none; }
+.pick-cancel { display: block; margin: 14px auto 0; background: none; border: 0; font-family: inherit; font-size: 16px; color: #6c757d; text-decoration: underline; cursor: pointer; }
 
 /* ── BOSS REPORT ── */
 .boss-report {

@@ -26,7 +26,7 @@
             <h1>Το μονοπάτι του πολλαπλασιασμού!</h1>
             <p>Διάλεξε πίστα και μάζεψε αστέρια!</p>
             <a href="../../../../../index.html" class="site-back-link">← Learning Fast</a>
-            <div id="total-stars-display">⭐ <span id="total-stars">0</span>/45</div>
+            <div id="total-stars-display">⭐ <span id="total-stars">0</span>/48</div>
         </header>
 
         <div class="map-container">
@@ -82,6 +82,17 @@
             </div>
 
             <button id="btn-continue" class="btn-primary">Συνέχεια</button>
+        </div>
+    </div>
+
+    <!-- Παράθυρο επιλογής προπαίδειας (τελευταίο στάδιο) -->
+    <div id="pick-screen" class="screen modal-overlay">
+        <div class="result-modal pick-modal" role="dialog" aria-modal="true" aria-labelledby="pick-title">
+            <h2 id="pick-title">Διάλεξε εσύ τις προπαίδειες που θες να εξασκηθείς!</h2>
+            <p class="pick-help">Πάτα τους αριθμούς που θέλεις. Θα βγουν πράξεις μόνο από αυτούς.</p>
+            <div class="pick-grid" id="pick-grid"></div>
+            <button id="pick-start" class="btn-primary" type="button">Ξεκίνα!</button>
+            <button id="pick-cancel" class="pick-cancel" type="button">Πίσω στον χάρτη</button>
         </div>
     </div>
 

@@ -32,7 +32,7 @@ const LEVELS = [
           { table: 5, count: 6 }
       ]
     },
-    { id: 14, title: "Τερματισμός", type: "distributed", isBoss: true, questions: 30,
+    { id: 14, title: "Τερματισμός: Όλοι μαζί", type: "distributed", isBoss: true, questions: 30,
       distribution: [
           { table: 0,  count: 1 },
           { table: 1,  count: 1 },
@@ -47,7 +47,9 @@ const LEVELS = [
           { table: 8,  count: 4, minB: 6 },
           { table: 9,  count: 4, minB: 6 }
       ]
-    }
+    },
+    /* Το παιδί διαλέγει τις προπαίδειες (παράθυρο επιλογής). Το id 16 κρατά την πρόοδό του. */
+    { id: 16, title: "Διάλεξε εσύ τις προπαίδειες που θες να εξασκηθείς!", type: "custom", isBoss: true, questions: 20 }
 ];
 
 const DEFAULT_QUESTIONS = 10;
@@ -77,6 +79,8 @@ function buildQuestionQueue(level) {
         for (let i = 0; i < count; i++) {
             questions.push({ tableVal: t, otherVal: pool[i], table: t });
         }
+    } else if (level.type === 'custom') {
+        return buildCustomQueue(level.tables, level.questions || 20);
     } else if (level.type === 'distributed') {
         level.distribution.forEach(({ table, count, minB }) => {
             const min = minB || 0;
@@ -90,6 +94,30 @@ function buildQuestionQueue(level) {
     }
 
     return questions;
+}
+
+// Προπαίδειες της επιλογής του παιδιού: κυκλικά από κάθε πίνακα, χωρίς διπλές πράξεις (2×3 και 3×2 είναι η ίδια)
+function buildCustomQueue(tables, max) {
+    const lists = tables.map(t => ({ t, others: shuffle(Array.from({ length: 12 }, (_, i) => i)) }));
+    const seen = new Set();
+    const questions = [];
+    let progressed = true;
+    while (questions.length < max && progressed) {
+        progressed = false;
+        for (const l of lists) {
+            while (l.others.length) {
+                const o = l.others.pop();
+                const key = Math.min(l.t, o) + 'x' + Math.max(l.t, o);
+                if (seen.has(key)) continue;
+                seen.add(key);
+                questions.push({ tableVal: l.t, otherVal: o, table: l.t });
+                progressed = true;
+                break;
+            }
+            if (questions.length >= max) break;
+        }
+    }
+    return shuffle(questions);
 }
 
 let userProgress = JSON.parse(localStorage.getItem('mathAdventureProgress')) || {};
@@ -143,7 +171,7 @@ function renderMap() {
         node.innerHTML += `<div class="node-stars">${starsHtml}</div>`;
         node.appendChild(label);
 
-        node.addEventListener('click', () => startGame(level));
+        node.addEventListener('click', () => level.type === 'custom' ? openPicker(level) : startGame(level));
 
         levelsWrapper.appendChild(node);
     });
@@ -208,6 +236,43 @@ function showMapScreen() {
     updateTotalStars();
 }
 
+// Παράθυρο επιλογής προπαίδειας (στάδιο 16)
+const pickScreen = document.getElementById('pick-screen');
+const pickGrid = document.getElementById('pick-grid');
+const pickStart = document.getElementById('pick-start');
+let pickLevel = null;
+let picked = new Set();
+
+function openPicker(level) {
+    pickLevel = level;
+    try { picked = new Set(JSON.parse(localStorage.getItem('mathAdventurePicked')) || []); } catch (e) { picked = new Set(); }
+    pickGrid.innerHTML = '';
+    for (let t = 0; t <= 11; t++) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'pick-chip' + (picked.has(t) ? ' on' : '');
+        b.textContent = t;
+        b.setAttribute('aria-pressed', picked.has(t));
+        b.addEventListener('click', () => {
+            if (picked.has(t)) picked.delete(t); else picked.add(t);
+            b.classList.toggle('on', picked.has(t));
+            b.setAttribute('aria-pressed', picked.has(t));
+            pickStart.disabled = picked.size === 0;
+        });
+        pickGrid.appendChild(b);
+    }
+    pickStart.disabled = picked.size === 0;
+    pickScreen.classList.add('active');
+}
+document.getElementById('pick-cancel').addEventListener('click', () => pickScreen.classList.remove('active'));
+pickStart.addEventListener('click', () => {
+    if (picked.size === 0) return;
+    const tables = [...picked].sort((a, b) => a - b);
+    try { localStorage.setItem('mathAdventurePicked', JSON.stringify(tables)); } catch (e) {}
+    pickScreen.classList.remove('active');
+    startGame({ ...pickLevel, title: 'Οι προπαίδειες που διάλεξα', tables });
+});
+
 function startGame(level) {
     currentLevel = level;
     currentQuestionIndex = 0;
@@ -215,6 +280,7 @@ function startGame(level) {
     levelQuestions = level.questions || DEFAULT_QUESTIONS;
     tableErrors = {};
     questionQueue = buildQuestionQueue(level);
+    if (level.type === 'custom') levelQuestions = questionQueue.length;
 
     levelTitleText.textContent = level.title;
     scoreText.textContent = "0";
