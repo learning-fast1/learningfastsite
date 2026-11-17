@@ -25,13 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let score         = 0;
     let correctAnswer = null;
     let currentPair   = [0, 0];
-    let answerValue   = '';
     let waiting       = false;
 
     // Two player
     const p = {
-        1: { score: 0, answer: '', correct: null, pair: [0,0], waiting: false },
-        2: { score: 0, answer: '', correct: null, pair: [0,0], waiting: false }
+        1: { score: 0, correct: null, pair: [0,0], waiting: false },
+        2: { score: 0, correct: null, pair: [0,0], waiting: false }
     };
 
     // --- DOM ---
@@ -108,14 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
     reviewBtn.addEventListener('click', () => {
         gameOver.classList.add('hidden');
         startReview();
-    });
-
-    // --- Numpad listeners ---
-    document.querySelectorAll('#game-screen .numpad-btn').forEach(btn => {
-        btn.addEventListener('click', () => handleSingle(btn.dataset.val));
-    });
-    document.querySelectorAll('#two-player-screen .numpad-btn').forEach(btn => {
-        btn.addEventListener('click', () => handleTwo(+btn.dataset.player, btn.dataset.val));
     });
 
     // ─── Pool management ───────────────────────────────────────────────────────
@@ -325,64 +316,63 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOver.classList.remove('hidden');
     }
 
-    // ─── Single player logic ───────────────────────────────────────────────────
+    // ─── Answer choices (4 buttons, the child picks the right one) ─────────────
 
-    function handleSingle(val) {
-        if (waiting) return;
-        if (val === 'del') {
-            answerValue = answerValue.slice(0, -1);
-        } else if (val === 'ok') {
-            if (!answerValue) return;
-            if (parseInt(answerValue) === correctAnswer) {
+    // 3 plausible wrong answers (a neighbour product, a sum, a near number) + the right one, shuffled
+    function makeChoices(a, b) {
+        const r = a * b;
+        const cand = [a * (b + 1), a * (b - 1), (a + 1) * b, (a - 1) * b, a + b, r + 1, r - 1, r + 2, r - 2, r + 10, r - 10];
+        const wrong = shuffle([...new Set(cand.filter(v => v >= 0 && v !== r))]).slice(0, 3);
+        for (let x = 0; wrong.length < 3; x++) if (x !== r && !wrong.includes(x)) wrong.push(x);
+        return shuffle([r, ...wrong]);
+    }
+
+    function renderChoices(player, a, b) {
+        const box = document.getElementById('choices-' + player);
+        box.innerHTML = '';
+        makeChoices(a, b).forEach(v => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'choice-btn';
+            btn.textContent = v;
+            btn.addEventListener('click', () => handleChoice(player, btn, v));
+            box.appendChild(btn);
+        });
+    }
+
+    function handleChoice(player, btn, value) {
+        const single = player === 0;
+        const st     = single ? null : p[player];
+        if (single ? waiting : st.waiting) return;
+        const correct  = single ? correctAnswer : st.correct;
+        const pair     = single ? currentPair : st.pair;
+        const feedback = single ? feedbackEl : el[player].feedback;
+        const answer   = single ? answerEl : el[player].answer;
+
+        if (value === correct) {
+            btn.classList.add('right');
+            document.querySelectorAll('#choices-' + player + ' .choice-btn').forEach(b => { b.disabled = true; });
+            answer.textContent = value;
+            if (single) {
                 score += 10;
                 scoreEl.textContent = score;
                 scoreEl.style.animation = 'none';
                 void scoreEl.offsetWidth;
                 scoreEl.style.animation = 'pulse 0.5s';
-                setFeedback(feedbackEl, true);
                 waiting = true;
-                setTimeout(() => newQuestion(0), 1200);
             } else {
-                trackWrong(...currentPair);
-                setFeedback(feedbackEl, false);
-                answerValue = '';
+                st.score += 10;
+                el[player].score.textContent = st.score;
+                st.waiting = true;
             }
+            setFeedback(feedback, true);
+            setTimeout(() => newQuestion(player), 1200);
         } else {
-            if (answerValue.length >= 3) return;
-            answerValue += val;
+            trackWrong(...pair);
+            setFeedback(feedback, false);
+            btn.classList.add('wrong');
+            btn.disabled = true;
         }
-        answerEl.textContent = answerValue || ';';
-    }
-
-    // ─── Two player logic ──────────────────────────────────────────────────────
-
-    function handleTwo(player, val) {
-        const state = p[player];
-        const dom   = el[player];
-        if (state.waiting) return;
-
-        if (val === 'del') {
-            state.answer = state.answer.slice(0, -1);
-        } else if (val === 'ok') {
-            if (!state.answer) return;
-            if (parseInt(state.answer) === state.correct) {
-                state.score += 10;
-                dom.score.textContent = state.score;
-                setFeedback(dom.feedback, true);
-                state.waiting = true;
-                setTimeout(() => newQuestion(player), 1200);
-            } else {
-                trackWrong(...state.pair);
-                setFeedback(dom.feedback, false);
-                state.answer = '';
-                dom.answer.textContent = ';';
-            }
-            return;
-        } else {
-            if (state.answer.length >= 3) return;
-            state.answer += val;
-        }
-        dom.answer.textContent = state.answer || ';';
     }
 
     // ─── Generate question ─────────────────────────────────────────────────────
@@ -395,20 +385,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (player === 0) {
             waiting       = false;
-            answerValue   = '';
             correctAnswer = result;
             currentPair   = [n1, n2];
             answerEl.textContent   = ';';
             feedbackEl.className   = 'feedback-inline hidden';
             questionEl.textContent = `${n1} × ${n2}`;
+            renderChoices(0, n1, n2);
         } else {
             p[player].waiting = false;
-            p[player].answer  = '';
             p[player].correct = result;
             p[player].pair    = [n1, n2];
             el[player].answer.textContent   = ';';
             el[player].feedback.className   = 'feedback-inline hidden';
             el[player].question.textContent = `${n1} × ${n2}`;
+            renderChoices(player, n1, n2);
         }
     }
 
@@ -416,6 +406,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setFeedback(el, isCorrect) {
         el.className   = `feedback-inline ${isCorrect ? 'correct' : 'wrong'}`;
-        el.textContent = isCorrect ? '✓ Σωστό!' : '✗ Λάθος! Προσπάθησε πάλι.';
+        el.textContent = isCorrect ? '✓ Σωστό!' : '✗ Λάθος! Διάλεξε άλλη απάντηση.';
     }
 });

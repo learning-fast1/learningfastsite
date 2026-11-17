@@ -591,6 +591,37 @@ body {
     transition: all 0.1s;
 }
 
+/* 4 απαντήσεις: διαλέγεις τη σωστή */
+.choices {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 340px;
+    margin-top: 8px;
+}
+.choice-btn {
+    padding: 18px 10px;
+    font-size: 2.2rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    background: white;
+    border: 3px solid #dfe6e9;
+    border-radius: 16px;
+    box-shadow: 0 6px 0 #dfe6e9;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: all 0.1s;
+}
+.choice-btn:hover:not(:disabled) { border-color: var(--secondary-color); box-shadow: 0 6px 0 var(--secondary-color); }
+.choice-btn:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #dfe6e9; }
+.choice-btn:focus-visible { outline: 3px solid var(--secondary-color); outline-offset: 3px; }
+.choice-btn.wrong { background: #fff5f5; border-color: #fab1b1; box-shadow: none; color: #e8a0a0; transform: translateY(6px); cursor: default; }
+.choice-btn.right { background: #f0fff8; border-color: #6edcb8; box-shadow: 0 6px 0 #058c63; color: var(--correct-color); }
+.choice-btn:disabled:not(.wrong):not(.right) { opacity: .6; cursor: default; }
+.player-panel .choices { max-width: 250px; gap: 8px; }
+.player-panel .choice-btn { padding: 12px 6px; font-size: 1.6rem; }
+
 .numpad-btn:hover {
     border-color: var(--secondary-color);
     box-shadow: 0 6px 0 var(--secondary-color);
@@ -652,6 +683,8 @@ body {
     .equals { font-size: 2.4rem; }
     .answer-display { font-size: 2.4rem; min-width: 65px; height: 65px; }
     .numpad-btn { padding: 14px; font-size: 1.5rem; }
+    .choice-btn { padding: 16px 8px; font-size: 2rem; }
+    .choices { max-width: 300px; }
     .numpad { max-width: 260px; gap: 10px; }
     .top-bar { flex-direction: column; gap: 10px; }
 }
