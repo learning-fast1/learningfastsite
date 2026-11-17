@@ -60,6 +60,9 @@ let currentCorrectAnswers = 0;
 let questionData = {};
 let questionQueue = []; // ουρά μοναδικών πράξεων για το τρέχον επίπεδο
 let tableErrors = {};
+let missed = [];       // πράξεις που το παιδί έκανε λάθος (για επανάληψη)
+let isRetry = false;   // true όταν ξαναλύνει τα λάθη του
+let currentQ = null;
 
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -279,6 +282,8 @@ function startGame(level) {
     currentCorrectAnswers = 0;
     levelQuestions = level.questions || DEFAULT_QUESTIONS;
     tableErrors = {};
+    missed = [];
+    isRetry = false;
     questionQueue = buildQuestionQueue(level);
     if (level.type === 'custom') levelQuestions = questionQueue.length;
 
@@ -301,6 +306,7 @@ function generateQuestion() {
     }
 
     const q = questionQueue[currentQuestionIndex];
+    currentQ = q;
     questionData.table = q.table;
 
     // Τυχαία εναλλαγή για ποικιλία (π.χ. 5×3 ή 3×5)
@@ -382,8 +388,11 @@ function handleAnswer(selectedAnswer, btnElement) {
         btnElement.classList.add('wrong');
         btnElement.style.pointerEvents = 'none';
 
+        // Η πράξη θα προταθεί για επανάληψη στο τέλος (μία φορά, όσα λάθη κι αν έγιναν)
+        if (currentQ && !missed.includes(currentQ)) missed.push(currentQ);
+
         // Καταγραφή λάθους ανά πίνακα (για boss report)
-        if (currentLevel.isBoss) {
+        if (currentLevel.isBoss && !isRetry) {
             const t = questionData.table;
             tableErrors[t] = (tableErrors[t] || 0) + 1;
         }
@@ -394,6 +403,7 @@ function endGame() {
     progressBar.style.width = '100%';
     
     setTimeout(() => {
+        if (isRetry) { showRetryResult(); return; }
         // Calculate Stars
         let stars = 0;
         if (currentCorrectAnswers === levelQuestions) stars = 3;
@@ -438,8 +448,62 @@ function endGame() {
             reportEl.style.display = 'none';
         }
 
+        resultTitle.textContent = 'Τέλος Πίστας!';
+        starsEarned.style.display = '';
+        countLine.style.display = '';
+        offerRetry();
         resultScreen.classList.add('active');
     }, 500);
+}
+
+// ---- Επανάληψη λαθών ----
+const resultTitle = document.getElementById('result-title');
+const countLine = document.getElementById('count-line');
+const retryBox = document.getElementById('retry-box');
+const retryText = document.getElementById('retry-text');
+const btnRetry = document.getElementById('btn-retry');
+const btnContinue = document.getElementById('btn-continue');
+
+// Αν έγιναν λάθη, ρωτά το παιδί αν θέλει να τα ξαναλύσει
+function offerRetry() {
+    const n = missed.length;
+    if (n === 0) {
+        retryBox.style.display = 'none';
+        btnContinue.textContent = 'Συνέχεια';
+        return;
+    }
+    retryText.textContent = n === 1
+        ? 'Έκανες λάθος σε 1 πράξη. Θες να την ξαναλύσεις;'
+        : 'Έκανες λάθος σε ' + n + ' πράξεις. Θες να τις ξαναλύσεις;';
+    retryBox.style.display = 'block';
+    btnContinue.textContent = 'Όχι, συνέχεια';
+}
+
+function startRetry() {
+    resultScreen.classList.remove('active');
+    isRetry = true;
+    questionQueue = shuffle(missed.slice());
+    missed = [];
+    currentQuestionIndex = 0;
+    currentCorrectAnswers = 0;
+    levelQuestions = questionQueue.length;
+    levelTitleText.textContent = 'Ξαναλύνω τα λάθη μου';
+    scoreText.textContent = '0';
+    generateQuestion();
+}
+btnRetry.addEventListener('click', startRetry);
+
+// Τέλος της επανάληψης: δεν αλλάζει αστέρια ούτε αναφορά
+function showRetryResult() {
+    resultTitle.textContent = 'Ξαναλύσαμε τα λάθη!';
+    starsEarned.style.display = 'none';
+    countLine.style.display = 'none';
+    document.getElementById('boss-report').style.display = 'none';
+    resultMessage.textContent = missed.length === 0
+        ? 'Μπράβο! Έλυσες σωστά όλες τις πράξεις που είχες λάθος!'
+        : 'Σε ' + missed.length + (missed.length === 1 ? ' πράξη' : ' πράξεις') + ' έκανες πάλι λάθος. Δοκίμασε ακόμη μία φορά!';
+    offerRetry();
+    resultScreen.classList.add('active');
 }
 
 function renderBossReport() {

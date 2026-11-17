@@ -66,19 +66,25 @@
     <!-- Οθόνη Αποτελεσμάτων (Μόλις τελειώσει μια πίστα) -->
     <div id="result-screen" class="screen modal-overlay">
         <div class="result-modal">
-            <h2>Τέλος Πίστας!</h2>
+            <h2 id="result-title">Τέλος Πίστας!</h2>
             <div class="stars-earned" id="stars-earned">
                 <span class="star" id="star1">⭐</span>
                 <span class="star" id="star2">⭐</span>
                 <span class="star" id="star3">⭐</span>
             </div>
             <p id="result-message">Μπράβο!</p>
-            <p>Σωστές Απαντήσεις: <span id="correct-count">0</span> / <span id="total-count">10</span></p>
+            <p id="count-line">Σωστές Απαντήσεις: <span id="correct-count">0</span> / <span id="total-count">10</span></p>
 
             <!-- Report — εμφανίζεται μόνο σε boss levels -->
             <div id="boss-report" class="boss-report" style="display:none">
                 <h3 class="report-title">📊 Ανάλυση Αποτελεσμάτων</h3>
                 <div id="report-content"></div>
+            </div>
+
+            <!-- Επανάληψη λαθών — εμφανίζεται μόνο αν έγιναν λάθη -->
+            <div id="retry-box" class="retry-box" style="display:none">
+                <p id="retry-text"></p>
+                <button id="btn-retry" class="btn-primary" type="button">Ναι, ξαναλύνω τα λάθη μου</button>
             </div>
 
             <button id="btn-continue" class="btn-primary">Συνέχεια</button>

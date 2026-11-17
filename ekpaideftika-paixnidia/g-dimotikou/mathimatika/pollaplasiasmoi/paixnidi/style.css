@@ -479,6 +479,11 @@ body {
     animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* ── ΕΠΑΝΑΛΗΨΗ ΛΑΘΩΝ ── */
+.retry-box { margin: 16px 0 4px; padding: 14px 14px 18px; border-radius: 18px; background: #fff4e0; border: 3px dashed var(--accent-color); }
+.retry-box p { margin: 0 0 4px; font-size: 18px; color: #495057; }
+.retry-box .btn-primary { margin-top: 12px; }
+
 /* ── ΕΠΙΛΟΓΗ ΠΡΟΠΑΙΔΕΙΩΝ ── */
 .pick-help { font-size: 17px; color: #495057; margin: 0 0 14px; }
 .pick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 6px; }
