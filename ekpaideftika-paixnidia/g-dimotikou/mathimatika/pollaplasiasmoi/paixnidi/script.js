@@ -375,7 +375,8 @@ function handleAnswer(selectedAnswer, btnElement) {
         // Round over — disable every choice now and advance after a beat.
         document.querySelectorAll('.answer-btn').forEach(b => b.style.pointerEvents = 'none');
         btnElement.classList.add('correct');
-        currentCorrectAnswers++;
+        // Μετράει μόνο η σωστή απάντηση με την πρώτη προσπάθεια
+        if (!missed.includes(currentQ)) currentCorrectAnswers++;
         scoreText.textContent = Math.round((currentCorrectAnswers / levelQuestions) * 100);
 
         setTimeout(() => {
@@ -407,8 +408,8 @@ function endGame() {
         // Calculate Stars
         let stars = 0;
         if (currentCorrectAnswers === levelQuestions) stars = 3;
-        else if (currentCorrectAnswers >= 7) stars = 2;
-        else if (currentCorrectAnswers >= 4) stars = 1;
+        else if (currentCorrectAnswers >= levelQuestions * 0.7) stars = 2;
+        else if (currentCorrectAnswers >= levelQuestions * 0.4) stars = 1;
 
         // Save progress if better
         if (!userProgress[currentLevel.id] || stars > userProgress[currentLevel.id]) {
