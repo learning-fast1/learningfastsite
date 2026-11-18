@@ -1,0 +1,21 @@
+{
+  "_comment": "Λίστα κατηγοριών. Για νέα κατηγορία: φτιάξτε ένα αρχείο στο data/categories/ και προσθέστε το όνομά του εδώ. Για νέο σενάριο: προσθέστε το μέσα στο αρχείο της κατηγορίας του (και την εικόνα στο images/scenarios/).",
+  "categories": [
+    "categories/a-sygkrouseis.json",
+    "categories/b-paizo.json",
+    "categories/c-katanoo.json",
+    "categories/d-epikoinono.json",
+    "categories/e-kanones.json",
+    "categories/st-dyskoles.json"
+  ],
+  "skills": {
+    "recognize": "Αναγνώριση κοινωνικών καταστάσεων",
+    "emotions": "Κατανόηση συναισθημάτων",
+    "perspective": "Οπτική του άλλου",
+    "communication": "Λειτουργική επικοινωνία",
+    "conflict": "Επίλυση συγκρούσεων",
+    "response": "Κατάλληλη αντίδραση",
+    "help": "Αναζήτηση βοήθειας",
+    "autonomy": "Κοινωνική αυτονομία"
+  }
+}
